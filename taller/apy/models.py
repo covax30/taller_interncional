@@ -38,3 +38,28 @@ class Repuesto(models.Model):
 
     def __str__(self):
         return f"{self.nombre} ({self.codigo})"
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+#-------------Entidad Administrador-----------
+class Administrador:
+    id_admin = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=100)
+    apellidos = models.CharField(max_length=100)
+    identificacion = models.CharField(max_length=20, unique=True)
+    edad = models.IntegerField()
+    correo = models.EmailField(unique=True)
+    telefono = models.CharField(max_length=20)
+    fecha_ingreso = models.DateField()
+    
+    def __str__(self):
+        return f"{self.nombre} {self.apellidos}"
