@@ -37,21 +37,9 @@ class Repuesto(models.Model):
     stock = models.IntegerField(default=0)
 
     def __str__(self):
-        return f"{self.nombre} ({self.codigo})"
+        return f"{self.nombre} ({self.codigo})"  
     
-<<<<<<< HEAD
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-#-------------Entidad Administrador-----------
+#-------------Modulo Administrador-----------
 class Administrador:
     id_admin = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
@@ -64,7 +52,7 @@ class Administrador:
     
     def __str__(self):
         return f"{self.nombre} {self.apellidos}"
-=======
+    
 #------- Gastos--------
 class Gastos(models.Model):
     id_gasto =  models.AutoField(primary_key = True)  #ID automatico
@@ -72,4 +60,14 @@ class Gastos(models.Model):
     descripcion = models.TextField() 
     tipo_gastos=models.CharField(max_length=100)
              
->>>>>>> f935463b3f731676c842f5e3b00171860bca2a3c
+#------------Modulo Informes-----------
+class Informes:
+    id_informe = models.AutoField(primary_key=True)
+    repuestos_usados = models.TextField()
+    costo_mano_obra = models.DecimalField(max_digits=10, decimal_places=2)
+    fecha = models.DateField()
+    hora = models.TimeField()
+    id_repuesto = models.ForeignKey(Repuesto, on_delete=models.CASCADE)
+    id_empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE)
+    tipo_informe = models.CharField(max_length=100)
+    id_mantenimiento = models.ForeignKey(Mantenimiento, on_delete=models.CASCADE)
