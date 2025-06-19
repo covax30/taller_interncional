@@ -67,6 +67,27 @@ class Informes:
     def __str__(self):
         return f"{self.id_informe} {self.tipo_informe}"
     
+class Herramienta(models.Model):
+    id = models.CharField(max_length=50, unique=True)
+    marca = models.CharField(max_length=50)
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField(blank=True)
+    stock = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.nombre} ({self.id})"
+
+class Insumos(models.Model):
+    id = models.IntegerField()
+    id_marca = models.CharField(max_length=50)
+    nombre = models.CharField(max_length=100)
+    costo = models.IntegerField()
+    tipo = models.CharField(max_length=100)
+    stock = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.nombre} ({self.id})"
+    
 #--------------Modulo Pago Servicio Publicos-----------
 class PagoServiciosPublicos:
     id_servicio = models.AutoField(primary_key=True)
@@ -95,72 +116,10 @@ class Pagos:
     id_proveedor = models.ForeignKey(Proveedores, on_delete=models.CASCADE)
     id_admin = models.ForeignKey(Administrador, on_delete=models.CASCADE)
     id_herramienta = models.ForeignKey(Herramienta, on_delete=models.CASCADE)
-    id_insumos = models.ForeignKey(Insumo, on_delete=models.CASCADE)
+    id_insumos = models.ForeignKey(Insumos, on_delete=models.CASCADE)
     id_repuestos = models.ForeignKey(Repuesto, on_delete=models.CASCADE)
     
     def __str__(self):
         return f"{self.id_pago} {self.monto}"
-        return f"{self.nombre} ({self.codigo})"
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-class herramienta(models.Model):
-    id = models.CharField(max_length=50, unique=True)
-    marca = models.CharField(max_length=50)
-    nombre = models.CharField(max_length=100)
-    descripcion = models.TextField(blank=True)
-    stock = models.IntegerField(default=0)
-
-    def __str__(self):
-        return f"{self.nombre} ({self.id})"
-
-class insumos(models.Model):
-    id = models.IntegerField()
-    id_marca = models.CharField(max_length=50)
-    nombre = models.CharField(max_length=100)
-    costo = models.IntegerField()
-    tipo = models.CharField(max_length=100)
-    stock = models.IntegerField(default=0)
-
-    def __str__(self):
-        return f"{self.nombre} ({self.id})"
