@@ -18,7 +18,7 @@ class Mantenimiento(models.Model):
 
     def __str__(self):
         return f"{self.fallas} - {self.id_tipo_mantenimiento}"
-    
+    #------ ENTIDAD repuestos --------
 class Repuesto(models.Model):
     id_marca = models.ForeignKey(marca, on_delete=models.CASCADE)
     categoria = models.CharField(max_length=100)
