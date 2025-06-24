@@ -59,7 +59,7 @@ class Compra(models.Model):
     def __str__(self):
         return f"{self.id_factura_compra} - {self.proveedor} - {self.fecha_compra} {self.hora_compra}"
 #------ MODULOS ERICK ---------
-#------ ENTIDAD de TIPO mantenmimiento ---------
+#------ ENTIDAD de TIPO mantenmimiento ---------1
 class TipoMantenimiento(models.Model):
     id = models.CharField(max_length=50, unique=True)
     nombre = models.CharField(max_length=50, unique=True)
@@ -67,7 +67,7 @@ class TipoMantenimiento(models.Model):
     def __str__(self):
         return self.nombre
         
-#------ ENTIDAD PRODUCTO --------
+#------ ENTIDAD GESTION DE MANTENIMIENTO --------2
 class Mantenimiento(models.Model):
     fallas = models.TextField()
     procesos = models.CharField(max_length=50)
@@ -77,7 +77,7 @@ class Mantenimiento(models.Model):
 
     def __str__(self):
         return f"{self.fallas} - {self.id_tipo_mantenimiento}"
-    #------ ENTIDAD repuestos --------
+#------ ENTIDAD REPUESTOS --------3
 class Repuesto(models.Model):
     id_marca = models.ForeignKey(marca, on_delete=models.CASCADE)
     categoria = models.CharField(max_length=100)
@@ -87,9 +87,35 @@ class Repuesto(models.Model):
     precio = models.IntegerField(default=0)
     
     def __str__(self):
-<<<<<<<<< Temporary merge branch 1
         return f"{self.nombre} ({self.codigo})"  
     
+#------ ENTIDAD HERRAMIENTAS --------4
+class herramienta(models.Model):
+
+    nombre = models.CharField(max_length=100)
+    color = models.CharField(max_length=100)
+    tipo = models.CharField(max_length=100)
+    material = models.CharField(max_length=100)
+    id_marca = models.ForeignKey(marca, on_delete=models.CASCADE)
+    stock = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.nombre} ({self.tipo})"
+    
+#------ ENTIDAD INSUMOS --------5
+class insumos(models.Model):
+
+    id_marca = models.CharField(max_length=50)
+    nombre = models.CharField(max_length=100)
+    costo = models.IntegerField()
+    tipo = models.CharField(max_length=100)
+    stock = models.IntegerField(default=0)
+
+    def __str__(self):
+
+        return f"{self.nombre} ({self.id})"
+    
+#-------------MODULOS DE YURY-----------
 #-------------Modulo Administrador-----------
 class Administrador:
     id_admin = models.AutoField(primary_key=True)
@@ -125,41 +151,7 @@ class Informes:
     
     def __str__(self):
         return f"{self.id_informe} {self.tipo_informe}"
-    
-class Herramienta(models.Model):
-    id = models.CharField(max_length=50, unique=True)
-    marca = models.CharField(max_length=50)
-=========
-        return f"{self.fabricante} ({self.categoria})"
 
-class herramienta(models.Model):
->>>>>>>>> Temporary merge branch 2
-    nombre = models.CharField(max_length=100)
-    color = models.CharField(max_length=100)
-    tipo = models.CharField(max_length=100)
-    material = models.CharField(max_length=100)
-    id_marca = models.ForeignKey(marca, on_delete=models.CASCADE)
-    stock = models.IntegerField(default=0)
-
-    def __str__(self):
-        return f"{self.nombre} ({self.tipo})"
-
-<<<<<<<<< Temporary merge branch 1
-class Insumos(models.Model):
-    id = models.IntegerField()
-=========
-class insumos(models.Model):
->>>>>>>>> Temporary merge branch 2
-    id_marca = models.CharField(max_length=50)
-    nombre = models.CharField(max_length=100)
-    costo = models.IntegerField()
-    tipo = models.CharField(max_length=100)
-    stock = models.IntegerField(default=0)
-
-    def __str__(self):
-<<<<<<<<< Temporary merge branch 1
-        return f"{self.nombre} ({self.id})"
-    
 #--------------Modulo Pago Servicio Publicos-----------
 class PagoServiciosPublicos:
     id_servicio = models.AutoField(primary_key=True)
@@ -193,8 +185,3 @@ class Pagos:
     
     def __str__(self):
         return f"{self.id_pago} {self.monto}"
-
-
-=========
-        return f"{self.nombre} ({self.stock})"
->>>>>>>>> Temporary merge branch 2
