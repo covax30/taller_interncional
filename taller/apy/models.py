@@ -58,6 +58,7 @@ class Compra(models.Model):
 
     def __str__(self):
         return f"{self.id_factura_compra} - {self.proveedor} - {self.fecha_compra} {self.hora_compra}"
+#------ MODULOS ERICK ---------
 #------ ENTIDAD de TIPO mantenmimiento ---------
 class TipoMantenimiento(models.Model):
     id = models.CharField(max_length=50, unique=True)
@@ -70,7 +71,7 @@ class TipoMantenimiento(models.Model):
 class Mantenimiento(models.Model):
     fallas = models.TextField()
     procesos = models.CharField(max_length=50)
-    id_vehiculo = models.ForeignKey(vehiculo, on_delete=models.CASCADE)
+    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE)
     id_empleado = models.ForeignKey(empleado, on_delete=models.CASCADE)
     id_tipo_mantenimiento = models.ForeignKey(TipoMantenimiento, on_delete=models.CASCADE)
 
