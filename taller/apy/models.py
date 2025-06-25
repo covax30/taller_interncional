@@ -58,6 +58,7 @@ class Compra(models.Model):
 
     def __str__(self):
         return f"{self.id_factura_compra} - {self.proveedor} - {self.fecha_compra} {self.hora_compra}"
+
 #------ MODULOS ERICK ---------
 #------ ENTIDAD de TIPO mantenmimiento ---------1
 class TipoMantenimiento(models.Model):
@@ -88,7 +89,7 @@ class Repuesto(models.Model):
         return f"{self.nombre} ({self.codigo})"  
     
 #------ ENTIDAD HERRAMIENTAS --------4
-class herramienta(models.Model):
+class Herramienta(models.Model):
 
     nombre = models.CharField(max_length=100)
     color = models.CharField(max_length=100)
@@ -101,7 +102,7 @@ class herramienta(models.Model):
         return f"{self.nombre} ({self.tipo})"
 
 #------ ENTIDAD INSUMOS --------5
-class insumos(models.Model):
+class Insumos(models.Model):
 
     id_marca = models.CharField(max_length=50)
     nombre = models.CharField(max_length=100)
@@ -115,7 +116,7 @@ class insumos(models.Model):
     
 #-------------MODULOS DE karol-----------
 #-------------Modulo Administrador-----------
-class Administrador:
+class Administrador(models.Model):
     id_admin = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
     apellidos = models.CharField(max_length=100)
@@ -138,7 +139,7 @@ class Gastos(models.Model):
 
 
 #--------------Modulo Pago Servicio Publicos-----------
-class PagoServiciosPublicos:
+class PagoServiciosPublicos(models.Model):
     id_servicio = models.AutoField(primary_key=True)
     monto = models,models.DecimalField(max_digits=10, decimal_places=2)
     
@@ -146,7 +147,7 @@ class PagoServiciosPublicos:
         return f"{self.id_servicio} {self.monto}"
     
 #--------------Modulo Proveedores--------------
-class Proveedores:
+class Proveedores(models.Model):
     id_proveedor = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
     telefono = models.CharField(max_length=20)
@@ -156,7 +157,7 @@ class Proveedores:
         return f"{self.id_proveedor} {self.correo}"
     
 #--------------Modulo Pagos-----------------
-class Pagos:
+class Pagos(models.Model):
     id_pago = models.AutoField(primary_key=True)
     tipo_pago = models.CharField(max_length=100)
     fecha = models.DateField()
@@ -164,8 +165,8 @@ class Pagos:
     monto = models,models.DecimalField(max_digits=10, decimal_places=2)
     id_proveedor = models.ForeignKey(Proveedores, on_delete=models.CASCADE)
     id_admin = models.ForeignKey(Administrador, on_delete=models.CASCADE)
-    id_herramienta = models.ForeignKey(herramienta, on_delete=models.CASCADE)
-    id_insumos = models.ForeignKey(insumos, on_delete=models.CASCADE)
+    id_herramienta = models.ForeignKey(Herramienta, on_delete=models.CASCADE)
+    id_insumos = models.ForeignKey(Insumos, on_delete=models.CASCADE)
     id_repuestos = models.ForeignKey(Repuesto, on_delete=models.CASCADE)
     
     def __str__(self):
@@ -210,7 +211,7 @@ class Mantenimiento(models.Model):
     def __str__(self):
         return f"{self.fallas} - {self.id_tipo_mantenimiento}"
 #------------Modulo Informes-----------
-class Informes:
+class Informes(models.Model):
     id_informe = models.AutoField(primary_key=True)
     repuestos_usados = models.TextField()
     costo_mano_obra = models.DecimalField(max_digits=10, decimal_places=2)
