@@ -67,10 +67,17 @@ class TipoMantenimiento(models.Model):
     def __str__(self):
         return self.nombre
         
+#------- Marca-------- 
+class Marca(models.Model):
+    nombre = models.CharField(max_length=100)
+    tipo = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.nombre} - {self.tipo}"
 
 #------ ENTIDAD REPUESTOS --------3
 class Repuesto(models.Model):
-    id_marca = models.ForeignKey(marca, on_delete=models.CASCADE)
+    id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE)
     categoria = models.CharField(max_length=100)
     fabricante = models.CharField(max_length=100)
     stock = models.IntegerField(default=0)
@@ -87,12 +94,12 @@ class herramienta(models.Model):
     color = models.CharField(max_length=100)
     tipo = models.CharField(max_length=100)
     material = models.CharField(max_length=100)
-    id_marca = models.ForeignKey(marca, on_delete=models.CASCADE)
+    id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE)
     stock = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.nombre} ({self.tipo})"
-    
+
 #------ ENTIDAD INSUMOS --------5
 class insumos(models.Model):
 
