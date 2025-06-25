@@ -115,7 +115,7 @@ class insumos(models.Model):
 
         return f"{self.nombre} ({self.id})"
     
-#-------------MODULOS DE YURY-----------
+#-------------MODULOS DE karol-----------
 #-------------Modulo Administrador-----------
 class Administrador:
     id_admin = models.AutoField(primary_key=True)
@@ -130,10 +130,58 @@ class Administrador:
     def __str__(self):
         return f"{self.nombre} {self.apellidos}"
     
-#------- Gastos-------- ya esta subido
+#------- Gastos--------
 class Gastos(models.Model):
-   
+    id_gasto =  models.AutoField(primary_key = True)  #ID automatico
     monto= models,models.DecimalField(max_digits=10, decimal_places=2)
     descripcion = models.TextField() 
     tipo_gastos=models.CharField(max_length=100)
              
+#------------Modulo Informes-----------
+class Informes:
+    id_informe = models.AutoField(primary_key=True)
+    repuestos_usados = models.TextField()
+    costo_mano_obra = models.DecimalField(max_digits=10, decimal_places=2)
+    fecha = models.DateField()
+    hora = models.TimeField()
+    id_repuesto = models.ForeignKey(Repuesto, on_delete=models.CASCADE)
+    id_empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE)
+    tipo_informe = models.CharField(max_length=100)
+    id_mantenimiento = models.ForeignKey(Mantenimiento, on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return f"{self.id_informe} {self.tipo_informe}"
+
+#--------------Modulo Pago Servicio Publicos-----------
+class PagoServiciosPublicos:
+    id_servicio = models.AutoField(primary_key=True)
+    monto = models,models.DecimalField(max_digits=10, decimal_places=2)
+    
+    def __str__(self):
+        return f"{self.id_servicio} {self.monto}"
+    
+#--------------Modulo Proveedores--------------
+class Proveedores:
+    id_proveedor = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=100)
+    telefono = models.CharField(max_length=20)
+    correo = models.EmailField(unique=True)
+    
+    def __str__(self):
+        return f"{self.id_proveedor} {self.correo}"
+    
+#--------------Modulo Pagos-----------------
+class Pagos:
+    id_pago = models.AutoField(primary_key=True)
+    tipo_pago = models.CharField(max_length=100)
+    fecha = models.DateField()
+    hora = models.TimeField()
+    monto = models,models.DecimalField(max_digits=10, decimal_places=2)
+    id_proveedor = models.ForeignKey(Proveedores, on_delete=models.CASCADE)
+    id_admin = models.ForeignKey(Administrador, on_delete=models.CASCADE)
+    id_herramienta = models.ForeignKey(herramienta, on_delete=models.CASCADE)
+    id_insumos = models.ForeignKey(insumos, on_delete=models.CASCADE)
+    id_repuestos = models.ForeignKey(Repuesto, on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return f"{self.id_pago} {self.monto}"
