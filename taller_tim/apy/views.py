@@ -35,3 +35,19 @@ def vista_repuestos(request):
 
 def vista_insumos(request):
     return render(request, 'vista_insumos.html')
+
+# --------------Vistas Steven --------------
+def vista_entrada_vehiculos(request):
+    return render(request, 'vista_entrada_vehiculos.html')
+
+def vista_salida_vehiculos(request):
+    return render(request, 'vista_salida_vehiculos.html')
+
+def vista_vehiculos(request):
+    return render(request, 'vista_vehiculos.html')
+
+def vista_clientes(request):
+    return render(request, 'vista_clientes.html')
+
+def vista_compras(request):
+    return render(request, 'vista_compras.html')

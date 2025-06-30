@@ -32,4 +32,11 @@ urlpatterns = [
     path('Modulo herramientas/',   vista_herramientas),
     path('Modulo repuestos/', vista_repuestos),
     path('Modulo insumos/', vista_insumos)
+    # --------------urls steven---------------
+    path('Modulo Entrada Vehiculos/', vista_entrada_vehiculos),
+    path('Modulo Salida Vehiculos/', vista_salida_vehiculos),
+    path('Modulo Vehiculos/', vista_vehiculos),
+    path('Modulo Clientes/', vista_clientes),
+    path('Modulo Compras/', vista_compras),
+    
 ]
