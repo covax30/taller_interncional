@@ -62,7 +62,7 @@ class Compra(models.Model):
 #------ MODULOS ERICK ---------
 #------ ENTIDAD de TIPO mantenmimiento ---------1
 class TipoMantenimiento(models.Model):
-    id = models.CharField(max_length=50, unique=True)
+    id = models.CharField(primary_key=True, max_length=50, unique=True)
     nombre = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
@@ -128,15 +128,6 @@ class Administrador(models.Model):
     
     def __str__(self):
         return f"{self.nombre} {self.apellidos}"
-    
-#------- Gastos--------
-class Gastos(models.Model):
-    id_gasto =  models.AutoField(primary_key = True)  #ID automatico
-    monto= models,models.DecimalField(max_digits=10, decimal_places=2)
-    descripcion = models.TextField() 
-    tipo_gastos=models.CharField(max_length=100)
-             
-
 
 #--------------Modulo Pago Servicio Publicos-----------
 class PagoServiciosPublicos(models.Model):

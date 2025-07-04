@@ -1,0 +1,42 @@
+{% extends "home.html" %}
+
+{% block body %}
+<body>
+    <!--header-->
+    {% include 'header.html' %}
+    <!--fin header-->
+    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+    <!--barra lateral-->
+    {% include 'barra_lateral.html' %}
+    <!--fin barra lateral-->
+   
+    <!--main content-->
+{% block content %}
+
+{% endblock %}
+    <!--fin main content-->
+
+    <!-- footer -->
+    {% include 'footer.html' %}
+    <!-- fin footer -->
+
+
+        <script src="{% static 'js/barra.js' %}"></script>
+    <script>
+        window.onload = function () {
+            const nombre = localStorage.getItem("nombreUsuario");
+            const imagen = localStorage.getItem("imagenPerfil");
+    
+            if (nombre) {
+                document.getElementById("user-name").textContent = nombre;
+            }
+    
+            if (imagen) {
+                document.getElementById("user-img").src = imagen;
+            } else {
+                document.getElementById("user-img").src = "perfil.jpg"; // Imagen por defecto
+            }
+        };
+    </script>
+</body>
+{% endblock %}
