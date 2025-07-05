@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse,JsonResponse
+from apy.models import *
 
 # Create your views here.
 # --------------Vistas Karol---------------
@@ -18,6 +19,12 @@ def vista_proveedores(request):
 
 def vista_pagos(request):
     return render(request, 'vista_pagos.html')
+
+def FacTabla(request):
+    return render(request, 'index_factura.html')
+
+def Contacta(request):
+    return render(request, 'index_contacto.html')
 
 # --------------Vistas erick---------------
 

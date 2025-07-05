@@ -1,0 +1,21 @@
+{% extends "Contacta.html" %}
+{% load static %}
+{% block body %}
+
+<body>
+
+    {% include "header_contacto.html" %}
+
+    <header class="contenido-header">
+        <img src="{% static 'lenguajes/img/header.png'%}" alt="Img" id="logoo">
+    </header>
+
+          {% block content %}
+          {% endblock content %}
+
+    <figure class="map">
+        <img src="{% static 'lenguajes/img/mapa.png'%}" height="220px" width="60%" alt="mapa">
+    </figure>
+
+</body>
+{% endblock %}
