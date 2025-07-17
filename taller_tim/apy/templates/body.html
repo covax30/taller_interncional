@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends 'home.html'%}
 {% load static %}
  {% block body %}
@@ -8,10 +9,18 @@
   <div class="app-wrapper"> 
 
     <!--begin::Header-->
+=======
+{% extends "home.html" %}
+{% load static %}
+{% block body %}
+<body class="hold-transition layout-top-nav">
+    <!--header-->
+>>>>>>> 6ec60e580ab6391c459bb187681d04c60fd33c3b
     {% include 'header.html' %}
     <!--end::Header--> 
     
     
+<<<<<<< HEAD
     
     <!--begin::Sidebar-->
 {% include 'sidebar.html' %}
@@ -112,3 +121,26 @@
 
 </body><!--end::Body-->
  {% endblock %}
+=======
+            if (imagen) {
+                document.getElementById("user-img").src = imagen;
+            } else {
+                document.getElementById("user-img").src = "perfil.jpg"; // Imagen por defecto
+            }
+        };
+    </script>
+
+
+<!-- REQUIRED SCRIPTS -->
+
+<!-- jQuery -->
+<script src="../../plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="../../dist/js/adminlte.min.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="../../dist/js/demo.js"></script>
+</body>
+{% endblock %}
+>>>>>>> 6ec60e580ab6391c459bb187681d04c60fd33c3b
