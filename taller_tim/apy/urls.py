@@ -1,8 +1,7 @@
 from django.urls import path
-
-from .Views import *
-from apy.Views.contenido.views import *
-from apy.Views.fixed_sidebar import *
+from .views import *
+from apy.view.gen_index.views import index
+from apy.view.Contenidos.views import *
 from apy.views import *
 from apy.view.proveedor.view import *
 
@@ -12,11 +11,7 @@ app_name = 'apy'
 urlpatterns = [
     # --------------urls Karol---------------
 
-    path('Modulo_Factura/',  factura, name = 'contenido.factura'),
-    path('Contactanos/',  contacto, name = 'contenido.contacto'),
-    path('index/', index.as_view(), name = 'contenido.index'),
-    #path('Modulo_Factura/',  factura, name = 'contenido.factura'),
-    #path('Contactanos/',  contacto, name = 'contenido.contacto'),
+    path('inicio/index/', index.as_view(), name='index'),
     path('factura/listar/', FacturaListView.as_view() , name='factura_lista'),
     path('factura/agregar/', FacturaCreateView.as_view(), name='factura_crear'),
     path('factura/editar/<int:pk>/', FacturaUpdateView.as_view(), name='factura_editar'),
