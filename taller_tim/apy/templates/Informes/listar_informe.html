@@ -1,0 +1,51 @@
+{% extends "generic_listar.html" %}
+
+{% block titulo %}
+        <h1 class="text-center">Lista de Informes</h1>
+{% endblock titulo %}
+
+{% block agregar %}
+<a href="{{crear_url}}" class=" btn btn-primary btn btn-xs"><i class="fas fa-plus"></i>
+          Agregar
+</a>
+{% endblock %}
+
+{% block columnas %}
+
+        <th>Id del informe</th>
+        <th>Repuestos usados</th>
+        <th>Costo mano obra</th>
+        <th>Fecha</th>
+        <th>Hora</th>
+        <th>Id repuesto</th>
+        <th>Id empleado</th>
+        <th>Tipo informe</th>
+        <th>Id mantenimiento</th>
+        <th>Acciones</th>
+
+{% endblock %}
+
+{% block iterar %}
+
+      {% for i in object_list %}
+      <tr>
+        <td>{{ i.id_informe }}</td>
+        <td>{{ i.repuestos_usados }}</td>
+        <td>{{ i.costo_mano_obra}}</td>
+        <td>{{ i.fecha}}</td>
+        <td>{{ i.hora}}</td>
+        <td>{{ i.id_repuesto}}</td>
+        <td>{{ i.id_empleado}}</td>
+        <td>{{ i.tipo_informe}}</td>
+        <td>{{ i.id_mantenimeinto}}</td>
+        <form method="post">
+
+          <td>
+            <a href="{% url 'apy:informes_editar' i.id_informe %}" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></a>
+            <a href="{% url 'apy:informes_eliminar' i.id_informe %}" class="btn btn-danger btn-xs"><i
+                class="fas fa-trash-alt"></i></a>
+          </td>
+      </tr>
+      {% endfor %}
+
+{% endblock %}
