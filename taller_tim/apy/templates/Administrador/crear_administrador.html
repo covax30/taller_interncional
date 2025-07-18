@@ -6,7 +6,7 @@
                 {%if form.errors%}
                 <div class="alert alert-danger alert-dismissible">
                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                    <h5><i class="icon fas fa-ban"></i> Ha ocurrido un error al intentar guardar un proveedor</h5>
+                    <h5><i class="icon fas fa-ban"></i> Ha ocurrido un error al intentar guardar un administrador</h5>
                     <ul>
                         {% for field in form %}
                         {% for error in field.errors %}
@@ -29,7 +29,7 @@
                 <button type="submit " class="btn btn-primary btn-flat"><i class="fas fa-save"></i>
                     Agregar
                 </button>
-                <a href="{% url 'apy:proveedor_lista' %}" class="btn btn-danger btn-flat float-right">
+                <a href="{% url 'apy:administrador_lista' %}" class="btn btn-danger btn-flat float-right">
                     <i class="fas fa-times"></i> Cancelar
                 </a>
 {% endblock %}
