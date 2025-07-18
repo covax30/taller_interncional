@@ -1,17 +1,22 @@
 from django.urls import path
-from apy.views import *
+from .views import *
+from apy.view.gen_index.views import index
 from apy.view.Contenidos.views import *
+from apy.views import *
 from apy.view.proveedor.view import *
 from apy.view.administrador.views import *
 from apy.view.informes.views import *
 from apy.view.pago_servicios.views import *
 from apy.view.pagos.views import *
 
+
 app_name = 'apy'
 
 urlpatterns = [
     # --------------urls Karol---------------
     #--------URL modulo factura----------------
+
+    path('inicio/index/', index.as_view(), name='index'),
     path('factura/listar/', FacturaListView.as_view() , name='factura_lista'),
     path('factura/agregar/', FacturaCreateView.as_view(), name='factura_crear'),
     path('factura/editar/<int:pk>/', FacturaUpdateView.as_view(), name='factura_editar'),

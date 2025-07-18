@@ -1,0 +1,30 @@
+{% extends "FacTabla.html" %}
+{% block body %}
+
+<body class="container mt-5">
+
+    <a href="MENU.html" class="btn btn-primary">Inicio</a>
+
+    <h1 class="text-center">Lista de Facturas</h1>
+    <input type="text" id="buscar" class="form-control mb-3" placeholder="Id de la factura o Identicación Cliente...">
+    
+          {% block content %}
+          {% endblock content %}
+
+    <a href="FacRe.html" class="btn btn-primary">Agregar una Factura</a>
+
+    <form id="editarFormulario" style="display: none;" class="mt-4">
+        <h3>Editar Factura</h3>
+        <input type="text" id="editarIdentificacion" class="form-control mb-2" placeholder="Id de la factura" required>
+        <input type="text" id="editarNombre" class="form-control mb-2" placeholder="Nombre Cliente" required>
+        <input type="number" id="editarCliente" class="form-control mb-2" placeholder="Identicación Cliente" required>
+        <input type="email" id="editarCorreo" class="form-control mb-2" placeholder="Correo Cliente" required>
+        <input type="text" id="editarPro" class="form-control mb-2" placeholder="Procedimientos realizados" required>
+        <input type="date" id="editarFecha" class="form-control mb-2" placeholder="Fecha de salida vehiculo" required>
+        <button type="submit" class="btn btn-success">Guardar cambios</button>
+        <button type="button" id="cancelarEdicion" class="btn btn-danger">Cancelar</button>
+    </form>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="FacTabla.js"></script>
+</body>
+{% endblock %}

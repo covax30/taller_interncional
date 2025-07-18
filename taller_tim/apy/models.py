@@ -62,6 +62,7 @@ class Compra(models.Model):
 #------ MODULOS ERICK ---------
 #------ ENTIDAD de TIPO mantenmimiento ---------1
 class TipoMantenimiento(models.Model):
+    id = models.CharField(max_length=50, unique=True, primary_key=True)
     id = models.CharField(primary_key=True, max_length=50, unique=True)
     nombre = models.CharField(max_length=50, unique=True)
 
