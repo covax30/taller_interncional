@@ -286,13 +286,15 @@ class CompraForm(ModelForm):
                     'class': 'form-control',
                 }
             ),
-            'fecha_compra':TextInput(
+            'fecha_compra': DateInput(
                 attrs={
+                    'type': 'date',
                     'placeholder':'Ingrese la fecha de compra',
                 }
             ),
-            'hora_compra':TextInput(
+            'hora_compra':TimeInput(
                 attrs={
+                    'type': 'time',
                     'placeholder':'Ingrese la hora de compra',
                 }
             )

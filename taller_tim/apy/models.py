@@ -17,7 +17,7 @@ class Cliente(models.Model):
 
 
 class Vehiculo(models.Model):
-    id_vehiculo = models.IntegerField(unique=True) 
+    id_vehiculo = models.AutoField(primary_key=True)
     id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)  # LLAVE
     placa = models.CharField(max_length=10, unique=True)
     modelo_vehiculo = models.CharField(max_length=100)
@@ -143,8 +143,8 @@ class Proveedores(models.Model):
 
 #--------------Modulo Compra (STEVEN)-----------------
 class Compra(models.Model):
+    id_compra = models.AutoField(primary_key=True)
     id_factura_compra = models.IntegerField(unique=True)
-    id_compra = models.IntegerField(default=0)
     id_proveedor = models.ForeignKey(Proveedores, on_delete=models.CASCADE)  # LLAVE
     fecha_compra = models.DateField()
     hora_compra = models.TimeField()
