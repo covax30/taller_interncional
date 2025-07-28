@@ -8,8 +8,8 @@ from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.urls import reverse_lazy
 from apy.forms import *
 
-# Create your views here.
-# --------------Vistas Karol---------------
+
+# --------------Vistas Proveedor---------------
 
 def proveedor(request):
     data = {

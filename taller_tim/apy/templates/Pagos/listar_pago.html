@@ -1,0 +1,53 @@
+{% extends "generic_listar.html" %}
+
+{% block titulo %}
+        <h1 class="text-center">Lista de Pagos</h1>
+{% endblock titulo %}
+
+{% block agregar %}
+<a href="{{crear_url}}" class=" btn btn-primary btn btn-xs"><i class="fas fa-plus"></i>
+          Agregar
+</a>
+{% endblock %}
+
+{% block columnas %}
+
+        <th>Id pago</th>
+        <th>Tipo pago</th>
+        <th>Fecha</th>
+        <th>Hora</th>
+        <th>Monto</th>
+        <th>Id proveedor</th>
+        <th>Id administrador</th>
+        <th>Id herramientas</th>
+        <th>Id insumos</th>
+        <th>Id repuestos</th>
+        <th>Acciones</th>
+
+{% endblock %}
+
+{% block iterar %}
+
+      {% for p in object_list %}
+      <tr>
+        <td>{{ p.id_pago }}</td>
+        <td>{{ p.tipo_pago }}</td>
+        <td>{{ p.fecha }}</td>
+        <td>{{ p.hora }}</td>
+        <td>{{ p.monto }}</td>
+        <td>{{ p.id_proveedor }}</td>
+        <td>{{ p.id_admin }}</td>
+        <td>{{ p.id_herramienta }}</td>
+        <td>{{ p.id_insumos }}</td>
+        <td>{{ p.id_repuestos }}</td>
+        <form method="post">
+
+          <td>
+            <a href="{% url 'apy:pagos_editar' p.id_pago %}" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></a>
+            <a href="{% url 'apy:pagos_eliminar' p.id_pago %}" class="btn btn-danger btn-xs"><i
+                class="fas fa-trash-alt"></i></a>
+          </td>
+      </tr>
+      {% endfor %}
+
+{% endblock %}
