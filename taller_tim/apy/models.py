@@ -126,7 +126,7 @@ class Administrador(models.Model):
 #--------------Modulo Pago Servicio Publicos-----------
 class PagoServiciosPublicos(models.Model):
     id_servicio = models.AutoField(primary_key=True)
-    monto = models,models.DecimalField(max_digits=10, decimal_places=2)
+    monto = models.DecimalField(max_digits=10, decimal_places=2)
     
     def __str__(self):
         return f"{self.id_servicio} {self.monto}"
@@ -159,12 +159,12 @@ class Pagos(models.Model):
     tipo_pago = models.CharField(max_length=100)
     fecha = models.DateField()
     hora = models.TimeField()
-    monto = models,models.DecimalField(max_digits=10, decimal_places=2)
-    id_proveedor = models.ForeignKey(Proveedores, on_delete=models.CASCADE)
-    id_admin = models.ForeignKey(Administrador, on_delete=models.CASCADE)
-    id_herramienta = models.ForeignKey(Herramienta, on_delete=models.CASCADE)
-    id_insumos = models.ForeignKey(Insumos, on_delete=models.CASCADE)
-    id_repuestos = models.ForeignKey(Repuesto, on_delete=models.CASCADE)
+    monto = models.DecimalField(max_digits=10, decimal_places=2)
+    id_proveedor = models.ForeignKey(Proveedores, on_delete=models.SET_NULL, null=True)
+    id_admin = models.ForeignKey(Administrador, on_delete=models.SET_NULL, null=True)
+    id_herramienta = models.ForeignKey(Herramienta, on_delete=models.SET_NULL, null=True, blank=True)
+    id_insumos = models.ForeignKey(Insumos, on_delete=models.SET_NULL, null=True, blank=True)
+    id_repuestos = models.ForeignKey(Repuesto, on_delete=models.SET_NULL, null=True, blank=True)
     
     def __str__(self):
         return f"{self.id_pago} {self.monto}"
@@ -214,10 +214,10 @@ class Informes(models.Model):
     costo_mano_obra = models.DecimalField(max_digits=10, decimal_places=2)
     fecha = models.DateField()
     hora = models.TimeField()
-    id_repuesto = models.ForeignKey(Repuesto, on_delete=models.CASCADE)
-    id_empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE)
+    id_repuesto = models.ForeignKey(Repuesto, on_delete=models.SET_NULL, null=True, blank=True)
+    id_empleado = models.ForeignKey(Empleado, on_delete=models.SET_NULL, null=True, blank=True)
     tipo_informe = models.CharField(max_length=100)
-    id_mantenimiento = models.ForeignKey(Mantenimiento, on_delete=models.CASCADE)
+    id_mantenimiento = models.ForeignKey(Mantenimiento, on_delete=models.SET_NULL, null=True, blank=True)
     
     def __str__(self):
         return f"{self.id_informe} {self.tipo_informe}"
