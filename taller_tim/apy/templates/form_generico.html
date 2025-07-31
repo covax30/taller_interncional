@@ -29,6 +29,55 @@
 </div>
 
 <script>
+    // Función para mostrar alerta de éxito
+    function mostrarAdminAgregado() {
+        Swal.fire({
+            icon: 'success',
+            title: 'Administrador agregado con éxito',
+            timer: 2500,
+            timerProgressBar: true,
+            showConfirmButton: false,
+            toast: false,
+            position: 'center'
+        });
+    }
+
+    // Mostrar alerta de éxito si el administrador fue agregado
+    {% if messages %}
+    {% for message in messages %}
+        {% if message.tags == 'success' %}
+        Swal.fire({
+            icon: 'success',
+            title: '{{ message }}',
+            timer: 2500,
+            timerProgressBar: true,
+            showConfirmButton: false
+        });
+        {% elif message.tags == 'error' %}
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: '{{ message }}',
+            confirmButtonColor: '#dc3545'
+        });
+        {% elif message.tags == 'warning' %}
+        Swal.fire({
+            icon: 'warning',
+            title: 'Advertencia',
+            text: '{{ message }}',
+            confirmButtonColor: '#ffc107'
+        });
+        {% elif message.tags == 'info' %}
+        Swal.fire({
+            icon: 'info',
+            title: 'Información',
+            text: '{{ message }}',
+            confirmButtonColor: '#17a2b8'
+        });
+        {% endif %}
+    {% endfor %}
+    {% endif %}
+
     {% if form.errors %}
     var errors = '';
     {% for field in form %}

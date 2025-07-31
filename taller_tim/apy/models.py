@@ -3,7 +3,7 @@ from django.db import models
 # MODULOS STEVEN
 
 class Cliente(models.Model):
-    id_cliente = models.IntegerField(unique=True)  
+    id_cliente = models.AutoField(primary_key=True)
     id_operacion = models.IntegerField(default=0)
     nombre = models.CharField(max_length=100)
     documento = models.BigIntegerField(default=0)
@@ -17,8 +17,8 @@ class Cliente(models.Model):
 
 
 class Vehiculo(models.Model):
-    id_vehiculo = models.IntegerField(unique=True) 
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)  # LLAVE
+    id_vehiculo = models.AutoField(primary_key=True)
+    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)  # LLAVE
     placa = models.CharField(max_length=10, unique=True)
     modelo_vehiculo = models.CharField(max_length=100)
     marca_vehiculo = models.CharField(max_length=100)
@@ -29,35 +29,28 @@ class Vehiculo(models.Model):
 
 
 class EntradaVehiculo(models.Model):
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)  # LLAVE
-    vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE)  # LLAVE
+    id_entrada = models.AutoField(primary_key=True)
+    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE) # LLAVE
+    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)  # LLAVE
     fecha_ingreso = models.DateField()
     hora_ingreso = models.TimeField()
 
     def __str__(self):
-        return f"{self.cliente.id_cliente} - {self.vehiculo.placa} - {self.fecha_ingreso} {self.hora_ingreso}"
+        return f"{self.id_cliente.id_cliente} - {self.id_vehiculo.placa} - {self.fecha_ingreso} {self.hora_ingreso}"
 
 
 class SalidaVehiculo(models.Model):
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)  # LLAVE
-    vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE)  # LLAVE
+    id_salida = models.AutoField(primary_key=True)
+    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE) # LLAVE
+    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)  # LLAVE
     diagnostico = models.CharField(max_length=100)
-    fecha_ingreso = models.DateField()
-    hora_ingreso = models.TimeField()
+    fecha_salida = models.DateField()
+    hora_salida = models.TimeField()
 
     def __str__(self):
-        return f"{self.cliente.id_cliente} - {self.vehiculo.placa} - {self.diagnostico}"
+        return f"{self.id_cliente.id_cliente} - {self.id_vehiculo.placa} - {self.diagnostico}"
 
-
-class Compra(models.Model):
-    id_factura_compra = models.IntegerField(unique=True)
-    id_compra = models.IntegerField(default=0)
-    proveedor = models.CharField(max_length=100)
-    fecha_compra = models.DateField()
-    hora_compra = models.TimeField()
-
-    def __str__(self):
-        return f"{self.id_factura_compra} - {self.proveedor} - {self.fecha_compra} {self.hora_compra}"
+# UBICACION ANTIGUA DE COMPRAS
 
 #------ MODULOS ERICK ---------
 #------ ENTIDAD de TIPO mantenmimiento ---------1
@@ -147,7 +140,19 @@ class Proveedores(models.Model):
     
     def __str__(self):
         return f"{self.id_proveedor} {self.correo}"
-    
+
+#--------------Modulo Compra (STEVEN)-----------------
+class Compra(models.Model):
+    id_compra = models.AutoField(primary_key=True)
+    id_factura_compra = models.IntegerField(unique=True)
+    id_proveedor = models.ForeignKey(Proveedores, on_delete=models.CASCADE)  # LLAVE
+    fecha_compra = models.DateField()
+    hora_compra = models.TimeField()
+
+    def __str__(self):
+        return f"{self.id_factura_compra} - {self.id_proveedor} - {self.fecha_compra} {self.hora_compra}"
+#------------------------------------------------------
+
 #--------------Modulo Pagos-----------------
 class Pagos(models.Model):
     id_pago = models.AutoField(primary_key=True)
