@@ -86,20 +86,14 @@ class ProveedorForm(ModelForm):
             )
         }
         
-<<<<<<< HEAD
 # ------------------- FORMS STEVEN -------------------    
 
 class ClienteForm(ModelForm):
-=======
-# -----------Formulario modelo administrador------------------
-class AdministradorForm(ModelForm):
->>>>>>> 3878fb8015073744e077a7b5bb9cf97fee5818e3
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['nombre'].widget.attrs['autofocus'] = True
         
     class Meta:
-<<<<<<< HEAD
         model = Cliente
         fields = '__all__'
         widgets = {
@@ -121,39 +115,10 @@ class AdministradorForm(ModelForm):
             'documento':TextInput(
                 attrs={
                     'placeholder':'Ingrese el documento del cliente',
-=======
-        model = Administrador
-        fields = '__all__'
-        widgets = {
-            'nombre':TextInput(
-                attrs={
-                    'placeholder':'Ingrese el nombre del administrador',
-                }
-            ),
-            'apellidos':TextInput(
-                attrs={
-                    'placeholder':'Ingrese los apellidos del administrador',
-                }
-            ),
-            'identificacion':TextInput(
-                attrs={
-                    'placeholder':'Ingrese la identificacion del administrador',
-                }
-            ),
-            'edad':NumberInput(
-                attrs={
-                    'placeholder':'Ingrese la edad del administrador',
-                }
-            ),
-            'correo':EmailInput(
-                attrs={
-                    'placeholder':'Ingrese el correo del administrador',
->>>>>>> 3878fb8015073744e077a7b5bb9cf97fee5818e3
                 }
             ),
             'telefono':TextInput(
                 attrs={
-<<<<<<< HEAD
                     'placeholder':'Ingrese el telefono del cliente',
                 }
             ),
@@ -238,15 +203,12 @@ class EntradaVehiculoForm(ModelForm):
             'id_cliente':Select(
                 attrs={
                     'class': 'form-control',
-=======
                     'placeholder':'Ingrese el telefono del administrador',
                     'type': 'tel'
->>>>>>> 3878fb8015073744e077a7b5bb9cf97fee5818e3
                 }
             ),
             'fecha_ingreso':DateInput(
                 attrs={
-<<<<<<< HEAD
                     'type': 'date',
                     'placeholder':'Ingrese la fecha de ingreso',
                 }
@@ -298,15 +260,10 @@ class SalidaVehiculoForm(ModelForm):
                 attrs={
                     'type': 'time',
                     'placeholder':'Ingrese la hora de salida',
-=======
-                    'placeholder':'Ingrese la fecha de ingreso del administrador',
-                    'type': 'date'
->>>>>>> 3878fb8015073744e077a7b5bb9cf97fee5818e3
                 }
             )
         }
         
-<<<<<<< HEAD
 class CompraForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -317,7 +274,83 @@ class CompraForm(ModelForm):
         fields = '__all__'
         widgets = {
             'id_factura_compra':Select(
-=======
+                attrs={
+                    'class': 'form-control',
+                }
+            ),
+            'id_compra':Select(
+                attrs={
+                    'class': 'form-control',
+                }
+            ),
+            'id_proveedor':Select(
+                attrs={
+                    'class': 'form-control',
+                }
+            ),
+            'fecha_compra': DateInput(
+                attrs={
+                    'type': 'date',
+                    'placeholder':'Ingrese la fecha de compra',
+                }
+            ),
+            'hora_compra':TimeInput(
+                attrs={
+                    'type': 'time',
+                    'placeholder':'Ingrese la hora de compra',
+                }
+            )
+        }
+
+# -----------Formulario modelo administrador------------------
+class AdministradorForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['nombre'].widget.attrs['autofocus'] = True
+        
+    class Meta:
+        model = Administrador
+        fields = '__all__'
+        widgets = {
+            'nombre':TextInput(
+                attrs={
+                    'placeholder':'Ingrese el nombre del administrador',
+                }
+            ),
+            'apellidos':TextInput(
+                attrs={
+                    'placeholder':'Ingrese los apellidos del administrador',
+                }
+            ),
+            'identificacion':TextInput(
+                attrs={
+                    'placeholder':'Ingrese la identificacion del administrador',
+                }
+            ),
+            'edad':NumberInput(
+                attrs={
+                    'placeholder':'Ingrese la edad del administrador',
+                }
+            ),
+            'correo':EmailInput(
+                attrs={
+                    'placeholder':'Ingrese el correo del administrador',
+                }
+            ),
+            'telefono':TextInput(
+                attrs={
+                    'placeholder':'Ingrese el telefono del administrador',
+                    'type': 'tel'
+                }
+            ),
+            'fecha_ingreso':DateInput(
+                attrs={
+                    'placeholder':'Ingrese la fecha de ingreso del administrador',
+                    'type': 'date'
+                }
+            )
+        }
+        
 # -----------Formulario modelo informe------------------    
 class InformeForm(ModelForm):
     def __init__(self, *args, **kwargs):
@@ -352,17 +385,10 @@ class InformeForm(ModelForm):
                 }
             ),
             'id_repuesto':Select(
->>>>>>> 3878fb8015073744e077a7b5bb9cf97fee5818e3
                 attrs={
                     'class': 'form-control',
                 }
             ),
-<<<<<<< HEAD
-            'id_compra':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-=======
             'tipo_informe':TextInput(
                 attrs={
                     'placeholder':'Ingrese el tipo de informe',
@@ -426,25 +452,12 @@ class PagosForm(ModelForm):
                     'step': '0.01',
                     'min': '0'
                 }
->>>>>>> 3878fb8015073744e077a7b5bb9cf97fee5818e3
             ),
             'id_proveedor':Select(
                 attrs={
                     'class': 'form-control',
                 }
             ),
-<<<<<<< HEAD
-            'fecha_compra': DateInput(
-                attrs={
-                    'type': 'date',
-                    'placeholder':'Ingrese la fecha de compra',
-                }
-            ),
-            'hora_compra':TimeInput(
-                attrs={
-                    'type': 'time',
-                    'placeholder':'Ingrese la hora de compra',
-=======
             'id_admin':Select(
                 attrs={
                     'class': 'form-control',
@@ -463,7 +476,6 @@ class PagosForm(ModelForm):
             'id_repuestos':Select(
                 attrs={
                     'class': 'form-control',
->>>>>>> 3878fb8015073744e077a7b5bb9cf97fee5818e3
                 }
             )
         }

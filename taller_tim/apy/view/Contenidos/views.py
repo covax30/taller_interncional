@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from apy.models import *
 from apy.view.Contenidos.views import *
+from django.contrib import messages
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
@@ -45,6 +46,10 @@ class FacturaCreateView(CreateView):
     template_name = 'Contenido/crear_factura.html'
     success_url = reverse_lazy('apy:factura_lista')
     
+    def form_valid(self, form):
+        messages.success(self.request, "Factura creada correctamente")
+        return super().form_valid(form)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context ['titulo'] = 'Crear Factura'
@@ -58,6 +63,10 @@ class FacturaUpdateView(UpdateView):
     template_name = 'Contenido/crear_factura.html'
     success_url = reverse_lazy('apy:factura_lista')
     
+    def form_valid(self, form):
+        messages.success(self.request, "Factura actualizada correctamente")
+        return super().form_valid(form)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Editar Factura'
@@ -69,6 +78,10 @@ class FacturaDeleteView(DeleteView):
     model = Factura
     template_name = 'Contenido/eliminar_factura.html'
     success_url = reverse_lazy('apy:factura_lista')
+    
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, "Factura eliminada correctamente")
+        return super().delete(request, *args, **kwargs)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

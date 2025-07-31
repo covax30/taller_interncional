@@ -3,6 +3,7 @@ from apy.models import *
 from apy.view.administrador.views import *
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import JsonResponse
+from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.urls import reverse_lazy
@@ -44,6 +45,10 @@ class AdministradorCreateView(CreateView):
     template_name = 'Administrador/crear_administrador.html'
     success_url = reverse_lazy('apy:administrador_lista')
     
+    def form_valid(self, form):
+        messages.success(self.request, "Administrador creado correctamente")
+        return super().form_valid(form)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context ['titulo'] = 'Crear Administrador'
@@ -57,6 +62,10 @@ class AdministradorUpdateView(UpdateView):
     template_name = 'Administrador/crear_administrador.html'
     success_url = reverse_lazy('apy:administrador_lista')
     
+    def form_valid(self, form):
+        messages.success(self.request, "Administrador actualizado correctamente")
+        return super().form_valid(form)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Editar Administrador'
@@ -68,6 +77,10 @@ class AdministradorDeleteView(DeleteView):
     model = Administrador
     template_name = 'Administrador/eliminar_administrador.html'
     success_url = reverse_lazy('apy:administrador_lista')
+    
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, "Administrador eliminado correctamente")
+        return super().delete(request, *args, **kwargs)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -29,15 +29,13 @@ urlpatterns = [
     path('factura/editar/<int:pk>/', FacturaUpdateView.as_view(), name='factura_editar'),
     path('factura/eliminar/<int:pk>/', FacturaDeleteView.as_view(), name='factura_eliminar'),
     
-    #--------URL modulo proveedor----------------
-    path('Proveedor/listar/', ProveedorListView.as_view() , name='proveedor_lista'),
-    path('Proveedor/agregar/', ProveedorCreateView.as_view() , name='proveedor_crear'),
-    path('Proveedor/editar/<int:pk>/', ProveedorUpdateView.as_view() , name='proveedor_editar'),
-    path('Proveedor/eliminar/<int:pk>/', ProveedorDeleteView.as_view() , name='proveedor_eliminar'),
-<<<<<<< HEAD
+    # -------------URL modulo proveedor---------------
+    path('Proveedor/listar/', ProveedorListView.as_view(), name='proveedor_lista'),
+    path('Proveedor/agregar/', ProveedorCreateView.as_view(), name='proveedor_crear'),
+    path('Proveedor/editar/<int:pk>/', ProveedorUpdateView.as_view(), name='proveedor_editar'),
+    path('Proveedor/eliminar/<int:pk>/', ProveedorDeleteView.as_view(), name='proveedor_eliminar'),
 
-    # --------------urls Steven-----------
-    
+    # -------------urls Steven--------------
     path('cliente/listar/', ClienteListView.as_view(), name='cliente_lista'),
     path('cliente/agregar/', ClienteCreateView.as_view(), name='cliente_crear'),
     path('cliente/editar/<int:pk>/', ClienteUpdateView.as_view(), name='cliente_editar'),
@@ -47,6 +45,7 @@ urlpatterns = [
     path('compra/agregar/', CompraCreateView.as_view(), name='compra_crear'),
     path('compra/editar/<int:pk>/', CompraUpdateView.as_view(), name='compra_editar'),
     path('compra/eliminar/<int:pk>/', CompraDeleteView.as_view(), name='compra_eliminar'),
+
 
     path('vehiculo/listar/', VehiculoListView.as_view(), name='vehiculo_lista'),
     path('vehiculo/agregar/', VehiculoCreateView.as_view(), name='vehiculo_crear'),
@@ -61,9 +60,7 @@ urlpatterns = [
     path('salida_vehiculo/listar/', SalidaVehiculoListView.as_view(), name='salida_vehiculo_lista'),
     path('salida_vehiculo/agregar/', SalidaVehiculoCreateView.as_view(), name='salida_vehiculo_crear'),
     path('salida_vehiculo/editar/<int:pk>/', SalidaVehiculoUpdateView.as_view(), name='salida_vehiculo_editar'),
-    path('salida_vehiculo/eliminar/<int:pk>/', SalidaVehiculoDeleteView.as_view(), name='salida_vehiculo_eliminar'),
-    
-=======
+    path('salida_vehiculo/eliminar/<int:pk>/', SalidaVehiculoDeleteView.as_view(), name='salida_vehiculo_eliminar'),    
     
     #--------URL modulo administrador----------------
     path('administrador/listar/', AdministradorListView.as_view() , name='administrador_lista'),
@@ -88,5 +85,5 @@ urlpatterns = [
     path('Pagos/agregar/', PagosCreateView.as_view() , name='pagos_crear'),
     path('Pagos/editar/<int:pk>/', PagosUpdateView.as_view() , name='pagos_editar'),
     path('Pagos/eliminar/<int:pk>/', PagosDeleteView.as_view() , name='pagos_eliminar')
->>>>>>> 3878fb8015073744e077a7b5bb9cf97fee5818e3
+    
 ] 
