@@ -49,16 +49,6 @@ class SalidaVehiculo(models.Model):
         return f"{self.cliente.id_cliente} - {self.vehiculo.placa} - {self.diagnostico}"
 
 
-class Compra(models.Model):
-    id_factura_compra = models.IntegerField(unique=True)
-    id_compra = models.IntegerField(default=0)
-    proveedor = models.CharField(max_length=100)
-    fecha_compra = models.DateField()
-    hora_compra = models.TimeField()
-
-    def __str__(self):
-        return f"{self.id_factura_compra} - {self.proveedor} - {self.fecha_compra} {self.hora_compra}"
-
 #------ MODULOS ERICK ---------
 #------ ENTIDAD de TIPO mantenmimiento ---------1
 class TipoMantenimiento(models.Model):
@@ -147,6 +137,19 @@ class Proveedores(models.Model):
     
     def __str__(self):
         return f"{self.id_proveedor} {self.correo}"
+    
+    
+    
+class Compra(models.Model):
+    id_factura_compra = models.IntegerField(unique=True)
+    id_compra = models.IntegerField(default=0)
+    proveedor = models.CharField(max_length=100)
+    fecha_compra = models.DateField()
+    hora_compra = models.TimeField()
+
+    def __str__(self):
+        return f"{self.id_factura_compra} - {self.proveedor} - {self.fecha_compra} {self.hora_compra}"
+
     
 #--------------Modulo Pagos-----------------
 class Pagos(models.Model):

@@ -35,7 +35,113 @@ urlpatterns = [
     path('Proveedor/editar/<int:pk>/', ProveedorUpdateView.as_view() , name='proveedor_editar'),
     path('Proveedor/eliminar/<int:pk>/', ProveedorDeleteView.as_view() , name='proveedor_eliminar'),
     
-    # --------------urls erick---------------
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    #--------URL modulo administrador----------------
+    path('administrador/listar/', AdministradorListView.as_view() , name='administrador_lista'),
+    path('administrador/agregar/', AdministradorCreateView.as_view() , name='administrador_crear'),
+    path('administrador/editar/<int:pk>/', AdministradorUpdateView.as_view() , name='administrador_editar'),
+    path('administrador/eliminar/<int:pk>/', AdministradorDeleteView.as_view() , name='administrador_eliminar'),
+    
+    #--------URL modulo informes----------------
+    path('informes/listar/', InformesListView.as_view() , name='informes_lista'),
+    path('informes/agregar/', InformesCreateView.as_view() , name='informes_crear'),
+    path('informes/editar/<int:pk>/', InformesUpdateView.as_view() , name='informes_editar'),
+    path('informes/eliminar/<int:pk>/', InformesDeleteView.as_view() , name='informes_eliminar'),
+    
+    #--------URL modulo pago de sercicios publicos----------------
+    path('PagoServicios/listar/', PagoServiciosListView.as_view() , name='pago_servicios_lista'),
+    path('PagoServicios/agregar/', PagoServiciosCreateView.as_view() , name='pago_servicios_crear'),
+    path('PagoServicios/editar/<int:pk>/', PagoServiciosUpdateView.as_view() , name='pago_servicios_editar'),
+    path('PagoServicios/eliminar/<int:pk>/', PagoServiciosDeleteView.as_view() , name='pago_servicios_eliminar'),
+    
+    #--------URL modulo pagos----------------
+    path('Pagos/listar/', PagosListView.as_view() , name='pagos_lista'),
+    path('Pagos/agregar/', PagosCreateView.as_view() , name='pagos_crear'),
+    path('Pagos/editar/<int:pk>/', PagosUpdateView.as_view() , name='pagos_editar'),
+    path('Pagos/eliminar/<int:pk>/', PagosDeleteView.as_view() , name='pagos_eliminar'),
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        # --------------urls erick---------------
     
     path('mantenimiento/listar/', MantenimientoListView.as_view() , name='mantenimiento_lista'),
     path('mantenimiento/agregar/', MantenimientoCreateView.as_view() , name='mantenimiento_crear'),
@@ -61,28 +167,4 @@ urlpatterns = [
     path('repuestos/agregar/', RepuestoCreateView.as_view() , name='repuesto_crear'),
     path('repuestos/editar/<int:pk>/', RepuestoUpdateView.as_view() , name='repuesto_editar'),
     path('repuestos/eliminar/<int:pk>/', RepuestoDeleteView.as_view() , name='repuesto_eliminar'),
-    
-    #--------URL modulo administrador----------------
-    path('administrador/listar/', AdministradorListView.as_view() , name='administrador_lista'),
-    path('administrador/agregar/', AdministradorCreateView.as_view() , name='administrador_crear'),
-    path('administrador/editar/<int:pk>/', AdministradorUpdateView.as_view() , name='administrador_editar'),
-    path('administrador/eliminar/<int:pk>/', AdministradorDeleteView.as_view() , name='administrador_eliminar'),
-    
-    #--------URL modulo informes----------------
-    path('informes/listar/', InformesListView.as_view() , name='informes_lista'),
-    path('informes/agregar/', InformesCreateView.as_view() , name='informes_crear'),
-    path('informes/editar/<int:pk>/', InformesUpdateView.as_view() , name='informes_editar'),
-    path('informes/eliminar/<int:pk>/', InformesDeleteView.as_view() , name='informes_eliminar'),
-    
-    #--------URL modulo pago de sercicios publicos----------------
-    path('PagoServicios/listar/', PagoServiciosListView.as_view() , name='pago_servicios_lista'),
-    path('PagoServicios/agregar/', PagoServiciosCreateView.as_view() , name='pago_servicios_crear'),
-    path('PagoServicios/editar/<int:pk>/', PagoServiciosUpdateView.as_view() , name='pago_servicios_editar'),
-    path('PagoServicios/eliminar/<int:pk>/', PagoServiciosDeleteView.as_view() , name='pago_servicios_eliminar'),
-    
-    #--------URL modulo pagos----------------
-    path('Pagos/listar/', PagosListView.as_view() , name='pagos_lista'),
-    path('Pagos/agregar/', PagosCreateView.as_view() , name='pagos_crear'),
-    path('Pagos/editar/<int:pk>/', PagosUpdateView.as_view() , name='pagos_editar'),
-    path('Pagos/eliminar/<int:pk>/', PagosDeleteView.as_view() , name='pagos_eliminar')
 ] 

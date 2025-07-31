@@ -81,29 +81,234 @@ class ProveedorForm(ModelForm):
                 }
             )
         }
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
         
-class MantenimientoForm(ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['fallas'].widget.attrs['autofocus'] = True
-        
-    class Meta:
-        model = Mantenimiento
-        fields = '__all__'
-        widgets = {
-            'fallas':TextInput(
-                attrs={
-                    'placeholder':'Ingrese las fallas',
-                }
-            ),
-            'procesos':TextInput(
-                attrs={
-                    'placeholder':'Ingrese los procesos',
-                }
-            ),
-            'id_vehiculo':Select(
-            )
-        }
+
 # -----------Formulario modelo administrador------------------
 class AdministradorForm(ModelForm):
     def __init__(self, *args, **kwargs):
@@ -212,7 +417,322 @@ class InformeForm(ModelForm):
                 }
             )
         }
-    
+   
+   
+      
+# -----------Formulario modelo pago servicios publicos------------------        
+class PagoServiciosForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['monto'].widget.attrs['autofocus'] = True
+        
+    class Meta:
+        model = PagoServiciosPublicos
+        fields = '__all__'
+        widgets = {
+            'monto':NumberInput(
+                attrs={
+                    'placeholder':'Ingrese el monto del pago de servicio publico',
+                    'step': '0.01'
+                }
+            )
+        }
+        
+# -----------Formulario modelo pagos------------------    
+class PagosForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['tipo_pago'].widget.attrs['autofocus'] = True
+        
+    class Meta:
+        model = Pagos
+        fields = '__all__'
+        widgets = {
+            'tipo_pago':TextInput(
+                attrs={
+                    'placeholder':'Ingrese el tipo de pago',
+                }
+            ),
+            'fecha':DateInput(
+                attrs={
+                    'placeholder':'Ingrese la fecha de la creacion del pago',
+                    'type': 'date'
+                }
+            ),
+            'hora':TimeInput(
+                attrs={
+                    'placeholder':'Ingrese la hora de la creacion del pago',
+                    'type': 'time'
+                }
+            ),
+            'monto':NumberInput(
+                attrs={
+                    'placeholder':'Ingrese el monto del pago',
+                    'step': '0.01',
+                    'min': '0'
+                }
+            ),
+            'id_proveedor':Select(
+                attrs={
+                    'class': 'form-control',
+                }
+            ),
+            'id_admin':Select(
+                attrs={
+                    'class': 'form-control',
+                }
+            ),
+            'id_herramientas':Select(
+                attrs={
+                    'class': 'form-control',
+                }
+            ),
+            'id_insumos':Select(
+                attrs={
+                    'class': 'form-control',
+                }
+            ),
+            'id_repuestos':Select(
+                attrs={
+                    'class': 'form-control',
+                }
+            )
+        }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+class MantenimientoForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['fallas'].widget.attrs['autofocus'] = True
+        
+    class Meta:
+        model = Mantenimiento
+        fields = '__all__'
+        widgets = {
+            'fallas':TextInput(
+                attrs={
+                    'placeholder':'Ingrese las fallas',
+                }
+            ),
+            'procesos':TextInput(
+                attrs={
+                    'placeholder':'Ingrese los procesos',
+                }
+            ),
+            'id_vehiculo':Select(
+            )
+        }
+        
+         
 class HerramientaForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -273,25 +793,8 @@ class TipoMantenimientoForm(ModelForm):
                     'placeholder':'Ingrese la descripcion del tipo de mantenimiento',
                 }
             ),
-        }        
-# -----------Formulario modelo pago servicios publicos------------------        
-class PagoServiciosForm(ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['monto'].widget.attrs['autofocus'] = True
-        
-    class Meta:
-        model = PagoServiciosPublicos
-        fields = '__all__'
-        widgets = {
-            'monto':NumberInput(
-                attrs={
-                    'placeholder':'Ingrese el monto del pago de servicio publico',
-                    'step': '0.01'
-                }
-            )
-        }
-        
+        }  
+
 class InsumoForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -367,64 +870,4 @@ class RepuestoForm(ModelForm):
                     'placeholder':'Ingrese el precio del repuesto',
                 }
             ),
-        }
-# -----------Formulario modelo pagos------------------    
-class PagosForm(ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['tipo_pago'].widget.attrs['autofocus'] = True
-        
-    class Meta:
-        model = Pagos
-        fields = '__all__'
-        widgets = {
-            'tipo_pago':TextInput(
-                attrs={
-                    'placeholder':'Ingrese el tipo de pago',
-                }
-            ),
-            'fecha':DateInput(
-                attrs={
-                    'placeholder':'Ingrese la fecha de la creacion del pago',
-                    'type': 'date'
-                }
-            ),
-            'hora':TimeInput(
-                attrs={
-                    'placeholder':'Ingrese la hora de la creacion del pago',
-                    'type': 'time'
-                }
-            ),
-            'monto':NumberInput(
-                attrs={
-                    'placeholder':'Ingrese el monto del pago',
-                    'step': '0.01',
-                    'min': '0'
-                }
-            ),
-            'id_proveedor':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-            'id_admin':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-            'id_herramientas':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-            'id_insumos':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-            'id_repuestos':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            )
         }
