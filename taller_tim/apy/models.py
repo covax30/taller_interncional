@@ -133,7 +133,7 @@ class Administrador(models.Model):
 #--------------Modulo Pago Servicio Publicos-----------
 class PagoServiciosPublicos(models.Model):
     id_servicio = models.AutoField(primary_key=True)
-    monto = models.DecimalField(max_digits=10, decimal_places=2)
+    monto = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     
     def __str__(self):
         return f"{self.id_servicio} {self.monto}"
