@@ -1,0 +1,35 @@
+{% extends "generic_listar.html"%}
+{% block titulo %}
+    <h1 class="text-center">Lista de Vehículos</h1>
+{% endblock %}
+{% block agregar %}
+    <a href="{% url 'apy:vehiculo_crear' %}" class="btn btn-primary">Agregar Vehículo</a>
+{% endblock %}
+
+{% block columnas %}
+  <th>Id Vehículo</th>
+  <th>Id Cliente</th>
+  <th>Placa</th>
+  <th>Modelo</th>
+  <th>Marca</th>
+  <th>Color</th>
+
+  <th>Acciones</th>
+{% endblock %}
+
+{% block iterar %}
+  {% for v in object_list %}
+    <tr>
+        <td>{{ v.id_vehiculo }}</td>
+        <td>{{ v.cliente.id_cliente }}</td>
+        <td>{{ v.placa }}</td>
+        <td>{{ v.modelo_vehiculo }}</td>
+        <td>{{ v.marca_vehiculo }}</td>
+        <td>{{ v.color }}</td>
+        <td>
+            <a href="{% url 'apy:vehiculo_editar' v.id_vehiculo %}" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></a>
+            <a href="{% url 'apy:vehiculo_eliminar' v.id_vehiculo %}" class="btn btn-danger btn-xs"><i class="fas fa-trash-alt"></i></a>
+        </td>
+    </tr>
+  {% endfor %}
+{% endblock %}
