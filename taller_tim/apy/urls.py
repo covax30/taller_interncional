@@ -75,10 +75,6 @@ urlpatterns = [
   
   
   
-  
-  
- 
-  
     #--------URL modulo administrador----------------
     path('administrador/listar/', AdministradorListView.as_view() , name='administrador_lista'),
     path('administrador/agregar/', AdministradorCreateView.as_view() , name='administrador_crear'),
@@ -102,9 +98,6 @@ urlpatterns = [
     path('Pagos/agregar/', PagosCreateView.as_view() , name='pagos_crear'),
     path('Pagos/editar/<int:pk>/', PagosUpdateView.as_view() , name='pagos_editar'),
     path('Pagos/eliminar/<int:pk>/', PagosDeleteView.as_view() , name='pagos_eliminar'),
-
-
-
 
 
 
