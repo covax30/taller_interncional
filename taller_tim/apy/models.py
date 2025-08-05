@@ -54,9 +54,10 @@ class SalidaVehiculo(models.Model):
 
 
 #------ MODULOS ERICK ---------
+
 #------ ENTIDAD de TIPO mantenmimiento ---------1
 class TipoMantenimiento(models.Model):
-    id = models.CharField(primary_key=True, max_length=50, unique=True)
+    id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=50, unique=True)
     descripcion = models.TextField(blank=True, null=True)
 
@@ -75,6 +76,7 @@ class Marca(models.Model):
 #------ ENTIDAD REPUESTOS --------3
 class Repuesto(models.Model):
     id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE)
+    nombre = models.CharField(max_length=100)
     categoria = models.CharField(max_length=100)
     fabricante = models.CharField(max_length=100)
     stock = models.IntegerField(default=0)

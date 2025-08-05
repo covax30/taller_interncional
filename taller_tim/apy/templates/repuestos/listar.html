@@ -14,6 +14,7 @@
 {% block columnas %}
 
         <th>id_marca</th>
+        <th>nombre</th>
         <th>categoria</th>
         <th>fabricante</th>
         <th>stock</th>
@@ -27,6 +28,7 @@
       {% for r in object_list %}
       <tr>
         <td>{{r.id_marca}}</td>
+        <td>{{r.nombre}}</td>
         <td>{{r.categoria}}</td>
         <td>{{r.fabricante}}</td>
         <td>{{r.stock}}</td>
