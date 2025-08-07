@@ -283,5 +283,5 @@ class Caja(models.Model):
     #class meta
         #verbose_name = 'Caja'
         #verbose_name_plural = 'Caja'
-from django.db import models
+
 
