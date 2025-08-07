@@ -1,0 +1,229 @@
+body {
+    font-family: 'Jost', sans-serif;
+    background-color: rgb(173, 195, 214);
+    margin: 0;
+    padding: 0;
+}
+
+.titulo {
+    margin-top: 0;
+    padding-top: 100px;
+    color: #03011d;
+    text-align: center;
+}
+
+.subtitulo {
+    color: #03011d;
+    text-align: left;
+}
+
+.inicio {
+    display: flex; /* Coloca los contenedores lado a lado */
+    gap: 20px; /* Espacio entre los contenedores */
+    background-color: #fff;
+    padding: 10px;
+}
+
+.quienes {
+    flex: none;
+    margin-left: 100px;
+    width: 35%;
+    padding: 10px;
+}
+
+.quienes p {
+    line-height: 26px;
+}
+
+.imgenes {
+    margin-left: 100px;
+    flex: none; /* Ocupa el espacio proporcional */
+    width: 50%;
+    display: flex; /* Activa Flexbox */
+    flex-wrap: wrap; /* Permite que las imágenes se ajusten en filas */
+    gap: 30px; /* Espacio entre las imágenes */
+    justify-content: center; /* Centra las imágenes en el contenedor */
+    align-items: center; /* Alinea verticalmente */
+}
+
+.tabla {
+    width: 50%; /* Ajusta el ancho de la tabla (cámbialo según necesites) */
+    margin: 0 auto; /* Centra la tabla horizontalmente */
+    border-collapse: collapse; /* Bordes limpios */
+}
+
+.tabla img .tabla img{
+    width: 100%; /* Las imágenes se ajustan al ancho de las celdas */
+    height: auto; /* Mantienen sus proporciones */
+    object-fit: cover;
+    padding: 50px;
+    border-radius: 8px; /* Opcional: bordes redondeados */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Opcional: sombra */
+}
+
+
+.imgenes img {
+    width: 100%; /* Haz que las imágenes ocupen todo el ancho disponible */
+    height: auto; /* Mantén la proporción de las imágenes */
+    object-fit: cover; /* Ajusta las imágenes para que se vean bien en el contenedor */
+    border-radius: 8px; /* Opcional: bordes redondeados */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Opcional: agrega sombra */
+}
+.bondades {
+    margin: 10px;
+    border-radius: 15px;
+    padding-left: 120px;
+    background-color: #fff;
+    text-align: left;
+     
+}
+
+.bondades p {
+    line-height: 26px;
+    width: 30%;
+}
+
+.banner img{
+    width: 100%;
+    height: auto;
+}
+
+.misiones {
+    margin-top: 50px;
+    padding: 10px;
+    display: flex;
+    background-color: #fff;
+    border-radius: 15px;
+    width: 70%;
+    margin: auto;
+}
+.uno, .dos, .tres{
+    flex: 1;
+    background-color: rgba(180, 180, 180, 0.682);
+    border-radius: 10px;
+padding: 10px;
+margin: 10px;
+}
+
+.proposito {
+    margin: 10px;
+    background-color: #fff;
+    border-radius: 15px;
+    padding: 20px;
+    padding-left: 120px;
+    padding-right: 120px;
+}
+
+.porque {
+    margin: 10px;
+    background-color: #fff;
+    border-radius: 15px;
+    padding: 20px;
+    padding-left: 120px;
+    padding-right: 120px;
+}
+
+.contacto {
+    display: flex;
+    background-color: #565656;
+    padding: 20px;
+    padding-left: 120px;
+    padding-right: 120px;
+}
+.logo, .contactanos {
+    flex: 1;
+    align-items: center;
+}
+
+.copy {
+    text-align: center;
+    height: 110px;
+    align-items: baseline;
+}
+
+.head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 80px;
+    background: #040227;;
+    position: fixed;
+    width: 100%;
+    z-index: 100;
+}
+
+.navbar {
+    display: flex;
+    position: relative;
+    margin-right: 10px;
+}
+
+.navbar a {
+    transition: 0.3s ease;
+    border-right: 0.1px solid #fff;
+}
+
+.navbar :hover {
+    transform: scale(1.1);
+}
+
+
+.dropdown {
+    position: relative;
+}
+
+.submenu {
+    display: none; /* Oculta el submenú por defecto */
+    position: absolute;
+    top: 100%; /* Aparece debajo del enlace principal */
+    left: 0;
+    background-color: #03011d;
+    padding: 0;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.submenu a {
+    display: block;
+    padding: 10px 20px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+.submenu a:hover {
+    background: #03011d;;
+}
+
+/* Mostrar el submenú cuando el cursor está sobre el dropdown */
+.dropdown:hover .submenu {
+    display: block; /* Muestra el submenú al hacer hover */
+}
+
+.logo{
+    margin-left: 3px;
+}
+.logo img {
+    width: 60px;
+    height: 100%;
+}
+
+.logo a {
+    text-decoration: none;
+    color: #fff;
+    
+    text-transform: uppercase;
+    font-size: 20px;
+
+}
+.navbar a {
+    display: block;
+    padding: 23px 20px;
+    color: #fff;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 20px;
+}
+
+.navbar a:hover {
+    background:#ff811b;
+}

@@ -850,7 +850,7 @@ class RepuestoForm(ModelForm):
                 }
             ),
             'precio':NumberInput(
-                attrs={
+                attrs={     
                     'placeholder':'Ingrese el precio del repuesto',
                 }
             ),
