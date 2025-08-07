@@ -80,10 +80,10 @@ class EmpleadoDeleteView(DeleteView):
     template_name = 'Empleado/eliminar_empleado.html'
     success_url = reverse_lazy('apy:empleado_lista')
     
-    def delete(self, request, *args, **kwargs):
-        # Versión corregida del mensaje
+    def form_valid(self, form):
         messages.success(self.request, "Empleado eliminado correctamente")
-        return super().delete(request, *args, **kwargs)
+        return super().form_valid(form)
+    
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

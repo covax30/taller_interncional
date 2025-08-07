@@ -7,6 +7,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.urls import reverse_lazy
 from apy.forms import *
+from django.contrib import messages
 
 # Create your views here.
 # --------------Vistas Karol---------------
@@ -45,6 +46,9 @@ class NominaCreateView(CreateView):
     form_class = NominaForm
     template_name = 'Nomina/crear_nomina.html'
     success_url = reverse_lazy('apy:nomina_lista')
+    def form_valid(self, form):
+        messages.success(self.request, "Nomina creada correctamente")
+        return super().form_valid(form)
     
     
     def get_context_data(self, **kwargs):
@@ -63,6 +67,10 @@ class NominaUpdateView(UpdateView):
     template_name = 'Nomina/crear_nomina.html'
     success_url = reverse_lazy('apy:nomina_lista')
     
+    def form_valid(self, form):
+        messages.success(self.request, "Nomina actualizada correctamente")
+        return super().form_valid(form)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Editar empleado'
@@ -74,6 +82,11 @@ class NominaDeleteView(DeleteView):
     model = Nomina
     template_name = 'Nomina/eliminar_nomina.html'
     success_url = reverse_lazy('apy:nomina_lista')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Administrador eliminado correctamente")
+        return super().form_valid(form)
+
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
