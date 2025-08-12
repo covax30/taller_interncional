@@ -3,6 +3,7 @@ from apy.models import *
 from apy.view.clientes.views import *
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import JsonResponse
+from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.urls import reverse_lazy
@@ -43,6 +44,11 @@ class ClienteCreateView(CreateView):
     form_class = ClienteForm
     template_name = 'clientes/crear_clientes.html'
     success_url = reverse_lazy('apy:cliente_lista')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Cliente creado correctamente")
+        return super().form_valid(form)
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -56,6 +62,10 @@ class ClienteUpdateView(UpdateView):
     form_class = ClienteForm
     template_name = 'clientes/crear_clientes.html'
     success_url = reverse_lazy('apy:cliente_lista')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Cliente actualizado correctamente")
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -68,6 +78,10 @@ class ClienteDeleteView(DeleteView):
     model = Cliente
     template_name = 'clientes/eliminar_clientes.html'
     success_url = reverse_lazy('apy:cliente_lista')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Cliente eliminado correctamente")
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

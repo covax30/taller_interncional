@@ -3,6 +3,7 @@ from apy.models import *
 from apy.view.entrada_vehiculos.views import *
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import JsonResponse
+from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.urls import reverse_lazy
@@ -47,6 +48,10 @@ class EntradaVehiculoCreateView(CreateView):
     template_name = 'entrada_vehiculos/crear_entrada_vehiculos.html'
     success_url = reverse_lazy('apy:entrada_vehiculo_lista')
 
+    def form_valid(self, form):
+        messages.success(self.request, "Entrada de Vehiculo creada correctamente")
+        return super().form_valid(form)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Crear de Entrada de Vehiculos'
@@ -59,7 +64,11 @@ class EntradaVehiculoUpdateView(UpdateView):
     form_class = EntradaVehiculoForm
     template_name = 'entrada_vehiculos/crear_entrada_vehiculos.html'
     success_url = reverse_lazy('apy:entrada_vehiculo_lista')
-
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Entrada de Vehiculo actualizada correctamente")
+        return super().form_valid(form)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Editar de Entrada de Vehiculos'
@@ -71,6 +80,10 @@ class EntradaVehiculoDeleteView(DeleteView):
     model = EntradaVehiculo
     template_name = 'entrada_vehiculos/eliminar_entrada_vehiculos.html'
     success_url = reverse_lazy('apy:entrada_vehiculo_lista')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Entrada de Vehiculo eliminada correctamente")
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
