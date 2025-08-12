@@ -29,19 +29,3 @@
     </form>
 </div>
 
-<script>
-    {% if form.errors %}  
-    var errors = '';
-    {% for field in form%}
-        {% for error in field.errors %}
-              errors +- = '{{ error}}\n';
-            {%endfor%}  
-        {% endfor %}    
-    Swal.fire({
-        title: 'Error',
-        html: {% for field in form %}{% for error in field.errors %}{{ error|escapejs }}<br>{% endfor %}{% endfor %},
-        icon: 'error',
-    });
-    {% endif %}
-</script>
-{% endblock content %}
