@@ -1,0 +1,48 @@
+
+{% extends "generic_listar.html" %}
+
+{% block titulo %}
+        <h1 class="text-center">listar repuestos</h1>
+{% endblock titulo %}
+
+{% block agregar %}
+<a href="{{crear_url}}" class=" btn btn-primary btn btn-xs"><i class="fas fa-plus"></i>
+          Agregar
+</a>
+{% endblock %}
+
+{% block columnas %}
+
+        <th>id_marca</th>
+        <th>nombre</th>
+        <th>categoria</th>
+        <th>fabricante</th>
+        <th>stock</th>
+        <th>ubicacion</th>
+        <th>precio</th>
+
+{% endblock %}
+
+{% block iterar %}
+
+      {% for r in object_list %}
+      <tr>
+        <td>{{r.id_marca}}</td>
+        <td>{{r.nombre}}</td>
+        <td>{{r.categoria}}</td>
+        <td>{{r.fabricante}}</td>
+        <td>{{r.stock}}</td>
+        <td>{{r.ubicacion}}</td>
+        <td>{{r.precio}}</td>
+
+        <form method="post">
+
+          <td>
+            <a href="{% url 'apy:repuesto_editar' r.id %}" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></a>
+            <a href="{% url 'apy:repuesto_eliminar' r.id %}" class="btn btn-danger btn-xs"><i
+                class="fas fa-trash-alt"></i></a>
+          </td>
+      </tr>
+      {% endfor %}
+
+{% endblock %}

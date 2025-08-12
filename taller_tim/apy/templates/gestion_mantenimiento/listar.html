@@ -1,0 +1,44 @@
+
+{% extends "generic_listar.html" %}
+
+{% block titulo %}
+        <h1 class="text-center">listar mantenimientos</h1>
+{% endblock titulo %}
+
+{% block agregar %}
+<a href="{{crear_url}}" class=" btn btn-primary btn btn-xs"><i class="fas fa-plus"></i>
+          Agregar
+</a>
+{% endblock %}
+
+{% block columnas %}
+
+        <th>fallas</th>
+        <th>procesos</th>
+        <th>Id Vehiculo</th>
+        <th>Id Empledo</th>
+        <th>Id tipo mantenimiento</th>
+
+{% endblock %}
+
+{% block iterar %}
+
+      {% for g in object_list %}
+      <tr>
+        <td>{{g.fallas}}</td>
+        <td>{{g.procesos}}</td>
+        <td>{{g.Id_Vehiculo}}</td>
+        <td>{{g.Id_Empledo}}</td>
+        <td>{{g.id_tipo_mantenimiento}}</td>
+
+        <form method="post">
+
+          <td>
+            <a href="{% url 'apy:mantenimiento_editar' g.id %}" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></a>
+            <a href="{% url 'apy:mantenimiento_eliminar' g.id %}" class="btn btn-danger btn-xs"><i
+                class="fas fa-trash-alt"></i></a>
+          </td>
+      </tr>
+      {% endfor %}
+
+{% endblock %}
