@@ -1,4 +1,5 @@
 .venv
+env/
 
 db.sqlite3
  796aeae4f5a247217655309dff9bd77dba27d4ae
