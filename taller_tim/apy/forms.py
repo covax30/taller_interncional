@@ -824,6 +824,11 @@ class RepuestoForm(ModelForm):
                     'placeholder':'Ingrese la marca del repuesto',
                 }
             ),
+            'nombre':TextInput(
+                attrs={
+                    'placeholder':'Ingrese el nombre de el repuesto',
+                }   
+            ),
             'categoria':TextInput(
                 attrs={
                     'placeholder':'Ingrese la categoria del repuesto',

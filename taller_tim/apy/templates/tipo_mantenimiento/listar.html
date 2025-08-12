@@ -14,11 +14,8 @@
 {% block columnas %}
 
         <th>nombre</th>
-        <th>color</th>
-        <th>tipo</th>
-        <th>material</th>
-        <th>Id_marca</th>
-        <th>stock</th>
+        <th>descripcion</th>
+        <th>acciones</th>
 
 {% endblock %}
 
@@ -27,11 +24,7 @@
       {% for t in object_list %}
       <tr>
         <td>{{t.nombre}}</td>
-        <td>{{t.color}}</td>
-        <td>{{t.tipo}}</td>
-        <td>{{t.material}}</td>
-        <td>{{t.Id_marca}}</td>
-        <td>{{t.stock}}</td>
+        <td>{{t.descripcion}}</td>
 
         <form method="post">
 

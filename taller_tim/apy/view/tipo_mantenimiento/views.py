@@ -65,6 +65,9 @@ class TipoMantenimientoDeleteView(DeleteView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['titulo'] = 'Eliminar Tipo de Mantenimiento'
-        context['entidad'] = 'Tipo de Mantenimiento'
+        context['titulo'] = 'Eliminar Repuesto'
+        context['entidad'] = 'Repuesto'
+        context['listar_url'] = reverse_lazy('apy:repuesto_lista')
+        # La clave es añadir el objeto al contexto
+        context['object'] = self.get_object() 
         return context
