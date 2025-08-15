@@ -32,6 +32,10 @@ class MantenimientoCreateView(CreateView):
     template_name = 'gestion_mantenimiento/crear.html'
     success_url = reverse_lazy('apy:mantenimiento_lista')
     
+    def form_valid(self, form):
+        messages.success(self.request, "Mantenimiento creado correctamente")
+        return super().form_valid(form)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Crear Mantenimiento'
@@ -45,6 +49,10 @@ class MantenimientoUpdateView(UpdateView):
     template_name = 'gestion_mantenimiento/crear.html'
     success_url = reverse_lazy('apy:mantenimiento_lista')
     
+    def form_valid(self, form):
+        messages.success(self.request, "Mantenimiento editado correctamente")
+        return super().form_valid(form)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Editar Mantenimiento'
@@ -56,6 +64,10 @@ class MantenimientoDeleteView(DeleteView):
     model = Mantenimiento
     template_name = 'gestion_mantenimiento/eliminar.html'
     success_url = reverse_lazy('apy:mantenimiento_lista')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Mantenimiento eliminado correctamente")
+        return super().form_valid(form)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

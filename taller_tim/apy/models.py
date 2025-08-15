@@ -12,30 +12,30 @@ class Cliente(models.Model):
     fecha_operacion = models.DateField()
     monto = models.IntegerField(default=0)
 
-    def __str__(self):
+    def _str_(self):
         return f"{self.id_cliente} - {self.nombre}"
 
 
 class Vehiculo(models.Model):
     id_vehiculo = models.AutoField(primary_key=True)
-    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)  # LLAVE
+    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, blank=True)  # LLAVE
     placa = models.CharField(max_length=10, unique=True)
     modelo_vehiculo = models.CharField(max_length=100)
     marca_vehiculo = models.CharField(max_length=100)
     color = models.CharField(max_length=100)
 
-    def __str__(self):
+    def _str_(self):
         return f"{self.placa} - {self.marca_vehiculo} - {self.modelo_vehiculo}"
     
 
 class EntradaVehiculo(models.Model):
     id_entrada = models.AutoField(primary_key=True)
-    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE) # LLAVE
-    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)  # LLAVE
+    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE ,blank=True) # LLAVE
+    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE , blank=True)  # LLAVE
     fecha_ingreso = models.DateField()
     hora_ingreso = models.TimeField()
 
-    def __str__(self):
+    def _str_(self):
         return f"{self.id_cliente.id_cliente} - {self.id_vehiculo.placa} - {self.fecha_ingreso} {self.hora_ingreso}"
     
 
@@ -43,13 +43,13 @@ class EntradaVehiculo(models.Model):
 
 class SalidaVehiculo(models.Model):
     id_salida = models.AutoField(primary_key=True)
-    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE) # LLAVE
+    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE, blank=True) # LLAVE
     id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)  # LLAVE
     diagnostico = models.CharField(max_length=100)
     fecha_salida = models.DateField()
     hora_salida = models.TimeField()
 
-    def __str__(self):
+    def _str_(self):
         return f"{self.id_cliente.id_cliente} - {self.id_vehiculo.placa} - {self.diagnostico}"
 
 
@@ -61,7 +61,7 @@ class TipoMantenimiento(models.Model):
     nombre = models.CharField(max_length=50, unique=True)
     descripcion = models.TextField(blank=True, null=True)
 
-    def __str__(self):
+    def _str_(self):
         return self.nombre
 
    
@@ -70,12 +70,12 @@ class Marca(models.Model):
     nombre = models.CharField(max_length=100)
     tipo = models.CharField(max_length=100)
 
-    def __str__(self):
-        return f"{self.nombre} - {self.tipo}"
+    def _str_(self):
+        return self.nombre
 
 #------ ENTIDAD REPUESTOS --------3
 class Repuesto(models.Model):
-    id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE)
+    id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE, blank=True, null=True)  # LLAVE
     nombre = models.CharField(max_length=100)
     categoria = models.CharField(max_length=100)
     fabricante = models.CharField(max_length=100)
@@ -83,8 +83,8 @@ class Repuesto(models.Model):
     ubicacion = models.CharField(max_length=100)
     precio = models.IntegerField(default=0)
     
-    def __str__(self):
-        return f"{self.nombre} ({self.codigo})"   
+    def _str_(self):
+        return f"{self.nombre} "   
    
     
 #------ ENTIDAD HERRAMIENTAS --------4
@@ -94,22 +94,22 @@ class Herramienta(models.Model):
     color = models.CharField(max_length=100)
     tipo = models.CharField(max_length=100)
     material = models.CharField(max_length=100)
-    id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE)
+    id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE, blank=True, null=True)
     stock = models.IntegerField(default=0)
 
-    def __str__(self):
-        return f"{self.nombre} ({self.tipo})"
+    def _str_(self):
+        return self.nombre
 
 #------ ENTIDAD INSUMOS --------5
 class Insumos(models.Model):
 
-    id_marca = models.CharField(max_length=50)
+    id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE, blank=True, null=True)
     nombre = models.CharField(max_length=100)
     costo = models.IntegerField()
     tipo = models.CharField(max_length=100)
     stock = models.IntegerField(default=0)
 
-    def __str__(self):
+    def _str_(self):
 
         return f"{self.nombre} ({self.id})"
 
@@ -126,7 +126,7 @@ class Administrador(models.Model):
     telefono = models.CharField(max_length=20)
     fecha_ingreso = models.DateField()
     
-    def __str__(self):
+    def _str_(self):
         return f"{self.nombre} {self.apellidos}"
 
 
@@ -135,7 +135,7 @@ class PagoServiciosPublicos(models.Model):
     id_servicio = models.AutoField(primary_key=True)
     monto = models.DecimalField(max_digits=10, decimal_places=2)
     
-    def __str__(self):
+    def _str_(self):
         return f"{self.id_servicio} {self.monto}"
     
 #--------------Modulo Proveedores--------------
@@ -145,7 +145,7 @@ class Proveedores(models.Model):
     telefono = models.CharField(max_length=20)
     correo = models.EmailField(unique=True)
     
-    def __str__(self):
+    def _str_(self):
         return f"{self.id_proveedor} {self.correo}"
     
 
@@ -153,15 +153,15 @@ class Proveedores(models.Model):
 class Compra(models.Model):
     id_compra = models.AutoField(primary_key=True)
     id_factura_compra = models.IntegerField(unique=True)
-    id_proveedor = models.ForeignKey(Proveedores, on_delete=models.CASCADE)  # LLAVE
+    id_proveedor = models.ForeignKey(Proveedores, on_delete=models.CASCADE, blank=True)  # LLAVE
     fecha_compra = models.DateField()
     hora_compra = models.TimeField()
 
-    def __str__(self):
+    def _str_(self):
         return f"{self.id_factura_compra} - {self.proveedor} - {self.fecha_compra} {self.hora_compra}"
 
     
-        return f"{self.id_factura_compra} - {self.id_proveedor} - {self.fecha_compra} {self.hora_compra}"
+        
 
 
 
@@ -178,7 +178,7 @@ class Pagos(models.Model):
     id_insumos = models.ForeignKey(Insumos, on_delete=models.SET_NULL, null=True, blank=True)
     id_repuestos = models.ForeignKey(Repuesto, on_delete=models.SET_NULL, null=True, blank=True)
     
-    def __str__(self):
+    def _str_(self):
         return f"{self.id_pago} {self.monto}"
 
 
@@ -189,7 +189,7 @@ class Gastos(models.Model):
     descripcion = models.TextField() 
     tipo_gastos=models.CharField(max_length=100,  unique=True)
     id_pagos_servicios = models.ForeignKey(PagoServiciosPublicos, on_delete=models.SET_NULL, null=True, blank=True)
-    def __str__(self):
+    def _str_(self):
         return f"{self.tipo_gastos} - ${self.monto}"
      #class meta
        #verbose_name = 'Gastos'
@@ -203,7 +203,7 @@ class Empleado(models.Model):
     identificacion = models.CharField(max_length=20, unique=True) 
     Correo= models.EmailField(max_length=254, unique=True)
     direccion = models.CharField(max_length=255)
-    def __str__(self):
+    def _str_(self):
         return f"{self.nombre} ({self.identificacion})"
     #class meta
         #verbose_name = 'Empleado'
@@ -219,7 +219,7 @@ class Mantenimiento(models.Model):
     id_empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE,blank=True,null=True)
     id_tipo_mantenimiento = models.ForeignKey(TipoMantenimiento, on_delete=models.CASCADE,blank=True,null=True)
 
-    def __str__(self):
+    def _str_(self):
         return f"{self.fallas} - {self.id_tipo_mantenimiento}"
 
     
@@ -235,7 +235,7 @@ class Informes(models.Model):
     tipo_informe = models.CharField(max_length=100)
     id_mantenimiento = models.ForeignKey(Mantenimiento, on_delete=models.SET_NULL, null=True, blank=True)
     
-    def __str__(self):
+    def _str_(self):
         return f"{self.id_informe} {self.tipo_informe}"
     
     
@@ -246,7 +246,7 @@ class Nomina(models.Model):
     monto= models.DecimalField(max_digits=10, decimal_places=2) 
     fecha_pago =  models.DateField() 
     id_empleado =   models.ForeignKey(Empleado, on_delete=models.SET_NULL, null=True)            
-    def __str__(self):
+    def _str_(self):
         return f"{self.rol} - ${self.monto} - {self.fecha_pago}"
      #class meta
         #verbose_name = 'Nomina'
@@ -265,7 +265,7 @@ class Factura(models.Model):
     direccion_empresa = models.CharField(max_length=45, null=True, blank=True)
     id_empleado = models.ForeignKey(Empleado, on_delete=models.SET_NULL, null=True, blank=True)
 
-    def __str__(self):
+    def _str_(self):
         return f"Factura {self.id} - {self.tipo_pago or 'Sin pago'}"
 
 #-----------Caja-----------------
@@ -280,9 +280,8 @@ class Caja(models.Model):
     id_Factura= models.ForeignKey(Factura, on_delete=models.CASCADE, null=True, blank=True)
     id_pagos= models.ForeignKey(Pagos, on_delete=models.CASCADE, null=True, blank=True)
     id_nomina= models.ForeignKey(Nomina, on_delete=models.CASCADE, null=True, blank=True) 
-    def __str__(self):
+    def _str_(self):
         return f"{self.tipo_movimiento} - {self.monto} en {self.fecha} {self.hora}"   
     #class meta
         #verbose_name = 'Caja'
         #verbose_name_plural = 'Caja'
-
