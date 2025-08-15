@@ -18,7 +18,7 @@ class Cliente(models.Model):
 
 class Vehiculo(models.Model):
     id_vehiculo = models.AutoField(primary_key=True)
-    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, blank=True)  # LLAVE
+    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, blank=True,null=True)  # LLAVE
     placa = models.CharField(max_length=10, unique=True)
     modelo_vehiculo = models.CharField(max_length=100)
     marca_vehiculo = models.CharField(max_length=100)
@@ -31,7 +31,7 @@ class Vehiculo(models.Model):
 class EntradaVehiculo(models.Model):
     id_entrada = models.AutoField(primary_key=True)
     id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE ,blank=True) # LLAVE
-    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE , blank=True)  # LLAVE
+    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE , blank=True,null=True)  # LLAVE
     fecha_ingreso = models.DateField()
     hora_ingreso = models.TimeField()
 
@@ -43,8 +43,8 @@ class EntradaVehiculo(models.Model):
 
 class SalidaVehiculo(models.Model):
     id_salida = models.AutoField(primary_key=True)
-    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE, blank=True) # LLAVE
-    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)  # LLAVE
+    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE, blank=True,null=True) # LLAVE
+    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE,blank=True,null=True)  # LLAVE
     diagnostico = models.CharField(max_length=100)
     fecha_salida = models.DateField()
     hora_salida = models.TimeField()
@@ -83,7 +83,7 @@ class Repuesto(models.Model):
     ubicacion = models.CharField(max_length=100)
     precio = models.IntegerField(default=0)
     
-    def _str_(self):
+    def __str__(self):
         return f"{self.nombre} "   
    
     
@@ -103,7 +103,7 @@ class Herramienta(models.Model):
 #------ ENTIDAD INSUMOS --------5
 class Insumos(models.Model):
 
-    id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE, blank=True, null=True)
+    id_marca = models.ForeignKey(Marca, on_delete=models.SET_NULL, blank=True, null=True)
     nombre = models.CharField(max_length=100)
     costo = models.IntegerField()
     tipo = models.CharField(max_length=100)
@@ -153,7 +153,7 @@ class Proveedores(models.Model):
 class Compra(models.Model):
     id_compra = models.AutoField(primary_key=True)
     id_factura_compra = models.IntegerField(unique=True)
-    id_proveedor = models.ForeignKey(Proveedores, on_delete=models.CASCADE, blank=True)  # LLAVE
+    id_proveedor = models.ForeignKey(Proveedores, on_delete=models.CASCADE, blank=True,null=True)  # LLAVE
     fecha_compra = models.DateField()
     hora_compra = models.TimeField()
 
@@ -172,8 +172,8 @@ class Pagos(models.Model):
     fecha = models.DateField()
     hora = models.TimeField()
     monto = models.DecimalField(max_digits=10, decimal_places=2)
-    id_proveedor = models.ForeignKey(Proveedores, on_delete=models.SET_NULL, null=True)
-    id_admin = models.ForeignKey(Administrador, on_delete=models.SET_NULL, null=True)
+    id_proveedor = models.ForeignKey(Proveedores, on_delete=models.SET_NULL, null=True,blank=True)
+    id_admin = models.ForeignKey(Administrador, on_delete=models.SET_NULL, null=True,blank=True)
     id_herramienta = models.ForeignKey(Herramienta, on_delete=models.SET_NULL, null=True, blank=True)
     id_insumos = models.ForeignKey(Insumos, on_delete=models.SET_NULL, null=True, blank=True)
     id_repuestos = models.ForeignKey(Repuesto, on_delete=models.SET_NULL, null=True, blank=True)
@@ -187,9 +187,9 @@ class Gastos(models.Model):
    
     monto = models.DecimalField(max_digits=10, decimal_places=2)
     descripcion = models.TextField() 
-    tipo_gastos=models.CharField(max_length=100,  unique=True)
-    id_pagos_servicios = models.ForeignKey(PagoServiciosPublicos, on_delete=models.SET_NULL, null=True, blank=True)
-    def _str_(self):
+    tipo_gastos=models.CharField(max_length=100)
+    id_pagos_servicios = models.ForeignKey(PagoServiciosPublicos, on_delete=models.SET_NULL, null=True, blank=True,)
+    def __str__(self):
         return f"{self.tipo_gastos} - ${self.monto}"
      #class meta
        #verbose_name = 'Gastos'
@@ -242,11 +242,11 @@ class Informes(models.Model):
 #-------- nomina------
 class Nomina(models.Model):
    
-    rol = models.CharField(max_length=100,  unique=True) 
+    rol = models.CharField(max_length=100) 
     monto= models.DecimalField(max_digits=10, decimal_places=2) 
     fecha_pago =  models.DateField() 
-    id_empleado =   models.ForeignKey(Empleado, on_delete=models.SET_NULL, null=True)            
-    def _str_(self):
+    id_empleado =   models.ForeignKey(Empleado, on_delete=models.SET_NULL, null=True,blank=True)            
+    def __str__(self):
         return f"{self.rol} - ${self.monto} - {self.fecha_pago}"
      #class meta
         #verbose_name = 'Nomina'
@@ -275,13 +275,15 @@ class Caja(models.Model):
     monto= models.DecimalField(max_digits=10, decimal_places=2)
     fecha= models.DateField()
     hora=models.TimeField()
-    id_gasto= models.ForeignKey( Gastos , on_delete=models.CASCADE, null=True, blank=True )
-    id_admin=models.ForeignKey(Administrador, on_delete=models.CASCADE, null=True, blank=True) 
-    id_Factura= models.ForeignKey(Factura, on_delete=models.CASCADE, null=True, blank=True)
-    id_pagos= models.ForeignKey(Pagos, on_delete=models.CASCADE, null=True, blank=True)
-    id_nomina= models.ForeignKey(Nomina, on_delete=models.CASCADE, null=True, blank=True) 
-    def _str_(self):
+    id_gasto= models.ForeignKey( Gastos , on_delete=models.SET_NULL, null=True, blank=True )
+    id_admin=models.ForeignKey(Administrador, on_delete=models.SET_NULL, null=True, blank=True) 
+    id_Factura= models.ForeignKey(Factura, on_delete=models.SET_NULL, null=True, blank=True)
+    id_pagos= models.ForeignKey(Pagos, on_delete=models.SET_NULL, null=True, blank=True)
+    id_nomina= models.ForeignKey(Nomina, on_delete=models.SET_NULL, null=True, blank=True) 
+    def __str__(self):
         return f"{self.tipo_movimiento} - {self.monto} en {self.fecha} {self.hora}"   
     #class meta
         #verbose_name = 'Caja'
         #verbose_name_plural = 'Caja'
+
+

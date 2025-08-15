@@ -78,9 +78,10 @@ class AdministradorDeleteView(DeleteView):
     template_name = 'Administrador/eliminar_administrador.html'
     success_url = reverse_lazy('apy:administrador_lista')
     
-    def delete(self, request, *args, **kwargs):
+    def form_valid(self, form):
         messages.success(self.request, "Administrador eliminado correctamente")
-        return super().delete(request, *args, **kwargs)
+        return super().form_valid(form)
+
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -3,6 +3,7 @@ from apy.models import *
 from apy.view.compras.views import *
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import JsonResponse
+from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.urls import reverse_lazy
@@ -43,6 +44,10 @@ class CompraCreateView(CreateView):
     form_class = CompraForm
     template_name = 'compras/crear_compras.html'
     success_url = reverse_lazy('apy:compra_lista')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Compra creada correctamente")
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -56,6 +61,10 @@ class CompraUpdateView(UpdateView):
     form_class = CompraForm
     template_name = 'compras/crear_compras.html'
     success_url = reverse_lazy('apy:compra_lista')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Compra actualizada correctamente")
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -68,6 +77,10 @@ class CompraDeleteView(DeleteView):
     model = Compra
     template_name = 'compras/eliminar_compras.html'
     success_url = reverse_lazy('apy:compra_lista')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Compra eliminada correctamente")
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -1,5 +1,6 @@
 
 {% extends "generic_listar.html" %}
+{% load static %}
 
 {% block titulo %}
         <h1 class="text-center">Lista de Facturas</h1>
@@ -45,6 +46,20 @@
             <a href="{% url 'apy:factura_editar' f.id %}" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></a>
             <a href="{% url 'apy:factura_eliminar' f.id %}" class="btn btn-danger btn-xs"><i
                 class="fas fa-trash-alt"></i></a>
+            <button type="button" class="btn btn-secondary btn-xs" onclick='generarPDFFacturaDesdeDjango({
+    id: "{{ f.id }}",
+    tipo_pago: "{{ f.tipo_pago }}",
+    id_cliente: "{{ f.id_cliente }}",
+    id_vehiculo: "{{ f.id_vehiculo }}",
+    id_tipo_mantenimiento: "{{ f.id_tipo_mantenimiento }}",
+    servicio_prestado: `{{ f.servicio_prestado }}`,
+    nombre_empresa: `{{ f.nombre_empresa }}`,
+    direccion_empresa: `{{ f.direccion_empresa }}`,
+    id_empleado: "{{ f.id_empleado }}"
+})'>
+  <i class="fas fa-print"></i>
+</button>
+
           </td>
       </tr>
       {% endfor %}
@@ -63,5 +78,8 @@
     {% endfor %}
   {% endif %}
 </script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="{% static 'js/imprimir_factura.js' %}"></script>
 
 {% endblock %}

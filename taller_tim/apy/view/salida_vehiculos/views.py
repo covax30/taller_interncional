@@ -3,6 +3,7 @@ from apy.models import *
 from apy.view.salida_vehiculos.views import *
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import JsonResponse
+from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.urls import reverse_lazy
@@ -46,6 +47,11 @@ class SalidaVehiculoCreateView(CreateView):
     form_class = SalidaVehiculoForm
     template_name = 'salida_vehiculos/crear_salida_vehiculos.html'
     success_url = reverse_lazy('apy:salida_vehiculo_lista')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Salida de Vehiculo creada correctamente")
+        return super().form_valid(form)
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -60,6 +66,11 @@ class SalidaVehiculoUpdateView(UpdateView):
     template_name = 'salida_vehiculos/crear_salida_vehiculos.html'
     success_url = reverse_lazy('apy:salida_vehiculo_lista')
 
+    def form_valid(self, form):
+        messages.success(self.request, "Salida de Vehiculo actualizada correctamente")
+        return super().form_valid(form)
+
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Editar de Salida de Vehiculos'
@@ -71,6 +82,10 @@ class SalidaVehiculoDeleteView(DeleteView):
     model = SalidaVehiculo
     template_name = 'salida_vehiculos/eliminar_salida_vehiculos.html'
     success_url = reverse_lazy('apy:salida_vehiculo_lista')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Salida de Vehiculo eliminada correctamente")
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

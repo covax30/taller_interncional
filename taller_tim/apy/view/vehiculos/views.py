@@ -3,6 +3,7 @@ from apy.models import *
 from apy.view.vehiculos.views import *
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import JsonResponse
+from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.urls import reverse_lazy
@@ -43,6 +44,10 @@ class VehiculoCreateView(CreateView):
     form_class = VehiculoForm
     template_name = 'vehiculos/crear_vehiculos.html'
     success_url = reverse_lazy('apy:vehiculo_lista')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Vehiculo creado correctamente")
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -56,6 +61,10 @@ class VehiculoUpdateView(UpdateView):
     form_class = VehiculoForm
     template_name = 'vehiculos/crear_vehiculos.html'
     success_url = reverse_lazy('apy:vehiculo_lista')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Vehiculo actualizado correctamente")
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -68,6 +77,11 @@ class VehiculoDeleteView(DeleteView):
     model = Vehiculo
     template_name = 'vehiculos/eliminar_vehiculos.html'
     success_url = reverse_lazy('apy:vehiculo_lista')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Vehiculo eliminado correctamente")
+        return super().form_valid(form)
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

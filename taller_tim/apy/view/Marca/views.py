@@ -7,6 +7,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.urls import reverse_lazy
 from apy.forms import *
+from django.contrib import messages
 
 # Create your views here.
 # --------------Vistas Karol---------------
@@ -45,6 +46,10 @@ class MarcaCreateView(CreateView):
     template_name = 'Marca/crear_marca.html'
     success_url = reverse_lazy('apy:marca_lista')
     
+    def form_valid(self, form):
+        messages.success(self.request, "Marca creada correctamente")
+        return super().form_valid(form)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context ['titulo'] = 'Crear Marca'
@@ -58,6 +63,10 @@ class MarcaUpdateView(UpdateView):
     template_name = 'Marca/crear_marca.html'
     success_url = reverse_lazy('apy:marca_lista')
     
+    def form_valid(self, form):
+        messages.success(self.request, "Marca actualizada correctamente")
+        return super().form_valid(form)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Editar marca'
@@ -69,6 +78,10 @@ class MarcaDeleteView(DeleteView):
     model = Marca
     template_name = 'Marca/eliminar_marca.html'
     success_url = reverse_lazy('apy:marca_lista')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Marca eliminada correctamente")
+        return super().form_valid(form)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
