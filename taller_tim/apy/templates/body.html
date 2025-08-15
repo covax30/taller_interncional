@@ -2,8 +2,10 @@
 {% load static %}
 {% block body %}
 <body class="layout-fixed sidebar-expand-lg sidebar-mini bg-body-tertiary">
+  
   <div class="app-wrapper"> 
     {% include 'header.html' %}
+
     {% include 'sidebar.html' %}
 
     {% block content %}
@@ -12,115 +14,77 @@
     {% include 'footer.html'%}
   </div>
 
-  <!-- Scripts JS (en orden correcto) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-  <!-- jQuery (asegúrate de no duplicarlo) -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{% static 'lib/datatables-1.10.20/datatables.min.js' %}"></script>
+<script src="{% static 'lib/adminlte-3.0.4/plugins/datatables-responsive/js/dataTables.responsive.js' %}"></script>
+<script src="{% static 'lib/adminlte-3.0.4/plugins/datatables-responsive/js/responsive.bootstrap4.js' %}"></script>
+<link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/css/jquery.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'lib/adminlte-3.0.4/plugins/datatables-responsive/css/responsive.bootstrap4.css' %}">
 
-  <!-- sweetalert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  <!-- Bootstrap -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
-  <!-- Luego, Popper.js -->
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script src="{% static 'lib/AdminLTE-4.0.0-rc3/dist/js/adminlte.min.js' %}"></script>
+<script src="{% static 'lib/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-dyZb8CT5EIG9YvGZr9YfCT1GHf4vPY7UoX8PbQZkXEQ1+ExR/dqI+3IBGoZTw6Z8+btfM68Ek58dxRZozm4JQw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-  <!-- Bootstrap 5 -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $('#mi-tabla').DataTable();
+  });
+</script>
 
-  <!-- AdminLTE -->
-  <script src="{% static 'lib/AdminLTE-4.0.0-rc3/dist/js/adminlte.min.js' %}"></script>
-
-  <!-- OverlayScrollbars -->
-  <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js" crossorigin="anonymous"></script>
-
-  <!-- DataTables CSS -->
-  <link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/datatables.min.css' %}">
-
-  <!-- DataTables JS -->
-  <script src="{% static 'lib/datatables-1.10.20/datatables.min.js' %}"></script>
-
-  <!-- Inicialización de DataTables -->
-  <script>
-    $(document).ready(function () {
-      $('#mi-tabla').DataTable(); // Asegúrate de que tu tabla tenga id="mi-tabla"
-    });
-  </script>
-
-  <!-- Configuración de OverlayScrollbars -->
-  <!-- ESTILOS DATATABLES -->
-  <link rel="stylesheet" href="{% static 'lib/adminlte-3.0.4/plugins/datatables-responsive/css/responsive.bootstrap4.css' %}">
-  <link rel="stylesheet" href="{% static 'lib/adminlte-3.0.4/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
-  <script src="{% static 'lib/adminlte-3.0.4/plugins/datatables-responsive/js/dataTables.responsive.js' %}"></script>
-  <script src="{% static 'lib/adminlte-3.0.4/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
-  <script src="{% static 'lib/adminlte-3.0.4/plugins/datatables-responsive/js/responsive.bootstrap4.js' %}"></script>
-  <script src="{% static 'lib/adminlte-3.0.4/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
-  <link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/css/jquery.dataTables.min.css' %}">
-  <script src="{% static 'lib/datatables-1.10.20/js/jquery.dataTables.min.js' %}"></script>
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-dyZb8CT5EIG9YvGZr9YfCT1GHf4vPY7UoX8PbQZkXEQ1+ExR/dqI+3IBGoZTw6Z8+btfM68Ek58dxRZozm4JQw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-  
-  
-  <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"
-    crossorigin="anonymous"></script>
-  <!--end::Third Party Plugin(OverlayScrollbars)--><!--begin::Required Plugin(popperjs for Bootstrap 5)-->
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-    crossorigin="anonymous"></script>
-  <!--end::Required Plugin(popperjs for Bootstrap 5)--><!--begin::Required Plugin(Bootstrap 5)-->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
-  <!--end::Required Plugin(Bootstrap 5)--><!--begin::Required Plugin(AdminLTE)-->
-  <script src="../js/adminlte.js"></script>
-  <!--end::Required Plugin(AdminLTE)--><!--begin::OverlayScrollbars Configure-->
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const sidebarWrapper = document.querySelector(".sidebar-wrapper");
-      if (sidebarWrapper && OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined) {
-        OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
-          scrollbars: {
-            theme: "os-theme-light",
-            autoHide: "leave",
-            clickScroll: true
-          }
-        });
-      }
-    });
-  </script>
-
-  <!-- Corrección de rutas de imágenes -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const cssLink = document.querySelector('link[href*="css/adminlte.css"]');
-      if (!cssLink) return;
-      const cssHref = cssLink.getAttribute('href');
-      const deploymentPath = cssHref.slice(0, cssHref.indexOf('css/adminlte.css'));
-
-      document.querySelectorAll('img[src^="/assets/"]').forEach(img => {
-        const originalSrc = img.getAttribute('src');
-        if (originalSrc) {
-          const relativeSrc = originalSrc.slice(1);
-          img.src = deploymentPath + relativeSrc;
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const sidebarWrapper = document.querySelector(".sidebar-wrapper");
+    if (sidebarWrapper && OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined) {
+      OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+        scrollbars: {
+          theme: "os-theme-light",
+          autoHide: "leave",
+          clickScroll: true
         }
       });
+    }
+  });
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const cssLink = document.querySelector('link[href*="css/adminlte.css"]');
+    if (!cssLink) return;
+    const cssHref = cssLink.getAttribute('href');
+    const deploymentPath = cssHref.slice(0, cssHref.indexOf('css/adminlte.css'));
+
+    document.querySelectorAll('img[src^="/assets/"]').forEach(img => {
+      const originalSrc = img.getAttribute('src');
+      if (originalSrc) {
+        const relativeSrc = originalSrc.slice(1);
+        img.src = deploymentPath + relativeSrc;
+      }
     });
-  </script> <!--end::Script-->
-  {% block extra_js %}
-  {% endblock %}
+  });
+</script>
+
+{% block extra_js %}
+{% endblock %}
 
 {% if messages %}
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      {% for message in messages %}
-        Swal.fire({
-          icon: '{% if "success" in message.tags %}success{% elif "error" in message.tags %}error{% else %}info{% endif %}',
-          title: '{{ message|escapejs }}',
-          timer: 2500,
-          showConfirmButton: false
-        });
-      {% endfor %}
-    });
-  </script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    {% for message in messages %}
+      Swal.fire({
+        icon: '{% if "success" in message.tags %}success{% elif "error" in message.tags %}error{% else %}info{% endif %}',
+        title: '{{ message|escapejs }}',
+        timer: 2500,
+        showConfirmButton: false
+      });
+    {% endfor %}
+  });
+</script>
 {% endif %}
 
 
