@@ -1,3 +1,47 @@
+{% load static %}
+<nav class="app-header navbar navbar-expand bg-body"> <!--begin::Container-->
+  <div class="container-fluid"> <!--begin::Start Navbar Links-->
+    <ul class="navbar-nav">
+      <li class="nav-item"> <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button"> <i
+            class="bi bi-list"></i> </a> </li>
+      <li class="nav-item d-none d-md-block"> <a href="#" class="nav-link">Graficas</a> </li>
+    </ul> <!--end::Start Navbar Links--> <!--begin::End Navbar Links-->
+    <ul class="navbar-nav ms-auto"> <!--begin::Navbar Search-->
+      <li class="nav-item">
+        <a class="nav-link" data-widget="navbar-search" href="#" role="button">
+          <i class="bi bi-search"></i>
+        </a>
+      </li> <!--end::Navbar Search--> <!--begin::Messages Dropdown Menu-->
+
+      </li> <!--end::Messages Dropdown Menu--> <!--begin::Notifications Dropdown Menu-->
+      <ul class="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto">
+        <!-- Messages Dropdown Menu -->
+        
+        <!-- Notifications Dropdown Menu -->
+         <li class="nav-item dropdown">
+    <a id="btnNotificaciones" class="nav-link" data-bs-toggle="dropdown" href="#">
+        <i class="bi bi-bell-fill"></i>
+        <span id="stock-notification-badge" class="navbar-badge badge text-bg-warning d-none">0</span>
+    </a>
+    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
+        <span id="notification-count" class="dropdown-item dropdown-header">0 Notificaciones</span>
+        <div class="dropdown-divider"></div>
+        <div id="stock-notifications-container">
+            <a href="#" class="dropdown-item">Sin notificaciones</a>
+        </div>
+        <div class="dropdown-divider"></div>
+        <a href="#" class="dropdown-item dropdown-footer">Ver todas</a>
+    </div>
+</li>
+        
+      </ul>
+
+    </ul> <!--end::End Navbar Links-->
+  </div> <!--end::Container-->
+</nav>
+
+<script src="{% static 'apy/js/notificaciones_stock.js' %}"></script>
+
 
 <nav class="app-header navbar navbar-expand bg-body" style="background: linear-gradient(to right, #007bff, #88e7f6ff);">
   <!--begin::Container-->
@@ -123,47 +167,3 @@
         </ul> <!--end::End Navbar Links-->
       </div> <!--end::Container-->
     </nav> 
-{% load static %}
-<nav class="app-header navbar navbar-expand bg-body"> <!--begin::Container-->
-  <div class="container-fluid"> <!--begin::Start Navbar Links-->
-    <ul class="navbar-nav">
-      <li class="nav-item"> <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button"> <i
-            class="bi bi-list"></i> </a> </li>
-      <li class="nav-item d-none d-md-block"> <a href="#" class="nav-link">Graficas</a> </li>
-    </ul> <!--end::Start Navbar Links--> <!--begin::End Navbar Links-->
-    <ul class="navbar-nav ms-auto"> <!--begin::Navbar Search-->
-      <li class="nav-item">
-        <a class="nav-link" data-widget="navbar-search" href="#" role="button">
-          <i class="bi bi-search"></i>
-        </a>
-      </li> <!--end::Navbar Search--> <!--begin::Messages Dropdown Menu-->
-
-      </li> <!--end::Messages Dropdown Menu--> <!--begin::Notifications Dropdown Menu-->
-      <ul class="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto">
-        <!-- Messages Dropdown Menu -->
-        
-        <!-- Notifications Dropdown Menu -->
-         <li class="nav-item dropdown">
-    <a id="btnNotificaciones" class="nav-link" data-bs-toggle="dropdown" href="#">
-        <i class="bi bi-bell-fill"></i>
-        <span id="stock-notification-badge" class="navbar-badge badge text-bg-warning d-none">0</span>
-    </a>
-    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-        <span id="notification-count" class="dropdown-item dropdown-header">0 Notificaciones</span>
-        <div class="dropdown-divider"></div>
-        <div id="stock-notifications-container">
-            <a href="#" class="dropdown-item">Sin notificaciones</a>
-        </div>
-        <div class="dropdown-divider"></div>
-        <a href="#" class="dropdown-item dropdown-footer">Ver todas</a>
-    </div>
-</li>
-        
-      </ul>
-
-    </ul> <!--end::End Navbar Links-->
-  </div> <!--end::Container-->
-</nav>
-
-<script src="{% static 'apy/js/notificaciones_stock.js' %}"></script>
-
