@@ -102,7 +102,7 @@ class ClienteForm(ModelForm):
                     'class': 'form-control',
                 }
             ),
-            'id_operacion':Select(
+            'id_operacion':TextInput(
                 attrs={
                     'class': 'form-control',
                 }

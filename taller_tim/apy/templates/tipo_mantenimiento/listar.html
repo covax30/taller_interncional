@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block columnas %}
-
+        <th>id</th>
         <th>nombre</th>
         <th>descripcion</th>
         <th>acciones</th>
@@ -23,6 +23,7 @@
 
       {% for t in object_list %}
       <tr>
+        <td>{{t.id}}</td>
         <td>{{t.nombre}}</td>
         <td>{{t.descripcion}}</td>
 
