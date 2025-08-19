@@ -30,7 +30,7 @@ class Vehiculo(models.Model):
 
 class EntradaVehiculo(models.Model):
     id_entrada = models.AutoField(primary_key=True)
-    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE ,blank=True) # LLAVE
+    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE ,blank=True, null=True) # LLAVE
     id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE , blank=True,null=True)  # LLAVE
     fecha_ingreso = models.DateField()
     hora_ingreso = models.TimeField()

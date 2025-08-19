@@ -44,7 +44,18 @@
     border-radius: 5px !important;        /* Bordes redondeados opcional */
     padding: 5px 10px !important;         /* Espaciado interno */
   }
+   /* Estilo para el select de cantidad de registros en DataTables */
+   .dataTables_length select {
+    background-color: #ffffff !important; /* fondo blanco */
+    color: #000000 !important;            /* texto negro */
+    border: 1px solid #ccc !important;    /* borde gris */
+    border-radius: 5px !important;        /* bordes redondeados */
+    padding: 5px 10px !important;         /* espaciado interno */
+  }
+
+
 </style>
+
     </div>
   </div>
 </div>
@@ -71,6 +82,9 @@
     $("#example1").DataTable({
       "responsive": true,
       "autoWidth": false,
+      "language": {
+        "url": "https://cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json"
+      }
     });
   });
 </script>
