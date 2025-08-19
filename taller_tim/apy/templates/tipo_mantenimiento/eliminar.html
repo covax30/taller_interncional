@@ -1,60 +1,15 @@
-{% extends "body.html" %}
-{% load widget_tweaks %}
-{% block content %}
+{% extends 'eliminar_generic.html' %}
 
-<div class="main-content" style="padding: 20px; padding-top: 70px; padding-bottom: 80px;">
-<form method="post" action="">
-    <div class="card card-default">
-        <div class="card-header">
-            <h3 class="card-title">
-                <i class="fas fa-plus"></i>
-                {{titulo}}
-            </h3>
-        </div>
-        <!-- /.card-header -->
-        <div class="card-body">
-            {% csrf_token %}
-            {% if form.errors %}
-            <div class="alert alert-danger alert-dismissible">
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                <h5><i class="icon fas fa-ban"></i> Ha ocurrido un error al intentar guardar el tipo de mantenimiento</h5>
-                <ul>
-                    {% for field in form %}
-                        {% for error in field.errors %}
-                            <li>{{error}}</li>
-                        {% endfor %}
-                    {% endfor %}
-                </ul>
-            </div>
-            {% endif %}
+{% block eliminar %}
+                <h5><i class="icon fas fa-ban"></i> Advertencia¡</h5>
+                Deseas eliminar el objeto? #{{object.id}}?
+{% endblock %}
 
-            <div class="alert alert-danger alert-dismissible">
-                {% block eliminar %}
-                {% endblock %}
-            </div>
-        </div>
-        <div class="card-footer">
-
-            {% block validar %}
-            {% endblock %}
-        </div>
-    </div>
-</form>
-</div>
-
-<script>
-    {% if form.errors %}  
-    var errors = '';
-    {% for field in form%}
-        {% for error in field.errors %}
-              errors +- = '{{ error}}\n';
-            {%endfor%}  
-        {% endfor %}    
-    Swal.fire({
-        title: 'Error',
-        html: {% for field in form %}{% for error in field.errors %}{{ error|escapejs }}<br>{% endfor %}{% endfor %},
-        icon: 'error',
-    });
-    {% endif %}
-</script>
-{% endblock content %}
+{% block validar %}
+            <button type="submit" class="btn btn-success swalDefauldtSuccess">
+                <i class="fas fa-save"></i> Si, Aceptar
+            </button>
+            <a href="{{ listar_url }}" class="btn btn-danger btn-flat">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+{% endblock %}

@@ -16,7 +16,7 @@ def marca(request):
     data = {
         'Marca':'Marca',
         'titulo':'Lista de Marcas',
-        'marcas': Empleado.objects.all()
+        'marcas': Marca.objects.all()
     }
     return render(request, 'Marca/cont_Marca.html', data)
 
