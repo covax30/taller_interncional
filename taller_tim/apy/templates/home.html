@@ -40,14 +40,15 @@
         integrity="sha256-tXJfXfp6Ewt1ilPzLDtQnJV4hclT9XuaZUKyUvmyr+Q=" crossorigin="anonymous" media="print"
         onload="this.media='all'">
 
-<!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="{% static 'lib/adminlte-3.0.4/plugins/font-awesome-5.11.1/css/all.min.css' %}">
+
 
 </head>
 
 {% block body %}
 {% endblock %}
 
+<!-- Scripts generales -->
+<script src="{% static 'apy/js/notificaciones_stock.js' %}"></script>
 
 {% if messages %}
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

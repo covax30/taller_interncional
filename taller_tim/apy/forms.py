@@ -323,7 +323,7 @@ class AdministradorForm(ModelForm):
                     'placeholder':'Ingrese los apellidos del administrador',
                 }
             ),
-            'identificacion':TextInput(
+            'identificacion':NumberInput(
                 attrs={
                     'placeholder':'Ingrese la identificacion del administrador',
                 }
@@ -331,6 +331,8 @@ class AdministradorForm(ModelForm):
             'edad':NumberInput(
                 attrs={
                     'placeholder':'Ingrese la edad del administrador',
+                    'min': 1,
+                    'max': 120
                 }
             ),
             'correo':EmailInput(

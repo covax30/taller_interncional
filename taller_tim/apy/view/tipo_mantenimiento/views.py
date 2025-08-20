@@ -5,6 +5,8 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.urls import reverse_lazy
 from apy.forms import *
+from django.contrib import messages
+
 
 # Create your views here.
 # --------------Vistas erick---------------
@@ -65,9 +67,7 @@ class TipoMantenimientoDeleteView(DeleteView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['titulo'] = 'Eliminar Repuesto'
-        context['entidad'] = 'Repuesto'
-        context['listar_url'] = reverse_lazy('apy:repuesto_lista')
-        # La clave es añadir el objeto al contexto
-        context['object'] = self.get_object() 
+        context['titulo'] = 'Eliminar tipo de mantenimiento'
+        context['entidad'] = 'tipo de mantenimiento'
+        context['listar_url'] = reverse_lazy('apy:tipo_mantenimiento_lista')
         return context
