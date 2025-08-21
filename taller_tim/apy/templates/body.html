@@ -1,5 +1,7 @@
+
 {% extends 'home.html' %}
 {% load static %}
+
 {% block body %}
 <body class="layout-fixed sidebar-expand-lg sidebar-mini bg-body-tertiary">
   
@@ -8,8 +10,9 @@
 
     {% include 'sidebar.html' %}
 
-    {% block content %}
-    {% endblock %}
+      <!--begin::Main Content-->
+      {% block main %}{% endblock %}
+      <!--end::Main Content-->
 
     {% include 'footer.html'%}
   </div>

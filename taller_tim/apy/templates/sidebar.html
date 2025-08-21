@@ -1,18 +1,11 @@
-  <aside class="app-sidebar shadow" style="background: linear-gradient(to bottom, #007bff, #a9f2fdff);">
-      <!--begin::Sidebar Brand-->
+    <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark"> <!--begin::Sidebar Brand-->
       <div class="sidebar-brand"> 
         <!--begin::Brand Link--> 
           <a href="../index.html" class="brand-link">
           <!--begin::Brand Image--> 
-            <img src="/static/img/ChatGPT Image 12 ago 2025, 07_46_00 a.m..png" alt="T.I.M Logo"
-            class="brand-image opacity-75 shadow rounded-circle" style="width: 15px; height: 15px;">
-              <!--end::Brand Image--> 
-              <!--begin::Brand Text--> 
-              <span class="brand-text fw-light">T.I.M</span> 
-              <!--end::Brand Text--> 
-          </a> 
-          <!--end::Brand Link--> 
-      </div>
+          <img src="/assets/img/AdminLTELogo.png" alt="AdminLTE Logo"
+            class="brand-image opacity-75 shadow"> <!--end::Brand Image--> <!--begin::Brand Text--> <span
+            class="brand-text fw-light">TIM</span> <!--end::Brand Text--> </a> <!--end::Brand Link--> </div>
       <!--end::Sidebar Brand--> 
       <!--begin::Sidebar Wrapper-->
       <div class="sidebar-wrapper">
@@ -22,6 +15,7 @@
             <!--TITULO DE barra-->
             <li class="nav-header">MENU</li>
             <!--inicio opciones nivel 1 menu -->
+              <!--ejemplo de dropdown en opciones-->
               <!--gestion vehiculos-->
             <li class="nav-item"> <a href="#" class="nav-link"> <i class="nav-icon bi bi-car-front"></i>
                 <p>
@@ -116,6 +110,9 @@
                   </a> </li>
                 <li class="nav-item"> <a href="{% url 'apy:compra_lista' %}" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
                     <p>Compras</p>
+                  </a> </li>
+                <li class="nav-item"> <a href="#" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
+                    <p>Productos</p>
                   </a> </li>
               </ul>
             </li>
