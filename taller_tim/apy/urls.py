@@ -181,11 +181,8 @@ urlpatterns = [
     path('repuestos/editar/<int:pk>/', RepuestoUpdateView.as_view() , name='repuesto_editar'),
     path('repuestos/eliminar/<int:pk>/', RepuestoDeleteView.as_view() , name='repuesto_eliminar'),
     
-<<<<<<< .merge_file_FBW9Ow
     # --------------urls estadisticas---------------
     path('estadisticas/', estadisticas, name='estadisticas'),
-=======
     path('main/', Main.as_view(), name='main'),
->>>>>>> .merge_file_trVbQZ
 ] 
 
