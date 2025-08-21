@@ -121,7 +121,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
-    BASE_DIR / 'apy' / 'static',
+    BASE_DIR / 'apy' / 'static' / 'AdminLTE' / 'dist',
 ]
 
 # Default primary key field type
