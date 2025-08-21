@@ -78,7 +78,7 @@ class PagoServiciosDeleteView(DeleteView):
     template_name = 'Pago_Servicios/eliminar_pagoservicios.html'
     success_url = reverse_lazy('apy:pago_servicios_lista')
     
-    def delete(self, request, *args, **kwargs):
+    def form_valid(self, request, *args, **kwargs):
         messages.success(self.request, "Pago de servicio eliminado correctamente")
         return super().delete(request, *args, **kwargs)
     

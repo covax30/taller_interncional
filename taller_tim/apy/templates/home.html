@@ -40,6 +40,7 @@
         integrity="sha256-tXJfXfp6Ewt1ilPzLDtQnJV4hclT9XuaZUKyUvmyr+Q=" crossorigin="anonymous" media="print"
         onload="this.media='all'">
 
+ <script src="{%static 'lib/Estadisticas/estadisticas.js'%}"></script>
 
 
 </head>
@@ -48,7 +49,7 @@
 {% endblock %}
 
 <!-- Scripts generales -->
-<script src="{% static 'apy/js/notificaciones_stock.js' %}"></script>
+<script src="{% static 'apy/notificaciones_stock.js' %}"></script>
 
 {% if messages %}
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
