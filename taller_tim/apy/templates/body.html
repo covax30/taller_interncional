@@ -14,7 +14,7 @@
       <!--end::Sidebar-->
 
       <!--begin::Main Content-->
-      {% block main %}{% endblock %}
+      {% block content %}{% endblock %}
       <!--end::Main Content-->
 
       <!--begin::Footer-->
@@ -22,7 +22,13 @@
       <!--end::Footer-->
     </div>
     <!--end::App Wrapper-->
-
+    <!--begin::Scripts datatable-->
+    <script src="{% static 'lib/datatables-1.10.20/datatables.min.js' %}"></script>
+    <script src="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/js/dataTables.responsive.js' %}"></script>
+    <script src="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/js/responsive.bootstrap4.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/css/jquery.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/plugins/responsive-/css/responsive.bootstrap4.css' %}">
+    <!--end::Scripts datatable-->
     <!--begin::Scripts archivos estáticos con static-->
     <script src="{% static 'AdminLTE/dist/js/overlayscrollbars.js' %}"></script>
     <script src="{% static 'AdminLTE/dist/js/popper.js' %}"></script>
