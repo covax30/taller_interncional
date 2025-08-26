@@ -62,29 +62,24 @@
 </div>
 
 <!-- rutas al archivo css de datatables -->
-<!-- rutas al archivo css de datatables -->
-<link rel="stylesheet" href="{% static 'lib/datatables-1.1020/datatables.css' %}">
-<link rel="stylesheet" href="{% static 'lib/datatables-1.1020/plugins/responsive-2.2.3/css/responsive.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/plugins/datatables.min.css' %}">
 
-<!-- jQuery -->
-<script src="{% static 'lib/datatables-1.10.20/plugins/jquery/jquery.min.js' %}"></script>
-<!-- Bootstrap 4 -->
-<script src="{% static 'lib/datatables-1.10.20/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'lib/datatables-1.10.20/plugins/datatables.min.js' %}"></script>
 <!-- DataTables -->
 
 <!-- AdminLTE App -->
-<script src="{% static 'lib/datatables-1.10.20/js/adminlte.min.js' %}"></script>
+
 
 <script>
-  $(function () {
-    $("#example1").DataTable({
-      "responsive": true,
-      "autoWidth": false,
-      "language": {
-        "url": "https://cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json"
-      }
+document.addEventListener('DOMContentLoaded', function () {
+    let table = new DataTable('#example1', {
+        responsive: true,
+        autoWidth: false,
+        language: {
+            url: "https://cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json"
+        }
     });
-  });
+});
 </script>
 
 {% if messages %}
