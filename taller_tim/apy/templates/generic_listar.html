@@ -49,21 +49,16 @@
   </div>
 </div>
 </div>
-
-<!-- rutas al archivo css de datatables -->
-<!-- rutas al archivo css de datatables -->
-<link rel="stylesheet" href="{% static 'lib/datatables-1.1020/datatables.css' %}">
-<link rel="stylesheet" href="{% static 'lib/datatables-1.1020/plugins/responsive-2.2.3/css/responsive.bootstrap4.min.css' %}">
-
 <!-- jQuery -->
-<script src="{% static 'lib/datatables-1.10.20/plugins/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'lib/datatables-1.10.20/js/jquery.dataTables.js' %}"></script>
+<!-- rutas al archivo css de datatables -->
+<link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/datatables.css' %}">
+<link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/css/responsive.bootstrap4.min.css' %}">
 <!-- Bootstrap 4 -->
-<script src="{% static 'lib/datatables-1.10.20/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'lib/datatables-1.10.20/plugins/bootstrap-4-4.1.1/js/bootstrap.bundle.min.js' %}"></script>
 <!-- DataTables -->
-
 <!-- AdminLTE App -->
-<script src="{% static 'lib/datatables-1.10.20/js/adminlte.min.js' %}"></script>
-
+<script src="{% static 'AdminLTE/dist/js/adminlte.js' %}"></script>
 <script>
   $(function () {
     $("#example1").DataTable({
@@ -74,7 +69,9 @@
 </script>
 
 {% if messages %}
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script src=" {% static 'taller_tim/apy/static/lib/sweetalert2/sweeralert2@11.js' %}"></script>
+
   <script>
     {% for message in messages %}
       Swal.fire({
