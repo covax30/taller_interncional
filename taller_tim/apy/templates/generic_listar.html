@@ -60,13 +60,13 @@
   </div>
 </div>
 </div>
-
+<!-- jQuery -->
+<script src="{% static 'lib/datatables-1.10.20/js/jquery.dataTables.js' %}"></script>
 <!-- rutas al archivo css de datatables -->
 <link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/plugins/datatables.min.css' %}">
 
 <script src="{% static 'lib/datatables-1.10.20/plugins/datatables.min.js' %}"></script>
 <!-- DataTables -->
-
 <!-- AdminLTE App -->
 
 
@@ -83,7 +83,9 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 {% if messages %}
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script src=" {% static 'taller_tim/apy/static/lib/sweetalert2/sweeralert2@11.js' %}"></script>
+
   <script>
     {% for message in messages %}
       Swal.fire({
