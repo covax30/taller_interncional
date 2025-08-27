@@ -1,3 +1,4 @@
+
 {% load static %}
 <!doctype html>
 <html lang="en">
@@ -30,17 +31,20 @@
 
     <!--begin::CSS Files-->
     <!-- Los archivos estáticos ahora se cargan con el tag static  -->
-     
     <link rel="preload" href="{% static 'AdminLTE/dist/css/adminlte.css' %}" as="style" />
     <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/adminlte.css' %}" />
     <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/fonts.css' %}" />
     <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/overlayscrollbar.css' %}" />
-    <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/bootstrap.css' %}" />
+    <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/bootstrap.min.css' %}" />
     <!--end::CSS Files-->
   </head>
   <!--end::Head-->
+{% include 'header.html' %}
 
   <!--begin::Body-->
   {% block body %}{% endblock %}
+  
+
+  {% include 'footer.html' %}
   <!--end::Body-->
 </html>
