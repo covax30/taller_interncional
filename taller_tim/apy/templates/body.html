@@ -1,129 +1,91 @@
-{% extends 'home.html'%}
+{% extends 'home.html' %}
 {% load static %}
- {% block body %}
-
-<body class="layout-fixed sidebar-expand-lg sidebar-mini bg-body-tertiary"> <!--begin::App Wrapper-->
-  
+{% block body %}
+<body class="layout-fixed sidebar-expand-lg sidebar-mini bg-body-tertiary">
   
   <div class="app-wrapper"> 
-
-    <!--begin::Header-->
-
-    {% include 'header.html' %}
-    <!--end::Header--> 
     
-    
-    
-    <!--begin::Sidebar-->
-{% include 'sidebar.html' %}
-    <!--end::Sidebar--> 
 
+    {% include 'sidebar.html' %}
 
-    
-    <!--begin::App Main-->
     {% block content %}
     {% endblock %}
-    <!--end::App Main--> 
 
+    
+  </div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+<script src="{% static 'lib/datatables-1.10.20/datatables.min.js' %}"></script>
+<script src="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/js/dataTables.responsive.js' %}"></script>
+<script src="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/js/responsive.bootstrap4.js' %}"></script>
+<link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/css/jquery.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/plugins/responsive-/css/responsive.bootstrap4.css' %}">
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
- 
-  <!--end::App Wrapper--> 
-    <!--begin::Footer-->
-{% include 'footer.html'%}
-    <!--end::Footer-->
+<script src="{% static 'lib/AdminLTE-4.0.0-rc3/dist/js/adminlte.min.js' %}"></script>
+<script src="{% static 'lib/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-dyZb8CT5EIG9YvGZr9YfCT1GHf4vPY7UoX8PbQZkXEQ1+ExR/dqI+3IBGoZTw6Z8+btfM68Ek58dxRZozm4JQw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
+<script>
+  $(document).ready(function () {
+    $('#example1').DataTable();
+  });
+</script>
 
-  <!--begin::Script--> 
-  <!--begin::Third Party Plugin(OverlayScrollbars)-->
-    <!-- Primero jQuery (si es necesario para AdminLTE) -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-  <!-- Luego, Popper.js -->
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-
-  <!-- Bootstrap 5 -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js"></script>
-
-  <!-- AdminLTE -->
-  <script src="{% static 'lib/AdminLTE-4.0.0-rc3/dist/js/adminlte.min.js' %}"></script>
-
-  <!-- ESTILOS DATATABLES -->
-  <link rel="stylesheet" href="{% static 'lib/adminlte-3.0.4/plugins/datatables-responsive/css/responsive.bootstrap4.css' %}">
-  <link rel="stylesheet" href="{% static 'lib/adminlte-3.0.4/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
-  <script src="{% static 'lib/adminlte-3.0.4/plugins/datatables-responsive/js/dataTables.responsive.js' %}"></script>
-  <script src="{% static 'lib/adminlte-3.0.4/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
-  <script src="{% static 'lib/adminlte-3.0.4/plugins/datatables-responsive/js/responsive.bootstrap4.js' %}"></script>
-  <script src="{% static 'lib/adminlte-3.0.4/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
-  <link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/css/jquery.dataTables.min.css' %}">
-  <script src="{% static 'lib/datatables-1.10.20/js/jquery.dataTables.min.js' %}"></script>
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-dyZb8CT5EIG9YvGZr9YfCT1GHf4vPY7UoX8PbQZkXEQ1+ExR/dqI+3IBGoZTw6Z8+btfM68Ek58dxRZozm4JQw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-  
-  
-  <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"
-    crossorigin="anonymous"></script>
-  <!--end::Third Party Plugin(OverlayScrollbars)--><!--begin::Required Plugin(popperjs for Bootstrap 5)-->
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-    crossorigin="anonymous"></script>
-  <!--end::Required Plugin(popperjs for Bootstrap 5)--><!--begin::Required Plugin(Bootstrap 5)-->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
-  <!--end::Required Plugin(Bootstrap 5)--><!--begin::Required Plugin(AdminLTE)-->
-  <script src="../js/adminlte.js"></script>
-  <!--end::Required Plugin(AdminLTE)--><!--begin::OverlayScrollbars Configure-->
-  <script>
-    const SELECTOR_SIDEBAR_WRAPPER = ".sidebar-wrapper"
-    const Default = {
-      scrollbarTheme: "os-theme-light",
-      scrollbarAutoHide: "leave",
-      scrollbarClickScroll: true
-    }
-    document.addEventListener("DOMContentLoaded", function () {
-      const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER)
-      if (
-        sidebarWrapper &&
-        OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined
-      ) {
-        OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
-          scrollbars: {
-            theme: Default.scrollbarTheme,
-            autoHide: Default.scrollbarAutoHide,
-            clickScroll: Default.scrollbarClickScroll
-          }
-        })
-      }
-    })
-  </script> <!--end::OverlayScrollbars Configure--><!-- Image path runtime fix -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // Find the link tag for the main AdminLTE CSS file.
-      const cssLink = document.querySelector('link[href*="css/adminlte.css"]');
-      if (!cssLink) {
-        return; // Exit if the link isn't found
-      }
-
-      // Extract the base path from the CSS href.
-      // e.g., from "../css/adminlte.css", we get "../"
-      // e.g., from "./css/adminlte.css", we get "./"
-      const cssHref = cssLink.getAttribute('href');
-      const deploymentPath = cssHref.slice(0, cssHref.indexOf('css/adminlte.css'));
-
-      // Find all images with absolute paths and fix them.
-      document.querySelectorAll('img[src^="/assets/"]').forEach(img => {
-        const originalSrc = img.getAttribute('src');
-        if (originalSrc) {
-          const relativeSrc = originalSrc.slice(1); // Remove leading '/'
-          img.src = deploymentPath + relativeSrc;
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const sidebarWrapper = document.querySelector(".sidebar-wrapper");
+    if (sidebarWrapper && OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined) {
+      OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+        scrollbars: {
+          theme: "os-theme-light",
+          autoHide: "leave",
+          clickScroll: true
         }
       });
-    });
-  </script> <!--end::Script-->
+    }
+  });
+</script>
 
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const cssLink = document.querySelector('link[href*="css/adminlte.css"]');
+    if (!cssLink) return;
+    const cssHref = cssLink.getAttribute('href');
+    const deploymentPath = cssHref.slice(0, cssHref.indexOf('css/adminlte.css'));
+
+    document.querySelectorAll('img[src^="/assets/"]').forEach(img => {
+      const originalSrc = img.getAttribute('src');
+      if (originalSrc) {
+        const relativeSrc = originalSrc.slice(1);
+        img.src = deploymentPath + relativeSrc;
+      }
+    });
+  });
+</script>
+
+{% block extra_js %}
+{% endblock %}
+
+{% if messages %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    {% for message in messages %}
+      Swal.fire({
+        icon: '{% if "success" in message.tags %}success{% elif "error" in message.tags %}error{% else %}info{% endif %}',
+        title: '{{ message|escapejs }}',
+        timer: 2500,
+        showConfirmButton: false
+      });
+    {% endfor %}
+  });
+</script>
+{% endif %}
 
 </body><!--end::Body-->
  {% endblock %}
-

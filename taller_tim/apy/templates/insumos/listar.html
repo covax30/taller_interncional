@@ -1,0 +1,53 @@
+
+{% extends "generic_listar.html" %}
+{% load humanize %}
+{% block titulo %}
+        <h1 class="text-center">Listar Insumos</h1>
+{% endblock titulo %}
+
+{% block agregar %}
+<a href="{{crear_url}}" class=" btn btn-primary btn btn-xs"><i class="fas fa-plus"></i>
+          Agregar
+</a>
+{% endblock %}
+
+{% block columnas %}
+
+<<<<<<< HEAD
+        <th>Id Marca</th>
+        <th>Nombre</th>
+        <th>Costo</th>
+        <th>Tipo</th>
+        <th>Stock</th>
+=======
+        <th>id_marca</th>
+        <th>nombre</th>
+        <th>costo</th>
+        <th>tipo</th>
+        <th>stock</th>
+>>>>>>> 458548d772d0cd1da87b18f38e7b82f22542ba17
+        <th>Acciones</th>
+
+{% endblock %}
+
+{% block iterar %}
+
+      {% for i in object_list %}
+      <tr>
+        <td>{{i.id_marca}}</td>
+        <td>{{i.nombre}}</td>
+        <td>{{i.costo|intcomma }}</td>
+        <td>{{i.tipo}}</td>
+        <td>{{i.stock}}</td>
+      
+        <form method="post">
+
+          <td>
+            <a href="{% url 'apy:insumo_editar' i.id %}" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></a>
+            <a href="{% url 'apy:insumo_eliminar' i.id %}" class="btn btn-danger btn-xs"><i
+                class="fas fa-trash-alt"></i></a>
+          </td>
+      </tr>
+      {% endfor %}
+
+{% endblock %}

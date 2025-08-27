@@ -1,4 +1,7 @@
+
 {% extends "generic_listar.html" %}
+{% load humanize %}
+{% load static %}
 
 {% block titulo %}
         <h1 class="text-center">Lista de Facturas</h1>
@@ -12,15 +15,16 @@
 
 {% block columnas %}
 
-        <th>Id de la factura</th>
-        <th>Tipo pago</th>
+        <th>Id de la Factura</th>
+        <th>Tipo Pago</th>
         <th>Id Cliente</th>
         <th>Id Vehiculo</th>
-        <th>Id tipo mantenimiento</th>
-        <th>Servicio prestado</th>
-        <th>Nombre empresa</th>
-        <th>Direccion empresa</th>
-        <th>Id empleado</th>
+        <th>Id Tipo Mantenimiento</th>
+        <th>Servicio Prestado</th>
+        <th>Nombre Empresa</th>
+        <th>Direccion Empresa</th>
+        <th>Id Empleado</th>
+        <th>Monto</th>
         <th>Acciones</th>
 
 {% endblock %}
@@ -38,14 +42,48 @@
         <td>{{ f.nombre_empresa}}</td>
         <td>{{ f.direccion_empresa}}</td>
         <td>{{ f.id_empleado}}</td>
+        <td>{{ f.monto|intcomma }}</td>
         <form method="post">
 
           <td>
             <a href="{% url 'apy:factura_editar' f.id %}" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></a>
             <a href="{% url 'apy:factura_eliminar' f.id %}" class="btn btn-danger btn-xs"><i
                 class="fas fa-trash-alt"></i></a>
+            <button type="button" class="btn btn-secondary btn-xs" onclick='generarPDFFacturaDesdeDjango({
+    id: "{{ f.id }}",
+    tipo_pago: "{{ f.tipo_pago }}",
+    id_cliente: "{{ f.id_cliente }}",
+    id_vehiculo: "{{ f.id_vehiculo }}",
+    id_tipo_mantenimiento: "{{ f.id_tipo_mantenimiento }}",
+    servicio_prestado: `{{ f.servicio_prestado }}`,
+    nombre_empresa: `{{ f.nombre_empresa }}`,
+    direccion_empresa: `{{ f.direccion_empresa }}`,
+    id_empleado: "{{ f.id_empleado }}",
+    monto: "{{ f.monto }}"
+})'>
+  <i class="fas fa-print"></i>
+</button>
+
           </td>
       </tr>
       {% endfor %}
+
+<!-- Mensajes con SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  {% if messages %}
+    {% for message in messages %}
+      Swal.fire({
+        icon: '{% if "success" in message.tags %}success{% elif "error" in message.tags %}error{% else %}info{% endif %}',
+        title: '{{ message|escapejs }}',
+        timer: 2500,
+        showConfirmButton: false
+      });
+    {% endfor %}
+  {% endif %}
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="{% static 'js/imprimir_factura.js' %}"></script>
 
 {% endblock %}

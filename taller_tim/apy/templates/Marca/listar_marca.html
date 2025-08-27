@@ -1,0 +1,41 @@
+{% extends "generic_listar.html" %}
+
+{% block titulo %}
+        <h1 class="text-center">Lista de Marcas</h1>
+{% endblock titulo %}
+
+{% block agregar %}
+<a href="{{crear_url}}" class=" btn btn-primary btn btn-xs"><i class="fas fa-plus"></i>
+          Agregar
+</a>
+{% endblock %}
+
+{% block columnas %}
+
+        <th>Id de la Marca</th>
+        <th>Nombre</th>
+        <th>Tipo </th>
+        <th>Acciones</th>
+
+{% endblock %}
+
+{% block iterar %}
+
+      {% for m in object_list %}
+      <tr>
+        <td>{{ m.id }}</td>
+        <td>{{ m.nombre}}</td>
+        <td>{{ m.tipo}}</td>
+        
+        
+        <form method="post">
+
+          <td>
+            <a href="{% url 'apy:marca_editar' m.id %}" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></a>
+            <a href="{% url 'apy:marca_eliminar' m.id %}" class="btn btn-danger btn-xs"><i
+                class="fas fa-trash-alt"></i></a>
+          </td>
+      </tr>
+      {% endfor %}
+
+{% endblock %}

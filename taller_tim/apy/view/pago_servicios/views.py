@@ -7,6 +7,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.urls import reverse_lazy
 from apy.forms import *
+from django.contrib import messages
 
 # --------------Vistas de pago servicios publicos---------------
 
@@ -44,6 +45,10 @@ class PagoServiciosCreateView(CreateView):
     template_name = 'Pago_Servicios/crear_pagoservicios.html'
     success_url = reverse_lazy('apy:pago_servicios_lista')
     
+    def form_valid(self, form):
+        messages.success(self.request, "Pago de servicio creado correctamente")
+        return super().form_valid(form)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context ['titulo'] = 'Crear Pago Servicios Publicos'
@@ -57,6 +62,10 @@ class PagoServiciosUpdateView(UpdateView):
     template_name = 'Pago_Servicios/crear_pagoservicios.html'
     success_url = reverse_lazy('apy:pago_servicios_lista')
     
+    def form_valid(self, form):
+        messages.success(self.request, "Pago de servicio actualizado correctamente")
+        return super().form_valid(form)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Editar Pago Servicios Publicos'
@@ -68,6 +77,10 @@ class PagoServiciosDeleteView(DeleteView):
     model = PagoServiciosPublicos
     template_name = 'Pago_Servicios/eliminar_pagoservicios.html'
     success_url = reverse_lazy('apy:pago_servicios_lista')
+    
+    def form_valid(self, request, *args, **kwargs):
+        messages.success(self.request, "Pago de servicio eliminado correctamente")
+        return super().delete(request, *args, **kwargs)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

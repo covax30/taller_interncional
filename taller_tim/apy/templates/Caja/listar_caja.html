@@ -1,0 +1,56 @@
+{% extends "generic_listar.html" %}
+{% load humanize %}
+
+{% block titulo %}
+        <h1 class="text-center">Lista Ingreso a Caja</h1>
+{% endblock titulo %}
+
+{% block agregar %}
+<a href="{{crear_url}}" class=" btn btn-primary btn btn-xs"><i class="fas fa-plus"></i>
+          Agregar
+</a>
+{% endblock %}
+
+{% block columnas %}
+
+        <th>Id  </th>
+        <th>Tipo de Movimiento</th>
+        <th>Monto</th>
+        <th>Fecha </th>
+        <th>Hora</th>
+        <th>Id Administrador</th>
+        <th>Id Factura</th>
+        <th>Id Gasto</th>
+        <th>Id Nomina</th>
+        <th>Id Pago</th>
+        
+        <th>Acciones</th>
+
+{% endblock %}
+
+{% block iterar %}
+
+      {% for j in object_list %}
+      <tr>
+        <td>{{ j.id }}</td>
+        <td>{{ j.tipo_movimiento}}</td>
+        <td>{{ j.monto|intcomma }}</td>
+        <td>{{ j.fecha}}</td>
+        <td>{{ j.hora}}</td>
+       <td>{{ j.id_admin}}</td> 
+       <td>{{ j.id_Factura}}</td>
+        <td>{{ j.id_gasto}}</td>
+        <td>{{ j.id_pagos}}</td>
+        <td>{{ j.id_nomina}}</td>
+        
+        <form method="post">
+
+          <td>
+            <a href="{% url 'apy:caja_editar' j.id %}" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></a>
+            <a href="{% url 'apy:caja_eliminar' j.id %}" class="btn btn-danger btn-xs"><i
+                class="fas fa-trash-alt"></i></a>
+          </td>
+      </tr>
+      {% endfor %}
+
+{% endblock %}

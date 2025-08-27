@@ -11,11 +11,10 @@
 {% endblock%}
 
 {% block columnas %}
-  <th>Id Proveedor</th>
+        <th>Id Proveedor</th>
         <th>Nombre</th>
         <th>Telefono</th>
         <th>Correo</th>
-        
         <th>Acciones</th>
 
 {% endblock %}
@@ -37,4 +36,19 @@
           </td>
       </tr>
       {% endfor %}
+
+<!-- Mensajes con SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  {% if messages %}
+    {% for message in messages %}
+      Swal.fire({
+        icon: '{% if "success" in message.tags %}success{% elif "error" in message.tags %}error{% else %}info{% endif %}',
+        title: '{{ message|escapejs }}',
+        timer: 2500,
+        showConfirmButton: false
+      });
+    {% endfor %}
+  {% endif %}
+</script>
 {% endblock %}

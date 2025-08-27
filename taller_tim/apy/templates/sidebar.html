@@ -1,11 +1,18 @@
-    <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark"> <!--begin::Sidebar Brand-->
+  <aside class="app-sidebar shadow" style="background: linear-gradient(to bottom, #007bff, #a9f2fdff);">
+      <!--begin::Sidebar Brand-->
       <div class="sidebar-brand"> 
         <!--begin::Brand Link--> 
           <a href="../index.html" class="brand-link">
           <!--begin::Brand Image--> 
-          <img src="/assets/img/AdminLTELogo.png" alt="AdminLTE Logo"
-            class="brand-image opacity-75 shadow"> <!--end::Brand Image--> <!--begin::Brand Text--> <span
-            class="brand-text fw-light">TIM</span> <!--end::Brand Text--> </a> <!--end::Brand Link--> </div>
+            <img src="/static/img/ChatGPT Image 12 ago 2025, 07_46_00 a.m..png" alt="T.I.M Logo"
+            class="brand-image opacity-75 shadow rounded-circle" style="width: 15px; height: 15px;">
+              <!--end::Brand Image--> 
+              <!--begin::Brand Text--> 
+              <span class="brand-text fw-light">T.I.M</span> 
+              <!--end::Brand Text--> 
+          </a> 
+          <!--end::Brand Link--> 
+      </div>
       <!--end::Sidebar Brand--> 
       <!--begin::Sidebar Wrapper-->
       <div class="sidebar-wrapper">
@@ -15,7 +22,6 @@
             <!--TITULO DE barra-->
             <li class="nav-header">MENU</li>
             <!--inicio opciones nivel 1 menu -->
-              <!--ejemplo de dropdown en opciones-->
               <!--gestion vehiculos-->
             <li class="nav-item"> <a href="#" class="nav-link"> <i class="nav-icon bi bi-car-front"></i>
                 <p>
@@ -24,16 +30,16 @@
                 </p>
               </a>
               <ul class="nav nav-treeview">
-                <li class="nav-item"> <a href="#" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
+                <li class="nav-item"> <a href="{% url 'apy:entrada_vehiculo_lista' %}" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
                     <p>Entrada de Vehiculo</p>
                   </a> </li>
-                <li class="nav-item"> <a href="#" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
+                <li class="nav-item"> <a href="{% url 'apy:salida_vehiculo_lista' %}" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
                     <p>Salida de Vehiculo</p>
                   </a> </li>
-                <li class="nav-item"> <a href="#" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
+                <li class="nav-item"> <a href="{% url 'apy:vehiculo_lista' %}" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
                     <p>Vehiculo</p>
                   </a> </li>
-                <li class="nav-item"> <a href="#" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
+                <li class="nav-item"> <a href="{% url 'apy:marca_lista' %}"  class="nav-link"> <i class="nav-icon bi bi-circle"></i>
                     <p>Marca</p>
                   </a> </li>
               </ul>
@@ -46,19 +52,19 @@
                 </p>
               </a>
               <ul class="nav nav-treeview">
-                <li class="nav-item"> <a href="#" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
+                <li class="nav-item"> <a href="{% url 'apy:mantenimiento_lista' %}" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
                     <p>Gestion mantenimiento</p>
                   </a> </li>
-                <li class="nav-item"> <a href="#" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
+                <li class="nav-item"> <a href="{% url 'apy:repuesto_lista' %}" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
                     <p>Gestion Repuestos</p>
                   </a> </li>
-                <li class="nav-item"> <a href="#" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
+                <li class="nav-item"> <a href="{% url 'apy:tipo_mantenimiento_lista' %}" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
                     <p>Tipo Mantenimiento</p>
                   </a> </li>
-                <li class="nav-item"> <a href="#" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
+                <li class="nav-item"> <a href="{% url 'apy:herramienta_lista' %}" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
                     <p>Herramientas</p>
                   </a> </li>
-                <li class="nav-item"> <a href="#" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
+                <li class="nav-item"> <a href="{% url 'apy:insumo_lista' %}" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
                     <p>Gestion Insumos</p>
                   </a> </li>
               </ul>
@@ -74,7 +80,7 @@
                 <li class="nav-item"> <a href="{% url 'apy:administrador_lista' %}" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
                     <p>Administrador</p>
                   </a> </li>
-                <li class="nav-item"> <a href="#" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
+                <li class="nav-item"> <a href="{% url 'apy:gasto_lista' %}" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
                     <p>Gastos</p>
                   </a> </li>
                 <li class="nav-item"> <a href="{% url 'apy:factura_lista' %}" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
@@ -83,10 +89,10 @@
                 <li class="nav-item"> <a href="{% url 'apy:pagos_lista' %}" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
                     <p>Pagos</p>
                   </a> </li>
-                <li class="nav-item"> <a href="#" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
+                <li class="nav-item"> <a href="{% url 'apy:caja_lista' %}" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
                     <p>Caja</p>
                   </a> </li>
-                <li class="nav-item"> <a href="#" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
+                <li class="nav-item"> <a href="{% url 'apy:nomina_lista' %}" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
                     <p>Nomina</p>
                   </a> </li>
                 <li class="nav-item"> <a href="{% url 'apy:pago_servicios_lista' %}" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
@@ -105,14 +111,11 @@
                 <li class="nav-item"> <a href="{% url 'apy:proveedor_lista' %}" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
                     <p>Proveedores</p>
                   </a> </li>
-                <li class="nav-item"> <a href="#" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
+                <li class="nav-item"> <a href="{% url 'apy:cliente_lista' %}" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
                     <p>Clientes</p>
                   </a> </li>
-                <li class="nav-item"> <a href="#" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
+                <li class="nav-item"> <a href="{% url 'apy:compra_lista' %}" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
                     <p>Compras</p>
-                  </a> </li>
-                <li class="nav-item"> <a href="#" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
-                    <p>Productos</p>
                   </a> </li>
               </ul>
             </li>
@@ -124,7 +127,7 @@
                 </p>
               </a>
               <ul class="nav nav-treeview">
-                <li class="nav-item"> <a href="#" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
+                <li class="nav-item"> <a href="{% url 'apy:empleado_lista' %}" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
                     <p>Empleados</p>
                   </a> </li>
               </ul>
@@ -140,7 +143,13 @@
               <ul class="nav nav-treeview">
                 <li class="nav-item"> <a href="{% url 'apy:informes_lista' %}" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
                     <p>Informes</p>
-                  </a> </li>
+                  </a> 
+                </li>
+                <li class="nav-item"> <a href="{% url 'apy:estadisticas' %}" class="nav-link"> <i class="nav-icon bi bi-circle"></i>
+                    <p>Estadisticas</p>
+                  </a> 
+                </li>
+              
               </ul>
             </li>
             <!--configuraciones-->
