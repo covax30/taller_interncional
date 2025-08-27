@@ -1,3 +1,4 @@
+ {% include 'header.html' %}
 {% load static %}
 <!doctype html>
 <html lang="en">
@@ -38,8 +39,10 @@
     <!--end::CSS Files-->
   </head>
   <!--end::Head-->
-
+ 
   <!--begin::Body-->
   {% block body %}{% endblock %}
+
+  {% include 'footer.html' %}
   <!--end::Body-->
 </html>
