@@ -17,10 +17,10 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script src="{% static 'lib/datatables-1.10.20/datatables.min.js' %}"></script>
-<script src="{% static 'lib/adminlte-3.0.4/plugins/datatables-responsive/js/dataTables.responsive.js' %}"></script>
-<script src="{% static 'lib/adminlte-3.0.4/plugins/datatables-responsive/js/responsive.bootstrap4.js' %}"></script>
+<script src="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/js/dataTables.responsive.js' %}"></script>
+<script src="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/js/responsive.bootstrap4.js' %}"></script>
 <link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/css/jquery.dataTables.min.css' %}">
-<link rel="stylesheet" href="{% static 'lib/adminlte-3.0.4/plugins/datatables-responsive/css/responsive.bootstrap4.css' %}">
+<link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/plugins/responsive-/css/responsive.bootstrap4.css' %}">
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -33,7 +33,7 @@
 
 <script>
   $(document).ready(function () {
-    $('#mi-tabla').DataTable();
+    $('#example1').DataTable();
   });
 </script>
 
@@ -86,7 +86,6 @@
   });
 </script>
 {% endif %}
-
 
 </body><!--end::Body-->
  {% endblock %}

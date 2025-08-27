@@ -1,7 +1,7 @@
 {% extends "form_generico.html"%}
 {% load widget_tweaks%}
-{% block form%}
-    {% csrf_token%}
+{% block form %}
+    {% csrf_token %}
 
     {% for field in form.visible_fields %}
     <div class="form-group mb-3">

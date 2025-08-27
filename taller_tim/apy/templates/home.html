@@ -1,10 +1,10 @@
 {% include 'header.html' %}
 <!DOCTYPE html>
-<html lang="en"> <!--begin::Head-->
+<html lang="es"> <!--begin::Head-->
 
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <title>AdminLTE 4 | Sidebar Mini</title><!--begin::Accessibility Meta Tags-->
+  <title> Taller Internacional de motores</title><!--begin::Accessibility Meta Tags-->
   {% load static %}
 
 
@@ -41,8 +41,8 @@
         integrity="sha256-tXJfXfp6Ewt1ilPzLDtQnJV4hclT9XuaZUKyUvmyr+Q=" crossorigin="anonymous" media="print"
         onload="this.media='all'">
 
-<!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="{% static 'lib/adminlte-3.0.4/plugins/font-awesome-5.11.1/css/all.min.css' %}">
+ <script src="{%static 'lib/Estadisticas/estadisticas.js'%}"></script>
+
 
 </head>
 
@@ -52,7 +52,7 @@
 {% include 'footer.html'%}
 
 <!-- Scripts generales -->
-<script src="{% static 'apy/js/notificaciones_stock.js' %}"></script>
+<script src="{% static 'apy/notificaciones_stock.js' %}"></script>
 
 {% if messages %}
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -69,5 +69,6 @@
     });
   </script>
 {% endif %}
+
 
 </html>
