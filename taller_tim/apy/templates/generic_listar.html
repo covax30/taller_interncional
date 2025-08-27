@@ -44,7 +44,18 @@
     border-radius: 5px !important;        /* Bordes redondeados opcional */
     padding: 5px 10px !important;         /* Espaciado interno */
   }
+   /* Estilo para el select de cantidad de registros en DataTables */
+   .dataTables_length select {
+    background-color: #ffffff !important; /* fondo blanco */
+    color: #000000 !important;            /* texto negro */
+    border: 1px solid #ccc !important;    /* borde gris */
+    border-radius: 5px !important;        /* bordes redondeados */
+    padding: 5px 10px !important;         /* espaciado interno */
+  }
+
+
 </style>
+
     </div>
   </div>
 </div>
@@ -52,20 +63,23 @@
 <!-- jQuery -->
 
 <!-- rutas al archivo css de datatables -->
-<link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/datatables.css' %}">
-<link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/css/responsive.bootstrap4.min.css' %}">
-<!-- Bootstrap 4 -->
-<script src="{% static 'lib/datatables-1.10.20/plugins/bootstrap-4-4.1.1/js/bootstrap.bundle.min.js' %}"></script>
+<link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/plugins/datatables.min.css' %}">
+
+<script src="{% static 'lib/datatables-1.10.20/plugins/datatables.min.js' %}"></script>
 <!-- DataTables -->
 <!-- AdminLTE App -->
-<script src="{% static 'AdminLTE/dist/js/adminlte.js' %}"></script>
+
+
 <script>
-  $(function () {
-    $("#example1").DataTable({
-      "responsive": true,
-      "autoWidth": false,
+document.addEventListener('DOMContentLoaded', function () {
+    let table = new DataTable('#example1', {
+        responsive: true,
+        autoWidth: false,
+        language: {
+            url: "https://cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json"
+        }
     });
-  });
+});
 </script>
 
 {% if messages %}

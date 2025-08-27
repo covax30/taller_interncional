@@ -40,6 +40,8 @@ urlpatterns = [
     #--------URL modulo factura----------------
 
     path('inicio/index/', index.as_view(), name='index'),
+    path('apy/api/repuestos-bajo-stock/', repuestos_bajo_stock_api, name='repuestos_bajo_stock_api'),
+
     
     path('factura/listar/', FacturaListView.as_view() , name='factura_lista'),
     path('factura/agregar/', FacturaCreateView.as_view(), name='factura_crear'),

@@ -1,4 +1,22 @@
 from django.db import models
+from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator
+import re
+
+#------------------FUNCION DE VALIDACION ----------------------
+def validar_email (value):  
+    if re.search(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', value) is None:
+        raise ValidationError('El correo no es valido')
+    
+telefono_regex = RegexValidator(
+    regex=r'^\d{7,10}$',
+    message="El teléfono debe contener solo números y tener entre 7 y 10 dígitos."
+)
+
+identificacion_regex = RegexValidator(
+    regex=r'^\d{5,20}$',
+    message="La identificación debe contener solo números y mínimo 5 dígitos."
+)
 
 # MODULOS STEVEN
 
@@ -30,7 +48,7 @@ class Vehiculo(models.Model):
 
 class EntradaVehiculo(models.Model):
     id_entrada = models.AutoField(primary_key=True)
-    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE ,blank=True) # LLAVE
+    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE ,blank=True, null=True) # LLAVE
     id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE , blank=True,null=True)  # LLAVE
     fecha_ingreso = models.DateField()
     hora_ingreso = models.TimeField()
@@ -82,6 +100,7 @@ class Repuesto(models.Model):
     stock = models.IntegerField(default=0)
     ubicacion = models.CharField(max_length=100)
     precio = models.IntegerField(default=0)
+    stock_minimo = models.IntegerField(default=2)
     
     def __str__(self):
         return f"{self.nombre} "   
@@ -118,13 +137,19 @@ class Insumos(models.Model):
 #-------------Modulo Administrador-----------
 class Administrador(models.Model):
     id_admin = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=100)
-    apellidos = models.CharField(max_length=100)
-    identificacion = models.CharField(max_length=20, unique=True)
-    edad = models.IntegerField()
-    correo = models.EmailField(unique=True)
-    telefono = models.CharField(max_length=20)
-    fecha_ingreso = models.DateField()
+    nombre = models.CharField(max_length=100, error_messages={'blank': 'El nombre es obligatorio'})
+    apellidos = models.CharField(max_length=100, error_messages={'blank': 'El apellido es obligatorio'})
+    identificacion = models.BigIntegerField(unique=True, error_messages={'unique': 'Ya existe un administrador con esa identificación', 
+                        'blank': 'La identificación es obligatoria'})
+    edad = models.PositiveIntegerField(error_messages={'blank': 'La edad es obligatoria'})
+    correo = models.EmailField(unique=True, validators=[validar_email],
+            error_messages={
+            'unique': 'Ya existe un administrador con ese correo',
+            'invalid': 'El correo no tiene un formato válido',
+            'blank': 'El correo es obligatorio'
+        })
+    telefono = models.CharField(max_length=20, validators=[telefono_regex], error_messages={'blank': 'El teléfono es obligatorio'})
+    fecha_ingreso = models.DateField(error_messages={'blank': 'La fecha de ingreso es obligatoria'})
     
     def __str__(self):
         return f"{self.nombre} {self.apellidos}"
@@ -142,8 +167,8 @@ class PagoServiciosPublicos(models.Model):
 class Proveedores(models.Model):
     id_proveedor = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
-    telefono = models.CharField(max_length=20)
-    correo = models.EmailField(unique=True)
+    telefono = models.CharField(max_length=20, validators=[telefono_regex])
+    correo = models.EmailField(unique=True, validators=[validar_email])
     
     def __str__(self):
         return f"{self.id_proveedor} {self.correo}"

@@ -5,6 +5,9 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.urls import reverse_lazy
 from apy.forms import *
+from django.db.models import F
+from apy.models import Repuesto
+from apy.forms import RepuestoForm
 
 # Create your views here.
 # --------------Vistas erick---------------
@@ -62,3 +65,17 @@ class RepuestoDeleteView(DeleteView):
         context['listar_url'] = reverse_lazy('apy:repuesto_lista')
         return context
 
+
+@csrf_exempt
+def repuestos_bajo_stock_api(request):
+    repuestos = Repuesto.objects.filter(stock__lt=F('stock_minimo'))
+    data = [
+        {
+            'id': r.id,
+            'nombre': r.nombre,
+            'stock': r.stock,
+            'stock_minimo': r.stock_minimo
+        }
+        for r in repuestos
+    ]
+    return JsonResponse(data, safe=False)
