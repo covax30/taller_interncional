@@ -1,4 +1,5 @@
 {% extends "generic_listar.html" %}
+{% load humanize %}
 
 {% block titulo %}
         <h1 class="text-center">Lista de Gastos</h1>
@@ -14,9 +15,8 @@
 
         <th>Id del Monto</th>
         <th>Descripcion</th>
-        <th>tipo gastos</th>
-        
-        <th>id_pagos_servicios</th>
+        <th>Tipo Gastos</th>
+        <th>Id Pago Servicios</th>
         <th>Monto</th>
         <th>Acciones</th>
 
@@ -27,12 +27,10 @@
       {% for g in object_list %}
       <tr>
         <td>{{ g.id }}</td>
-        
         <td>{{ g.descripcion}}</td>
         <td>{{ g.tipo_gastos}}</td>
-        
         <td>{{ g.id_pagos_servicios}}</td>
-        <td>{{ g.monto }}</td>
+        <td>{{ g.monto|intcomma }}</td>
       
         
         <form method="post">

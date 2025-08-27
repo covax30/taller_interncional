@@ -1,7 +1,8 @@
 {% extends "generic_listar.html" %}
+{% load humanize %}
 
 {% block titulo %}
-        <h1 class="text-center">Lista ingreso a caja</h1>
+        <h1 class="text-center">Lista Ingreso a Caja</h1>
 {% endblock titulo %}
 
 {% block agregar %}
@@ -33,7 +34,7 @@
       <tr>
         <td>{{ j.id }}</td>
         <td>{{ j.tipo_movimiento}}</td>
-        <td>{{ j.monto}}</td>
+        <td>{{ j.monto|intcomma }}</td>
         <td>{{ j.fecha}}</td>
         <td>{{ j.hora}}</td>
        <td>{{ j.id_admin}}</td> 

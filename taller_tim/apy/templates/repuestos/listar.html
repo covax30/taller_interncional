@@ -1,8 +1,8 @@
-
 {% extends "generic_listar.html" %}
+{% load humanize %}
 
 {% block titulo %}
-        <h1 class="text-center">listar repuestos</h1>
+        <h1 class="text-center">Listar Repuestos</h1>
 {% endblock titulo %}
 
 {% block agregar %}
@@ -13,13 +13,14 @@
 
 {% block columnas %}
 
-        <th>id_marca</th>
-        <th>nombre</th>
-        <th>categoria</th>
-        <th>fabricante</th>
-        <th>stock</th>
-        <th>ubicacion</th>
-        <th>precio</th>
+        <th>Id Marca</th>
+        <th>Nombre</th>
+        <th>Categoria</th>
+        <th>Fabricante</th>
+        <th>Stock</th>
+        <th>Ubicación</th>
+        <th>Precio</th>
+        <th>Acciones</th>
 
 {% endblock %}
 
@@ -33,7 +34,7 @@
         <td>{{r.fabricante}}</td>
         <td>{{r.stock}}</td>
         <td>{{r.ubicacion}}</td>
-        <td>{{r.precio}}</td>
+        <td>{{r.precio|intcomma }}</td>
 
         <form method="post">
 

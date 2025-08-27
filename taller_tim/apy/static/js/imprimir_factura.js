@@ -53,6 +53,9 @@ function generarPDFFacturaDesdeDjango(factura) {
     yPos += 10;
     doc.text(`ID Empleado: ${factura.id_empleado}`, 20, yPos);
 
+    yPos += 15;
+    doc.text(`Monto: ${factura.monto}`, 20, yPos);
+
     // Guardar
     doc.save(`Factura_${factura.id}.pdf`);
 

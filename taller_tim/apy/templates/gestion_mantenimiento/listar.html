@@ -2,7 +2,7 @@
 {% extends "generic_listar.html" %}
 
 {% block titulo %}
-        <h1 class="text-center">listar mantenimientos</h1>
+        <h1 class="text-center">Listar Mantenimientos</h1>
 {% endblock titulo %}
 
 {% block agregar %}
@@ -13,11 +13,12 @@
 
 {% block columnas %}
 
-        <th>fallas</th>
-        <th>procesos</th>
+        <th>Fallas</th>
+        <th>Procesos</th>
         <th>Id Vehiculo</th>
         <th>Id Empledo</th>
-        <th>Id tipo mantenimiento</th>
+        <th>Id Tipo Mantenimiento</th>
+        <th>Acciones</th>
 
 {% endblock %}
 
@@ -27,8 +28,8 @@
       <tr>
         <td>{{g.fallas}}</td>
         <td>{{g.procesos}}</td>
-        <td>{{g.Id_Vehiculo}}</td>
-        <td>{{g.Id_Empledo}}</td>
+        <td>{{g.id_vehiculo}}</td>
+        <td>{{g.id_empleado}}</td>
         <td>{{g.id_tipo_mantenimiento}}</td>
 
         <form method="post">

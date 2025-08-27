@@ -1,3 +1,4 @@
+{% include 'header.html' %}
 <!DOCTYPE html>
 <html lang="en"> <!--begin::Head-->
 
@@ -5,7 +6,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <title>AdminLTE 4 | Sidebar Mini</title><!--begin::Accessibility Meta Tags-->
   {% load static %}
-   {% load static %}
+
 
   <!-- Meta -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -47,6 +48,8 @@
 
 {% block body %}
 {% endblock %}
+
+{% include 'footer.html'%}
 
 <!-- Scripts generales -->
 <script src="{% static 'apy/js/notificaciones_stock.js' %}"></script>
