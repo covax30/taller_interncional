@@ -17,6 +17,7 @@
                     ¿Deseas eliminar este registro?
                 </div>
             </div>
+            {% endif %}
             <div class="card-footer">
                 <button type="submit" class="btn btn-info btn-flat ">
                     <i class="fas fa-check"></i> Sí, Aceptar
@@ -28,4 +29,20 @@
         </div>
     </form>
 </div>
-{% endblock content %}
+
+<script>
+    {% if form.errors %}  
+    var errors = '';
+    {% for field in form%}
+        {% for error in field.errors %}
+              errors +- = '{{ error}}\n';
+            {%endfor%}  
+        {% endfor %}    
+    Swal.fire({
+        title: 'Error',
+        html: {% for field in form %}{% for error in field.errors %}{{ error|escapejs }}<br>{% endfor %}{% endfor %},
+        icon: 'error',
+    });
+    {% endif %}
+</script>
+{% endblock %}
