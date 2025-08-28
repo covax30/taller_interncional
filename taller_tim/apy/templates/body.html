@@ -5,10 +5,8 @@
   <body class="layout-fixed sidebar-expand-lg sidebar-mini sidebar-collapse bg-body-tertiary">
     <!--begin::App Wrapper-->
     <div class="app-wrapper">
-      <!--begin::Header-->
-      
-      <!--end::Header-->
-
+  
+      {%include 'header.html'%}
       <!--begin::Sidebar-->
       {% include 'sidebar.html' %}
       <!--end::Sidebar-->
@@ -17,13 +15,11 @@
       {% block content %}{% endblock %}
       <!--end::Main Content-->
 
-      <!--begin::Footer-->
-      
-      <!--end::Footer-->
+      {% include 'footer.html' %}
     </div>
     <!--end::App Wrapper-->
  <!-- rutas al archivo css de datatables -->
-<link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/plugins/datatables.min.css' %}">
+
 
 <script src="{% static 'lib/datatables-1.10.20/plugins/datatables.min.js' %}"></script>
 <!-- DataTables -->

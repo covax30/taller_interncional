@@ -1,5 +1,6 @@
 
 {% load static %}
+
 <!doctype html>
 <html lang="en">
   <!--begin::Head-->
@@ -31,20 +32,29 @@
 
     <!--begin::CSS Files-->
     <!-- Los archivos estáticos ahora se cargan con el tag static  -->
+       <!-- Google Font: Source Sans Pro -->
+            <link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/plugins/font-awesome-5.11.1/css/all.min.css' %}">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     <link rel="preload" href="{% static 'AdminLTE/dist/css/adminlte.css' %}" as="style" />
     <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/adminlte.css' %}" />
     <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/fonts.css' %}" />
     <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/overlayscrollbar.css' %}" />
     <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/bootstrap.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/plugins/datatables.min.css' %}">
     <!--end::CSS Files-->
   </head>
   <!--end::Head-->
-{% include 'header.html' %}
+
+    <!--begin::Header-->
 
   <!--begin::Body-->
-  {% block body %}{% endblock %}
-  
+ 
+   <!--begin::Footer-->
+      {%block body%} {%endblock%}
+   
+      <!--end::Footer-->
 
-  {% include 'footer.html' %}
+  
   <!--end::Body-->
+
 </html>
