@@ -11,7 +11,7 @@
             />
             <!--end::Brand Image-->
             <!--begin::Brand Text-->
-            <span class="brand-text fw-light">AdminLTE 4</span>
+            <span class="brand-text fw-light">T.I.M</span>
             <!--end::Brand Text-->
           </a>
           <!--end::Brand Link-->
@@ -29,478 +29,237 @@
               data-accordion="false"
               id="navigation"
             >
+              <li class="nav-header">MENU</li>
+
               <li class="nav-item">
                 <a href="#" class="nav-link">
-                  <i class="nav-icon bi bi-speedometer"></i>
+                  <i class="nav-icon bi bi-bar-chart-fill"></i>
                   <p>
-                     Gestion de Vehiculos
+                    Analisis y reportes
                     <i class="nav-arrow bi bi-chevron-right"></i>
                   </p>
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-
-                    <!--WIDGET BOOSTRAP-->
-                    <a href={% url 'apy:entrada_vehiculo_lista' %} class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
+                    <a href="{% url 'apy:informes_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Informes </p>
+                    </a>
+                  </li> 
+                </ul>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon bi bi-bar-chart-fill"></i>
+                  <p>
+                    Gestion de Vehiculo
+                    <i class="nav-arrow bi bi-chevron-right"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'apy:entrada_vehiculo_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
                       <p>Entrada de Vehiculo </p>
                     </a>
-                    
-                  </li>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <!--WIDGET BOOSTRAP-->
-                    <a href="{% static 'AdminLTE/dist/index2.html' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Dashboard v2</p>
+                    <a href="{% url 'apy:salida_vehiculo_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Salida de Vehiculo </p>
                     </a>
-                  </li>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    
-                    <!--WIDGET BOOSTRAP-->
-                    <a href="{% static 'AdminLTE/dist/index3.html' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Dashboard v3</p>
+                    <a href="{% url 'apy:vehiculo_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Vehiculo </p>
                     </a>
-                  </li>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'apy:marca_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Marca </p>
+                    </a>
+                  </li> 
                 </ul>
               </li>
               <li class="nav-item">
-
-                <!--GENERATE BOOSTRAP-->
-                <a href="{% static 'AdminLTE/dist/generate/theme.html' %}" class="nav-link">
-                  <i class="nav-icon bi bi-palette"></i>
-                  <p>Theme Generate</p>
-                </a>
-              </li>
-              <li class="nav-item">
                 <a href="#" class="nav-link">
-                  <i class="nav-icon bi bi-box-seam-fill"></i>
+                  <i class="nav-icon bi bi-bar-chart-fill"></i>
                   <p>
-                    Widgets
+                    Gestion de Mantenimiento
                     <i class="nav-arrow bi bi-chevron-right"></i>
                   </p>
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-
-                    <!--WIDGET BOOSTRAP-->
-                    <a href="{% static 'AdminLTE/dist/widgets/small-box.html' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Small Box</p>
+                    <a href="{% url 'apy:mantenimiento_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Mantenimiento </p>
                     </a>
-                  </li>
-
-                   <!--WIDGET BOOSTRAP-->
-                    <a href="{% static 'AdminLTE/dist/widgets/info-box.html' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>info Box</p>
-                    </a>
-                  </li>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
                   <li class="nav-item">
-
-                     <!--WIDGET BOOSTRAP-->
-                    <a href="{% static 'AdminLTE/dist/widgets/cards.html' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Cards</p>
+                    <a href="{% url 'apy:repuesto_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Repuestos </p>
                     </a>
-                  </li>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'apy:tipo_mantenimiento_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Tipos de Mantenimientos </p>
+                    </a>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'apy:herramienta_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Herramientas </p>
+                    </a>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'apy:insumo_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Insumos </p>
+                    </a>
+                  </li> 
                 </ul>
               </li>
-              <li class="nav-item menu-open">
-                <a href="#" class="nav-link active">
-                  <i class="nav-icon bi bi-clipboard-fill"></i>
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon bi bi-bar-chart-fill"></i>
                   <p>
-                    Layout Options
-                    <span class="nav-badge badge text-bg-secondary me-3">6</span>
+                    Administracion y Finanzas
                     <i class="nav-arrow bi bi-chevron-right"></i>
                   </p>
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-
-                    <!--WIDGET BOOSTRAP-->
-                    <a href="{% static 'AdminLTE/dist/layout/unfixed-sidebar.html' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Default Sidebar</p>
+                    <a href="{% url 'apy:administrador_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Administrador </p>
                     </a>
-                  </li>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
                   <li class="nav-item">
-
-                    <!--WIDGET BOOSTRAP-->
-                    <a href="{% static 'AdminLTE/dist/layout/fixed-sidebar.html' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Fixed Sidebar</p>
+                    <a href="{% url 'apy:gasto_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Gastos </p>
                     </a>
-                  </li>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
                   <li class="nav-item">
-
-                    <!--WIDGET BOOSTRAP-->
-                    <a href="{% static 'AdminLTE/dist/layout/fixed-header.html' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Fixed Header</p>
+                    <a href="{% url 'apy:factura_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Facturas </p>
                     </a>
-                  </li>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
                   <li class="nav-item">
-
-                    <!--WIDGET BOOSTRAP-->
-                    <a href="{% static 'AdminLTE/dist/layout/fixed-footer.html' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Fixed Footer</p>
+                    <a href="{% url 'apy:pagos_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Pagos </p>
                     </a>
-                  </li>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
                   <li class="nav-item">
-
-                    <!--WIDGET BOOSTRAP-->
-                    <a href="{% static 'AdminLTE/dist/layout/fixed-complete.html' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Fixed Complete</p>
+                    <a href="{% url 'apy:caja_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Caja </p>
                     </a>
-                  </li>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
                   <li class="nav-item">
-
-                    <!--WIDGET BOOSTRAP-->
-                    <a href="{% static 'AdminLTE/dist/layout/layout-custom-area.html' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Layout <small>+ Custom Area </small></p>
+                    <a href="{% url 'apy:nomina_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Nomina </p>
                     </a>
-                  </li>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
                   <li class="nav-item">
-
-                    <!--WIDGET BOOSTRAP-->
-                    <a href="{% static 'AdminLTE/dist/layout/sidebar-mini.html' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Sidebar Mini</p>
+                    <a href="{% url 'apy:pago_servicios_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Servicios publicos </p>
                     </a>
-                  </li>
-                  <li class="nav-item">
-                    
-
-                    <!--WIDGET BOOSTRAP-->
-                    <a href="{% static 'AdminLTE/dist/layout/collapsed-sidebar.html' %}" class="nav-link active">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Sidebar Mini <small>+ Collapsed</small></p>
-                    </a>
-                  </li>
-                  <li class="nav-item">
-
-                    <!--WIDGET BOOSTRAP-->
-                    <a href="{% static 'AdminLTE/dist/layout/logo-switch.html' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Sidebar Mini <small>+ Logo Switch</small></p>
-                    </a>
-                  </li>
-                  <li class="nav-item">
-
-                    <!--WIDGET BOOSTRAP-->
-                    <a href="{% static 'AdminLTE/dist/layout/layout-rtl.html' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Layout RTL</p>
-                    </a>
-                  </li>
+                  </li> 
                 </ul>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link">
-                  <i class="nav-icon bi bi-tree-fill"></i>
+                  <i class="nav-icon bi bi-bar-chart-fill"></i>
                   <p>
-                    UI Elements
+                    Gestion de Clientes
                     <i class="nav-arrow bi bi-chevron-right"></i>
                   </p>
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-
-                    <!--WIDGET BOOSTRAP-->
-                    <a href="{% static 'AdminLTE/dist/UI/general.html' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>General</p>
+                    <a href="{% url 'apy:proveedor_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Proveedores </p>
                     </a>
-                  </li>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
                   <li class="nav-item">
-
-                    <!--WIDGET BOOSTRAP-->
-                    <a href="{% static 'AdminLTE/dist/UI/icons.html' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Icons</p>
+                    <a href="{% url 'apy:cliente_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Clientes </p>
                     </a>
-                  </li>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
                   <li class="nav-item">
-
-                    <!--WIDGET BOOSTRAP-->
-                    <a href="{% static 'AdminLTE/dist/UI/timeline.html' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Timeline</p>
+                    <a href="{% url 'apy:compra_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Compras </p>
                     </a>
-                  </li>
+                  </li> 
                 </ul>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link">
-                  <i class="nav-icon bi bi-pencil-square"></i>
+                  <i class="nav-icon bi bi-bar-chart-fill"></i>
                   <p>
-                    Forms
+                    Recursos Humanos
                     <i class="nav-arrow bi bi-chevron-right"></i>
                   </p>
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="../forms/general.html" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>General Elements</p>
+                    <a href="{% url 'apy:empleado_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Empleados </p>
                     </a>
-                  </li>
+                  </li> 
                 </ul>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon bi bi-table"></i>
+                <a href="{% url 'apy:main' %}" class="nav-link">
+                  <i class="nav-icon bi bi-bar-chart-fill"></i>
                   <p>
-                    Tables
+                    Configuraciones
                     <i class="nav-arrow bi bi-chevron-right"></i>
                   </p>
-                </a>
-                <ul class="nav nav-treeview">
-                  <li class="nav-item">
-                    <a href="../tables/simple.html" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Simple Tables</p>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-
-              <li class="nav-header">EXAMPLES</li>
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon bi bi-box-arrow-in-right"></i>
-                  <p>
-                    Auth
-                    <i class="nav-arrow bi bi-chevron-right"></i>
-                  </p>
-                </a>
-                <ul class="nav nav-treeview">
-                  <li class="nav-item">
-                    <a href="#" class="nav-link">
-                      <i class="nav-icon bi bi-box-arrow-in-right"></i>
-                      <p>
-                        Version 1
-                        <i class="nav-arrow bi bi-chevron-right"></i>
-                      </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                      <li class="nav-item">
-                        <a href="../examples/login.html" class="nav-link">
-                          <i class="nav-icon bi bi-circle"></i>
-                          <p>Login</p>
-                        </a>
-                      </li>
-                      <li class="nav-item">
-                        <a href="../examples/register.html" class="nav-link">
-                          <i class="nav-icon bi bi-circle"></i>
-                          <p>Register</p>
-                        </a>
-                      </li>
-                    </ul>
-                  </li>
-                  <li class="nav-item">
-                    <a href="#" class="nav-link">
-                      <i class="nav-icon bi bi-box-arrow-in-right"></i>
-                      <p>
-                        Version 2
-                        <i class="nav-arrow bi bi-chevron-right"></i>
-                      </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                      <li class="nav-item">
-                        <a href="../examples/login-v2.html" class="nav-link">
-                          <i class="nav-icon bi bi-circle"></i>
-                          <p>Login</p>
-                        </a>
-                      </li>
-                      <li class="nav-item">
-                        <a href="../examples/register-v2.html" class="nav-link">
-                          <i class="nav-icon bi bi-circle"></i>
-                          <p>Register</p>
-                        </a>
-                      </li>
-                    </ul>
-                  </li>
-                  <li class="nav-item">
-                    <a href="../examples/lockscreen.html" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Lockscreen</p>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-
-              <li class="nav-header">DOCUMENTATIONS</li>
-              <li class="nav-item">
-                <a href="../docs/introduction.html" class="nav-link">
-                  <i class="nav-icon bi bi-download"></i>
-                  <p>Installation</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="../docs/layout.html" class="nav-link">
-                  <i class="nav-icon bi bi-grip-horizontal"></i>
-                  <p>Layout</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="../docs/color-mode.html" class="nav-link">
-                  <i class="nav-icon bi bi-star-half"></i>
-                  <p>Color Mode</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon bi bi-ui-checks-grid"></i>
-                  <p>
-                    Components
-                    <i class="nav-arrow bi bi-chevron-right"></i>
-                  </p>
-                </a>
-                <ul class="nav nav-treeview">
-                  <li class="nav-item">
-                    <a href="../docs/components/main-header.html" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Main Header</p>
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="../docs/components/main-sidebar.html" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Main Sidebar</p>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon bi bi-filetype-js"></i>
-                  <p>
-                    Javascript
-                    <i class="nav-arrow bi bi-chevron-right"></i>
-                  </p>
-                </a>
-                <ul class="nav nav-treeview">
-                  <li class="nav-item">
-                    <a href="../docs/javascript/treeview.html" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Treeview</p>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-              <li class="nav-item">
-                <a href="../docs/browser-support.html" class="nav-link">
-                  <i class="nav-icon bi bi-browser-edge"></i>
-                  <p>Browser Support</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="../docs/how-to-contribute.html" class="nav-link">
-                  <i class="nav-icon bi bi-hand-thumbs-up-fill"></i>
-                  <p>How To Contribute</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="../docs/faq.html" class="nav-link">
-                  <i class="nav-icon bi bi-question-circle-fill"></i>
-                  <p>FAQ</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="../docs/license.html" class="nav-link">
-                  <i class="nav-icon bi bi-patch-check-fill"></i>
-                  <p>License</p>
-                </a>
-              </li>
-
-              <li class="nav-header">MULTI LEVEL EXAMPLE</li>
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon bi bi-circle-fill"></i>
-                  <p>Level 1</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon bi bi-circle-fill"></i>
-                  <p>
-                    Level 1
-                    <i class="nav-arrow bi bi-chevron-right"></i>
-                  </p>
-                </a>
-                <ul class="nav nav-treeview">
-                  <li class="nav-item">
-                    <a href="#" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Level 2</p>
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="#" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>
-                        Level 2
-                        <i class="nav-arrow bi bi-chevron-right"></i>
-                      </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                      <li class="nav-item">
-                        <a href="#" class="nav-link">
-                          <i class="nav-icon bi bi-record-circle-fill"></i>
-                          <p>Level 3</p>
-                        </a>
-                      </li>
-                      <li class="nav-item">
-                        <a href="#" class="nav-link">
-                          <i class="nav-icon bi bi-record-circle-fill"></i>
-                          <p>Level 3</p>
-                        </a>
-                      </li>
-                      <li class="nav-item">
-                        <a href="#" class="nav-link">
-                          <i class="nav-icon bi bi-record-circle-fill"></i>
-                          <p>Level 3</p>
-                        </a>
-                      </li>
-                    </ul>
-                  </li>
-                  <li class="nav-item">
-                    <a href="#" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Level 2</p>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon bi bi-circle-fill"></i>
-                  <p>Level 1</p>
-                </a>
-              </li>
-
-              <li class="nav-header">LABELS</li>
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon bi bi-circle text-danger"></i>
-                  <p class="text">Important</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon bi bi-circle text-warning"></i>
-                  <p>Warning</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon bi bi-circle text-info"></i>
-                  <p>Informational</p>
                 </a>
               </li>
             </ul>
