@@ -11,8 +11,6 @@ from .views import *
 from apy.view.Contenidos.views import *
 from apy.view.gen_index.views import index
 
-from apy.views import *
-
 from apy.view.proveedor.view import *
 from apy.view.administrador.views import *
 from apy.view.informes.views import *
@@ -177,5 +175,6 @@ urlpatterns = [
     path('repuestos/eliminar/<int:pk>/', RepuestoDeleteView.as_view() , name='repuesto_eliminar'),
     
     path('main/', Main.as_view(), name='main'),
+    
 ] 
 

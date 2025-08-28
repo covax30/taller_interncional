@@ -11,7 +11,7 @@
             />
             <!--end::Brand Image-->
             <!--begin::Brand Text-->
-            <span class="brand-text fw-light">AdminLTE 4</span>
+            <span class="brand-text fw-light">T.I.M</span>
             <!--end::Brand Text-->
           </a>
           <!--end::Brand Link-->
@@ -33,80 +33,233 @@
 
               <li class="nav-item">
                 <a href="#" class="nav-link">
-                  <i class="nav-icon bi bi-circle-fill"></i>
+                  <i class="nav-icon bi bi-bar-chart-fill"></i>
                   <p>
-                    Level 1
+                    Analisis y reportes
                     <i class="nav-arrow bi bi-chevron-right"></i>
                   </p>
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="#" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Level 2</p>
+                    <a href="{% url 'apy:informes_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Informes </p>
                     </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="#" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>
-                        Level 2
-                        <i class="nav-arrow bi bi-chevron-right"></i>
-                      </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                      <li class="nav-item">
-                        <a href="#" class="nav-link">
-                          <i class="nav-icon bi bi-record-circle-fill"></i>
-                          <p>Level 3</p>
-                        </a>
-                      </li>
-                      <li class="nav-item">
-                        <a href="#" class="nav-link">
-                          <i class="nav-icon bi bi-record-circle-fill"></i>
-                          <p>Level 3</p>
-                        </a>
-                      </li>
-                      <li class="nav-item">
-                        <a href="#" class="nav-link">
-                          <i class="nav-icon bi bi-record-circle-fill"></i>
-                          <p>Level 3</p>
-                        </a>
-                      </li>
-                    </ul>
-                  </li>
-                  <li class="nav-item">
-                    <a href="#" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Level 2</p>
-                    </a>
-                  </li>
+                  </li> 
                 </ul>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link">
-                  <i class="nav-icon bi bi-circle-fill"></i>
-                  <p>Level 1</p>
+                  <i class="nav-icon bi bi-bar-chart-fill"></i>
+                  <p>
+                    Gestion de Vehiculo
+                    <i class="nav-arrow bi bi-chevron-right"></i>
+                  </p>
                 </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'apy:entrada_vehiculo_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Entrada de Vehiculo </p>
+                    </a>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'apy:salida_vehiculo_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Salida de Vehiculo </p>
+                    </a>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'apy:vehiculo_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Vehiculo </p>
+                    </a>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'apy:marca_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Marca </p>
+                    </a>
+                  </li> 
+                </ul>
               </li>
-
-              <li class="nav-header">LABELS</li>
               <li class="nav-item">
                 <a href="#" class="nav-link">
-                  <i class="nav-icon bi bi-circle text-danger"></i>
-                  <p class="text">Important</p>
+                  <i class="nav-icon bi bi-bar-chart-fill"></i>
+                  <p>
+                    Gestion de Mantenimiento
+                    <i class="nav-arrow bi bi-chevron-right"></i>
+                  </p>
                 </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'apy:mantenimiento_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Mantenimiento </p>
+                    </a>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'apy:repuesto_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Repuestos </p>
+                    </a>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'apy:tipo_mantenimiento_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Tipos de Mantenimientos </p>
+                    </a>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'apy:herramienta_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Herramientas </p>
+                    </a>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'apy:insumo_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Insumos </p>
+                    </a>
+                  </li> 
+                </ul>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link">
-                  <i class="nav-icon bi bi-circle text-warning"></i>
-                  <p>Warning</p>
+                  <i class="nav-icon bi bi-bar-chart-fill"></i>
+                  <p>
+                    Administracion y Finanzas
+                    <i class="nav-arrow bi bi-chevron-right"></i>
+                  </p>
                 </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'apy:administrador_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Administrador </p>
+                    </a>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'apy:gasto_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Gastos </p>
+                    </a>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'apy:factura_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Facturas </p>
+                    </a>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'apy:pagos_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Pagos </p>
+                    </a>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'apy:caja_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Caja </p>
+                    </a>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'apy:nomina_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Nomina </p>
+                    </a>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'apy:pago_servicios_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Servicios publicos </p>
+                    </a>
+                  </li> 
+                </ul>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link">
-                  <i class="nav-icon bi bi-circle text-info"></i>
-                  <p>Informational</p>
+                  <i class="nav-icon bi bi-bar-chart-fill"></i>
+                  <p>
+                    Gestion de Clientes
+                    <i class="nav-arrow bi bi-chevron-right"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'apy:proveedor_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Proveedores </p>
+                    </a>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'apy:cliente_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Clientes </p>
+                    </a>
+                  </li> 
+                </ul>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'apy:compra_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Compras </p>
+                    </a>
+                  </li> 
+                </ul>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon bi bi-bar-chart-fill"></i>
+                  <p>
+                    Recursos Humanos
+                    <i class="nav-arrow bi bi-chevron-right"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'apy:empleado_lista' %}" class="nav-link">
+                      <i class="nav-icon bi-file-earmark"></i>
+                      <p>Empleados </p>
+                    </a>
+                  </li> 
+                </ul>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'apy:main' %}" class="nav-link">
+                  <i class="nav-icon bi bi-bar-chart-fill"></i>
+                  <p>
+                    Configuraciones
+                    <i class="nav-arrow bi bi-chevron-right"></i>
+                  </p>
                 </a>
               </li>
             </ul>
