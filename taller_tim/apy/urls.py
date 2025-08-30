@@ -11,8 +11,6 @@ from .views import *
 from apy.view.Contenidos.views import *
 from apy.view.gen_index.views import index
 
-from apy.views import *
-
 from apy.view.proveedor.view import *
 from apy.view.administrador.views import *
 from apy.view.informes.views import *
@@ -29,12 +27,7 @@ from apy.view.compras.views import *
 from apy.view.vehiculos.views import *
 from apy.view.entrada_vehiculos.views import *
 from apy.view.salida_vehiculos.views import *
-<<<<<<< .merge_file_FBW9Ow
-from apy.view.Estadisticas.views import *
-
-=======
 from apy.view.main.main import Main
->>>>>>> .merge_file_trVbQZ
 
 app_name = 'apy'
 
@@ -181,8 +174,7 @@ urlpatterns = [
     path('repuestos/editar/<int:pk>/', RepuestoUpdateView.as_view() , name='repuesto_editar'),
     path('repuestos/eliminar/<int:pk>/', RepuestoDeleteView.as_view() , name='repuesto_eliminar'),
     
-    # --------------urls estadisticas---------------
-    path('estadisticas/', estadisticas, name='estadisticas'),
     path('main/', Main.as_view(), name='main'),
+    
 ] 
 
