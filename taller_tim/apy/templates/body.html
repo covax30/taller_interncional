@@ -6,12 +6,12 @@
 
   <body class="layout-fixed sidebar-expand-lg sidebar-mini sidebar-collapse bg-body-tertiary">
     <!--begin::App Wrapper-->
-       {% include 'header.html' %}
+       
     <div class="app-wrapper">
       <!--begin::Header-->
    
       <!--end::Header-->
-
+      {% include 'header.html' %}
       <!--begin::Sidebar-->
       {% include 'sidebar.html' %}
       <!--end::Sidebar-->
@@ -24,7 +24,6 @@
     </div>
     <!--end::App Wrapper-->
 
-      {% include 'footer.html' %}
 
     <!-- rutas al archivo css de datatables -->
     <link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/plugins/datatables.min.css' %}">
@@ -35,7 +34,7 @@
     <script src="{% static 'AdminLTE/dist/js/overlayscrollbars.js' %}"></script>
     
     <script src="{% static 'AdminLTE/dist/js/bootstrap.bundle.min.js' %}"></script>
-    <script src="{% static 'AdminLTE/dist/js/adminlte.js' %}"></script>
+   
     <!--end::Scripts-->
 
     <!--begin::OverlayScrollbars Configure-->
