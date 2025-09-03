@@ -84,7 +84,7 @@ class InformesDeleteView(DeleteView):
         return super().dispatch(request, *args, **kwargs)
     
     def form_valid(self, form):
-        messages.success(self.request, "Administrador eliminado correctamente")
+        messages.success(self.request, "Informe eliminado correctamente")
         return super().form_valid(form)  
     
     def get_context_data(self, **kwargs):

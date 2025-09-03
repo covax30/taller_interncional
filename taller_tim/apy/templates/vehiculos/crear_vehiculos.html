@@ -3,39 +3,27 @@
 {% block form %}
     {% csrf_token %}
 
-    {% if form.errors %}
-    <div class="alert alert-danger alert-dismissible">
-        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-        <h5><i class="icon fas fa-ban"></i> Error al intentar guardar</h5>
-        <ul>
-            {% for field in form %}
-            {% for error in field.errors %}
-            <li>{{error}}</li>
-            {% endfor %}
-            {% endfor %}
-        </ul>
-    </div>
-    {% endif %}
-
     {% for field in form.visible_fields %}
-    <div class="form_group">
-        <label for="{{field.id_for_label}}">{{field.label}}: </label>
-        
-        {% if field.name == 'fecha' %}
-            <!-- Campo fecha con ícono de calendario -->
-            <div class="input-group">
-                {{field|add_class:'form-control'|attr:'autocomplete:off'}}
-                <div class="input-group-append">
-                    <span class="input-group-text">
-                        <i class="fas fa-calendar-alt"></i>
-                    </span>
-                </div>
+    <div class="form-group mb-3">
+        <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
+        {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
+
+        {% if field.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in field.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
             </div>
-        {% else %}
-            <!-- Campos normales -->
-            {{field|add_class:'form-control'|attr:'autocomplete:off'}}
         {% endif %}
     </div>
     {% endfor %}
-    
+{% endblock %}
+
+{% block Cancelar %}
+                <button type="submit " class="btn btn-primary btn-flat"><i class="fas fa-save"></i>
+                    Agregar
+                </button>
+                <a href="{% url 'apy:vehiculo_lista' %}" class="btn btn-default btn-flat float-right">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
 {% endblock %}

@@ -84,7 +84,7 @@ class NominaDeleteView(DeleteView):
     success_url = reverse_lazy('apy:nomina_lista')
     
     def form_valid(self, form):
-        messages.success(self.request, "Administrador eliminado correctamente")
+        messages.success(self.request, "Nomina eliminado correctamente")
         return super().form_valid(form)
 
     

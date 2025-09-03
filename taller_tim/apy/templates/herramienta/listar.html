@@ -2,7 +2,7 @@
 {% extends "generic_listar.html" %}
 
 {% block titulo %}
-        <h1 class="text-center">listar herramientas</h1>
+        <h1 class="text-center">Listar Herramientas</h1>
 {% endblock titulo %}
 
 {% block agregar %}
@@ -13,12 +13,13 @@
 
 {% block columnas %}
 
-        <th>nombre</th>
-        <th>color</th>
-        <th>tipo</th>
-        <th>material</th>
-        <th>Id_marca</th>
-        <th>stock</th>
+        <th>Nombre</th>
+        <th>Color</th>
+        <th>Tipo</th>
+        <th>Material</th>
+        <th>Id marca</th>
+        <th>Stock</th>
+        <th>Acciones</th>
 
 {% endblock %}
 
@@ -30,7 +31,7 @@
         <td>{{h.color}}</td>
         <td>{{h.tipo}}</td>
         <td>{{h.material}}</td>
-        <td>{{h.Id_marca}}</td>
+        <td>{{h.id_marca}}</td>
         <td>{{h.stock}}</td>
 
         <form method="post">

@@ -1,4 +1,5 @@
 {% extends "generic_listar.html" %}
+{% load humanize %}
 
 {% block titulo %}
         <h1 class="text-center">Lista de Pagos de Servicios Públicos</h1>
@@ -12,8 +13,9 @@
 
 {% block columnas %}
 
-        <th>Id servicio</th>
-        <th>monto</th>
+        <th>Id Servicio</th>
+        <th>Tipo de Servicio</th>
+        <th>Monto</th>
         <th>Acciones</th>
 
 {% endblock %}
@@ -23,7 +25,8 @@
       {% for ps in object_list %}
       <tr>
         <td>{{ ps.id_servicio }}</td>
-        <td>{{ ps.monto }}</td>
+        <td>{{ ps.get_servicio_display }}</td>
+        <td>{{ ps.monto|intcomma }}</td>
         <form method="post">
 
           <td>

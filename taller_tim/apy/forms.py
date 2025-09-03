@@ -4,6 +4,7 @@ from django.forms import DateInput
 from django.forms import TimeInput
 from django.forms import ModelForm
 from django.forms import TextInput, Select
+from decimal import Decimal, InvalidOperation
 
 from apy.models import *
 
@@ -11,7 +12,7 @@ from apy.models import *
 class FacturaForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['id_cliente'].widget.attrs['autofocus'] = True
+        self.fields['tipo_pago'].widget.attrs['autofocus'] = True
         
     class Meta:
         model = Factura
@@ -56,7 +57,45 @@ class FacturaForm(ModelForm):
                 attrs={
                     'class': 'form-control',
                 }
+            ),
+            'monto':NumberInput(
+                attrs={
+                    'placeholder':'Ingrese el monto total del servicio prestado',
+                }
             )
+        }
+        error_messages = {
+            'id_operacion': {
+                'required': 'El id de la operacion es obligatorio',
+            },
+            'tipo_pago':{
+                    'required': 'El tipo de pago es obligatorio',
+                },
+            'id_cliente':{
+                    'required': 'El id del cliente es obligatorio',
+                },
+            'id_vehiculo':{
+                    'required': 'El id del vehiculo es obligatorio',
+                },
+            'id_tipo_mantenimiento':{
+                    'required': 'El id de tipo de mantenimiento es obligatorio',
+                },
+            'servicio_prestado':{
+                    'required': 'El servicio prestado es obligatorio',
+                },
+            'nombre_empresa':{
+                    'required': 'El nombre de la empresa es obligatorio',
+                },
+            'direccion_empresa':{
+                    'required': 'La direccion de la empresa es obligatoria',
+                },
+            'id_empleado':{
+                    'required': 'El id del empleado es obligatorio',
+                },
+            'monto':{
+                    'required': 'El monto es obligatorio',
+                }
+
         }
         
 # -----------Formulario modelo proveedor------------------        
@@ -74,7 +113,7 @@ class ProveedorForm(ModelForm):
                     'placeholder':'Ingrese el nombre del proveedor',
                 }
             ),
-            'telefono':TextInput(
+            'telefono':NumberInput(
                 attrs={
                     'placeholder':'Ingrese el telefono del proveedor',
                 }
@@ -85,13 +124,25 @@ class ProveedorForm(ModelForm):
                 }
             )
         }
-
+        error_messages = {
+            'nombre': {
+                'required': 'El nombre del proveedor es obligatorio',
+            },
+            'telefono': {
+                'required': 'El telefono del proveedor es obligatorio',
+            },
+            'correo': {
+                'required': 'El correo del proveedor es obligatorio',
+                'invalid': 'El correo no tiene un formato válido',
+                'unique': 'Ya existe un cliente con ese correo',
+            }
+        }
 # ------------------- FORMS STEVEN -------------------    
 
 class ClienteForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['nombre'].widget.attrs['autofocus'] = True
+        self.fields['id_operacion'].widget.attrs['autofocus'] = True
         
     class Meta:
         model = Cliente
@@ -112,12 +163,12 @@ class ClienteForm(ModelForm):
                     'placeholder':'Ingrese el nombre del cliente',
                 }
             ),
-            'documento':TextInput(
+            'documento':NumberInput(
                 attrs={
                     'placeholder':'Ingrese el documento del cliente',
                 }
             ),
-            'telefono':TextInput(
+            'telefono':NumberInput(
                 attrs={
                     'placeholder':'Ingrese el telefono del cliente',
                 }
@@ -133,17 +184,45 @@ class ClienteForm(ModelForm):
                     'placeholder': 'Ingrese la fecha de operacion',
                 }
             ),
-            'monto':TextInput(
+            'monto':NumberInput(
                 attrs={
                     'placeholder':'Ingrese el monto del cliente',
                 }
             )
         }
+        error_messages = {
+            'id_operacion': {
+                'required': 'El id de la operacion es obligatorio',
+            },
+            'nombre': {
+                'required': 'El nombre es obligatorio',
+            },
+            'documento': {
+                'required': 'El docmuento de identidad es obligatorio',
+                'unique': 'Ya existe un cliente con ese documento de identidad',
+                'invalid': 'Por favor ingrese solo números en el documento de identidad',
+            },
+            'telefono': {
+                'required': 'El teléfono es obligatorio',
+                'invalid': 'Por favor ingrese solo números en el telefono',
+            },
+            'correo': {
+                'required': 'El correo es obligatorio',
+                'invalid': 'El correo no tiene un formato válido',
+                'unique': 'Ya existe un cliente con ese correo',
+            },
+            'fecha_operacion': {
+                'required': 'La fecha de operacion es obligatoria',
+            },
+            'monto': {
+                'required': 'El monto es obligatorio',
+            },
+        }
         
 class VehiculoForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['placa'].widget.attrs['autofocus'] = True
+        self.fields['id_cliente'].widget.attrs['autofocus'] = True
         
     class Meta:
         model = Vehiculo
@@ -179,6 +258,24 @@ class VehiculoForm(ModelForm):
                     'placeholder':'Ingrese el color del vehiculo',
                 }
             ),
+        }
+        error_messages = {
+            'id_cliente': {
+                'required': 'El id del cliente es obligatorio',
+            },
+            'placa': {
+                'required': 'La placa del vehiculo es obligatoria',
+                'unique': 'Ya existe un vehiculo con esa placa',
+            },
+            'modelo_vehiculo': {
+                'required': 'El modelo de vehiculo es obligatorio',
+            },
+            'marca_vehiculo': {
+                'required': 'La marca del vehiculo es obligatoria',
+            },
+            'color': {
+                'required': 'El color del vehiculo es obligatorio',
+            },
         }
         
 class EntradaVehiculoForm(ModelForm):
@@ -219,6 +316,23 @@ class EntradaVehiculoForm(ModelForm):
                     'placeholder':'Ingrese la hora de ingreso',
                 }
             ),
+        }
+        error_messages = {
+            'id_entrada': {
+                'required': 'El id de entrada es obligatorio',
+            },
+            'id_vehiculo': {
+                'required': 'El id del vehiculo es obligatorio',
+            },
+            'id_cliente': {
+                'required': 'El id del cliente es obligatorio',
+            },
+            'fecha_ingreso': {
+                'required': 'La fecha de ingreso del vehiculo es obligatoria',
+            },
+            'hora_ingreso': {
+                'required': 'La hora de ingreso del vehiculo es obligatoria',
+            },
         }
         
 class SalidaVehiculoForm(ModelForm):
@@ -263,11 +377,31 @@ class SalidaVehiculoForm(ModelForm):
                 }
             )
         }
+        error_messages = {
+            'id_salida': {
+                'required': 'El id de salida es obligatorio',
+            },
+            'id_vehiculo': {
+                'required': 'El id del vehiculo es obligatorio',
+            },
+            'id_cliente': {
+                'required': 'El id del cliente es obligatorio',
+            },
+            'diagnostico': {
+                'required': 'El diagnostico del vehiculo es obligatorio',
+            },
+            'fecha_salida': {
+                'required': 'La fecha de salida del vehiculo es obligatoria',
+            },
+            'hora_salida': {
+                'required': 'La hora de salida del vehiculo es obligatoria',
+            },
+        }
         
 class CompraForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['id_proveedor'].widget.attrs['autofocus'] = True
+        self.fields['id_factura_compra'].widget.attrs['autofocus'] = True
         
     class Meta:
         model = Compra
@@ -301,6 +435,20 @@ class CompraForm(ModelForm):
                 }
             )
         }
+        error_messages = {
+            'id_factura_compra': {
+                'required': 'El id de la factura de compra es obligatorio',
+            },
+            'id_proveedor': {
+                'required': 'El id del proveedor es obligatorio',
+            },
+            'fecha_compra': {
+                'required': 'La fecha de la compra es obligatoria',
+            },
+            'hora_compra': {
+                'required': 'La hora de la compra es obligatoria',
+            },
+        }
      
        
 # -----------Formulario modelo administrador------------------
@@ -326,13 +474,16 @@ class AdministradorForm(ModelForm):
             'identificacion':NumberInput(
                 attrs={
                     'placeholder':'Ingrese la identificacion del administrador',
+                    'pattern': '[0-9]+',
+                    'title': 'Solo se permiten números',
+                    'maxlength': '20'
                 }
             ),
             'edad':NumberInput(
                 attrs={
                     'placeholder':'Ingrese la edad del administrador',
                     'min': 1,
-                    'max': 120
+                    'max': 100
                 }
             ),
             'correo':EmailInput(
@@ -340,7 +491,7 @@ class AdministradorForm(ModelForm):
                     'placeholder':'Ingrese el correo del administrador',
                 }
             ),
-            'telefono':TextInput(
+            'telefono':NumberInput(
                 attrs={
                     'placeholder':'Ingrese el telefono del administrador',
                     'type': 'tel'
@@ -353,12 +504,44 @@ class AdministradorForm(ModelForm):
                 }
             )
         }
+        error_messages = {
+            'nombre': {
+                'required': 'El nombre es obligatorio',
+            },
+            'apellidos': {
+                'required': 'El apellido es obligatorio',
+            },
+            'identificacion': {
+                'required': 'La identificación es obligatoria',
+                'unique': 'Ya existe un administrador con esa identificación',
+                'invalid': 'Por favor ingrese solo números en la identificación',
+            },
+            'edad': {
+                'required': 'La edad es obligatoria',
+                'invalid': 'Por favor ingrese solo números en la edad',
+            },
+            'correo': {
+                'required': 'El correo es obligatorio',
+                'invalid': 'El correo no tiene un formato válido',
+                'unique': 'Ya existe un administrador con ese correo',
+            },
+            'telefono': {
+                'required': 'El teléfono es obligatorio',
+                'invalid': 'Por favor ingrese solo números en el telefono',
+            },
+            'fecha_ingreso': {
+                'required': 'La fecha de ingreso es obligatoria',
+            },
+        }
+        
+
+    
         
 # -----------Formulario modelo informe------------------    
 class InformeForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['tipo_informe'].widget.attrs['autofocus'] = True
+        self.fields['repuestos_usados'].widget.attrs['autofocus'] = True
         
     class Meta:
         model = Informes
@@ -413,6 +596,35 @@ class InformeForm(ModelForm):
                 }
             )
         }
+        error_messages = {
+            'repuestos_usados': {
+                'required': 'Los repuestos usados son obligatorios',
+            },
+            'costo_mano_obra': {
+                'required': 'El costo de mano de obra es obligatorio',
+            },
+            'fecha': {
+                'required': 'La fecha es obligatoria',
+            },
+            'hora': {
+                'required': 'La hora es obligatoria',
+            },
+            'id_repuesto': {
+                'required': 'El id del repuesto es obligatorio',
+            },
+            'id_empleado': {
+                'required': 'El id del empleado es obligatorio',
+            },
+            'id_tipo_mantenimiento': {
+                'required': 'El id de tipo de mantenimiento es obligatorio',
+            },
+            'tipo_informe': {
+                'required': 'El tipo de informe es obligatorio',
+            },
+            'id_mantenimiento': {
+                'required': 'El id de mantenimiento es obligatorio',
+            },
+        }
    
    
       
@@ -423,11 +635,20 @@ class PagoServiciosForm(ModelForm):
         # Add safety check to prevent KeyError
         if 'monto' in self.fields:
             self.fields['monto'].widget.attrs['autofocus'] = True
-        
+            
+        if 'servicio' in self.fields:
+            choices = list(self.fields['servicio'].choices)[1:] 
+            self.fields['servicio'].choices = [("", "Seleccione el servicio")] + choices
+            
     class Meta:
         model = PagoServiciosPublicos
         fields = '__all__'
         widgets = {
+            'servicio': Select(
+                attrs={
+                    'placeholder': 'Seleccione el servicio',
+                }
+            ),
             'monto': NumberInput(
                 attrs={
                     'placeholder': 'Ingrese el monto del pago de servicio publico',
@@ -435,6 +656,14 @@ class PagoServiciosForm(ModelForm):
                 }
             )
         }
+        error_messages = {
+            'servicio': {
+                'required': 'Debe seleccionar un servicio',
+            },
+            'monto': {
+                'required': 'El monto de pago es obligatorio',
+            },
+         }
         
 # -----------Formulario modelo pagos------------------    
 class PagosForm(ModelForm):
@@ -480,7 +709,7 @@ class PagosForm(ModelForm):
                     'class': 'form-control',
                 }
             ),
-            'id_herramientas':Select(
+            'id_herramienta':Select(
                 attrs={
                     'class': 'form-control',
                 }
@@ -496,6 +725,36 @@ class PagosForm(ModelForm):
                 }
             )
         }
+        error_messages = {
+            'tipo_pago': {
+                'required': 'El tipo de pago es obligatorio',
+            },
+            'fecha': {
+                'required': 'La fecha es obligatoria',
+            },
+            'hora': {
+                'required': 'La hora es obligatoria',
+            },
+            'monto': {
+                'required': 'El monto es obligatorio',
+            },
+            'id_proveedor': {
+                'required': 'El id del proveedor es obligatorio',
+            },
+            'id_admin': {
+                'required': 'El id del administrador es obligatorio',
+            },
+            'id_herramienta': {
+                'required': 'El id de las herramientas es obligatorio',
+            },
+            'id_insumos': {
+                'required': 'El id de los insumos es obligatorio',
+            },
+            'id_repuestos': {
+                'required': 'El id de los repuestos es obligatorio',
+            },
+        }
+   
         
 #------- formularios Yury--------        
         
@@ -515,28 +774,47 @@ class EmpleadoForm(ModelForm):
                     'placeholder':'Ingrese el nombre del empleado',
                 }
             ),
-            'telefono':TextInput(
+            'telefono':NumberInput(
                 attrs={
                     'placeholder':'Ingrese el telefono del empleado',
                 }
             ),
-            'identificacion':TextInput(
+            'identificacion':NumberInput(
                 attrs={
                     'placeholder':'Ingrese la identificacion del empleado',
                 }
             ),
-            'correo':TextInput(
+            'Correo':TextInput(
                 attrs={
                     'placeholder':'Ingrese el correo del empleado',
                 }
             ),
-            'telefono':TextInput(
+            'direccion':TextInput(
                 attrs={
                     'placeholder':'Ingrese la direccion del empleado',
                 }
             )
             
        }  
+        error_messages = {
+            'nombre': {
+                'required': 'El nombre del empleado es obligatorio',
+            },
+            'telefono': {
+                'required': 'El telefono del empleado es obligatorio',
+            },
+            'identificacion': {
+                'required': 'La identificacion del empleado es obligatoria',
+            },
+            'Correo': {
+                'required': 'El correo del empleado es obligatorio',
+                'invalid': 'El correo no tiene un formato válido',
+                'unique': 'Ya existe un administrador con ese correo',
+            },
+            'direccion': {
+                'required': 'La direccion del empleado es obligatoria',
+            },
+        }
  #------- formulario Gastos -------     
         
 class GastosForm(ModelForm):
@@ -548,9 +826,11 @@ class GastosForm(ModelForm):
         model = Gastos
         fields = '__all__'
         widgets = {
-            'monto':TextInput(
+            'monto': NumberInput(
                 attrs={
-                    'placeholder':'Ingrese el monto del gasto',
+                    'placeholder': 'Ingrese el monto del gasto',
+                    'min': '99',
+                    'step': '0.01'        # permite decimales
                 }
             ),
             'descripcion':TextInput(
@@ -568,6 +848,21 @@ class GastosForm(ModelForm):
                     'class': 'form-control',
                 }
             )
+        }
+        error_messages = {
+            'monto': {
+                'required': 'El monto del gasto es obligatorio',
+                'invalid': 'El monto debe ser un número válido (entero o decimal)',
+            },
+            'descripcion': {
+                'required': 'La descripcion del gasto es obligatorio',
+            },
+            'tipo_gastos': {
+                'required': 'El tipo de gasto es obligatorio',
+            },
+            'id_pagos_servicios': {
+                'required': 'El id del pago de servicios es obligatorio',
+            },
         }
 #-----formularo Marca ---------------        
 class MarcaForm(ModelForm):
@@ -591,12 +886,20 @@ class MarcaForm(ModelForm):
             ),
          
        } 
+        error_messages = {
+            'nombre': {
+                'required': 'El nombre de marca es obligatorio',
+            },
+            'tipo': {
+                'required': 'E tipo de marca es obligatoria',
+            },
+        }
         
 #-----formularo Nomina ---------------
 class   NominaForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['id_empleado'].widget.attrs['autofocus'] = True
+        self.fields['rol'].widget.attrs['autofocus'] = True
         
     class Meta:
         model = Nomina
@@ -607,7 +910,7 @@ class   NominaForm(ModelForm):
                     'placeholder':'Ingrese rol del empleado',
                 }
             ),
-            'monto':TextInput(
+            'monto':NumberInput(
              attrs={
                   'placeholder':'Ingrese el monto del empleado',
                 }
@@ -626,13 +929,27 @@ class   NominaForm(ModelForm):
                 }
             )
         }
+        error_messages = {
+            'rol': {
+                'required': 'El rol es obligatorio',
+            },
+            'monto': {
+                'required': 'El monto es obligatorio',
+            },
+            'fecha_pago': {
+                'required': 'La fecha de pago de la nomina es obligatoria',
+            },
+            'id_empleado': {
+                'required': 'El id del empleado es obligatorio',
+            }
+        }
         
    #------- formulario Caja ---------------
 class CajaForm(ModelForm): 
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['id_admin'].widget.attrs['autofocus'] = True
+        self.fields['tipo_movimiento'].widget.attrs['autofocus'] = True
         
     class Meta:
         model = Caja
@@ -643,7 +960,7 @@ class CajaForm(ModelForm):
                     'placeholder':'Ingrese el tipo de movimiento',
                 }
             ),
-            'monto':TextInput(
+            'monto':NumberInput(
                 attrs={
                     'placeholder':'Ingrese el monto del movimiento',
                 }
@@ -687,7 +1004,36 @@ class CajaForm(ModelForm):
                     'class': 'form-control',
                 }
             )
-        }         
+        }       
+        error_messages = {
+            'tipo_mantenimiento': {
+                'required': 'El tipo de mantenimiento es obligatorio',
+            },
+            'monto': {
+                'required': 'El monto es obligatorio',
+            },
+            'fecha': {
+                'required': 'La fecha es obligatoria',
+            },
+            'hora': {
+                'required': 'La hora es obligatoria',
+            },
+            'id_admin': {
+                'required': 'El id del administrador es obligatorio',
+            },
+            'id_Factura': {
+                'required': 'El id de la factura es obligatorio',
+            },
+            'id_gasto': {
+                'required': 'El id del gasto es obligatorio',
+            },
+            'id_pagos': {
+                'required': 'El id del pago es obligatorio',
+            },
+            'id_nomina': {
+                'required': 'El id de la nomina es obligatorio',
+            },
+        }  
        
         
 class MantenimientoForm(ModelForm):
@@ -710,7 +1056,37 @@ class MantenimientoForm(ModelForm):
                 }
             ),
             'id_vehiculo':Select(
+                attrs={
+                    'class': 'form-control',
+                }
+            ),
+            'id_empleado':Select(
+                attrs={
+                    'class': 'form-control',
+                }
+            ),
+            'id_tipo_mantenimiento':Select(
+                attrs={
+                    'class': 'form-control',
+                }
             )
+        }
+        error_messages = {
+            'fallas': {
+                'required': 'Es obligatorio registrar las fallas encontradas',
+            },
+            'procesos': {
+                'required': 'Es obligatorio registrar los procesos realizados al vehiculo',
+            },
+            'id_vehiculo': {
+                'required': 'El id del vehiculo es obligatorio',
+            },
+            'id_empleado': {
+                'required': 'El id del empleado es obligatorio',
+            },
+            'id_tipo_mantenimiento': {
+                'required': 'El id del tipo de mantenimiento es obligatorio',
+            }
         }
         
          
@@ -754,6 +1130,26 @@ class HerramientaForm(ModelForm):
                 },
             )
         }
+        error_messages = {
+            'nombre': {
+                'required': 'El nombre de la herramienta es obligatorio',
+            },
+            'color': {
+                'required': 'Es color de la herramienta es obligatorio',
+            },
+            'tipo': {
+                'required': 'El tipo de herramienta es obligatorio',
+            },
+            'material': {
+                'required': 'El material de la herramienta es obligatorio',
+            },
+            'id_marca': {
+                'required': 'El id de la marca es obligatoria',
+            },
+            'stock': {
+                'required': 'El stock de la herramienta es obligatorio',
+            }
+        }
 
 class TipoMantenimientoForm(ModelForm):
     def __init__(self, *args, **kwargs):
@@ -775,11 +1171,19 @@ class TipoMantenimientoForm(ModelForm):
                 }
             ),
         }  
+        error_messages = {
+            'nombre': {
+                'required': 'El nombre del tipo de mantenimiento es obligatorio',
+            },
+            'descripcion': {
+                'required': 'La descripcion del tipo de mantenimiento es obligatorio',
+            },
+        }
 
 class InsumoForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['nombre'].widget.attrs['autofocus'] = True
+        self.fields['id_marca'].widget.attrs['autofocus'] = True
         
     class Meta:
         model = Insumos
@@ -811,11 +1215,28 @@ class InsumoForm(ModelForm):
                 }
             ),
         }
+        error_messages = {
+            'id_marca': {
+                'required': 'El id de la marca es obligatoria',
+            },
+            'nombre': {
+                'required': 'El nombre del insumo es obligatorio',
+            },
+            'costo': {
+                'required': 'El costo del insumo es obligatorio',
+            },
+            'tipo': {
+                'required': 'El tipo de insumo es obligatorio',
+            },
+            'stock': {
+                'required': 'El stock de insumo es obligatorio',
+            },
+        }
 
 class RepuestoForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['nombre'].widget.attrs['autofocus'] = True
+        self.fields['id_marca'].widget.attrs['autofocus'] = True
         
     class Meta:
         model = Repuesto
@@ -851,9 +1272,42 @@ class RepuestoForm(ModelForm):
                     'placeholder':'Ingrese la ubicacion del repuesto',
                 }
             ),
-            'precio':NumberInput(
-                attrs={     
-                    'placeholder':'Ingrese el precio del repuesto',
-                }
+            'precio': TextInput(
+                attrs={'placeholder': 'Ingrese el precio del repuesto'}
             ),
         }
+        error_messages = {
+            'id_marca': {
+                'required': 'El id de la marca obligatoria',
+            },
+            'nombre': {
+                'required': 'El nombre del repuesto es obligatorio',
+            },
+            'categoria': {
+                'required': 'El nombre de la categoria es obligatoria',
+            },
+            'fabricante': {
+                'required': 'El nombre del fabricate es obligatorio',
+            },
+            'stock': {
+                'required': 'El stock del repuesto es obligatorio',
+            },
+            'ubicacion': {
+                'required': 'La ubicacion del repuesto es obligatoria',
+            },
+            'precio': {
+                'required': 'El precio del repuesto es obligatorio',
+            }
+        }
+        def clean_precio(self):
+            precio = self.data.get('precio')
+            if precio:
+            # quitar puntos o comas de miles
+                precio = precio.replace('.', '').replace(',', '')
+                try:
+                    return int(precio)
+                except (ValueError, InvalidOperation):
+                    raise forms.ValidationError(
+                    "Ingrese un número válido (ej: 3600 o 3.600 o 3,600)"
+                    )
+            return 0
