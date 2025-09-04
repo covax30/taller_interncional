@@ -6,7 +6,7 @@
     <!--begin::App Wrapper-->
     <div class="app-wrapper">
       <!--begin::Header-->
-      {% include 'header.html' %}
+
       <!--end::Header-->
 
       <!--begin::Sidebar-->
@@ -14,21 +14,13 @@
       <!--end::Sidebar-->
 
       <!--begin::Main Content-->
-      {% block main %}{% endblock %}
+      {% block content %}{% endblock %}
       <!--end::Main Content-->
-
+      
       <!--begin::Footer-->
-      {% include 'footer.html' %}
       <!--end::Footer-->
     </div>
     <!--end::App Wrapper-->
-
-    <!--begin::Scripts archivos estáticos con static-->
-    <script src="{% static 'AdminLTE/dist/js/overlayscrollbars.js' %}"></script>
-    <script src="{% static 'AdminLTE/dist/js/popper.js' %}"></script>
-    <script src="{% static 'AdminLTE/dist/js/bootstrap.js' %}"></script>
-    <script src="{% static 'AdminLTE/dist/js/adminlte.js' %}"></script>
-    <!--end::Scripts-->
 
     <!--begin::OverlayScrollbars Configure-->
     <script>

@@ -2,9 +2,9 @@
 <!doctype html>
 <html lang="en">
   <!--begin::Head-->
+  
   <head>
     <title>AdminLTE 4 | Sidebar Mini</title>
-
     <!--begin::Accessibility Meta Tags-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
     <meta name="color-scheme" content="light dark" />
@@ -35,11 +35,30 @@
     <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/fonts.css' %}" />
     <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/overlayscrollbar.css' %}" />
     <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/bootstrap.css' %}" />
+
+    <link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/css/jquery.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/datatables.css' %}">
+<link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/css/responsive.bootstrap4.min.css' %}">
+
     <!--end::CSS Files-->
+
+    <!--begin::Scripts archivos estáticos con static-->
+    <script src="{% static 'AdminLTE/dist/js/overlayscrollbars.js' %}"></script>
+    <script src="{% static 'AdminLTE/dist/js/popper.js' %}"></script>
+    <script src="{% static 'AdminLTE/dist/js/bootstrap.js' %}"></script>
+    <script src="{% static 'AdminLTE/dist/js/adminlte.js' %}"></script>
+    
+    <script src="{% static 'lib/datatables-1.10.20/datatables.min.js' %}"></script>
+
+<script src="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/js/responsive.bootstrap4.min.js' %}"></script>
+ <!-- <script src="{% static 'AdminLTE/dist/js/adminlte.min.js' %}"></script> -->
+    <!--end::Scripts-->
   </head>
   <!--end::Head-->
-
+  {% include 'header.html' %}
   <!--begin::Body-->
   {% block body %}{% endblock %}
   <!--end::Body-->
+  {% include 'footer.html' %}
 </html>
