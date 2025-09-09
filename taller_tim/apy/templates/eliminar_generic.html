@@ -2,29 +2,24 @@
 
 {% block content %}
 <div class="main-content" style="padding: 20px; padding-top: 70px; padding-bottom: 80px;">
-<form method="post" action="">
-    <div class="card card-default">
-        <div class="card-header">
-            <h3 class="card-title">
-                <i class="fas fa-plus"></i>
-                {{titulo}}
-            </h3>
-        </div>
-        <!-- /.card-header -->
-        <div class="card-body">
-            {% csrf_token %}
-            {% if form.errors %}
-            <div class="alert alert-danger alert-dismissible">
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                <h5><i class="icon fas fa-ban"></i> Ha ocurrido un error al intentar guardar la factura</h5>
-                <ul>
-                    {% for field in form %}
-                        {% for error in field.errors %}
-                            <li>{{error}}</li>
-                        {% endfor %}
-                    {% endfor %}
-                </ul>
+    <form method="post">
+        <div class="card card-danger">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-trash-alt"></i>
+                    Eliminar {{ entidad }}
+                </h3>
             </div>
+<<<<<<< HEAD
+=======
+            <div class="card-body">
+                {% csrf_token %}
+                <div class="alert alert-danger alert-dismissible">
+                    <h5><i class="icon fas fa-ban"></i> ¡Advertencia!</h5>
+                    ¿Deseas eliminar este registro?
+                </div>
+            </div>
+>>>>>>> 10035ee66d5686f58bc9f0a8b03902fc28a52551
             {% endif %}
             <div class="card-footer">
                 <button type="submit" class="btn btn-info btn-flat ">
@@ -53,4 +48,8 @@
     });
     {% endif %}
 </script>
+<<<<<<< HEAD
 {% endblock %}
+=======
+{% endblock %}
+>>>>>>> 10035ee66d5686f58bc9f0a8b03902fc28a52551

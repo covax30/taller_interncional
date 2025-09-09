@@ -29,7 +29,12 @@ from apy.view.compras.views import *
 from apy.view.vehiculos.views import *
 from apy.view.entrada_vehiculos.views import *
 from apy.view.salida_vehiculos.views import *
+<<<<<<< HEAD
 from apy.view.main.main import Main
+=======
+from apy.view.Estadisticas.views import *
+
+>>>>>>> 10035ee66d5686f58bc9f0a8b03902fc28a52551
 
 app_name = 'apy'
 
@@ -40,6 +45,8 @@ urlpatterns = [
     #--------URL modulo factura----------------
 
     path('inicio/index/', index.as_view(), name='index'),
+    path('apy/api/repuestos-bajo-stock/', repuestos_bajo_stock_api, name='repuestos_bajo_stock_api'),
+
     
     path('factura/listar/', FacturaListView.as_view() , name='factura_lista'),
     path('factura/agregar/', FacturaCreateView.as_view(), name='factura_crear'),
@@ -174,6 +181,11 @@ urlpatterns = [
     path('repuestos/editar/<int:pk>/', RepuestoUpdateView.as_view() , name='repuesto_editar'),
     path('repuestos/eliminar/<int:pk>/', RepuestoDeleteView.as_view() , name='repuesto_eliminar'),
     
+<<<<<<< HEAD
     path('main/', Main.as_view(), name='main'),
+=======
+    # --------------urls estadisticas---------------
+    path('estadisticas/', estadisticas, name='estadisticas'),
+>>>>>>> 10035ee66d5686f58bc9f0a8b03902fc28a52551
 ] 
 

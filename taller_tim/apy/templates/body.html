@@ -3,6 +3,7 @@
 
 {% block body %}
   <body class="layout-fixed sidebar-expand-lg sidebar-mini sidebar-collapse bg-body-tertiary">
+<<<<<<< HEAD
     <!--begin::App Wrapper-->
     <div class="app-wrapper">
       <!--begin::Header-->
@@ -34,6 +35,52 @@
         const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
         const isMobile = window.innerWidth <= 992;
 
+=======
+    
+    <!--begin::App Wrapper-->
+    <div class="app-wrapper">
+      <!--begin::Header-->
+      
+      <!--end::Header-->
+
+      <!--begin::Sidebar-->
+      {% include 'sidebar.html' %}
+      <!--end::Sidebar-->
+
+      <!--begin::Main Content-->
+      {% block content %}{% endblock %}
+      <!--end::Main Content-->
+
+      <!--begin::Footer-->
+      
+      <!--end::Footer-->
+    </div>
+    <!--end::App Wrapper-->
+ <!-- rutas al archivo css de datatables -->
+<link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/plugins/datatables.min.css' %}">
+
+<script src="{% static 'lib/datatables-1.10.20/plugins/datatables.min.js' %}"></script>
+<!-- DataTables -->
+    <!--begin::Scripts archivos estáticos con static-->
+    <script src="{% static 'AdminLTE/dist/js/overlayscrollbars.js' %}"></script>
+    
+    <script src="{% static 'AdminLTE/dist/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'AdminLTE/dist/js/adminlte.js' %}"></script>
+    <!--end::Scripts-->
+
+    <!--begin::OverlayScrollbars Configure-->
+    <script>
+      const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
+      const Default = {
+        scrollbarTheme: 'os-theme-light',
+        scrollbarAutoHide: 'leave',
+        scrollbarClickScroll: true,
+      };
+      document.addEventListener('DOMContentLoaded', function () {
+        const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
+        const isMobile = window.innerWidth <= 992;
+
+>>>>>>> 10035ee66d5686f58bc9f0a8b03902fc28a52551
         if (
           sidebarWrapper &&
           window.OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined &&

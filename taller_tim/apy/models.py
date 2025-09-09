@@ -1,56 +1,68 @@
 from django.db import models
+from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator
+import re
 
-# MODULOS STEVEN
-
-class Cliente(models.Model):
-    id_cliente = models.AutoField(primary_key=True)
-    id_operacion = models.IntegerField(default=0)
-    nombre = models.CharField(max_length=100)
-    documento = models.BigIntegerField(default=0)
-    telefono = models.BigIntegerField(default=0)
-    correo = models.EmailField(max_length=100)
-    fecha_operacion = models.DateField()
-    monto = models.IntegerField(default=0)
-
-    def __str__(self):
-        return f"{self.id_cliente} - {self.nombre}"
-
-
-class Vehiculo(models.Model):
-    id_vehiculo = models.AutoField(primary_key=True)
-    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, blank=True,null=True)  # LLAVE
-    placa = models.CharField(max_length=10, unique=True)
-    modelo_vehiculo = models.CharField(max_length=100)
-    marca_vehiculo = models.CharField(max_length=100)
-    color = models.CharField(max_length=100)
-
-    def __str__(self):
-        return f"{self.placa} - {self.marca_vehiculo} - {self.modelo_vehiculo}"
+#------------------FUNCION DE VALIDACION ----------------------
+def validar_email (value):  
+    if re.search(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', value) is None:
+        raise ValidationError('El correo no es valido')
     
-
-class EntradaVehiculo(models.Model):
-    id_entrada = models.AutoField(primary_key=True)
-    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE ,blank=True) # LLAVE
-    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE , blank=True,null=True)  # LLAVE
-    fecha_ingreso = models.DateField()
-    hora_ingreso = models.TimeField()
-
-    def _str_(self):
-        return f"{self.id_cliente.id_cliente} - {self.id_vehiculo.placa} - {self.fecha_ingreso} {self.hora_ingreso}"
+def validar_telefono(value):
+    s = str(value).strip()
     
+    if not re.fullmatch(r'^\d+$', s):
+        raise ValidationError('El telefono debe contener únicamente números')
+    
+    if not (7 <= len(s) <= 10):
+        raise ValidationError('El teléfono debe tener entre 7 y 10 dígitos')
+    
+def validar_identificacion(value):
+    s = str(value).strip()
 
+    # Verifica solo números (sin letras ni símbolos)
+    if not re.fullmatch(r'^\d+$', s):
+        raise ValidationError('La identificación debe contener únicamente números')
 
+    # Verifica la longitud
+    if not (8 <= len(s) <= 11):
+        raise ValidationError('La identificación debe tener entre 8 y 11 dígitos')
+    
+def validar_edad(value):
+    if value < 16 or value > 90:
+        raise ValidationError('La edad debe estar en un rango entre 16 a 90 años')
+    
+def validar_monto(value):
+    s = str(value).strip()
 
-class SalidaVehiculo(models.Model):
-    id_salida = models.AutoField(primary_key=True)
-    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE, blank=True,null=True) # LLAVE
-    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE,blank=True,null=True)  # LLAVE
-    diagnostico = models.CharField(max_length=100)
-    fecha_salida = models.DateField()
-    hora_salida = models.TimeField()
+    # Regex: solo números con opcional parte decimal
+    if not re.fullmatch(r'^\d+(\.\d+)?$', s):
+        raise ValidationError('El monto debe ser un número válido (entero o decimal)')
 
-    def _str_(self):
-        return f"{self.id_cliente.id_cliente} - {self.id_vehiculo.placa} - {self.diagnostico}"
+    monto = float(s)
+
+    if monto < 99:
+        raise ValidationError('El monto debe ser mayor o igual a 99')
+
+placa_regex = RegexValidator(
+        regex=r'^[A-Z]{3}\d{3}$',
+        message="La placa debe tener el formato ABC123 (3 letras seguidas de 3 números)."
+    )
+
+modelo_regex = RegexValidator(
+        regex=r'^\d{4}$',
+        message="El modelo debe ser un año válido de 4 dígitos (ej: 2024)."
+    )
+
+marca_regex = RegexValidator(
+        regex=r'^[A-Za-z\s]+$',
+        message="La marca solo debe contener letras."
+    )
+
+color_regex = RegexValidator(
+        regex=r'^[A-Za-z\s]+$',
+        message="El color solo debe contener letras."
+    )
 
 
 #------ MODULOS ERICK ---------
@@ -75,13 +87,18 @@ class Marca(models.Model):
 
 #------ ENTIDAD REPUESTOS --------3
 class Repuesto(models.Model):
-    id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE, blank=True, null=True)  # LLAVE
+    id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE)  # LLAVE
     nombre = models.CharField(max_length=100)
     categoria = models.CharField(max_length=100)
     fabricante = models.CharField(max_length=100)
-    stock = models.IntegerField(default=0)
+    stock = models.IntegerField()
     ubicacion = models.CharField(max_length=100)
-    precio = models.IntegerField(default=0)
+    precio = models.IntegerField(  # 🔹 ENTEROS, sin decimales
+        error_messages={
+            'invalid': 'Ingrese un número válido para el precio.',
+            'required': 'El precio del repuesto es obligatorio.'
+        } , validators=[validar_monto]
+    )
     
     def __str__(self):
         return f"{self.nombre} "   
@@ -94,24 +111,86 @@ class Herramienta(models.Model):
     color = models.CharField(max_length=100)
     tipo = models.CharField(max_length=100)
     material = models.CharField(max_length=100)
-    id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE, blank=True, null=True)
-    stock = models.IntegerField(default=0)
+    id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE)
+    stock = models.IntegerField()
 
     def __str__(self):
         return self.nombre
 
-#------ ENTIDAD INSUMOS --------5
+#------ ENTIDAD INSUMOS --------
 class Insumos(models.Model):
 
-    id_marca = models.ForeignKey(Marca, on_delete=models.SET_NULL, blank=True, null=True)
+    id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE)
     nombre = models.CharField(max_length=100)
-    costo = models.IntegerField()
+    costo = models.IntegerField(  # 🔹 ENTEROS, sin decimales
+        error_messages={
+            'invalid': 'Ingrese un número válido para el costo.',
+            'required': 'El costo del insumo es obligatorio.'
+        } , validators=[validar_monto]
+    )
     tipo = models.CharField(max_length=100)
-    stock = models.IntegerField(default=0)
+    stock = models.IntegerField()
 
     def __str__(self):
 
         return f"{self.nombre} ({self.id})"
+
+
+# MODULOS STEVEN
+
+class Cliente(models.Model):
+    id_cliente = models.AutoField(primary_key=True)
+    id_operacion = models.ForeignKey(TipoMantenimiento, on_delete=models.CASCADE)
+    nombre = models.CharField(max_length=100)
+    documento = models.BigIntegerField(validators=[validar_identificacion])
+    telefono = models.BigIntegerField(validators=[validar_telefono])
+    correo = models.EmailField(max_length=100, validators=[validar_email])
+    fecha_operacion = models.DateField()
+    monto = models.IntegerField(  # 🔹 ENTEROS, sin decimales
+        error_messages={
+            'invalid': 'Ingrese un número válido para el monto.',
+            'required': 'El monto del cliente es obligatorio.'
+        } , validators=[validar_monto]
+    )
+
+    def __str__(self):
+        return f"{self.id_cliente} - {self.nombre}"
+
+
+class Vehiculo(models.Model):
+    id_vehiculo = models.AutoField(primary_key=True)
+    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)  
+    placa = models.CharField(max_length=10, unique=True,validators=[placa_regex])
+    modelo_vehiculo = models.CharField(max_length=4,validators=[modelo_regex])
+    marca_vehiculo = models.CharField(max_length=100, validators=[marca_regex])
+    color = models.CharField(max_length=100, validators=[color_regex])
+
+    def __str__(self):
+        return f"{self.placa} - {self.marca_vehiculo} - {self.modelo_vehiculo}"
+    
+
+class EntradaVehiculo(models.Model):
+    id_entrada = models.AutoField(primary_key=True)
+    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE) # LLAVE
+    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)  # LLAVE
+    fecha_ingreso = models.DateField()
+    hora_ingreso = models.TimeField()
+
+    def __str__(self):
+        return f"{self.id_cliente.id_cliente} - {self.id_vehiculo.placa} - {self.fecha_ingreso} {self.hora_ingreso}"
+    
+
+class SalidaVehiculo(models.Model):
+    id_salida = models.AutoField(primary_key=True)
+    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE) # LLAVE
+    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)  # LLAVE
+    diagnostico = models.CharField(max_length=100)
+    fecha_salida = models.DateField()
+    hora_salida = models.TimeField()
+
+    def __str__(self):
+        return f"{self.id_cliente.id_cliente} - {self.id_vehiculo.placa} - {self.diagnostico}"
+
 
  
 #-------------MODULOS DE karol-----------
@@ -120,10 +199,10 @@ class Administrador(models.Model):
     id_admin = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
     apellidos = models.CharField(max_length=100)
-    identificacion = models.CharField(max_length=20, unique=True)
-    edad = models.IntegerField()
-    correo = models.EmailField(unique=True)
-    telefono = models.CharField(max_length=20)
+    identificacion = models.IntegerField(max_length=11, unique=True, validators=[validar_identificacion])
+    edad = models.PositiveIntegerField(validators=[validar_edad])
+    correo = models.EmailField(unique=True, validators=[validar_email])
+    telefono = models.IntegerField(max_length=10, validators=[validar_telefono])
     fecha_ingreso = models.DateField()
     
     def __str__(self):
@@ -132,37 +211,38 @@ class Administrador(models.Model):
 
 #--------------Modulo Pago Servicio Publicos-----------
 class PagoServiciosPublicos(models.Model):
+    SERVICIO_OPCIONES = [
+        ('luz', 'Luz'),
+        ('agua', 'Agua'),
+        ('gas', 'Gas'),
+        ('internet', 'Internet'),
+    ]
+
+    servicio = models.CharField(
+        max_length=20,
+        choices=SERVICIO_OPCIONES
+    )
     id_servicio = models.AutoField(primary_key=True)
-    monto = models.DecimalField(max_digits=10, decimal_places=2)
+    monto = models.IntegerField(  # 🔹 ENTEROS, sin decimales
+        error_messages={
+            'invalid': 'Ingrese un número válido para el monto.',
+            'required': 'El monto de la nomina es obligatorio.'
+        } , validators=[validar_monto]
+    )
     
     def __str__(self):
-        return f"{self.id_servicio} {self.monto}"
+        return f"{self.id_servicio} - {self.servicio} -{self.monto}"
     
 #--------------Modulo Proveedores--------------
 class Proveedores(models.Model):
     id_proveedor = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
-    telefono = models.CharField(max_length=20)
-    correo = models.EmailField(unique=True)
+    telefono = models.CharField(max_length=20, validators=[validar_telefono])
+    correo = models.EmailField(unique=True, validators=[validar_email])
     
     def __str__(self):
         return f"{self.id_proveedor} {self.correo}"
     
-
-#--------------Modulo Compra (STEVEN)-----------------
-class Compra(models.Model):
-    id_compra = models.AutoField(primary_key=True)
-    id_factura_compra = models.IntegerField(unique=True)
-    id_proveedor = models.ForeignKey(Proveedores, on_delete=models.CASCADE, blank=True,null=True)  # LLAVE
-    fecha_compra = models.DateField()
-    hora_compra = models.TimeField()
-
-    def __str__(self):
-        return f"{self.id_factura_compra} - {self.proveedor} - {self.fecha_compra} {self.hora_compra}"
-
-    
-        
-
 
 
 #--------------Modulo Pagos-----------------
@@ -171,12 +251,17 @@ class Pagos(models.Model):
     tipo_pago = models.CharField(max_length=100)
     fecha = models.DateField()
     hora = models.TimeField()
-    monto = models.DecimalField(max_digits=10, decimal_places=2)
-    id_proveedor = models.ForeignKey(Proveedores, on_delete=models.SET_NULL, null=True,blank=True)
-    id_admin = models.ForeignKey(Administrador, on_delete=models.SET_NULL, null=True,blank=True)
-    id_herramienta = models.ForeignKey(Herramienta, on_delete=models.SET_NULL, null=True, blank=True)
-    id_insumos = models.ForeignKey(Insumos, on_delete=models.SET_NULL, null=True, blank=True)
-    id_repuestos = models.ForeignKey(Repuesto, on_delete=models.SET_NULL, null=True, blank=True)
+    monto = models.IntegerField(  # 🔹 ENTEROS, sin decimales
+        error_messages={
+            'invalid': 'Ingrese un número válido para el monto.',
+            'required': 'El monto del pago es obligatorio.'
+        } , validators=[validar_monto]
+    )
+    id_proveedor = models.ForeignKey(Proveedores, on_delete=models.CASCADE)
+    id_admin = models.ForeignKey(Administrador, on_delete=models.CASCADE)
+    id_herramienta = models.ForeignKey(Herramienta, on_delete=models.CASCADE)
+    id_insumos = models.ForeignKey(Insumos, on_delete=models.CASCADE)
+    id_repuestos = models.ForeignKey(Repuesto, on_delete=models.CASCADE)
     
     def __str__(self):
         return f"{self.id_pago} {self.monto}"
@@ -185,10 +270,15 @@ class Pagos(models.Model):
 
 class Gastos(models.Model):
    
-    monto = models.DecimalField(max_digits=10, decimal_places=2)
+    monto = models.IntegerField(  # 🔹 ENTEROS, sin decimales
+        error_messages={
+            'invalid': 'Ingrese un número válido para el monto.',
+            'required': 'El monto del gasto es obligatorio.'
+        }, validators=[validar_monto]
+    )
     descripcion = models.TextField() 
     tipo_gastos=models.CharField(max_length=100)
-    id_pagos_servicios = models.ForeignKey(PagoServiciosPublicos, on_delete=models.SET_NULL, null=True, blank=True,)
+    id_pagos_servicios = models.ForeignKey(PagoServiciosPublicos, on_delete=models.CASCADE)
     def __str__(self):
         return f"{self.tipo_gastos} - ${self.monto}"
      #class meta
@@ -199,9 +289,9 @@ class Gastos(models.Model):
 class Empleado(models.Model): 
    
     nombre = models.CharField(max_length=100)
-    telefono = models.CharField(max_length=15)
-    identificacion = models.CharField(max_length=20, unique=True) 
-    Correo= models.EmailField(max_length=254, unique=True)
+    telefono = models.CharField(max_length=15, validators=[validar_telefono])
+    identificacion = models.CharField(max_length=20, unique=True, validators=[validar_identificacion]) 
+    Correo= models.EmailField(max_length=254, unique=True, validators=[validar_email])
     direccion = models.CharField(max_length=255)
     def __str__(self):
         return f"{self.nombre} ({self.identificacion})"
@@ -215,9 +305,9 @@ class Empleado(models.Model):
 class Mantenimiento(models.Model):
     fallas = models.TextField()
     procesos = models.CharField(max_length=50)
-    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE,blank=True,null=True)
-    id_empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE,blank=True,null=True)
-    id_tipo_mantenimiento = models.ForeignKey(TipoMantenimiento, on_delete=models.CASCADE,blank=True,null=True)
+    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE)
+    id_empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE)
+    id_tipo_mantenimiento = models.ForeignKey(TipoMantenimiento, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.fallas} - {self.id_tipo_mantenimiento}"
@@ -227,13 +317,18 @@ class Mantenimiento(models.Model):
 class Informes(models.Model):
     id_informe = models.AutoField(primary_key=True)
     repuestos_usados = models.TextField()
-    costo_mano_obra = models.DecimalField(max_digits=10, decimal_places=2)
+    costo_mano_obra = models.IntegerField(  # 🔹 ENTEROS, sin decimales
+        error_messages={
+            'invalid': 'Ingrese un número válido para el costo de mano de obra.',
+            'required': 'El costo de mano de obra es obligatorio.'
+        }, validators=[validar_monto]
+    )
     fecha = models.DateField()
     hora = models.TimeField()
-    id_repuesto = models.ForeignKey(Repuesto, on_delete=models.SET_NULL, null=True, blank=True)
-    id_empleado = models.ForeignKey(Empleado, on_delete=models.SET_NULL, null=True, blank=True)
+    id_repuesto = models.ForeignKey(Repuesto, on_delete=models.CASCADE)
+    id_empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE)
     tipo_informe = models.CharField(max_length=100)
-    id_mantenimiento = models.ForeignKey(Mantenimiento, on_delete=models.SET_NULL, null=True, blank=True)
+    id_mantenimiento = models.ForeignKey(Mantenimiento, on_delete=models.CASCADE)
     
     def __str__(self):
         return f"{self.id_informe} {self.tipo_informe}"
@@ -242,10 +337,15 @@ class Informes(models.Model):
 #-------- nomina------
 class Nomina(models.Model):
    
-    rol = models.CharField(max_length=100) 
-    monto= models.DecimalField(max_digits=10, decimal_places=2) 
+    rol = models.CharField(max_length=100)
+    monto = models.IntegerField(  # 🔹 ENTEROS, sin decimales
+        error_messages={
+            'invalid': 'Ingrese un número válido para el monto.',
+            'required': 'El monto de la nomina es obligatorio.'
+        } , validators=[validar_monto]
+    )
     fecha_pago =  models.DateField() 
-    id_empleado =   models.ForeignKey(Empleado, on_delete=models.SET_NULL, null=True,blank=True)            
+    id_empleado =   models.ForeignKey(Empleado, on_delete=models.CASCADE)            
     def __str__(self):
         return f"{self.rol} - ${self.monto} - {self.fecha_pago}"
      #class meta
@@ -256,30 +356,54 @@ class Nomina(models.Model):
 #-----------Factura-----------------
 class Factura(models.Model):
     
-    tipo_pago = models.CharField(max_length=45, null=True, blank=True)
-    id_cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True)
-    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.SET_NULL, null=True, blank=True)
-    id_tipo_mantenimiento = models.ForeignKey(TipoMantenimiento, on_delete=models.SET_NULL, null=True, blank=True)
-    servicio_prestado = models.CharField(max_length=45, null=True, blank=True)
-    nombre_empresa = models.CharField(max_length=45, null=True, blank=True)
-    direccion_empresa = models.CharField(max_length=45, null=True, blank=True)
-    id_empleado = models.ForeignKey(Empleado, on_delete=models.SET_NULL, null=True, blank=True)
+    tipo_pago = models.CharField(max_length=45)
+    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
+    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE)
+    id_tipo_mantenimiento = models.ForeignKey(TipoMantenimiento, on_delete=models.CASCADE)
+    servicio_prestado = models.CharField(max_length=45)
+    nombre_empresa = models.CharField(max_length=45)
+    direccion_empresa = models.CharField(max_length=45)
+    id_empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE)
+    monto = models.IntegerField(  # 🔹 ENTEROS, sin decimales
+        error_messages={
+            'invalid': 'Ingrese un número válido para el monto.',
+            'required': 'El monto de la factura es obligatorio.'
+        } , validators=[validar_monto]
+    )
 
     def __str__(self):
         return f"Factura {self.id} - {self.tipo_pago or 'Sin pago'}"
+
+
+#--------------Modulo Compra (STEVEN)-----------------
+class Compra(models.Model):
+    id_compra = models.AutoField(primary_key=True)
+    id_factura_compra = models.ForeignKey(Factura, on_delete=models.CASCADE)
+    id_proveedor = models.ForeignKey(Proveedores, on_delete=models.CASCADE)  # LLAVE
+    fecha_compra = models.DateField()
+    hora_compra = models.TimeField()
+
+    def __str__(self):
+        return f"{self.id_factura_compra} - {self.proveedor} - {self.fecha_compra} {self.hora_compra}"
+
 
 #-----------Caja-----------------
 class Caja(models.Model):
    
     tipo_movimiento= models.CharField(max_length=50)
-    monto= models.DecimalField(max_digits=10, decimal_places=2)
+    monto = models.IntegerField(  # 🔹 ENTEROS, sin decimales
+        error_messages={
+            'invalid': 'Ingrese un número válido para el monto.',
+            'required': 'El monto de la caja es obligatorio.'
+        } , validators=[validar_monto]
+    )
     fecha= models.DateField()
     hora=models.TimeField()
-    id_gasto= models.ForeignKey( Gastos , on_delete=models.SET_NULL, null=True, blank=True )
-    id_admin=models.ForeignKey(Administrador, on_delete=models.SET_NULL, null=True, blank=True) 
-    id_Factura= models.ForeignKey(Factura, on_delete=models.SET_NULL, null=True, blank=True)
-    id_pagos= models.ForeignKey(Pagos, on_delete=models.SET_NULL, null=True, blank=True)
-    id_nomina= models.ForeignKey(Nomina, on_delete=models.SET_NULL, null=True, blank=True) 
+    id_gasto= models.ForeignKey( Gastos , on_delete=models.CASCADE)
+    id_admin=models.ForeignKey(Administrador, on_delete=models.CASCADE) 
+    id_Factura= models.ForeignKey(Factura, on_delete=models.CASCADE)
+    id_pagos= models.ForeignKey(Pagos, on_delete=models.CASCADE)
+    id_nomina= models.ForeignKey(Nomina, on_delete=models.CASCADE) 
     def __str__(self):
         return f"{self.tipo_movimiento} - {self.monto} en {self.fecha} {self.hora}"   
     #class meta

@@ -1,4 +1,5 @@
 {% extends "generic_listar.html" %}
+{% load humanize %}
 
 {% block titulo %}
         <h1 class="text-center">Lista de Pagos</h1>
@@ -12,16 +13,16 @@
 
 {% block columnas %}
 
-        <th>Id pago</th>
-        <th>Tipo pago</th>
+        <th>Id Pago</th>
+        <th>Tipo Pago</th>
         <th>Fecha</th>
         <th>Hora</th>
         <th>Monto</th>
-        <th>Id proveedor</th>
-        <th>Id administrador</th>
-        <th>Id herramientas</th>
-        <th>Id insumos</th>
-        <th>Id repuestos</th>
+        <th>Id Proveedor</th>
+        <th>Id Administrador</th>
+        <th>Id Herramientas</th>
+        <th>Id Insumos</th>
+        <th>Id Repuestos</th>
         <th>Acciones</th>
 
 {% endblock %}
@@ -34,7 +35,7 @@
         <td>{{ p.tipo_pago }}</td>
         <td>{{ p.fecha }}</td>
         <td>{{ p.hora }}</td>
-        <td>{{ p.monto }}</td>
+        <td>{{ p.monto|intcomma }}</td>
         <td>{{ p.id_proveedor }}</td>
         <td>{{ p.id_admin }}</td>
         <td>{{ p.id_herramienta }}</td>

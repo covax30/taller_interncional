@@ -6,8 +6,12 @@
 @font-face {
     font-display: block;
     font-family: bootstrap-icons;
+<<<<<<< HEAD
     src: url(../fonts/bootstrap-icons.woff2) format("woff2"), 
     url(../fonts/bootstrap-icons.woff) format("woff")
+=======
+    src: url("../fonts/bootstrap-icons.woff2") format("woff2"), url("../fonts/bootstrap-icons.woff") format("woff")
+>>>>>>> 10035ee66d5686f58bc9f0a8b03902fc28a52551
 }
 
 .bi::before,

@@ -1,4 +1,6 @@
 {% extends "generic_listar.html" %}
+{% load humanize %}
+
 {% block titulo %}
         <h1 class="text-center">Lista de Clientes</h1>
 {% endblock titulo %}
@@ -15,7 +17,7 @@
   <th>Correo</th>
   <th>Documento</th>
   <th>Id Operacion</th>
-  <th>Fecha de operacion</th>
+  <th>Fecha de Operacion</th>
   <th>Monto</th>
 
   <th>Acciones</th>
@@ -31,8 +33,7 @@
         <td>{{ c.documento }}</td>
         <td>{{ c.id_operacion }}</td>
         <td>{{ c.fecha_operacion }}</td>
-        <td>{{ c.monto }}</td>
-
+        <td>{{ c.monto|intcomma }}</td>
         <td>
             <a href="{% url 'apy:cliente_editar' c.id_cliente %}" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></a>
             <a href="{% url 'apy:cliente_eliminar' c.id_cliente %}" class="btn btn-danger btn-xs"><i class="fas fa-trash-alt"></i></a>

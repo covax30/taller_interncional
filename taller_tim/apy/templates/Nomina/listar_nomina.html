@@ -1,4 +1,5 @@
 {% extends "generic_listar.html" %}
+{% load humanize %}
 
 {% block titulo %}
         <h1 class="text-center">Lista de Nomina</h1>
@@ -12,11 +13,11 @@
 
 {% block columnas %}
 
-        <th>Id de la nomina</th>
-        <th>rol</th>
-        <th>monto </th>
-        <th>fecha de pago </th>
-        <th>id del empleado  </th>
+        <th>Id de la Nomina</th>
+        <th>Rol</th>
+        <th>Monto </th>
+        <th>Fecha de Pago </th>
+        <th>Id del Empleado  </th>
         <th>Acciones</th>
 
 {% endblock %}
@@ -27,7 +28,7 @@
       <tr>
         <td>{{ n.id }}</td>
         <td>{{ n.rol}}</td>
-        <td>{{ n.monto}}</td>
+        <td>{{ n.monto|intcomma }}</td>
         <td>{{ n.fecha_pago}}</td>
         <td>{{ n.id_empleado}}</td>
         
