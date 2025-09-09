@@ -30,7 +30,6 @@
           </tbody>
         </table>
 
-<<<<<<< HEAD
         <style>
           /* Estilo para el campo de búsqueda de DataTables */
           .dataTables_filter input {
@@ -48,44 +47,6 @@
 
 
 <!-- ================== LIBRERÍAS CSS ================== -->
-=======
-    </tbody>
-      </table>
-      <style>
-  /* Estilo para el campo de búsqueda de DataTables */
-  .dataTables_filter input {
-    background-color: #ffffff !important; /* Fondo blanco */
-    color: #000000 !important;            /* Texto negro */
-    border: 1px solid #ccc !important;    /* Borde gris */
-    border-radius: 5px !important;        /* Bordes redondeados opcional */
-    padding: 5px 10px !important;         /* Espaciado interno */
-  }
-   /* Estilo para el select de cantidad de registros en DataTables */
-   .dataTables_length select {
-    background-color: #ffffff !important; /* fondo blanco */
-    color: #000000 !important;            /* texto negro */
-    border: 1px solid #ccc !important;    /* borde gris */
-    border-radius: 5px !important;        /* bordes redondeados */
-    padding: 5px 10px !important;         /* espaciado interno */
-  }
-
-
-</style>
-
-    </div>
-  </div>
-</div>
-</div>
-<!-- jQuery -->
-
-<!-- rutas al archivo css de datatables -->
-<link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/plugins/datatables.min.css' %}">
-
-<script src="{% static 'lib/datatables-1.10.20/plugins/datatables.min.js' %}"></script>
-<!-- DataTables -->
-<!-- AdminLTE App -->
-
->>>>>>> 10035ee66d5686f58bc9f0a8b03902fc28a52551
 
 <!-- ================== LIBRERÍAS JS ================== -->
 <!-- 1. JQUERY -->
@@ -101,7 +62,6 @@
 {% if messages %}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-<<<<<<< HEAD
   {% for message in messages %}
   Swal.fire({
     icon: '{% if "success" in message.tags %}success{% elif "error" in message.tags %}error{% else %}info{% endif %}',
@@ -119,40 +79,11 @@
     $("#example1").DataTable({
       "responsive": true,
       "autoWidth": false,
-=======
-document.addEventListener('DOMContentLoaded', function () {
-    let table = new DataTable('#example1', {
-        responsive: true,
-        autoWidth: false,
-        language: {
-            url: "https://cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json"
-        }
->>>>>>> 10035ee66d5686f58bc9f0a8b03902fc28a52551
     });
 });
 </script>
 
-<<<<<<< HEAD
 <!-- 7. BLOQUE EXTRA -->
-=======
-{% if messages %}
-
-  <script src=" {% static 'taller_tim/apy/static/lib/sweetalert2/sweeralert2@11.js' %}"></script>
-
-  <script>
-    {% for message in messages %}
-      Swal.fire({
-        icon: '{% if "success" in message.tags %}success{% elif "error" in message.tags %}error{% else %}info{% endif %}',
-        title: '{{ message|escapejs }}',
-        timer: 2500,
-        showConfirmButton: false
-      });
-    {% endfor %}
-  </script>
-{% endif %}
-
-<!-- Bloque para JS extra -->
->>>>>>> 10035ee66d5686f58bc9f0a8b03902fc28a52551
 {% block extra_js %}
 {% endblock %}
 
