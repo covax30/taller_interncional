@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'apy',
+    'login',
     'widget_tweaks'
 ]
 
@@ -128,3 +129,6 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+LOGIN_URL = '/login'
+LOGIN_REDIRECT_URL = 'apy:informes_lista'
+LOGOUT_REDIRECT_URL = '/login'

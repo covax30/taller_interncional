@@ -6,5 +6,6 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('apy/', include('apy.urls')),  # todas las rutas de tu app "apy"
+    path('login/', include('login.urls')),  # todas las rutas de tu app "login"
 ]
 
