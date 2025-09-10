@@ -1,0 +1,71 @@
+{% extends "generic_listar.html" %}
+{% load humanize %}
+
+{% block titulo %}
+        <h1 class="text-center">Lista de Pagos</h1>
+{% endblock titulo %}
+
+{% block agregar %}
+<a href="{{crear_url}}" class=" btn btn-primary btn btn-xs"><i class="fas fa-plus"></i>
+          Agregar
+</a>
+{% endblock %}
+
+{% block columnas %}
+
+        <th>Id Pago</th>
+        <th>Tipo Pago</th>
+        <th>Fecha</th>
+        <th>Hora</th>
+        <th>Monto</th>
+        <th>Id Proveedor</th>
+        <th>Id Administrador</th>
+        <th>Id Herramientas</th>
+        <th>Id Insumos</th>
+        <th>Id Repuestos</th>
+        <th>Id Nomina</th>
+        <th>Acciones</th>
+
+{% endblock %}
+
+{% block iterar %}
+
+      {% for p in object_list %}
+      <tr>
+        <td>{{ p.id_pago }}</td>
+        <td>{{ p.tipo_pago }}</td>
+        <td>{{ p.fecha }}</td>
+        <td>{{ p.hora }}</td>
+        <td>{{ p.monto|intcomma }}</td>
+        <td>{{ p.id_proveedor }}</td>
+        <td>{{ p.id_admin }}</td>
+        <td>{{ p.id_herramienta }}</td>
+        <td>{{ p.id_insumos }}</td>
+        <td>{{ p.id_repuestos }}</td>
+        <td>{{ p.id_nomina }}</td>
+        <form method="post">
+
+          <td>
+            <a href="{% url 'apy:pagos_editar' p.id_pago %}" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></a>
+            <a href="{% url 'apy:pagos_eliminar' p.id_pago %}" class="btn btn-danger btn-xs"><i
+                class="fas fa-trash-alt"></i></a>
+          </td>
+      </tr>
+      {% endfor %}
+
+<!-- Mensajes con SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  {% if messages %}
+    {% for message in messages %}
+      Swal.fire({
+        icon: '{% if "success" in message.tags %}success{% elif "error" in message.tags %}error{% else %}info{% endif %}',
+        title: '{{ message|escapejs }}',
+        timer: 2500,
+        showConfirmButton: false
+      });
+    {% endfor %}
+  {% endif %}
+</script>
+
+{% endblock %}
