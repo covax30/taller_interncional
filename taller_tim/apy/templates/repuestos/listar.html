@@ -1,8 +1,16 @@
+<<<<<<< HEAD
 {% extends "generic_listar.html" %}
 {% load humanize %}
 
 {% block titulo %}
         <h1 class="text-center">Listar Repuestos</h1>
+=======
+
+{% extends "generic_listar.html" %}
+
+{% block titulo %}
+        <h1 class="text-center">listar repuestos</h1>
+>>>>>>> origin/erick
 {% endblock titulo %}
 
 {% block agregar %}
@@ -13,6 +21,7 @@
 
 {% block columnas %}
 
+<<<<<<< HEAD
         <th>Id Marca</th>
         <th>Nombre</th>
         <th>Categoria</th>
@@ -21,6 +30,15 @@
         <th>Ubicación</th>
         <th>Precio</th>
         <th>Acciones</th>
+=======
+        <th>id_marca</th>
+        <th>nombre</th>
+        <th>categoria</th>
+        <th>fabricante</th>
+        <th>stock</th>
+        <th>ubicacion</th>
+        <th>precio</th>
+>>>>>>> origin/erick
 
 {% endblock %}
 
@@ -34,7 +52,11 @@
         <td>{{r.fabricante}}</td>
         <td>{{r.stock}}</td>
         <td>{{r.ubicacion}}</td>
+<<<<<<< HEAD
         <td>{{r.precio|intcomma }}</td>
+=======
+        <td>{{r.precio}}</td>
+>>>>>>> origin/erick
 
         <form method="post">
 
