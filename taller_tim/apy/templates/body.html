@@ -6,13 +6,12 @@
     <!--begin::App Wrapper-->
     <div class="app-wrapper">
       <!--begin::Header-->
-
       <!--end::Header-->
-
+      
       <!--begin::Sidebar-->
       {% include 'sidebar.html' %}
       <!--end::Sidebar-->
-
+      
       <!--begin::Main Content-->
       {% block content %}{% endblock %}
       <!--end::Main Content-->
@@ -50,5 +49,9 @@
       });
     </script>
     <!--end::OverlayScrollbars Configure-->
+
+    <!-- BLOQUE PARA SCRIPTS ADICIONALES DE PÁGINAS ESPECÍFICAS -->
+    {% block extra_scripts %}
+    {% endblock %}
   </body>
 {% endblock %}

@@ -29,6 +29,7 @@ from apy.view.compras.views import *
 from apy.view.vehiculos.views import *
 from apy.view.entrada_vehiculos.views import *
 from apy.view.salida_vehiculos.views import *
+from apy.view.estadisticas.views import *
 from apy.view.main.main import Main
 
 app_name = 'apy'
@@ -175,5 +176,10 @@ urlpatterns = [
     path('repuestos/eliminar/<int:pk>/', RepuestoDeleteView.as_view() , name='repuesto_eliminar'),
     
     path('main/', Main.as_view(), name='main'),
+    path('estadisticas/', estadisticas, name='estadisticas'),
+    path('api/clientes/count/', api_contador_clientes, name='api_contador_clientes'),
+    path('api/vehiculos/count/', api_contador_vehiculos, name='api_contador_vehiculos'),
+    path('api/insumos/count/', api_contador_insumos, name='api_contador_insumos'),
+    path('api/gastos/count/', api_contador_gastos, name='api_contador_gastos'),
 ] 
 

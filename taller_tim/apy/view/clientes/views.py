@@ -47,13 +47,23 @@ class ClienteCreateView(CreateView):
     
     def form_valid(self, form):
         messages.success(self.request, "Cliente creado correctamente")
-        return super().form_valid(form)
-
-
+        response = super().form_valid(form)
+        
+        # Si la request es AJAX, devolver JSON con el nuevo contador
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            total_clientes = Cliente.objects.count()
+            return JsonResponse({
+                'success': True, 
+                'total_clientes': total_clientes,
+                'message': 'Cliente creado correctamente'
+            })
+        
+        return response
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Crear de Clientes'
-        context['entidad'] = 'Cliente'  
+        context['entidad'] = 'Cliente'
         context['listar_url'] = reverse_lazy('apy:cliente_lista')
         return context
     
@@ -89,3 +99,20 @@ class ClienteDeleteView(DeleteView):
         context['entidad'] = 'Cliente'  
         context['listar_url'] = reverse_lazy('apy:cliente_lista')
         return context
+    
+    
+# Vista para mostrar estadísticas
+def estadisticas_view(request):
+    # Contar total de clientes
+    total_clientes = Cliente.objects.count()
+    
+    # Puedes agregar más estadísticas aquí
+    context = {
+        'total_clientes': total_clientes,
+    }
+    return render(request, 'estadisticas.html', context)
+
+# API para actualización dinámica del contador de clientes
+def api_contador_clientes(request):
+    total_clientes = Cliente.objects.count()
+    return JsonResponse({'total_clientes': total_clientes})
