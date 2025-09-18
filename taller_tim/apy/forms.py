@@ -952,7 +952,7 @@ class CajaForm(ModelForm):
         model = Caja
         fields = '__all__'
         widgets = {
-            'tipo_movimiento':TextInput(
+            'tipo_movimiento':Select(
                 attrs={
                     'placeholder':'Ingrese el tipo de movimiento',
                 }
@@ -1166,19 +1166,9 @@ class InsumoForm(ModelForm):
                     'placeholder':'Ingrese la descripcion del insumo',
                 }
             ),
-            'nombre':TextInput(
-                attrs={
-                    'placeholder':'Ingrese el nombre del insumo',
-                }
-            ),
             'costo':NumberInput(
                 attrs={
                     'placeholder':'Ingrese el costo del insumo',
-                }
-            ),
-            'tipo':TextInput(
-                attrs={
-                    'placeholder':'Ingrese el tipo de insumo',
                 }
             ),
             'stock':NumberInput(
@@ -1186,22 +1176,24 @@ class InsumoForm(ModelForm):
                     'placeholder':'Ingrese la cantidad del insumo',
                 }
             ),
+            'cantidad':Select(
+                attrs={
+                    'placeholder':'Ingrese la unidad de medida del insumo',
+                }
+            ),
         }
         error_messages = {
             'id_marca': {
                 'required': 'El id de la marca es obligatoria',
             },
-            'nombre': {
-                'required': 'El nombre del insumo es obligatorio',
-            },
             'costo': {
                 'required': 'El costo del insumo es obligatorio',
             },
-            'tipo': {
-                'required': 'El tipo de insumo es obligatorio',
-            },
             'stock': {
                 'required': 'El stock de insumo es obligatorio',
+            },
+            'cantidad': {
+                'required': 'La unidad de medida del insumo es obligatoria',
             },
         }
 

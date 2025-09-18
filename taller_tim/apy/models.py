@@ -121,15 +121,24 @@ class Herramienta(models.Model):
 class Insumos(models.Model):
 
     id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE)
-    nombre = models.CharField(max_length=100)
     costo = models.IntegerField(  # 🔹 ENTEROS, sin decimales
         error_messages={
             'invalid': 'Ingrese un número válido para el costo.',
             'required': 'El costo del insumo es obligatorio.'
-        } , validators=[validar_monto]
+        }, validators=[validar_monto]
     )
-    tipo = models.CharField(max_length=100)
     stock = models.IntegerField()
+    CANTIDAD_OPCIONES = [
+        ('galon', 'Galón'),
+        ('litro', 'Litro'),
+        ('mililitro', 'Mililitro'),
+        ('unidades', 'Unidades'),
+    ]
+
+    cantidad = models.CharField(
+        max_length=20,
+        choices=CANTIDAD_OPCIONES
+    )
 
     def __str__(self):
 
@@ -389,8 +398,17 @@ class Compra(models.Model):
 
 #-----------Caja-----------------
 class Caja(models.Model):
-   
-    tipo_movimiento= models.CharField(max_length=50)
+    TIPO_OPCIONES = [
+        ('Ingreso', 'Ingreso'),
+        ('Gasto', 'Gasto'),
+        ('Venta', 'Venta'),
+        ('Compra', 'Compra'),
+    ]
+
+    tipo_movimiento = models.CharField(
+        max_length=20,
+        choices=TIPO_OPCIONES
+    )
     monto = models.IntegerField(  # 🔹 ENTEROS, sin decimales
         error_messages={
             'invalid': 'Ingrese un número válido para el monto.',

@@ -134,16 +134,26 @@
       <!--begin::Row - Gráficos y Chat-->
       <div class="row">
         <!-- Start col -->
-        <div class="col-lg-7 connectedSortable">
-          <div class="card mb-4">
-            <div class="card-header">
-              <h3 class="card-title">Valor de Ventas</h3>
+        <div class="card card-success">
+              <div class="card-header">
+                <h3 class="card-title"><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Gráfico de barras</font></font></h3>
+
+                <div class="card-tools">
+                  <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                  </button>
+                  <button type="button" class="btn btn-tool" data-card-widget="remove">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="chart"><div class="chartjs-size-monitor"><div class="chartjs-size-monitor-expand"><div class=""></div></div><div class="chartjs-size-monitor-shrink"><div class=""></div></div></div>
+                  <canvas id="barChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%; display: block; width: 329px;" width="658" height="500" class="chartjs-render-monitor"></canvas>
+                </div>
+              </div>
+              <!-- /.card-body -->
             </div>
-            <div class="card-body">
-              <div id="revenue-chart"></div>
-            </div>
-          </div>
-        </div>
 
         <!-- Segunda columna para otros gráficos o widgets -->
         <div class="col-lg-5">
@@ -170,6 +180,34 @@
 <!-- ApexCharts para gráficos -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.min.js"
   integrity="sha256-+vh8GkaU7C9/wbSLIcwq82tQ2wTf44aOHA8HlBMwRI8=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+  const meses = {{ meses|safe }};
+  const totales = {{ totales|safe }};
+
+  new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+      labels: meses,
+      datasets: [{
+        label: 'Ingresos de caja',
+        data: totales,
+        backgroundColor: 'rgba(60,141,188,0.9)',
+        borderColor: 'rgba(60,141,188,0.8)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+</script>
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
