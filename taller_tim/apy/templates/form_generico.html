@@ -118,6 +118,64 @@
   }
 </script>
 
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+<!-- Flatpickr -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Buscar todos los inputs tipo "date"
+    document.querySelectorAll('input[type="date"]').forEach(function(input) {
+      
+      // Inicializar flatpickr
+      const fp = flatpickr(input, {
+        dateFormat: "m/d/Y",
+        allowInput: true
+      });
+
+      // Crear contenedor input-group
+      const wrapper = document.createElement("div");
+      wrapper.classList.add("input-group");
+
+      // Reemplazar input original en el DOM
+      const parent = input.parentNode;
+      parent.insertBefore(wrapper, input);
+      wrapper.appendChild(input);
+
+      // Crear el span con el ícono
+      const span = document.createElement("span");
+      span.classList.add("input-group-text");
+      span.innerHTML = `<i class="bi bi-calendar-event"></i>`;
+      wrapper.appendChild(span);
+
+      // Hacer que el ícono abra el calendario
+      span.addEventListener("click", function() {
+        fp.open();
+      });
+    });
+  });
+</script>
+<!-- JS para el selector de hora -->
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    flatpickr('input[type="time"]', {
+      enableTime: true,       // Activa la hora
+      noCalendar: true,       // Quita el calendario
+      dateFormat: "h:i ",      // Formato de 24h (HH:mm)
+      clickOpens: true,
+      time_24hr: false,        // Reloj de 24 horas
+      allowInput: true        // Permite escribir manualmente
+      
+    });
+  });
+</script>
+
+
 
 
 {% endblock content %}

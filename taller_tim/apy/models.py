@@ -83,7 +83,7 @@ class Marca(models.Model):
     tipo = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.nombre
+        return f"{self.nombre} - {self.tipo}"
 
 #------ ENTIDAD REPUESTOS --------3
 class Repuesto(models.Model):
@@ -121,14 +121,14 @@ class Herramienta(models.Model):
 class Insumos(models.Model):
 
     id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE)
-    nombre = models.CharField(max_length=100)
+    
     costo = models.IntegerField(  # 🔹 ENTEROS, sin decimales
         error_messages={
             'invalid': 'Ingrese un número válido para el costo.',
             'required': 'El costo del insumo es obligatorio.'
         } , validators=[validar_monto]
     )
-    tipo = models.CharField(max_length=100)
+    
     stock = models.IntegerField()
 
     def __str__(self):

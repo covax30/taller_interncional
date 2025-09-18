@@ -660,6 +660,7 @@ class PagosForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['tipo_pago'].widget.attrs['autofocus'] = True
         
+        
     class Meta:
         model = Pagos
         fields = '__all__'
