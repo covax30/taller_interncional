@@ -84,7 +84,7 @@ class CajaUpdateView(UpdateView):
         return context
 
 class CajaDeleteView(DeleteView):
-    model = Nomina
+    model = Caja
     template_name = 'Caja/eliminar_caja.html'
     success_url = reverse_lazy('apy:caja_lista')
     
