@@ -8,7 +8,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', include('login.urls'),name= 'login'),  # todas las rutas de tu app "login"
     path('apy/', include('apy.urls')),  # todas las rutas de tu app "apy"
-    path('', forgot_view.as_view(), name="forgot"),
+    path('forgot/', forgot_view.as_view(), name="forgot"),
 
 ]
 

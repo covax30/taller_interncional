@@ -189,7 +189,7 @@
                     </li>
                   <li class="user-footer">
                     <a href="#" class="btn btn-default btn-flat">Perfil</a>
-                    <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                    <form action="{% url 'login:logout' %}" method="post" style="display: inline;">
                       {% csrf_token %}
                       <button type="submit" class="btn btn-default btn-flat float-end">Cerrar sesión</button>
                     </form>
@@ -198,7 +198,7 @@
               </li>
             {% endif %}
             <!--end::User Menu Dropdown-->
-            <a class="nav-link" href="{% url 'logout'%}">
+            <a class="nav-link" href="{% url 'login:logout'%}">
                     <i class="fas fa-power-off" aria-hidden="true"></i>
             </a>
           </ul>
