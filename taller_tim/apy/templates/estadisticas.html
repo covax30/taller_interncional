@@ -345,61 +345,6 @@
       });
     }
 
-    // Configuración del gráfico principal de ventas
-    const sales_chart_options = {
-      series: [
-        {
-          name: 'Productos Digitales',
-          data: [28, 48, 40, 19, 86, 27, 90],
-        },
-        {
-          name: 'Electrónicos',
-          data: [65, 59, 80, 81, 56, 55, 40],
-        },
-      ],
-      chart: {
-        height: 300,
-        type: 'area',
-        toolbar: {
-          show: false,
-        },
-      },
-      legend: {
-        show: true,
-        position: 'top',
-      },
-      colors: ['#0d6efd', '#1bd5b6ff'],
-      dataLabels: {
-        enabled: false,
-      },
-      stroke: {
-        curve: 'smooth',
-      },
-      xaxis: {
-        type: 'datetime',
-        categories: [
-          '2024-01-01',
-          '2024-02-01',
-          '2024-03-01',
-          '2024-04-01',
-          '2024-05-01',
-          '2024-06-01',
-          '2024-07-01',
-        ],
-      },
-      tooltip: {
-        x: {
-          format: 'MMMM yyyy',
-        },
-      },
-    };
-
-    const sales_chart = new ApexCharts(
-      document.querySelector('#revenue-chart'),
-      sales_chart_options,
-    );
-    sales_chart.render();
-
     // Gráfico adicional para estadísticas mensuales
     const monthly_stats_options = {
       series: [44, 55, 13, 33],
