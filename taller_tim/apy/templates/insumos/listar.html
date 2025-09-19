@@ -13,19 +13,10 @@
 
 {% block columnas %}
 
-<<<<<<< HEAD
         <th>Id Marca</th>
-        <th>Nombre</th>
         <th>Costo</th>
-        <th>Tipo</th>
         <th>Stock</th>
-=======
-        <th>id_marca</th>
-        <th>nombre</th>
-        <th>costo</th>
-        <th>tipo</th>
-        <th>stock</th>
->>>>>>> 458548d772d0cd1da87b18f38e7b82f22542ba17
+        <th>Unidad de Medida</th>
         <th>Acciones</th>
 
 {% endblock %}
@@ -35,11 +26,9 @@
       {% for i in object_list %}
       <tr>
         <td>{{i.id_marca}}</td>
-        <td>{{i.nombre}}</td>
         <td>{{i.costo|intcomma }}</td>
-        <td>{{i.tipo}}</td>
         <td>{{i.stock}}</td>
-      
+        <td>{{i.unidad_medida}}</td>
         <form method="post">
 
           <td>

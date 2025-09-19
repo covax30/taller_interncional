@@ -83,7 +83,7 @@ class Marca(models.Model):
     tipo = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.nombre
+        return f"{self.nombre} - {self.tipo}"
 
 #------ ENTIDAD REPUESTOS --------3
 class Repuesto(models.Model):
@@ -121,15 +121,24 @@ class Herramienta(models.Model):
 class Insumos(models.Model):
 
     id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE)
-    nombre = models.CharField(max_length=100)
     costo = models.IntegerField(  # 🔹 ENTEROS, sin decimales
         error_messages={
             'invalid': 'Ingrese un número válido para el costo.',
             'required': 'El costo del insumo es obligatorio.'
-        } , validators=[validar_monto]
+        }, validators=[validar_monto]
     )
-    tipo = models.CharField(max_length=100)
     stock = models.IntegerField()
+    CANTIDAD_OPCIONES = [
+        ('galon', 'Galón'),
+        ('litro', 'Litro'),
+        ('mililitro', 'Mililitro'),
+        ('unidades', 'Unidades'),
+    ]
+
+    cantidad = models.CharField(
+        max_length=20,
+        choices=CANTIDAD_OPCIONES
+    )
 
     def __str__(self):
 
@@ -140,7 +149,6 @@ class Insumos(models.Model):
 
 class Cliente(models.Model):
     id_cliente = models.AutoField(primary_key=True)
-    id_operacion = models.ForeignKey(TipoMantenimiento, on_delete=models.CASCADE)
     nombre = models.CharField(max_length=100)
     documento = models.BigIntegerField(validators=[validar_identificacion])
     telefono = models.BigIntegerField(validators=[validar_telefono])
@@ -245,28 +253,6 @@ class Proveedores(models.Model):
     
 
 
-#--------------Modulo Pagos-----------------
-class Pagos(models.Model):
-    id_pago = models.AutoField(primary_key=True)
-    tipo_pago = models.CharField(max_length=100)
-    fecha = models.DateField()
-    hora = models.TimeField()
-    monto = models.IntegerField(  # 🔹 ENTEROS, sin decimales
-        error_messages={
-            'invalid': 'Ingrese un número válido para el monto.',
-            'required': 'El monto del pago es obligatorio.'
-        } , validators=[validar_monto]
-    )
-    id_proveedor = models.ForeignKey(Proveedores, on_delete=models.CASCADE)
-    id_admin = models.ForeignKey(Administrador, on_delete=models.CASCADE)
-    id_herramienta = models.ForeignKey(Herramienta, on_delete=models.CASCADE)
-    id_insumos = models.ForeignKey(Insumos, on_delete=models.CASCADE)
-    id_repuestos = models.ForeignKey(Repuesto, on_delete=models.CASCADE)
-    
-    def __str__(self):
-        return f"{self.id_pago} {self.monto}"
-
-
 
 class Gastos(models.Model):
    
@@ -353,6 +339,29 @@ class Nomina(models.Model):
         #verbose_name_plural = 'Nomina'
 
 
+#--------------Modulo Pagos-----------------
+class Pagos(models.Model):
+    id_pago = models.AutoField(primary_key=True)
+    tipo_pago = models.CharField(max_length=100)
+    fecha = models.DateField()
+    hora = models.TimeField()
+    monto = models.IntegerField(  # 🔹 ENTEROS, sin decimales
+        error_messages={
+            'invalid': 'Ingrese un número válido para el monto.',
+            'required': 'El monto del pago es obligatorio.'
+        } , validators=[validar_monto]
+    )
+    id_proveedor = models.ForeignKey(Proveedores, on_delete=models.CASCADE)
+    id_admin = models.ForeignKey(Administrador, on_delete=models.CASCADE)
+    id_herramienta = models.ForeignKey(Herramienta, on_delete=models.CASCADE)
+    id_insumos = models.ForeignKey(Insumos, on_delete=models.CASCADE)
+    id_repuestos = models.ForeignKey(Repuesto, on_delete=models.CASCADE)
+    id_nomina= models.ForeignKey(Nomina, on_delete=models.CASCADE, blank=True, null=True) 
+    
+    def __str__(self):
+        return f"{self.id_pago} {self.monto}"
+
+
 #-----------Factura-----------------
 class Factura(models.Model):
     
@@ -389,8 +398,17 @@ class Compra(models.Model):
 
 #-----------Caja-----------------
 class Caja(models.Model):
-   
-    tipo_movimiento= models.CharField(max_length=50)
+    TIPO_OPCIONES = [
+        ('Ingreso', 'Ingreso'),
+        ('Gasto', 'Gasto'),
+        ('Venta', 'Venta'),
+        ('Compra', 'Compra'),
+    ]
+
+    tipo_movimiento = models.CharField(
+        max_length=20,
+        choices=TIPO_OPCIONES
+    )
     monto = models.IntegerField(  # 🔹 ENTEROS, sin decimales
         error_messages={
             'invalid': 'Ingrese un número válido para el monto.',
@@ -399,11 +417,8 @@ class Caja(models.Model):
     )
     fecha= models.DateField()
     hora=models.TimeField()
-    id_gasto= models.ForeignKey( Gastos , on_delete=models.CASCADE)
     id_admin=models.ForeignKey(Administrador, on_delete=models.CASCADE) 
-    id_Factura= models.ForeignKey(Factura, on_delete=models.CASCADE)
-    id_pagos= models.ForeignKey(Pagos, on_delete=models.CASCADE)
-    id_nomina= models.ForeignKey(Nomina, on_delete=models.CASCADE) 
+    id_Factura= models.ForeignKey(Factura, on_delete=models.CASCADE, blank=True, null=True)
     def __str__(self):
         return f"{self.tipo_movimiento} - {self.monto} en {self.fecha} {self.hora}"   
     #class meta

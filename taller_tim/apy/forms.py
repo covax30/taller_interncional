@@ -153,11 +153,6 @@ class ClienteForm(ModelForm):
                     'class': 'form-control',
                 }
             ),
-            'id_operacion':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
             'nombre':TextInput(
                 attrs={
                     'placeholder':'Ingrese el nombre del cliente',
@@ -191,12 +186,6 @@ class ClienteForm(ModelForm):
             )
         }
         error_messages = {
-            'id_operacion': {
-                'required': 'El id de la operacion es obligatorio',
-            },
-            'nombre': {
-                'required': 'El nombre es obligatorio',
-            },
             'documento': {
                 'required': 'El docmuento de identidad es obligatorio',
                 'unique': 'Ya existe un cliente con ese documento de identidad',
@@ -671,6 +660,7 @@ class PagosForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['tipo_pago'].widget.attrs['autofocus'] = True
         
+        
     class Meta:
         model = Pagos
         fields = '__all__'
@@ -723,6 +713,11 @@ class PagosForm(ModelForm):
                 attrs={
                     'class': 'form-control',
                 }
+            ),
+            'id_nomina':Select(
+                attrs={
+                    'class': 'form-control',
+                }
             )
         }
         error_messages = {
@@ -752,6 +747,9 @@ class PagosForm(ModelForm):
             },
             'id_repuestos': {
                 'required': 'El id de los repuestos es obligatorio',
+            },
+            'id_nomina': {
+                'required': 'El id de la nomina es obligatorio',
             },
         }
    
@@ -955,7 +953,7 @@ class CajaForm(ModelForm):
         model = Caja
         fields = '__all__'
         widgets = {
-            'tipo_movimiento':TextInput(
+            'tipo_movimiento':Select(
                 attrs={
                     'placeholder':'Ingrese el tipo de movimiento',
                 }
@@ -988,22 +986,6 @@ class CajaForm(ModelForm):
                     'class': 'form-control',
                 }
             ),
-            'id_gasto':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-            'id_pagos':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-            
-            'id_nomina':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            )
         }       
         error_messages = {
             'tipo_mantenimiento': {
@@ -1023,15 +1005,6 @@ class CajaForm(ModelForm):
             },
             'id_Factura': {
                 'required': 'El id de la factura es obligatorio',
-            },
-            'id_gasto': {
-                'required': 'El id del gasto es obligatorio',
-            },
-            'id_pagos': {
-                'required': 'El id del pago es obligatorio',
-            },
-            'id_nomina': {
-                'required': 'El id de la nomina es obligatorio',
             },
         }  
        
@@ -1194,19 +1167,9 @@ class InsumoForm(ModelForm):
                     'placeholder':'Ingrese la descripcion del insumo',
                 }
             ),
-            'nombre':TextInput(
-                attrs={
-                    'placeholder':'Ingrese el nombre del insumo',
-                }
-            ),
             'costo':NumberInput(
                 attrs={
                     'placeholder':'Ingrese el costo del insumo',
-                }
-            ),
-            'tipo':TextInput(
-                attrs={
-                    'placeholder':'Ingrese el tipo de insumo',
                 }
             ),
             'stock':NumberInput(
@@ -1214,6 +1177,25 @@ class InsumoForm(ModelForm):
                     'placeholder':'Ingrese la cantidad del insumo',
                 }
             ),
+            'cantidad':Select(
+                attrs={
+                    'placeholder':'Ingrese la unidad de medida del insumo',
+                }
+            ),
+        }
+        error_messages = {
+            'id_marca': {
+                'required': 'El id de la marca es obligatoria',
+            },
+            'costo': {
+                'required': 'El costo del insumo es obligatorio',
+            },
+            'stock': {
+                'required': 'El stock de insumo es obligatorio',
+            },
+            'cantidad': {
+                'required': 'La unidad de medida del insumo es obligatoria',
+            },
         }
         error_messages = {
             'id_marca': {

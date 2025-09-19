@@ -1,22 +1,22 @@
 {% extends "form_generico.html" %}
 {% load widget_tweaks %}
 {% block form %}
-                {% csrf_token %}
+    {% csrf_token %}
 
-                {% for field in form.visible_fields %}
-<div class="form-group mb-3">
-    <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
-    {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
+    {% for field in form.visible_fields %}
+    <div class="form-group mb-3">
+        <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
+        {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
 
-    {% if field.errors %}
-    <div class="invalid-feedback d-block">
-        {% for error in field.errors %}
-        <small>{{ error }}</small><br>
-        {% endfor %}
+        {% if field.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in field.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
-    {% endif %}
-</div>
-{% endfor %}
+    {% endfor %}
 {% endblock %}
 
 {% block Cancelar %}

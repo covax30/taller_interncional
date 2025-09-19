@@ -2,107 +2,91 @@
 {% load static %}
 {% block content %}
 
-<div class="main-content" style="padding: 20px; padding-top: 70px; padding-bottom: 80px;">
-<div class="col-md-12">
-  <div class="card card-default">
-    <div class="card-header">
-      <h3 class="card-title">
-        <i class="fas fa-exclamation-triangle"></i>
-        {% block titulo %}
-        {% endblock titulo %}
-      </h3>
-    </div>
-    <div class="card-body">
-      <div class="card-footer">
-        {% block agregar %}
-        {% endblock %}
-        
+<div class="main-content" style="padding: 20px; padding-top: 70px; padding-bottom: 80px; width: 100%">
+  <div class="col-md-12">
+    <div class="card card-default">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="fas fa-exclamation-triangle"></i>
+          {% block titulo %}
+          {% endblock titulo %}
+        </h3>
       </div>
-      <table id="example1" class="table table-bordered table-striped">
-        <thead>
-          <tr>
-            {% block columnas %}
-
+      <div class="card-body">
+        <div class="card-footer">
+          {% block agregar %}
+          {% endblock %}
+        </div>
+        <table id="example1" class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              {% block columnas %}
+              {% endblock %}
+            </tr>
+          </thead>
+          <tbody id="tablaFacturas">
+            {% block iterar %}
             {% endblock %}
-          </tr>
-        </thead>
-    <tbody id="tablaFacturas">
-      {% block iterar %}
-      
-      
-      
-      {% endblock %}
+          </tbody>
+        </table>
 
-    </tbody>
-      </table>
-      <style>
-  /* Estilo para el campo de búsqueda de DataTables */
-  .dataTables_filter input {
-    background-color: #ffffff !important; /* Fondo blanco */
-    color: #000000 !important;            /* Texto negro */
-    border: 1px solid #ccc !important;    /* Borde gris */
-    border-radius: 5px !important;        /* Bordes redondeados opcional */
-    padding: 5px 10px !important;         /* Espaciado interno */
-  }
-   /* Estilo para el select de cantidad de registros en DataTables */
-   .dataTables_length select {
-    background-color: #ffffff !important; /* fondo blanco */
-    color: #000000 !important;            /* texto negro */
-    border: 1px solid #ccc !important;    /* borde gris */
-    border-radius: 5px !important;        /* bordes redondeados */
-    padding: 5px 10px !important;         /* espaciado interno */
-  }
-
-
-</style>
-
+        <style>
+          /* Estilo para el campo de búsqueda de DataTables */
+          .dataTables_filter input {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+            border: 1px solid #ccc !important;
+            border-radius: 5px !important;
+            padding: 5px 10px !important;
+          }
+        </style>
+      </div>
     </div>
   </div>
 </div>
-</div>
-
-<!-- rutas al archivo css de datatables -->
-<link rel="stylesheet" href="{% static 'lib/datatables-1.1020/datatables.css' %}">
-<link rel="stylesheet" href="{% static 'lib/datatables-1.1020/plugins/responsive-2.2.3/css/responsive.bootstrap4.min.css' %}">
-
-<!-- jQuery -->
-<script src="{% static 'lib/adminlte-3.0.4/plugins/jquery/jquery.min.js' %}"></script>
-<!-- Bootstrap 4 -->
-#<script src="{% static 'lib/adminlte-3.0.4/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-<!-- DataTables -->
-<script src="{% static 'lib/datatables-1.10.20/js/jquery.dataTables.min.js' %}"></script>
-<script src="{% static 'lib/datatables-1.10.20/js/dataTables.bootstrap4.min.js' %}"></script>
-<script src="{% static 'lib/datatables-1.10.20/css/dataTables.responsive.min.js' %}"></script>
-<script src="{% static 'lib/datatables-1.10.20/css/responsive.bootstrap4.min.js' %}"></script>
 
 
+<!-- ================== LIBRERÍAS CSS ================== -->
+
+<!-- ================== LIBRERÍAS JS ================== -->
+<!-- 1. JQUERY -->
+<!--<script src="{% static 'lib/datatables-1.10.20/js/jquery.dataTables.min.js' %}"></script>-->
+
+<!-- 2. BOOTSTRAP -->
+<!-- <script src="{% static 'lib/datatables-1.10.20/plugins/bootstrap-4-4.1.1/js/bootstrap.min.js' %}"></script>-->
+
+<!-- 3. DATATABLES + PLUGINS -->
+<!-- 4. ADMINLTE -->
+
+<!-- 5. SWEETALERT2 -->
+{% if messages %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-  $(function () {
+  {% for message in messages %}
+  Swal.fire({
+    icon: '{% if "success" in message.tags %}success{% elif "error" in message.tags %}error{% else %}info{% endif %}',
+    title: '{{ message|escapejs }}',
+    timer: 2500,
+    showConfirmButton: false
+  });
+  {% endfor %}
+</script>
+{% endif %}
+
+<!-- 6. SCRIPT PERSONALIZADO -->
+<script>
+  $(function() {
     $("#example1").DataTable({
       "responsive": true,
       "autoWidth": false,
-      "language": {
-        "url": "https://cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json"
-      }
+         language: {
+            url: "../../../static/lenguajes/espanol.json"
+        }
     });
   });
 </script>
 
-{% if messages %}
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script>
-    {% for message in messages %}
-      Swal.fire({
-        icon: '{% if "success" in message.tags %}success{% elif "error" in message.tags %}error{% else %}info{% endif %}',
-        title: '{{ message|escapejs }}',
-        timer: 2500,
-        showConfirmButton: false
-      });
-    {% endfor %}
-  </script>
-{% endif %}
-
-<!-- Bloque para JS extra -->
+<!-- 7. BLOQUE EXTRA -->
 {% block extra_js %}
 {% endblock %}
 

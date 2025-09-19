@@ -1,6 +1,9 @@
 {% extends "generic_listar.html" %}
+<<<<<<< HEAD
 {% load humanize %}
 
+=======
+>>>>>>> origin/erick
 {% block titulo %}
         <h1 class="text-center">Lista de Clientes</h1>
 {% endblock titulo %}
@@ -17,7 +20,7 @@
   <th>Correo</th>
   <th>Documento</th>
   <th>Id Operacion</th>
-  <th>Fecha de Operacion</th>
+  <th>Fecha de operacion</th>
   <th>Monto</th>
 
   <th>Acciones</th>
@@ -31,7 +34,6 @@
         <td>{{ c.telefono }}</td>
         <td>{{ c.correo }}</td>
         <td>{{ c.documento }}</td>
-        <td>{{ c.id_operacion }}</td>
         <td>{{ c.fecha_operacion }}</td>
         <td>{{ c.monto|intcomma }}</td>
         <td>

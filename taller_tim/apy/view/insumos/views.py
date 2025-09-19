@@ -75,3 +75,18 @@ class InsumoDeleteView(DeleteView):
         context['listar_url'] = reverse_lazy('apy:insumo_lista')
         return context
     
+# Vista para mostrar estadísticas
+def estadisticas_view(request):
+    # Contar total de insumos
+    total_insumos = Insumos.objects.count()
+
+    # Puedes agregar más estadísticas aquí
+    context = {
+        'total_insumos': total_insumos,
+    }
+    return render(request, 'estadisticas.html', context)
+
+# API para actualización dinámica del contador de insumos
+def api_contador_insumos(request):
+    total_insumos = Insumos.objects.count()
+    return JsonResponse({'total_insumos': total_insumos})

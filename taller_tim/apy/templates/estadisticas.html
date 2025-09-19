@@ -1,7 +1,140 @@
 {% extends 'body.html' %}
 {% load static %}
+
+<!-- ESTILOS ESPECÍFICOS PARA ESTADÍSTICAS -->
+{% block extra_head %}
+<!-- Bootstrap Icons para los iconos -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+  crossorigin="anonymous" />
+
+<!-- ApexCharts para los gráficos -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.css"
+  integrity="sha256-4MX+61mt9NVvvuPjUWdUdyfZfxSB1/Rf9WtqRHgG5S0=" crossorigin="anonymous" />
+
+<!-- JSVectorMap para mapas (opcional) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/css/jsvectormap.min.css"
+  integrity="sha256-+uGLJmmTKOqBr+2E6KDYs/NRsHxSkONXFHUL0fy2O/4=" crossorigin="anonymous" />
+{% endblock %}
+
+<!-- CONTENIDO PRINCIPAL DE ESTADÍSTICAS -->
 {% block content %}
-<div class="card card-success">
+<!--begin::App Main-->
+<main class="app-main">
+  <!--begin::App Content Header-->
+  <div class="app-content-header">
+    <!--begin::Container-->
+    <div class="container-fluid">
+      <!--begin::Row-->
+      <div class="row">
+        <div class="col-sm-6">
+          <h3 class="mb-0"><a href="{% url 'apy:informes_lista' %}">Lista de Informes</a></h3>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-end">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Estadísticas</li>
+          </ol>
+        </div>
+      </div>
+      <!--end::Row-->
+    </div>
+    <!--end::Container-->
+  </div>
+  <!--end::App Content Header-->
+
+  <!--begin::App Content-->
+  <div class="app-content">
+    <!--begin::Container-->
+    <div class="container-fluid">
+      <!--begin::Row - Widgets de Estadísticas-->
+      <div class="row">
+        <!--begin::Col-->
+        <div class="col-lg-3 col-6">
+          <!--begin::Small Box Widget 1-->
+          <div class="small-box text-bg-primary">
+            <div class="inner">
+              <h3 id="contador-insumos">{{ total_insumos|default:0 }}</h3>
+              <p>Registros de insumos por tipo</p>
+            </div>
+            <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M19.4 13.5a7.5 7.5 0 0 0 0-3l2-1.5-2-3.5-2.3.5a7.5 7.5 0 0 0-2.6-1.5l-.4-2.4h-4l-.4 2.4a7.5 7.5 0 
+                0 0-2.6 1.5l-2.3-.5-2 3.5 2 1.5a7.5 7.5 0 0 0 0 3l-2 1.5 2 3.5 2.3-.5a7.5 7.5 0 0 0 2.6 1.5l.4 2.4h4l.4-2.4a7.5 7.5 0 
+                0 0 2.6-1.5l2.3.5 2-3.5-2-1.5zM12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5z">
+              </path>
+            </svg>
+
+            <a href="{% url 'apy:insumo_lista' %}" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+              Ver insumos <i class="bi bi-link-45deg"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-6">
+          <!--begin::Small Box Widget 2 - VEHICULOS REGISTRADOS-->
+          <div class="small-box text-bg-success">
+            <div class="inner">
+              <h3 id="contador-vehiculos">{{ total_vehiculos|default:0 }}</h3>
+              <p>Vehículos Registrados</p>
+            </div>
+            <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true">
+              <path d="M3 6a1 1 0 0 0-1 1v8a3 3 0 0 0 3 3h1a3 3 0 0 0 6 0h4a3 3 0 0 0 6 0h1a1 1 0 0 0 1-1v-4
+              a1 1 0 0 0-.2-.6l-2.6-3.4A2 2 0 0 0 18.6 8H15V7a1 1 0 0 0-1-1H3zm12 4h3.6l2.4 3v1h-6v-4zM7 17
+              a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm10 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z">
+              </path>
+            </svg>
+
+            <a href="{% url 'apy:vehiculo_lista' %}" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+              Ver vehiculos <i class="bi bi-link-45deg"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-6">
+          <!--begin::Small Box Widget 3 - CLIENTES REGISTRADOS-->
+          <div class="small-box text-bg-warning">
+            <div class="inner">
+              <h3 id="contador-clientes">{{ total_clientes|default:0 }}</h3>
+              <p>Clientes Registrados</p>
+            </div>
+            <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true">
+              <path d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 
+              0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 
+              01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 
+              0 000-1.5h-2.25V7.5z">
+              </path>
+            </svg>
+            <a href="{% url 'apy:cliente_lista' %}"
+              class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-50-hover">
+              Ver clientes <i class="bi bi-link-45deg"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-6">
+          <!--begin::Small Box Widget 4-->
+          <div class="small-box text-bg-danger">
+            <div class="inner">
+              <h3 id="contador-gastos">{{ total_gastos|default:0 }}</h3>
+              <p>Gastos Registrados</p>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="small-box-icon" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M0 0h1v15h15v1H0V0zm14.5 10.5L10 6l-3 3-4-4-.5.5 4.5 4.5 3-3 4 4-.5.5z"/>
+            </svg>
+
+            <a href="{% url 'apy:gasto_lista' %}" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+              Ver gastos <i class="bi bi-link-45deg"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      <!--end::Row-->
+
+      <!--begin::Row - Gráficos y Chat-->
+      <div class="row">
+        <!-- Start col -->
+        <div class="card card-success">
               <div class="card-header">
                 <h3 class="card-title"><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Gráfico de barras</font></font></h3>
 
@@ -22,6 +155,31 @@
               <!-- /.card-body -->
             </div>
 
+        <!-- Segunda columna para otros gráficos o widgets -->
+        <div class="col-lg-5">
+          <div class="card mb-4">
+            <div class="card-header">
+              <h3 class="card-title">Estadísticas Mensuales</h3>
+            </div>
+            <div class="card-body">
+              <div id="monthly-stats-chart"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}
+
+<!-- SCRIPTS ESPECÍFICOS PARA ESTADÍSTICAS -->
+{% block extra_scripts %}
+<!-- SortableJS para elementos arrastrables -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js" crossorigin="anonymous"></script>
+
+<!-- ApexCharts para gráficos -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.min.js"
+  integrity="sha256-+vh8GkaU7C9/wbSLIcwq82tQ2wTf44aOHA8HlBMwRI8=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <script>
   const meses = {{ meses|safe }};
@@ -51,4 +209,161 @@
   });
 </script>
 
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+
+    // FUNCIÓN PARA ACTUALIZAR CONTADOR DE INSUMOS
+    async function actualizarContadorInsumos() {
+      try {
+        const response = await fetch("{% url 'apy:api_contador_insumos' %}");
+        if (response.ok) {
+          const data = await response.json();
+          document.getElementById('contador-insumos').textContent = data.total_insumos;
+
+          // Efecto visual opcional
+          const contador = document.getElementById('contador-insumos');
+          contador.style.transform = 'scale(1.1)';
+          contador.style.transition = 'transform 0.2s';
+          setTimeout(() => {
+            contador.style.transform = 'scale(1)';
+          }, 200);
+        }
+      } catch (error) {
+        console.error('Error al actualizar contador de insumos:', error);
+      }
+    }
+
+    // Actualizar contador cada 30 segundos
+    setInterval(actualizarContadorInsumos, 30000);
+
+    // Actualizar inmediatamente al cargar la página
+    actualizarContadorInsumos();
+
+
+    // FUNCIÓN PARA ACTUALIZAR CONTADOR DE VEHICULOS
+    async function actualizarContadorVehiculos() {
+      try {
+        const response = await fetch("{% url 'apy:api_contador_vehiculos' %}");
+        if (response.ok) {
+          const data = await response.json();
+          document.getElementById('contador-vehiculos').textContent = data.total_vehiculos;
+
+          // Efecto visual opcional
+          const contador = document.getElementById('contador-vehiculos');
+          contador.style.transform = 'scale(1.1)';
+          contador.style.transition = 'transform 0.2s';
+          setTimeout(() => {
+            contador.style.transform = 'scale(1)';
+          }, 200);
+        }
+      } catch (error) {
+        console.error('Error al actualizar contador de vehiculos:', error);
+      }
+    }
+
+    // Actualizar contador cada 30 segundos
+    setInterval(actualizarContadorVehiculos, 30000);
+
+    // Actualizar inmediatamente al cargar la página
+    actualizarContadorVehiculos();
+
+    // FUNCIÓN PARA ACTUALIZAR CONTADOR DE CLIENTES
+    async function actualizarContadorClientes() {
+      try {
+        const response = await fetch("{% url 'apy:api_contador_clientes' %}");
+        if (response.ok) {
+          const data = await response.json();
+          document.getElementById('contador-clientes').textContent = data.total_clientes;
+
+          // Efecto visual opcional
+          const contador = document.getElementById('contador-clientes');
+          contador.style.transform = 'scale(1.1)';
+          contador.style.transition = 'transform 0.2s';
+          setTimeout(() => {
+            contador.style.transform = 'scale(1)';
+          }, 200);
+        }
+      } catch (error) {
+        console.error('Error al actualizar contador de clientes:', error);
+      }
+    }
+
+    // Actualizar contador cada 30 segundos
+    setInterval(actualizarContadorClientes, 30000);
+
+    // Actualizar inmediatamente al cargar la página
+    actualizarContadorClientes();
+
+
+    // FUNCIÓN PARA ACTUALIZAR CONTADOR DE GASTOS
+    async function actualizarContadorGastos() {
+      try {
+        const response = await fetch("{% url 'apy:api_contador_gastos' %}");
+        if (response.ok) {
+          const data = await response.json();
+          document.getElementById('contador-gastos').textContent = data.total_gastos;
+
+          // Efecto visual opcional
+          const contador = document.getElementById('contador-gastos');
+          contador.style.transform = 'scale(1.1)';
+          contador.style.transition = 'transform 0.2s';
+          setTimeout(() => {
+            contador.style.transform = 'scale(1)';
+          }, 200);
+        }
+      } catch (error) {
+        console.error('Error al actualizar contador de gastos:', error);
+      }
+    }
+
+    // Actualizar contador cada 30 segundos
+    setInterval(actualizarContadorGastos, 30000);
+
+    // Actualizar inmediatamente al cargar la página
+    actualizarContadorGastos();
+
+    // Escuchar actualizaciones de otras pestañas
+    if ('BroadcastChannel' in window) {
+      const channel = new BroadcastChannel('cliente_updates');
+      channel.addEventListener('message', function (event) {
+        if (event.data.type === 'cliente_creado') {
+          actualizarContadorClientes();
+        }
+      });
+    }
+
+    // Configuración de Sortable para elementos arrastrables
+    if (document.querySelector('.connectedSortable')) {
+      new Sortable(document.querySelector('.connectedSortable'), {
+        group: 'shared',
+        handle: '.card-header',
+      });
+
+      const cardHeaders = document.querySelectorAll('.connectedSortable .card-header');
+      cardHeaders.forEach((cardHeader) => {
+        cardHeader.style.cursor = 'move';
+      });
+    }
+
+    // Gráfico adicional para estadísticas mensuales
+    const monthly_stats_options = {
+      series: [44, 55, 13, 33],
+      chart: {
+        type: 'donut',
+        height: 300,
+      },
+      labels: ['Ventas', 'Usuarios', 'Productos', 'Ordenes'],
+      colors: ['#0d6efd', '#20c997', '#ffc107', '#dc3545'],
+      legend: {
+        position: 'bottom',
+      },
+    };
+
+    const monthly_chart = new ApexCharts(
+      document.querySelector('#monthly-stats-chart'),
+      monthly_stats_options,
+    );
+    monthly_chart.render();
+  });
+</script>
 {% endblock %}

@@ -47,7 +47,18 @@ class VehiculoCreateView(CreateView):
     
     def form_valid(self, form):
         messages.success(self.request, "Vehiculo creado correctamente")
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        
+        # Si la request es AJAX, devolver JSON con el nuevo contador
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            total_vehiculos = Vehiculo.objects.count()
+            return JsonResponse({
+                'success': True, 
+                'total_vehiculos': total_vehiculos,
+                'message': 'Vehiculo creado correctamente'
+            })
+        
+        return response
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -89,3 +100,19 @@ class VehiculoDeleteView(DeleteView):
         context['entidad'] = 'Vehiculo'  
         context['listar_url'] = reverse_lazy('apy:vehiculo_lista')
         return context
+    
+# Vista para mostrar estadísticas
+def estadisticas_view(request):
+    # Contar total de vehiculos
+    total_vehiculos = Vehiculo.objects.count()
+
+    # Puedes agregar más estadísticas aquí
+    context = {
+        'total_vehiculos': total_vehiculos,
+    }
+    return render(request, 'estadisticas.html', context)
+
+# API para actualización dinámica del contador de vehiculos
+def api_contador_vehiculos(request):
+    total_vehiculos = Vehiculo.objects.count()
+    return JsonResponse({'total_vehiculos': total_vehiculos})

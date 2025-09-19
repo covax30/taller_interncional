@@ -21,7 +21,7 @@ def gasto(request):
 
 class GastosListView(ListView):
     model = Gastos
-    template_name ='Gastos/listar_gasto.html'
+    template_name ='Gastos/listar_gasto.html' 
     
     # @method_decorator(login_required)
     @method_decorator(csrf_exempt)
@@ -90,3 +90,20 @@ class GastosDeleteView(DeleteView):
         context['entidad'] = 'Gastos'
         context['listar_url'] = reverse_lazy('apy:gasto_lista')
         return context
+    
+    
+# Vista para mostrar estadísticas
+def estadisticas_view(request):
+    # Contar total de gastos
+    total_gastos = Gastos.objects.count()
+
+    # Puedes agregar más estadísticas aquí
+    context = {
+        'total_gastos': total_gastos,
+    }
+    return render(request, 'estadisticas.html', context)
+
+# API para actualización dinámica del contador de gastos
+def api_contador_gastos(request):
+    total_gastos = Gastos.objects.count()
+    return JsonResponse({'total_gastos': total_gastos})
