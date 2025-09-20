@@ -29,7 +29,7 @@ from apy.view.compras.views import *
 from apy.view.vehiculos.views import *
 from apy.view.entrada_vehiculos.views import *
 from apy.view.salida_vehiculos.views import *
-from apy.view.estadisticas.views import *
+from apy.view.Estadisticas.views import *
 from apy.view.main.main import Main
 
 app_name = 'apy'
