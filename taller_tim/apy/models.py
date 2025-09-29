@@ -135,10 +135,7 @@ class Insumos(models.Model):
         ('unidades', 'Unidades'),
     ]
 
-    cantidad = models.CharField(
-        max_length=20,
-        choices=CANTIDAD_OPCIONES
-    )
+    cantidad = models.CharField(max_length=20, choices=CANTIDAD_OPCIONES)
 
     def __str__(self):
 
