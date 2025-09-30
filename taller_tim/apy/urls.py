@@ -29,7 +29,7 @@ from apy.view.compras.views import *
 from apy.view.vehiculos.views import *
 from apy.view.entrada_vehiculos.views import *
 from apy.view.salida_vehiculos.views import *
-from apy.view.estadisticas.views import *
+from apy.view.Estadisticas.views import *
 from apy.view.main.main import Main
 
 app_name = 'apy'
@@ -81,13 +81,9 @@ urlpatterns = [
     path('salida_vehiculo/agregar/', SalidaVehiculoCreateView.as_view(), name='salida_vehiculo_crear'),
     path('salida_vehiculo/editar/<int:pk>/', SalidaVehiculoUpdateView.as_view(), name='salida_vehiculo_editar'),
     path('salida_vehiculo/eliminar/<int:pk>/', SalidaVehiculoDeleteView.as_view(), name='salida_vehiculo_eliminar'),    
-    
   
   
   
-  
-  
- 
   
     #--------URL modulo administrador----------------
     path('administrador/listar/', AdministradorListView.as_view() , name='administrador_lista'),
