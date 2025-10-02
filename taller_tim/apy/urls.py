@@ -81,9 +81,7 @@ urlpatterns = [
     path('salida_vehiculo/eliminar/<int:pk>/', SalidaVehiculoDeleteView.as_view(), name='salida_vehiculo_eliminar'),    
     
   
-  
-  
-  
+    
   
  
   
@@ -110,11 +108,6 @@ urlpatterns = [
     path('Pagos/agregar/', PagosCreateView.as_view() , name='pagos_crear'),
     path('Pagos/editar/<int:pk>/', PagosUpdateView.as_view() , name='pagos_editar'),
     path('Pagos/eliminar/<int:pk>/', PagosDeleteView.as_view() , name='pagos_eliminar'),
-
-
-
-
-
 
     #--------------urls Yury
     #----------url Empleado -------
@@ -174,6 +167,8 @@ urlpatterns = [
     path('repuestos/agregar/', RepuestoCreateView.as_view() , name='repuesto_crear'),
     path('repuestos/editar/<int:pk>/', RepuestoUpdateView.as_view() , name='repuesto_editar'),
     path('repuestos/eliminar/<int:pk>/', RepuestoDeleteView.as_view() , name='repuesto_eliminar'),
+    path("repuestos/modal/crear/", RepuestoCreateModalView.as_view(), name="repuesto_modal_crear"),
+
     
     path('main/', Main.as_view(), name='main'),
     path('estadisticas/', estadisticas, name='estadisticas'),

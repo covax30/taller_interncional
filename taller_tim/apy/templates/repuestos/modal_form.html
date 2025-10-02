@@ -1,0 +1,103 @@
+{% load widget_tweaks %}
+{% block form %}
+
+    <div id="msg-repuesto"></div>  {# Aquí se mostrarán los mensajes #}
+
+    <form id="repuestoForm" method="post" action="{% url 'apy:repuesto_modal_crear' %}">
+        {% csrf_token %}
+    {% for field in form.visible_fields %}
+    <div class="form-group mb-3">
+        <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
+        {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
+
+        {% if field.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in field.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+{% endblock %}
+
+{% block Cancelar %}
+    <button type="button" id="btnGuardarRepuesto" class="btn btn-primary btn-flat">
+        <i class="fas fa-save"></i> Agregar
+    </button>
+    <a href="{% url 'apy:repuesto_lista' %}" class="btn btn-default btn-flat float-right">
+        <i class="fas fa-times"></i> Cancelar
+    </a>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* Delegación: captura clicks de botones que aparezcan dinámicamente */
+$(document).on('click', '#btnGuardarRepuesto', function(e){
+    e.preventDefault();
+    const $btn = $(this);
+    const $modal = $('#modal-id_repuesto');
+    const $form = $modal.find('form#repuestoForm');
+
+    if (!$form.length) {
+        console.error('No se encontró el formulario #repuestoForm dentro del modal.');
+        return;
+    }
+
+    const url = $form.attr('action');
+    const formData = new FormData($form[0]);
+
+    $btn.prop('disabled', true).addClass('disabled').text('Guardando...');
+
+    $.ajax({
+        url: url,
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        headers: {'X-Requested-With': 'XMLHttpRequest'},
+        success: function(data){
+            // si tu vista devuelve JSON { success: True/False, ... }
+            if (data.success) {
+                // mostrar mensaje en el modal (o prependerlo)
+                if (!$modal.find('#msg-repuesto').length) {
+                    $modal.find('.modal-body').prepend('<div id="msg-repuesto"></div>');
+                }
+                $modal.find('#msg-repuesto').html('<div class="alert alert-success">'+(data.message||'Guardado correctamente')+'</div>');
+
+                // actualizar select en la página (estamos en el padre)
+                const $select = $('#id_id_repuesto');
+                const option = new Option(data.text, data.id, true, true);
+                $select.append(option).val(data.id).trigger('change');
+
+                // cerrar modal en 3s
+                //setTimeout(function(){ $modal.modal('hide'); }, 3000);
+                setTimeout(() => {
+                    $("#modal-id_repuesto").modal("hide");
+                }, 3000);
+
+            } else {
+                // errores de validación: reemplazar body con html si viene
+                if (data.html) {
+                    $modal.find('.modal-body').html(data.html);
+                } else {
+                    if (!$modal.find('#msg-repuesto').length) $modal.find('.modal-body').prepend('<div id="msg-repuesto"></div>');
+                    $modal.find('#msg-repuesto').html('<div class="alert alert-danger">'+(data.message||'Error en el servidor')+'</div>');
+                }
+            }
+        },
+        error: function(xhr, status, err) {
+            if (!$modal.find('#msg-repuesto').length) $modal.find('.modal-body').prepend('<div id="msg-repuesto"></div>');
+            $modal.find('#msg-repuesto').html('<div class="alert alert-danger">Error en el servidor. Revisa consola.</div>');
+            console.error('AJAX error:', status, err);
+        },
+        complete: function(){
+            $btn.prop('disabled', false).removeClass('disabled').text('Agregar');
+        }
+    });
+});
+</script>
+
+
+
+{% endblock %}
