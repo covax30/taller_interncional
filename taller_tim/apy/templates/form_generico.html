@@ -15,43 +15,17 @@
             <div class="card-body">
                 {% block form %}
 
-  {% for field in form %}
-    {% if 'foreign-key-field' in field.field.widget.attrs.class %}
-      <div class="form-group mb-3">
-        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-        <div class="input-group">
-          {{ field|add_class:"form-control" }}
-          <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modal-{{ field.name }}">
-            <i class="bi bi-plus"></i>
-          </button>
-        </div>
-      </div>
+                {% endblock %}
 
-      <!-- Modal fuera del input group -->
-      <div class="modal fade" id="modal-{{ field.name }}" tabindex="-1" aria-labelledby="modalLabel-{{ field.name }}" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="modalLabel-{{ field.name }}">Agregar {{ field.label }}</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
-            <div class="modal-body">
-              <!-- Aquí va el formulario para agregar el modelo relacionado -->
-              <p>Contenido del modal para <strong>{{ field.label }}</strong>.</p>
+            <div class="card-footer">
+
+                {% block Cancelar %}
+                {% endblock %}
+
             </div>
-          </div>
         </div>
-      </div>
-
-    {% else %}
-      <div class="form-group mb-3">
-        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-        {{ field|add_class:"form-control" }}
-      </div>
-    {% endif %}
-  {% endfor %}
-{% endblock %}
-
+    </form>
 </div>
 
 <script>
