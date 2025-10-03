@@ -1,0 +1,48 @@
+{% extends "generic_listar.html" %}
+<<<<<<< HEAD
+{% load humanize %}
+=======
+>>>>>>> origin/erick
+
+{% block titulo %}
+        <h1 class="text-center">Lista de Nomina</h1>
+{% endblock titulo %}
+
+{% block agregar %}
+<a href="{{crear_url}}" class=" btn btn-primary btn btn-xs"><i class="fas fa-plus"></i>
+          Agregar
+</a>
+{% endblock %}
+
+{% block columnas %}
+
+        <th>Id de la Nomina</th>
+        <th>Rol</th>
+        <th>Monto </th>
+        <th>Fecha de Pago </th>
+        <th>Id del Empleado  </th>
+        <th>Acciones</th>
+
+{% endblock %}
+
+{% block iterar %}
+
+      {% for n in object_list %}
+      <tr>
+        <td>{{ n.id }}</td>
+        <td>{{ n.rol}}</td>
+        <td>{{ n.monto|intcomma }}</td>
+        <td>{{ n.fecha_pago}}</td>
+        <td>{{ n.id_empleado}}</td>
+        
+        <form method="post">
+
+          <td>
+            <a href="{% url 'apy:nomina_editar' n.id %}" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></a>
+            <a href="{% url 'apy:nomina_eliminar' n.id %}" class="btn btn-danger btn-xs"><i
+                class="fas fa-trash-alt"></i></a>
+          </td>
+      </tr>
+      {% endfor %}
+
+{% endblock %}
