@@ -89,7 +89,12 @@ class Marca(models.Model):
 class Repuesto(models.Model):
     id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE)  # LLAVE
     nombre = models.CharField(max_length=100)
-    categoria = models.CharField(max_length=100)
+    CATEGORIA_OPCIONES = [
+        ('automotriz', 'Automotriz'),
+        ('industrial', 'Industrial'),
+    ]
+    categoria = models.CharField(max_length=100, choices=CATEGORIA_OPCIONES)
+    subcategoria = models.CharField(max_length=100, blank=True, null=True)
     fabricante = models.CharField(max_length=100)
     stock = models.IntegerField()
     ubicacion = models.CharField(max_length=100)

@@ -32,6 +32,106 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.querySelector("form");
+    const categoriaSelect = document.getElementById("id_categoria");
+    const subcategoriaSelect = document.getElementById("id_subcategoria");
+    const subcategoriaDiv = document.getElementById("div_subcategoria");
+    
+    console.log("Categoria Select:", categoriaSelect);
+    console.log("Subcategoria Select:", subcategoriaSelect);
+    console.log("Subcategoria Div:", subcategoriaDiv);
+    
+    // ----- SUBCATEGORÍAS DEPENDIENTES -----
+    const subcategorias = {
+        'automotriz': [
+            {value: 'motor', text: 'Motor'},
+            {value: 'frenos', text: 'Frenos'},
+            {value: 'suspension', text: 'Suspensión'},
+            {value: 'direccion', text: 'Dirección'},
+            {value: 'transmision', text: 'Transmisión'},
+            {value: 'electrico', text: 'Sistema Eléctrico'}
+        ],
+        'industrial': [
+            {value: 'hidraulica', text: 'Hidráulica'},
+            {value: 'neumatica', text: 'Neumática'},
+            {value: 'electronica', text: 'Electrónica'},
+            {value: 'mecanica', text: 'Mecánica'},
+            {value: 'rodamientos', text: 'Rodamientos'},
+            {value: 'bandas', text: 'Bandas y Correas'}
+        ]
+    };
+    
+    // Guardar el valor original de subcategoría si existe (modo edición)
+    const subcategoriaOriginal = subcategoriaSelect ? subcategoriaSelect.value : '';
+    
+    // Ocultar subcategoría al inicio si no hay categoría seleccionada
+    if (subcategoriaDiv && categoriaSelect) {
+        if (!categoriaSelect.value || categoriaSelect.value === '') {
+            subcategoriaDiv.style.display = 'none';
+        }
+    }
+    
+    // Función para actualizar subcategorías
+    function actualizarSubcategorias(valorCategoria, mantenerValor = false) {
+        if (!subcategoriaSelect) {
+            console.error("No se encontró el select de subcategoría");
+            return;
+        }
+        
+        console.log("Actualizando subcategorías para:", valorCategoria);
+        
+        // Limpiar todas las opciones
+        subcategoriaSelect.innerHTML = "";
+        
+        // Agregar opción por defecto
+        const optionDefault = document.createElement("option");
+        optionDefault.value = "";
+        optionDefault.textContent = "Seleccione subcategoría";
+        subcategoriaSelect.appendChild(optionDefault);
+        
+        if (valorCategoria && subcategorias[valorCategoria]) {
+            // Mostrar el div de subcategoría
+            if (subcategoriaDiv) {
+                subcategoriaDiv.style.display = 'block';
+            }
+            
+            // Agregar opciones correspondientes
+            subcategorias[valorCategoria].forEach(item => {
+                let option = document.createElement("option");
+                option.value = item.value;
+                option.textContent = item.text;
+                subcategoriaSelect.appendChild(option);
+            });
+            
+            console.log("Opciones agregadas:", subcategorias[valorCategoria].length);
+            
+            // Restaurar valor si se está editando
+            if (mantenerValor && subcategoriaOriginal) {
+                subcategoriaSelect.value = subcategoriaOriginal;
+            }
+        } else {
+            // Ocultar si no hay categoría o no es válida
+            if (subcategoriaDiv) {
+                subcategoriaDiv.style.display = 'none';
+            }
+            console.log("Categoría no válida o vacía");
+        }
+    }
+    
+    // Cargar subcategorías si ya hay una categoría seleccionada (modo edición)
+    if (categoriaSelect && categoriaSelect.value && categoriaSelect.value !== '') {
+        console.log("Cargando subcategorías para valor inicial:", categoriaSelect.value);
+        actualizarSubcategorias(categoriaSelect.value, true);
+    }
+    
+    // Listener para cambios en categoría
+    if (categoriaSelect) {
+        categoriaSelect.addEventListener("change", function () {
+            console.log("Cambio en categoría detectado:", this.value);
+            actualizarSubcategorias(this.value, false);
+        });
+    } else {
+        console.error("No se encontró el select de categoría con id 'id_categoria'");
+    }
 
     form.addEventListener("submit", function (e) {
         e.preventDefault(); // no recarga el iframe

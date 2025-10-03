@@ -25,9 +25,11 @@
     <button type="button" id="btnGuardarRepuesto" class="btn btn-primary btn-flat">
         <i class="fas fa-save"></i> Agregar
     </button>
-    <a href="{% url 'apy:repuesto_lista' %}" class="btn btn-default btn-flat float-right">
+    <button type="button" id="btnCancelarRepuesto" 
+            class="btn btn-default btn-flat float-right" 
+            data-bs-disxmiss="modal">
         <i class="fas fa-times"></i> Cancelar
-    </a>
+    </button>
 {% endblock %}
 
 {% block extra_js %}
@@ -73,8 +75,14 @@ $(document).on('click', '#btnGuardarRepuesto', function(e){
                 // cerrar modal en 3s
                 //setTimeout(function(){ $modal.modal('hide'); }, 3000);
                 setTimeout(() => {
-                    $("#modal-id_repuesto").modal("hide");
-                }, 3000);
+                    const modalElement = document.getElementById('modal-id_repuesto');
+                    if (modalElement) {
+                        const bsModal = bootstrap.Modal.getInstance(modalElement);
+                        if (bsModal) {
+                            bsModal.hide();
+                        }
+                    }
+                }, 3000);          
 
             } else {
                 // errores de validación: reemplazar body con html si viene
@@ -96,8 +104,16 @@ $(document).on('click', '#btnGuardarRepuesto', function(e){
         }
     });
 });
+
+// Cuando el modal se cierre, limpiar el formulario
+$('#modal-id_repuesto').on('hidden.bs.modal', function () {
+    const $form = $(this).find('form#repuestoForm')[0];
+    if ($form) {
+        $form.reset(); // resetea todos los inputs
+    }
+    // limpiar mensajes de validación si los hubiera
+    $(this).find('#msg-repuesto').html('');
+});
 </script>
-
-
 
 {% endblock %}

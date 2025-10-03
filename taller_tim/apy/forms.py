@@ -1202,6 +1202,9 @@ class RepuestoForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['id_marca'].widget.attrs['autofocus'] = True
+        # Hacer que subcategoría sea solo lectura inicialmente
+        # Las opciones se llenarán dinámicamente con JavaScript
+        self.fields['subcategoria'].required = False
         
     class Meta:
         model = Repuesto
@@ -1217,9 +1220,14 @@ class RepuestoForm(ModelForm):
                     'placeholder':'Ingrese el nombre de el repuesto',
                 }   
             ),
-            'categoria':TextInput(
+            'categoria':Select(
                 attrs={
                     'placeholder':'Ingrese la categoria del repuesto',
+                }
+            ),
+            'subcategoria':Select(
+                attrs={
+                    'class': 'form-control',
                 }
             ),
             'fabricante':TextInput(
