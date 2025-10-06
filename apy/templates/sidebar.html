@@ -1,0 +1,289 @@
+{% load static %}
+<aside class="app-sidebar bg-dark shadow" data-bs-theme="dark">
+        <!--begin::Sidebar Brand-->
+        <div class="sidebar-brand">
+          <!--begin::Brand Link-->
+          <a href="../index.html" class="brand-link">
+            <!--begin::Brand Image-->
+            <img src="{% static 'AdminLTE/dist/assets/img/AdminLTELogo.png' %}"
+              alt="AdminLTE Logo"
+              class="brand-image opacity-75 shadow"
+            />
+            <!--end::Brand Image-->
+            <!--begin::Brand Text-->
+            <span class="brand-text fw-light">T.I.M</span>
+            <!--end::Brand Text-->
+          </a>
+          <!--end::Brand Link-->
+        </div>
+        <!--end::Sidebar Brand-->
+        <!--begin::Sidebar Wrapper-->
+        <div class="sidebar-wrapper">
+          <nav class="mt-2">
+            <!--begin::Sidebar Menu-->
+            <ul
+              class="nav sidebar-menu flex-column"
+              data-lte-toggle="treeview"
+              role="navigation"
+              aria-label="Main navigation"
+              data-accordion="false"
+              id="navigation"
+            >
+               <li class="nav-item">
+              <a class="nav-link" data-widget="navbar-search" href="#" role="button">
+                <i class="bi bi-search"></i>
+              </a>
+            </li>
+              <!--1er super item-->
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon bi bi-graph-down"></i>
+                  <p>
+                    Analisis y Reportes
+                    <i class="nav-arrow bi bi-chevron-right"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+
+                    <!-- 1er item-->
+                    <a href="{% url 'apy:estadisticas' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Informes</p>
+                    </a>
+                  </li>
+
+                </ul>
+              </li>
+              <!--fin super item-->
+              <!--2er super item-->
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon bi bi-car-front-fill"></i>
+
+                  <p>
+                    Gestion de Vehiculo
+                    <i class="nav-arrow bi bi-chevron-right"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <!-- 1er item-->
+                  <li class="nav-item">
+                    <a href="{% url 'apy:entrada_vehiculo_lista' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Entrada de vehiculo</p>
+                    </a>
+                  </li>
+                  <!-- 2er item-->
+                  <li class="nav-item">
+                    <a href="{% url 'apy:salida_vehiculo_lista' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>salida de vehiculo</p>
+                    </a>
+                  </li>
+                  <!-- 3er item-->
+                  <li class="nav-item">
+                    <a href="{% url 'apy:vehiculo_lista' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>vehiculo</p>
+                    </a>
+                  </li>
+                  <!-- 4er item-->
+                  <li class="nav-item">
+                    <a href="{% url 'apy:marca_lista' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Marcas</p>
+                    </a>
+                  </li>
+
+                </ul>
+              </li>
+              <!--fin super item-->
+              <!--3er super item-->
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon bi bi-wrench"></i>
+                  <p>
+                    Mantenimiento y repuestos
+                    <i class="nav-arrow bi bi-chevron-right"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <!-- 1er item-->
+                  <li class="nav-item">
+                    <a href="{% url 'apy:mantenimiento_lista' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Gestion Mantenimento</p>
+                    </a>
+                  </li>
+                  <!-- 2er item-->
+                  <li class="nav-item">
+                    <a href="{% url 'apy:repuesto_lista' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Gestion repuestos</p>
+                    </a>
+                  </li>
+                  <!-- 3er item-->
+                  <li class="nav-item">
+                    <a href="{% url 'apy:tipo_mantenimiento_lista' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Tipos de Mantenimiento</p>
+                    </a>
+                  </li>
+                  <!-- 4er item-->
+                  <li class="nav-item">
+                    <a href="{% url 'apy:herramienta_lista' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Herramientas</p>
+                    </a>
+                  </li>
+                  <!-- 5er item-->
+                  <li class="nav-item">
+                    <a href="{% url 'apy:insumo_lista' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Gestion Insumos</p>
+                    </a>
+                  </li>
+
+                </ul>
+              </li>
+              <!--fin super item-->
+              <!--4er super item-->
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon bi bi-currency-dollar"></i>
+
+                  <p>
+                    Administracion
+                    <i class="nav-arrow bi bi-chevron-right"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <!-- 1er item-->
+                  <li class="nav-item">
+                    <a href="{% url 'apy:administrador_lista' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Admistrador</p>
+                    </a>
+                  </li>
+                  <!-- 2er item-->
+                  <li class="nav-item">
+                    <a href="{% url 'apy:gasto_lista' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Gastos</p>
+                    </a>
+                  </li>
+                  <!-- 3er item-->
+                  <li class="nav-item">
+                    <a href="{% url 'apy:factura_lista' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Facturas</p>
+                    </a>
+                  </li>
+                  <!-- 4er item-->
+                  <li class="nav-item">
+                    <a href="{% url 'apy:pagos_lista' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Pagos</p>
+                    </a>
+                  </li>
+                  <!-- 5er item-->
+                  <li class="nav-item">
+                    <a href="{% url 'apy:caja_lista' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Caja</p>
+                    </a>
+                  </li>
+                  <!-- 6er item-->
+                  <li class="nav-item">
+                    <a href="{% url 'apy:nomina_lista' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Nomina</p>
+                    </a>
+                  </li>
+                  <!-- 6er item-->
+                  <li class="nav-item">
+                    <a href="{% url 'apy:pago_servicios_lista' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Servicios Publicos</p>
+                    </a>
+                  </li>
+
+                </ul>
+              </li>
+              <!--fin super item-->
+              <!--5er super item-->
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon bi bi-people-fill"></i>
+
+                  <p>
+                    Gestion de Clientes
+                    <i class="nav-arrow bi bi-chevron-right"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <!-- 1er item-->
+                  <li class="nav-item">
+                    <a href="{% url 'apy:proveedor_lista' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Proveedores</p>
+                    </a>
+                  </li>
+                  <!-- 2er item-->
+                  <li class="nav-item">
+                    <a href="{% url 'apy:cliente_lista' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Clientes</p>
+                    </a>
+                  </li>
+                  <!-- 3er item-->
+                  <li class="nav-item">
+                    <a href="{% url 'apy:compra_lista' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Compras</p>
+                    </a>
+                  </li>
+                  
+                </ul>
+              </li>
+              <!--fin super item-->
+              <!--6er super item-->
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon bi bi-building-fill"></i>
+
+                  <p>
+                    Recursos Humanos
+                    <i class="nav-arrow bi bi-chevron-right"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <!-- 1er item-->
+                  <li class="nav-item">
+                    <a href="{% url 'apy:empleado_lista' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Empleados</p>
+                    </a>
+                  </li>
+                  
+                </ul>
+              </li>
+              <!--fin super item-->
+              <!--7er super item-->
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon bi bi-gear-fill"></i>
+                  <p>
+                    Configuracion
+                    <i class="nav-arrow bi bi-chevron-right"></i>
+                  </p>
+                </a>
+              </li>
+              <!--fin super item-->
+            </ul>
+            <!--end::Sidebar Menu-->
+          </nav>
+        </div>
+        <!--end::Sidebar Wrapper-->
+      </aside>
