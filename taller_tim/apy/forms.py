@@ -213,6 +213,7 @@ class VehiculoForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['id_cliente'].widget.attrs['autofocus'] = True
         
+        
     class Meta:
         model = Vehiculo
         fields = '__all__'
@@ -220,11 +221,14 @@ class VehiculoForm(ModelForm):
             'id_vehiculo':Select(
                 attrs={
                     'class': 'form-control',
+                    'class': 'form-control foreign-key-field'
                 }
             ),
             'id_cliente':Select(
+                
                 attrs={
                     'class': 'form-control',
+                    'class': 'form-control foreign-key-field'
                 }
             ),
             'placa':TextInput(

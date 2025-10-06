@@ -1,9 +1,10 @@
-{% extends "form_generico.html"%}
+{% extends "form/form_generico.html"%}
 {% load widget_tweaks%}
 {% block form %}
     {% csrf_token %}
 
     {% for field in form.visible_fields %}
+    
     <div class="form-group mb-3">
         <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
         {{ field|add_class:'form-control'|attr:'autocomplete:off' }}

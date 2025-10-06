@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.template.loader import render_to_string
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
@@ -89,40 +90,37 @@ class RepuestoDeleteView(DeleteView):
         context['listar_url'] = reverse_lazy('apy:repuesto_lista')
         return context
 
+
+
 class RepuestoCreateModalView(CreateView):
     model = Repuesto
     form_class = RepuestoForm
-    template_name = "repuestos/modal_form.html"  # plantilla parcial
+    template_name = "repuestos/modal_form.html"
     success_url = reverse_lazy("apy:repuesto_lista")
 
-    def form_valid(self, form):
-        self.object = form.save()
-        # Retornamos JSON para actualizar el select sin refrescar la página
-        return JsonResponse({
-            "success": True,
-            "id": self.object.id,
-            "text": str(self.object)
-        })
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
-    def form_invalid(self, form):
-        return JsonResponse({
-            "success": False,
-            "html": render(self.request, self.template_name, {"form": form}).content.decode("utf-8")
-        })
-        
     def form_valid(self, form):
-        self.object = form.save()
-        return JsonResponse({
-            "success": True,
-            "id": self.object.id,
-            "text": str(self.object),
-            "message": "Repuesto registrado correctamente ✅"
-        })
+        try:
+            self.object = form.save()
+            return JsonResponse({
+                "success": True,
+                "id": self.object.id,
+                "text": str(self.object),
+                "message": "Repuesto registrado correctamente ✅"
+            })
+        except Exception as e:
+            return JsonResponse({
+                "success": False,
+                "message": f"Error al guardar: {str(e)}"
+            }, status=500)
     
     def form_invalid(self, form):
+        html = render_to_string(self.template_name, {"form": form}, request=self.request)
         return JsonResponse({
             "success": False,
-            "html": render(self.request, self.template_name, {"form": form}).content.decode("utf-8"),
-            "message": "Error al registrar el repuesto ❌"
+            "html": html,
+            "message": "Por favor, corrige los errores en el formulario ❌"
         })
-
