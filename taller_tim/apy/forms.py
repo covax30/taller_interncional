@@ -1217,6 +1217,9 @@ class RepuestoForm(ModelForm):
             'id_marca':Select(
                 attrs={
                     'placeholder':'Ingrese la marca del repuesto',
+                    'class': 'form-select',
+                    'data-bs-toggle': 'modal',
+                    'data-bs-target': '#modalMarca'
                 }
             ),
             'nombre':TextInput(

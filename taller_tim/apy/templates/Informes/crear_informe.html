@@ -72,13 +72,11 @@
             {{ form.id_repuesto }}
             <div class="input-group-append">
                 <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_repuesto">
-                    <i class="fas fa-search"></i>
+                    <i class="fas fa-plus"></i>
                 </button>
             </div>
         </div>
     </div>
-
-    <!-- Modal Repuestos -->
 
     <!-- id_empleado con modal -->
     <div class="form-group mb-3">
@@ -87,7 +85,7 @@
             {{ form.id_empleado }}
             <div class="input-group-append">
                 <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_empleado">
-                    <i class="fas fa-search"></i>
+                    <i class="fas fa-plus"></i>
                 </button>
             </div>
         </div>
@@ -115,12 +113,14 @@
             {{ form.id_mantenimiento }}
             <div class="input-group-append">
                 <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_mantenimiento">
-                    <i class="fas fa-search"></i>
+                    <i class="fas fa-plus"></i>
                 </button>
             </div>
         </div>
     </div>
 
+
+    <!-- Modal Repuesto -->
     <div class="modal fade" id="modal-id_repuesto" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -135,11 +135,68 @@
         </div>
     </div>
 
+    <!-- Modal Empleado -->
+    <div class="modal fade" id="modal-id_empleado" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Crear Empleado</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Mantenimiento -->
+    <div class="modal fade" id="modal-id_mantenimiento" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Crear Mantenimiento</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Repuesto. -->
     <script>
         $("#modal-id_repuesto").on("show.bs.modal", function(){
             var modal = $(this);
             $.ajax({
                 url: "{% url 'apy:repuesto_modal_crear' %}",
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+                }
+            });
+        });
+    </script>
+
+    <!-- Script empleado. -->
+    <script>
+        $("#modal-id_empleado").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:empleado_modal_crear' %}",
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+                }
+            });
+        });
+    </script>
+
+    <!-- Script mantenimiento. -->
+    <script>
+        $("#modal-id_mantenimiento").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:mantenimiento_modal_crear' %}",
                 success: function(data){
                     modal.find(".modal-body").html(data.html || data);
                 }

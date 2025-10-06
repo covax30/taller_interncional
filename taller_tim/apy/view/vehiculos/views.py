@@ -3,6 +3,7 @@ from apy.models import *
 from apy.view.vehiculos.views import *
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import JsonResponse
+from django.template.loader import render_to_string
 from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
@@ -116,3 +117,36 @@ def estadisticas_view(request):
 def api_contador_vehiculos(request):
     total_vehiculos = Vehiculo.objects.count()
     return JsonResponse({'total_vehiculos': total_vehiculos})
+
+class VehiculoCreateModalView(CreateView):
+    model = Vehiculo
+    form_class = VehiculoForm
+    template_name = "vehiculos/modal_vehiculo.html"
+    success_url = reverse_lazy("apy:vehiculo_lista")
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        try:
+            self.object = form.save()
+            return JsonResponse({
+                "success": True,
+                "id": self.object.id,
+                "text": str(self.object),
+                "message": "Vehiculo registrado correctamente ✅"
+            })
+        except Exception as e:
+            return JsonResponse({
+                "success": False,
+                "message": f"Error al guardar: {str(e)}"
+            }, status=500)
+    
+    def form_invalid(self, form):
+        html = render_to_string(self.template_name, {"form": form}, request=self.request)
+        return JsonResponse({
+            "success": False,
+            "html": html,
+            "message": "Por favor, corrige los errores en el formulario ❌"
+        })

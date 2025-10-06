@@ -2,21 +2,159 @@
 {% load widget_tweaks %}
 {% block form %}
     {% csrf_token %}
-
-    {% for field in form.visible_fields %}
+ 
+    <!-- id_marca con modal -->
     <div class="form-group mb-3">
-        <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
-        {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
-
-        {% if field.errors %}
+        <label for="{{ form.id_marca.id_for_label }}">Marca:</label>
+        <div class="input-group">
+            {{ form.id_marca|add_class:'form-control' }}
+            <div class="input-group-append">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_marca">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+        {% if form.id_marca.errors %}
             <div class="invalid-feedback d-block">
-                {% for error in field.errors %}
+                {% for error in form.id_marca.errors %}
                     <small>{{ error }}</small><br>
                 {% endfor %}
             </div>
         {% endif %}
     </div>
-    {% endfor %}
+
+    <!-- Nombre -->
+    <div class="form-group mb-3">
+        <label for="{{ form.nombre.id_for_label }}">Nombre:</label>
+        <div class="input-group">
+            {{ form.nombre|add_class:'form-control'|attr:'autocomplete:off' }}
+        </div>
+        {% if form.nombre.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.nombre.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Categoría -->
+    <div class="form-group mb-3">
+        <label for="{{ form.categoria.id_for_label }}">Categoría:</label>
+        <div class="input-group">
+            {{ form.categoria|add_class:'form-control' }}
+        </div>
+        {% if form.categoria.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.categoria.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Subcategoría -->
+    <div class="form-group mb-3">
+        <label for="{{ form.subcategoria.id_for_label }}">Subcategoría:</label>
+        <div class="input-group">
+            {{ form.subcategoria|add_class:'form-control' }}
+        </div>
+        {% if form.subcategoria.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.subcategoria.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Fabricante -->
+    <div class="form-group mb-3">
+        <label for="{{ form.fabricante.id_for_label }}">Fabricante:</label>
+        <div class="input-group">
+            {{ form.fabricante|add_class:'form-control' }}
+        </div>
+        {% if form.fabricante.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.fabricante.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Stock -->
+    <div class="form-group mb-3">
+        <label for="{{ form.stock.id_for_label }}">Stock:</label>
+        <div class="input-group">
+            {{ form.stock|add_class:'form-control' }}
+        </div>
+        {% if form.stock.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.stock.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Ubicación -->
+    <div class="form-group mb-3">
+        <label for="{{ form.ubicacion.id_for_label }}">Ubicación:</label>
+        <div class="input-group">
+            {{ form.ubicacion|add_class:'form-control' }}
+        </div>
+        {% if form.ubicacion.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.ubicacion.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Precio -->
+    <div class="form-group mb-3">
+        <label for="{{ form.precio.id_for_label }}">Precio:</label>
+        <div class="input-group">
+            {{ form.precio|add_class:'form-control' }}
+        </div>
+        {% if form.precio.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.precio.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Modal Marca -->
+    <div class="modal fade" id="modal-id_marca" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Crear Marca</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script marca. -->
+    <script>
+        $("#modal-id_marca").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:marca_modal_crear' %}",  // <-- endpoint para crear Marca
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+                }
+            });
+        });
+    </script>
 {% endblock %}
 
 {% block Cancelar %}

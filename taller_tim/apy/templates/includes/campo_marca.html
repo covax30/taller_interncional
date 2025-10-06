@@ -1,0 +1,19 @@
+{% load widget_tweaks %}
+<div class="form-group mb-3" id="div_id_marca">
+  <label for="{{ form.id_marca.id_for_label }}">Marca:</label>
+  <div class="input-group">
+    {{ form.id_marca|add_class:'form-control' }}
+    <div class="input-group-append">
+      <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_marca">
+        <i class="fas fa-search"></i>
+      </button>
+    </div>
+  </div>
+  {% if form.id_marca.errors %}
+    <div class="invalid-feedback d-block">
+      {% for error in form.id_marca.errors %}
+        <small>{{ error }}</small><br>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
