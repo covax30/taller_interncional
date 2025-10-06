@@ -53,20 +53,5 @@
     <!-- BLOQUE PARA SCRIPTS ADICIONALES DE PÁGINAS ESPECÍFICAS -->
     {% block extra_scripts %}
     {% endblock %}
-    <style>
-        .input-group-text {
-       background-color: #f8f9fa;
-       cursor: pointer;
-      }
-
-       .input-group-text i {
-        font-size: 18px;
-       color: #007bff;
-      }
-
-       .input-group-text:hover i {
-        color: #28a745;
-      }
-    </style>
-  </body>
+    <script src="{% static 'AdminLTE/dist/js/theme_switcher.js' %}"> </script>
 {% endblock %}
