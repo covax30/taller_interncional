@@ -36,8 +36,8 @@
             </td>
             <td>{{ user.date_joined|date:"Y-m-d H:i" }}</td>
             <td>
-                <a href="{% url 'apy:usuario_editar' user.id %}" class="btn btn-info btn-xs" title="Editar"><i class="fas fa-edit"></i></a>
-                <a href="{% url 'apy:usuario_eliminar' user.id %}" class="btn btn-danger btn-xs" title="Eliminar"><i class="fas fa-trash-alt"></i></a>
+                <a href="{% url 'apy:registro_usuario_editar' user.id %}" class="btn btn-info btn-xs" title="Editar"><i class="fas fa-edit"></i></a>
+                <a href="{% url 'apy:registro_usuario_eliminar' user.id %}" class="btn btn-danger btn-xs" title="Eliminar"><i class="fas fa-trash-alt"></i></a>
             </td>
         </tr>
     {% endfor %}

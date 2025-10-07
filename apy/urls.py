@@ -85,17 +85,14 @@ urlpatterns = [
     path('salida_vehiculo/eliminar/<int:pk>/', SalidaVehiculoDeleteView.as_view(), name='salida_vehiculo_eliminar'),   
     
     # --------------urls Usuario y permisos-------------- 
-    path('usuario/', perfil_usuario, name='perfil_usuarios'),  
-    path('permisos/', permisos_usuarios, name='permisos_usuarios'),  
+    path('perfil/', PerfilUsuarioUpdateView.as_view(), name='perfil_usuarios'),  
+
+    path('registro/lista/', RegistroUsuarioListView.as_view(), name='registro_usuario_lista'), 
+    path('registro/crear/', RegistroUsuarioCreateView.as_view(), name='registro_usuario_crear'), 
+    path('registro/editar/<int:pk>/', RegistroUpdateView.as_view(), name='registro_usuario_editar'), 
+    path('registro/eliminar/<int:pk>/', RegistroDeleteView.as_view(), name='registro_usuario_eliminar'),
     
-     # 1. LISTADO (UsuarioListView)
-    path('usuarios/lista/', RegistroUsuarioListView.as_view(), name='usuario_lista'), 
-    # 2. CREAR (Necesaria para el botón "Agregar Usuario")
-    path('usuarios/crear/', RegistroUsuarioCreateView.as_view(), name='registro_usuario_crear'), 
-    # 3. EDITAR (Mapea 'usuario_editar' a RegistroUpdateView)
-    path('usuarios/editar/<int:pk>/', RegistroUpdateView.as_view(), name='usuario_editar'), 
-    # 4. ELIMINAR (Mapea 'usuario_eliminar' a RegistroDeleteView)
-    path('usuarios/eliminar/<int:pk>/', RegistroDeleteView.as_view(), name='usuario_eliminar'),
+    path('permisos/', permisos_usuarios, name='permisos_usuarios'),  
   
   
   

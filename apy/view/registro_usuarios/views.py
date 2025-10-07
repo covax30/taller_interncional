@@ -15,7 +15,7 @@ class RegistroUsuarioCreateView(CreateView):
     form_class = RegistroUsuarioForm
     template_name = 'registro_usuarios/registro_usuarios.html' 
     # 🟢 CORREGIDO: URL correcta de listado
-    success_url = reverse_lazy('apy:usuario_lista') 
+    success_url = reverse_lazy('apy:registro_usuario_lista') 
 
     def form_valid(self, form):
         # El método save del formulario maneja la creación y el rol
@@ -27,7 +27,7 @@ class RegistroUsuarioCreateView(CreateView):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Registro de Nuevo Usuario'
         context['entidad'] = 'Usuarios'
-        context['listar_url'] = reverse_lazy('apy:usuario_lista') 
+        context['listar_url'] = reverse_lazy('apy:registro_usuario_lista') 
         return context
 
 # ====================================================================
@@ -38,13 +38,13 @@ class RegistroUpdateView(UpdateView):
     model = User
     form_class = RegistroUsuarioForm # Usa el formulario unificado
     template_name = 'registro_usuarios/registro_usuarios.html' 
-    success_url = reverse_lazy('apy:usuario_lista') 
+    success_url = reverse_lazy('apy:registro_usuario_lista') 
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Editar Usuario'
         context['entidad'] = 'Usuarios'
-        context['listar_url'] = reverse_lazy('apy:usuario_lista')
+        context['listar_url'] = reverse_lazy('apy:registro_usuario_lista')
         return context
 
     def form_valid(self, form):
@@ -63,13 +63,13 @@ class RegistroUpdateView(UpdateView):
 class RegistroDeleteView(DeleteView):
     model = User
     template_name = 'registro_usuarios/eliminar_registro_usuarios.html'
-    success_url = reverse_lazy('apy:usuario_lista') 
+    success_url = reverse_lazy('apy:registro_usuario_lista') 
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Eliminar Usuario'
         context['entidad'] = 'Usuarios'
-        context['listar_url'] = reverse_lazy('apy:usuario_lista')
+        context['listar_url'] = reverse_lazy('apy:registro_usuario_lista')
         return context
     
     def form_valid(self, form):
@@ -87,7 +87,7 @@ class RegistroUsuarioListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # 🛑 CORRECCIÓN: El nombre correcto es 'registro_usuario_crear'
+        # CORRECCIÓN: El nombre correcto es 'registro_usuario_crear'
         context['crear_url'] = reverse_lazy('apy:registro_usuario_crear') 
         context['entidad'] = 'Usuarios'
         return context
