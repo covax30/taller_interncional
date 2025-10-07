@@ -32,6 +32,10 @@ from apy.view.salida_vehiculos.views import *
 from apy.view.Estadisticas.views import *
 from apy.view.main.main import Main
 
+from apy.view.usuario.views import *  
+from apy.view.permisos.views import *
+from apy.view.registro_usuarios.views import *
+
 app_name = 'apy'
 
 urlpatterns = [
@@ -41,8 +45,6 @@ urlpatterns = [
     #--------URL modulo factura----------------
 
     path('inicio/index/', index.as_view(), name='index'),
-    path('apy/api/repuestos-bajo-stock/', repuestos_bajo_stock_api, name='repuestos_bajo_stock_api'),
-
     
     path('factura/listar/', FacturaListView.as_view() , name='factura_lista'),
     path('factura/agregar/', FacturaCreateView.as_view(), name='factura_crear'),
@@ -80,7 +82,20 @@ urlpatterns = [
     path('salida_vehiculo/listar/', SalidaVehiculoListView.as_view(), name='salida_vehiculo_lista'),
     path('salida_vehiculo/agregar/', SalidaVehiculoCreateView.as_view(), name='salida_vehiculo_crear'),
     path('salida_vehiculo/editar/<int:pk>/', SalidaVehiculoUpdateView.as_view(), name='salida_vehiculo_editar'),
-    path('salida_vehiculo/eliminar/<int:pk>/', SalidaVehiculoDeleteView.as_view(), name='salida_vehiculo_eliminar'),    
+    path('salida_vehiculo/eliminar/<int:pk>/', SalidaVehiculoDeleteView.as_view(), name='salida_vehiculo_eliminar'),   
+    
+    # --------------urls Usuario y permisos-------------- 
+    path('usuario/', perfil_usuario, name='perfil_usuarios'),  
+    path('permisos/', permisos_usuarios, name='permisos_usuarios'),  
+    
+     # 1. LISTADO (UsuarioListView)
+    path('usuarios/lista/', RegistroUsuarioListView.as_view(), name='usuario_lista'), 
+    # 2. CREAR (Necesaria para el botón "Agregar Usuario")
+    path('usuarios/crear/', RegistroUsuarioCreateView.as_view(), name='registro_usuario_crear'), 
+    # 3. EDITAR (Mapea 'usuario_editar' a RegistroUpdateView)
+    path('usuarios/editar/<int:pk>/', RegistroUpdateView.as_view(), name='usuario_editar'), 
+    # 4. ELIMINAR (Mapea 'usuario_eliminar' a RegistroDeleteView)
+    path('usuarios/eliminar/<int:pk>/', RegistroDeleteView.as_view(), name='usuario_eliminar'),
   
   
   
@@ -179,5 +194,5 @@ urlpatterns = [
     path('api/vehiculos/count/', api_contador_vehiculos, name='api_contador_vehiculos'),
     path('api/insumos/count/', api_contador_insumos, name='api_contador_insumos'),
     path('api/gastos/count/', api_contador_gastos, name='api_contador_gastos'),
-] 
+]
 

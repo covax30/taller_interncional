@@ -5,6 +5,10 @@ from django.forms import TimeInput
 from django.forms import ModelForm
 from django.forms import TextInput, Select
 from decimal import Decimal, InvalidOperation
+# apy/forms.py (Asegúrate de importar esto)
+from django.contrib.auth.hashers import make_password
+from django import forms  # Asegúrate de usar la importación estándar de forms
+from django.contrib.auth.models import User, Permission  # Importación de modelos de Django
 
 from apy.models import *
 
@@ -138,7 +142,137 @@ class ProveedorForm(ModelForm):
             }
         }
 # ------------------- FORMS STEVEN -------------------    
+ 
+    # Formulario para gestionar los permisos de los usuarios
+class UserPermissionsForm(forms.Form):
+    user = forms.ModelChoiceField(
+        queryset=User.objects.all(), 
+        label="Seleccionar Usuario"
+    )
+    permissions = forms.ModelMultipleChoiceField(
+        queryset=Permission.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        label="Seleccionar Permisos"
+    )
 
+# Formulario para gestionar los datos personales del usuario
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email']  # Campos para editar el perfil del usuario
+
+# apy/forms.py (Clase Unificada)
+
+from django import forms
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+
+class RegistroUsuarioForm(forms.ModelForm):
+    # Campos adicionales no presentes en el modelo User
+    password = forms.CharField(
+        label='Contraseña',
+        widget=forms.PasswordInput(attrs={'placeholder': 'Contraseña', 'class': 'form-control'}),
+        strip=False,
+        required=True # Por defecto, requerido para la CREACIÓN
+    )
+    password2 = forms.CharField(
+        label='Confirmar Contraseña',
+        widget=forms.PasswordInput(attrs={'placeholder': 'Repita la contraseña', 'class': 'form-control'}),
+        strip=False,
+        required=True # Por defecto, requerido para la CREACIÓN
+    )
+    role = forms.ChoiceField(
+        label='Rol',
+        choices=[('normal', 'Empleado'), ('admin', 'Gerente')],
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=True
+    )
+
+    class Meta:
+        model = User
+        # Incluye todos los campos base que se usan en ambas vistas.
+        fields = ('username', 'email', 'password') 
+        widgets = {
+            'username': forms.TextInput(attrs={'placeholder': 'Nombre de usuario', 'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'placeholder': 'Correo electrónico', 'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Lógica para la EDICIÓN (cuando self.instance.pk existe)
+        if self.instance.pk:
+            # 1. Hacemos las contraseñas opcionales
+            self.fields['password'].required = False
+            self.fields['password2'].required = False
+            
+            # 2. Inicializamos el campo 'role' al valor actual del usuario
+            if self.instance.is_superuser:
+                self.initial['role'] = 'admin'
+            else:
+                self.initial['role'] = 'normal'
+        
+        # Aseguramos la clase form-control en todos los select (para el campo 'role')
+        self.fields['role'].widget.attrs['class'] = 'form-control'
+
+    def clean_password2(self):
+        """
+        Valida que las contraseñas coincidan SOLO si el usuario ingresó alguna.
+        """
+        password = self.cleaned_data.get('password')
+        password2 = self.cleaned_data.get('password2')
+
+        if password or password2:
+             if password != password2:
+                raise ValidationError("Las contraseñas no coinciden.")
+             # Si ambas coinciden, devuelve la contraseña hasheada para guardar
+             if password:
+                return make_password(password) # ¡IMPORTANTE! Hashea la contraseña para guardarla
+        
+        # En la edición, si no se ingresó contraseña, no devolvemos nada
+        return password2
+
+    def save(self, commit=True):
+        """
+        Maneja la creación (User.objects.create_user) o la actualización (user.save()).
+        """
+        if self.instance.pk:
+            # --- LÓGICA DE ACTUALIZACIÓN (UPDATEVIEW) ---
+            user = super().save(commit=False) # Guarda los campos ModelForm (username, email)
+            
+            # Si se proporcionó una nueva contraseña, la actualiza
+            new_password = self.cleaned_data.get('password2')
+            if new_password:
+                user.password = new_password
+            
+            # Lógica del Rol (siempre se actualiza en la edición)
+            role = self.cleaned_data.get('role')
+            user.is_staff = (role == 'admin')
+            user.is_superuser = (role == 'admin')
+            
+            self.success_message = f'Usuario {user.username} actualizado con éxito.'
+
+        else:
+            # --- LÓGICA DE CREACIÓN (CREATEVIEW) ---
+            user = User.objects.create_user(
+                username=self.cleaned_data['username'],
+                email=self.cleaned_data['email'],
+                # El campo password ya viene hasheado del clean_password2
+                password=self.cleaned_data['password'] 
+            )
+            
+            # Lógica del Rol
+            role = self.cleaned_data.get('role')
+            user.is_staff = (role == 'admin')
+            user.is_superuser = (role == 'admin')
+            
+            self.success_message = f'{"Gerente" if role == "admin" else "Empleado"} {user.username} registrado con éxito.'
+
+        if commit:
+            user.save()
+        
+        return user
+    
 class ClienteForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

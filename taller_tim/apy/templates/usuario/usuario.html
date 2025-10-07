@@ -1,0 +1,137 @@
+{% extends 'body.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+		<div class="col-md-3 border-right">
+			<div class="d-flex flex-column align-items-center text-center p-3 py-5">
+				<img class="rounded-circle mt-5" width="150px" src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg">
+				<span class="font-weight-bold">
+					<p> {{ user.username|default:user.username }}</p>
+				</span>
+				<span class="text-black-50">
+					<p> {{ user.email }}</p>
+				</span>
+				<span> 
+
+				</span>
+				
+				<button class="btn btn-primary mt-3" type="button">Upload new image</button>
+			</div>
+		</div>
+		
+		<div class="col-md-5 border-end">
+			<div class="p-3 py-5">
+				<div class="d-flex justify-content-between align-items-center mb-3">
+					<h4 class="text-right">Profile Settings</h4>
+				</div>
+				
+				<div class="row mt-2">
+					<div class="col-12">
+						<div class="card mb-3 bg-soft-blue text-blue">
+							<div class="card-body">
+								<div class="row">
+									<div class="col-md-6">
+										<h6>Account Created on:</h6>
+									</div>
+									
+									<div class="col-md-6 text-end">
+										<h6>01/01/3020</h6>
+									</div>
+									
+									<div class="col-md-6">
+										<h6>Account Expires on:</h6>
+									</div>
+									
+									<div class="col-md-6 text-end">
+										<h6 class="">01/01/3020</h6>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<div class="col-md-6">
+						<div class="form-floating mb-4">
+							<input type="text" class="form-control" placeholder="FirstName" id="FirstName">
+							
+							<label for="FirstName">First Name</label>
+						</div>
+					</div>
+					
+					<div class="col-md-6">
+						<div class="form-floating mb-4">
+							<input type="text" class="form-control" placeholder="LastName" id="LastName">
+							
+							<label for="LastName">Last Name</label>
+						</div>
+					</div>
+				</div>
+				
+				<div class="row mt-3">
+					<div class="col-md-6">
+						<div class="form-floating mb-4">
+							<input type="email" class="form-control" placeholder="Email" id="Email">
+							
+							<label for="Email">Email</label>
+						</div>
+					</div>
+					
+					<div class="col-md-6">
+						<div class="form-select-wrapper mb-4">
+							<select class="form-select" id="form-select" name="timezone" required="">
+								<option selected="" disabled="" value="">Time Zone</option>
+								
+								<option value="116">America/Indiana/Indianapolis</option>
+								
+								<option value="152">America/New_York</option>
+								
+								<option value="194">America/Vancouver</option>
+							</select>
+						</div>
+					</div>	
+			          <div class="col-md-6">
+	
+					</div>
+			          <!-- /column -->
+			
+			          <div class="col-md-12">
+						
+					</div>
+				</div>
+				
+				<div class="text-center">
+					<button type="submit" class="btn btn-primary">Update Profile</button>
+				</div>
+			</div>
+		</div>
+		
+		<div class="col-md-4">
+			<div class="p-3 py-5">
+				<div class="d-flex justify-content-between align-items-center mb-3">
+					<h4 class="text-right">Change Password</h4>
+				</div>
+				
+				<div class="col-md-12">
+					<div class="form-floating password-field mb-4">
+						<input type="password" class="form-control" placeholder="Password" id="loginPassword"><span class="password-toggle"><i class="uil uil-eye"></i></span>
+						
+						<label for="loginPassword">Password</label>
+					</div>
+				</div>
+				
+				<div class="col-md-12">
+					<div class="form-floating password-field mb-4">
+						<input type="password" class="form-control" placeholder="Confirm Password" id="loginPasswordConfirm"><span class="password-toggle"><i class="uil uil-eye"></i></span>
+						
+						<label for="loginPasswordConfirm">Confirm Password</label>
+					</div>
+				</div>
+				
+				<div class="col-12">
+					<button type="submit" class="btn btn-primary">Change Password</button>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
