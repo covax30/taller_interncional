@@ -1,11 +1,12 @@
 from django.shortcuts import render
-from apy.models import *
-from django.urls import reverse_lazy
-from apy.forms import *
 from django.db.models.functions import TruncMonth
 from django.db.models import Sum
 from datetime import datetime
 from calendar import month_name
+from django.shortcuts import render
+from apy.models import Caja
+
+from django.http import HttpResponse
 
 def estadisticas(request):
     # Filtramos solo los ingresos
@@ -30,4 +31,5 @@ def estadisticas(request):
         'meses': meses,
         'totales': totales,
     }
+
     return render(request, 'estadisticas.html', context)

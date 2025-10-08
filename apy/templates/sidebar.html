@@ -288,6 +288,28 @@
                     <i class="nav-arrow bi bi-chevron-right"></i>
                   </p>
                 </a>
+               <ul class="nav nav-treeview">
+                  <!-- 1er item-->
+                  <li class="nav-item">
+                    <a href="{% url 'apy:perfil_usuarios' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Usuario</p>
+                    </a>
+                  </li>
+                   <!-- 2er item-->
+                  <li class="nav-item">
+                    <a href="{% url 'apy:registro_usuario_lista' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Registro de usuarios</p>
+                    </a>
+                  </li>
+                  <!-- 3er item-->
+                  <li class="nav-item">
+                    <a href="{% url 'apy:permisos_usuarios' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Permisos</p>
+                    </a>
+                  </li>
               </li>
               <!--fin super item-->
             </ul>

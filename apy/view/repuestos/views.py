@@ -6,6 +6,9 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.urls import reverse_lazy
 from apy.forms import *
+from django.db.models import F
+from apy.models import Repuesto
+from apy.forms import RepuestoForm
 
 # Create your views here.
 # --------------Vistas erick---------------

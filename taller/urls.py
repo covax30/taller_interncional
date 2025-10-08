@@ -7,4 +7,6 @@ urlpatterns = [
     path('login/', include(('login.urls', 'login'), namespace='login')),  # ✅ con namespace
     path('apy/', include(('apy.urls', 'apy'), namespace='apy')),          # idem, por claridad
     path('forgot/', forgot_view.as_view(), name="forgot"),
+    
+    path('auth/', include('django.contrib.auth.urls')),  # Rutas de autenticación de Django (login, logout, password_change, etc.)
 ]

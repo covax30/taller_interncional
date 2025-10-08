@@ -1,6 +1,9 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
+
+from django.contrib.auth.models import User
+
 import re
 
 #------------------FUNCION DE VALIDACION ----------------------
@@ -148,6 +151,25 @@ class Insumos(models.Model):
 
 
 # MODULOS STEVEN
+class Module(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+class Permission(models.Model):
+    module = models.ForeignKey(Module, related_name='perms', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='permissions', on_delete=models.CASCADE)
+    view = models.BooleanField(default=False)
+    add = models.BooleanField(default=False)
+    change = models.BooleanField(default=False)
+    delete = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.module.name}"
+
+
+
 
 class Cliente(models.Model):
     id_cliente = models.AutoField(primary_key=True)
