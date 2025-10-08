@@ -1,0 +1,58 @@
+{% extends "generic_listar.html"%}
+
+{% block titulo %}
+    <h1 class="text-center">Lista de Usuarios del Sistema</h1>
+{% endblock %}
+
+{% block agregar %}
+    <a href="{% url 'apy:registro_usuario_crear' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Agregar Usuario
+    </a>
+{% endblock %}
+
+{% block columnas %}
+    <th>ID</th>
+    <th>Nombre de Usuario</th>
+    <th>Email</th>
+    <th>Rol</th>
+    <th>Fecha de Creación</th>
+    <th>Acciones</th>
+{% endblock %}
+
+{% block iterar %}
+    {% for user in object_list %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+                {% if user.is_superuser %}
+                    <span class="badge bg-danger">Gerente (Admin)</span>
+                {% elif user.is_staff %}
+                    <span class="badge bg-warning">Staff</span>
+                {% else %}
+                    <span class="badge bg-success">Empleado</span>
+                {% endif %}
+            </td>
+            <td>{{ user.date_joined|date:"Y-m-d H:i" }}</td>
+            <td>
+                <a href="{% url 'apy:registro_usuario_editar' user.id %}" class="btn btn-info btn-xs" title="Editar"><i class="fas fa-edit"></i></a>
+                <a href="{% url 'apy:registro_usuario_eliminar' user.id %}" class="btn btn-danger btn-xs" title="Eliminar"><i class="fas fa-trash-alt"></i></a>
+            </td>
+        </tr>
+    {% endfor %}
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        {% if messages %}
+            {% for message in messages %}
+                Swal.fire({
+                    icon: '{% if "success" in message.tags %}success{% elif "error" in message.tags %}error{% else %}info{% endif %}',
+                    title: '{{ message|escapejs }}',
+                    timer: 2500,
+                    showConfirmButton: false
+                });
+            {% endfor %}
+        {% endif %}
+    </script>
+{% endblock %}

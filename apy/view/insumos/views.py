@@ -31,10 +31,6 @@ class InsumoCreateView(CreateView):
     template_name = 'insumos/crear.html'
     success_url = reverse_lazy('apy:insumo_lista')
     
-    def form_valid(self, form):
-        messages.success(self.request, "insumo creado correctamente")
-        return super().form_valid(form)  
-    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Crear Insumo'
@@ -48,6 +44,10 @@ class InsumoUpdateView(UpdateView):
     template_name = 'insumos/crear.html'
     success_url = reverse_lazy('apy:insumo_lista')
     
+    def form_valid(self, form):
+        messages.success(self.request, "Insumo actualizado correctamente")
+        return super().form_valid(form)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Editar Insumo'
@@ -59,6 +59,10 @@ class InsumoDeleteView(DeleteView):
     model = Insumos
     template_name = 'insumos/eliminar.html'
     success_url = reverse_lazy('apy:insumo_lista')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Insumo eliminado correctamente")
+        return super().form_valid(form)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

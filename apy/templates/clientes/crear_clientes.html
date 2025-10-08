@@ -1,5 +1,6 @@
-{% extends "form_generico.html"%}
+{% extends "form_generico.html" %}
 {% load widget_tweaks %}
+
 {% block form %}
     {% csrf_token %}
 
@@ -23,7 +24,7 @@
                 <button type="submit " class="btn btn-primary btn-flat"><i class="fas fa-save"></i>
                     Agregar
                 </button>
-                <a href="{% url 'apy:cliente_lista' %}" class="btn btn-default btn-flat float-right">
+                <a href="{% url 'apy:cliente_lista' %}" class="btn btn-danger btn-flat float-right">
                     <i class="fas fa-times"></i> Cancelar
                 </a>
 {% endblock %}
