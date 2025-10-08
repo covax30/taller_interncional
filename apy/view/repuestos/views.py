@@ -35,9 +35,9 @@ class RepuestoCreateView(CreateView):
     template_name = 'repuestos/crear.html'
     success_url = reverse_lazy('apy:repuesto_lista')
     
-    @method_decorator(csrf_exempt)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
+    def form_valid(self, form):
+        messages.success(self.request, "repuesto creado correctamente")
+        return super().form_valid(form)    
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
