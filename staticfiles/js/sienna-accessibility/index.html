@@ -1,3 +1,4 @@
+
 <!doctypehtml>
     <html charset=utf-8 lang=en>
     <meta charset=utf-8>
@@ -944,6 +945,13 @@
     <meta charset=utf-8>
     <link href=https://fonts.googleapis.com rel=preconnect>
     <link href=https://fonts.gstatic.com rel=preconnect crossorigin="">
+     <!-- Pre-carga y carga de estilos CSS -->
+    {% load static %}
+    <link rel="preload" href="{% static 'AdminLTE/dist/css/adminlte.css' %}" as="style" />
+    <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/adminlte.css' %}" />
+    <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/bootstrap.css' %}" />
+
+
     <meta content="Wed, 19 Jul 2023 23:31:19 GMT" name=revisied><noscript data-n-css=""></noscript>
     <div id=__next>
         <div>
