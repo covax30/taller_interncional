@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.urls import reverse_lazy
+from django.template.loader import render_to_string
 from apy.forms import *
 
 # --------------Vistas de administrador---------------
@@ -89,3 +90,36 @@ class AdministradorDeleteView(DeleteView):
         context['entidad'] = 'Administradores'
         context['listar_url'] = reverse_lazy('apy:administrador_lista')
         return context
+    
+class AdministradorCreateModalView(CreateView):
+    model = Administrador
+    form_class = AdministradorForm
+    template_name = "administrador/modal_administrador.html"
+    success_url = reverse_lazy("apy:administrador_lista")
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        try:
+            self.object = form.save()
+            return JsonResponse({
+                "success": True,
+                "id": self.object.id_admin,
+                "text": str(self.object),
+                "message": "Administrador registrado correctamente ✅"
+            })
+        except Exception as e:
+            return JsonResponse({
+                "success": False,
+                "message": f"Error al guardar: {str(e)}"
+            }, status=500)
+    
+    def form_invalid(self, form):
+        html = render_to_string(self.template_name, {"form": form}, request=self.request)
+        return JsonResponse({
+            "success": False,
+            "html": html,
+            "message": "Por favor, corrige los errores en el formulario ❌"
+        })

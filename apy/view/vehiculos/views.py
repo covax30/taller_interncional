@@ -128,25 +128,61 @@ class VehiculoCreateModalView(CreateView):
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
+    def post(self, request, *args, **kwargs):
+        """Override post para manejar peticiones AJAX"""
+        # Verificar si es petición AJAX
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        
+        if not is_ajax:
+            return JsonResponse({
+                "success": False,
+                "message": "Esta vista solo acepta peticiones AJAX"
+            }, status=400)
+        
+        return super().post(request, *args, **kwargs)
+
     def form_valid(self, form):
+        """Manejar formulario válido"""
         try:
             self.object = form.save()
+
+            # ✅ construir texto para el select (usando __str__)
+            vehiculo_text = str(self.object)
+            
             return JsonResponse({
                 "success": True,
-                "id": self.object.id,
-                "text": str(self.object),
-                "message": "Vehiculo registrado correctamente ✅"
+                "id": self.object.id_vehiculo,
+                "text": vehiculo_text,
+                "message": "Vehículo registrado correctamente ✅"
             })
         except Exception as e:
+            # Log del error para debugging
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error al guardar vehículo: {str(e)}", exc_info=True)
+            
             return JsonResponse({
                 "success": False,
                 "message": f"Error al guardar: {str(e)}"
             }, status=500)
     
     def form_invalid(self, form):
-        html = render_to_string(self.template_name, {"form": form}, request=self.request)
+        """Manejar formulario inválido"""
+        # Renderizar el template con los errores
+        html = render_to_string(
+            self.template_name, 
+            {"form": form}, 
+            request=self.request
+        )
+        
+        # También puedes enviar los errores en formato JSON
+        errors_dict = {}
+        for field, errors in form.errors.items():
+            errors_dict[field] = [{"message": str(error)} for error in errors]
+        
         return JsonResponse({
             "success": False,
             "html": html,
+            "errors": errors_dict,
             "message": "Por favor, corrige los errores en el formulario ❌"
-        })
+        }, status=400)

@@ -62,26 +62,6 @@ class MarcaCreateView(CreateView):
         context ['listar_url'] = reverse_lazy('apy:marca_lista')
         return context
     
-    def form_valid(self, form):
-        self.object = form.save()
-
-        #  forma de detectar 
-        if self.request.headers.get("x-requested-with") == "XMLHttpRequest":
-            return JsonResponse({
-                "success": True,
-                "id": self.object.id,
-                "nombre": str(self.object.nombre)  # usa __str__ del modelo
-            })
-
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        if self.request.headers.get("x-requested-with") == "XMLHttpRequest":
-            return JsonResponse({
-                "success": False,
-                "errors": form.errors
-            }, status=400)
-        return super().form_invalid(form)
     
 class MarcaUpdateView(UpdateView):
     model = Marca
@@ -148,17 +128,3 @@ class MarcaCreateModalView(CreateView):
             "html": html,
             "message": "Por favor, corrige los errores en el formulario ❌"
         })
-        
-def marca_modal_crear(request):
-    if request.method == "POST":
-        form = MarcaForm(request.POST)
-        if form.is_valid():
-            marca = form.save()
-            return JsonResponse({
-                "success": True,
-                "id": marca.id,
-                "nombre": marca.nombre
-            })
-        return JsonResponse({"success": False, "errors": form.errors})
-    return JsonResponse({"success": False, "error": "Método no permitido"})
-

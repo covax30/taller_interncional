@@ -3,26 +3,98 @@
 {% block form %}
     {% csrf_token %}
 
-    {% for field in form.visible_fields %}
+    <!-- Rol -->
     <div class="form-group mb-3">
-        <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
-        {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
-
-        {% if field.errors %}
+        <label for="{{ form.rol.id_for_label }}">Rol:</label>
+        <div class="input-group">
+            {{ form.rol|add_class:'form-control'|attr:'autocomplete:off' }}
+        </div>
+        {% if form.rol.errors %}
             <div class="invalid-feedback d-block">
-                {% for error in field.errors %}
+                {% for error in form.rol.errors %}
                     <small>{{ error }}</small><br>
                 {% endfor %}
             </div>
         {% endif %}
     </div>
-    {% endfor %}
+
+    <!-- Monto -->
+    <div class="form-group mb-3">
+        <label for="{{ form.monto.id_for_label }}">Monto:</label>
+        <div class="input-group">
+            {{ form.monto|add_class:'form-control' }}
+        </div>
+        {% if form.monto.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.monto.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Fecha -->
+    <div class="form-group mb-3">
+        <label for="{{ form.fecha_pago.id_for_label }}">Fecha Pago:</label>
+        <div class="input-group">
+            {{ form.fecha_pago|add_class:'form-control' }}
+        </div>
+        {% if form.fecha_pago.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.fecha_pago.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Id Empleado con modal -->
+    <div class="form-group mb-3">
+        <label for="{{ form.id_empleado.id_for_label }}">Id Empleado:</label>
+        <div class="input-group">
+            {{ form.id_empleado }}
+            <div class="input-group-append">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_empleado">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Empleado -->
+    <div class="modal fade" id="modal-id_empleado" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content"> 
+            <div class="modal-header">
+                <h5 class="modal-title">Crear Empleado</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script empleado. -->
+    <script>
+        $("#modal-id_empleado").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:empleado_modal_crear' %}",
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+                }
+            });
+        });
+    </script>
+
 {% endblock %}
 
 {% block Cancelar %}
-            <button type="button" class="btn btn-primary btn-flat" onclick="confirmarEnvio()">
-                <i class="fas fa-save"></i> Agregar
-            </button>
+            <button type="submit " class="btn btn-primary btn-flat"><i class="fas fa-save"></i>
+                    Agregar
+                </button>
 
                 <a href="{% url 'apy:marca_lista' %}" class="btn btn-danger btn-flat float-right">
                     <i class="fas fa-times"></i> Cancelar
