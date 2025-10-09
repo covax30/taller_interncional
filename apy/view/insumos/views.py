@@ -31,10 +31,6 @@ class InsumoCreateView(CreateView):
     template_name = 'insumos/crear.html'
     success_url = reverse_lazy('apy:insumo_lista')
     
-    def form_valid(self, form):
-        messages.success(self.request, "Insumo creado correctamente")
-        return super().form_valid(form)
-    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Crear Insumo'

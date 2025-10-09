@@ -15,14 +15,21 @@
   };
 
   const setTheme = function (theme) {
-    if (
-      theme === "auto" &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches
-    ) {
+    // === INICIO DEL CÓDIGO MODIFICADO PARA SINCRONIZACIÓN ===
+    const isDark =
+        theme === "dark" || 
+        (theme === "auto" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+    if (isDark) {
       document.documentElement.setAttribute("data-bs-theme", "dark");
+      // LÍNEA CLAVE: Añadir la clase para activar el estilo Dark de AdminLTE en el widget
+      document.body.classList.add("asw-dark-contrast"); 
     } else {
       document.documentElement.setAttribute("data-bs-theme", theme);
+      // LÍNEA CLAVE: Quitar la clase para volver al estilo Light en el widget
+      document.body.classList.remove("asw-dark-contrast"); 
     }
+    // === FIN DEL CÓDIGO MODIFICADO ===
   };
 
   setTheme(getPreferredTheme());

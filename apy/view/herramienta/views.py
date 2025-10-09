@@ -32,6 +32,10 @@ class HerramientaCreateView(CreateView):
     template_name = 'herramienta/crear.html'
     success_url = reverse_lazy('apy:herramienta_lista')
     
+    def form_valid(self, form):
+        messages.success(self.request, "herramienta creada correctamente")
+        return super().form_valid(form)  
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Crear Herramienta'
