@@ -3,20 +3,158 @@
 {% block form %}
     {% csrf_token %}
 
-    {% for field in form.visible_fields %}
+    <!-- Fallas -->
     <div class="form-group mb-3">
-        <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
-        {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
-
-        {% if field.errors %}
+        <label for="{{ form.fallas.id_for_label }}">Fallas:</label>
+        <div class="input-group">
+            {{ form.fallas|add_class:'form-control'|attr:'autocomplete:off' }}
+        </div>
+        {% if form.fallas.errors %}
             <div class="invalid-feedback d-block">
-                {% for error in field.errors %}
+                {% for error in form.fallas.errors %}
                     <small>{{ error }}</small><br>
                 {% endfor %}
             </div>
         {% endif %}
     </div>
-    {% endfor %}
+
+    <!-- Procesos -->
+    <div class="form-group mb-3">
+        <label for="{{ form.procesos.id_for_label }}">Procesos:</label>
+        <div class="input-group">
+            {{ form.procesos|add_class:'form-control'|attr:'autocomplete:off' }}
+        </div>
+        {% if form.procesos.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.procesos.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Id Vehiculo con modal -->
+    <div class="form-group mb-3">
+        <label for="{{ form.id_vehiculo.id_for_label }}">Vehículo:</label>
+        <div class="input-group">
+            {{ form.id_vehiculo }}
+            <div class="input-group-append">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_vehiculo">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Id Empleado con modal -->
+    <div class="form-group mb-3">
+        <label for="{{ form.id_empleado.id_for_label }}">Empleado:</label>
+        <div class="input-group">
+            {{ form.id_empleado }}
+            <div class="input-group-append">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_empleado">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Id Tipo Mantenimiento con modal -->
+    <div class="form-group mb-3">
+        <label for="{{ form.id_tipo_mantenimiento.id_for_label }}">Tipo Mantenimiento:</label>
+        <div class="input-group">
+            {{ form.id_tipo_mantenimiento }}
+            <div class="input-group-append">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_tipo_mantenimiento">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Vehiculo -->
+    <div class="modal fade" id="modal-id_vehiculo" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Crear Vehículo</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Empleado -->
+    <div class="modal fade" id="modal-id_empleado" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Crear Empleado</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tipo Mantenimiento -->
+    <div class="modal fade" id="modal-id_tipo_mantenimiento" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Crear Tipo Mantenimiento</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Vehiculo. -->
+    <script>
+        $("#modal-id_vehiculo").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:vehiculo_modal_crear' %}",
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+                }
+            });
+        });
+    </script>
+    
+    <!-- Script empleado. -->
+    <script>
+        $("#modal-id_empleado").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:empleado_modal_crear' %}",
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+                }
+            });
+        });
+    </script>
+
+    <!-- Script tipo de Mantenimiento. -->
+    <script>
+        $("#modal-id_tipo_mantenimiento").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:tipo_mantenimiento_modal_crear' %}",
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+                }
+            });
+        });
+    </script>
 {% endblock %}
 
 {% block Cancelar %}

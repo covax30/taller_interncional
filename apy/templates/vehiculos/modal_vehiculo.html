@@ -1,0 +1,156 @@
+{% load widget_tweaks %}
+{% block form %}
+
+    <div id="msg-vehiculo"></div>  {# Aquí se mostrarán los mensajes #}
+
+    <form id="vehiculoForm" method="post" action="{% url 'apy:vehiculo_modal_crear' %}">
+        {% csrf_token %}
+    {% for field in form.visible_fields %}
+    <div class="form-group mb-3">
+        <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
+        {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
+
+        {% if field.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in field.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    {% endfor %}
+{% endblock %}
+
+{% block Cancelar %}
+    <button type="button" id="btnGuardarVehiculo" class="btn btn-primary btn-flat">
+        <i class="fas fa-save"></i> Agregar
+    </button>
+    <a href="{% url 'apy:vehiculo_crear' %}" class="btn btn-default btn-flat float-right">
+        <i class="fas fa-times"></i> Cancelar
+    </a>
+{% endblock %}
+
+ 
+
+{% block extra_js %}
+<script>
+/* Delegación: captura clicks de botones que aparezcan dinámicamente */
+$(document).on('click', '#btnGuardarVehiculo', function(e){
+    e.preventDefault();
+    const $btn = $(this);
+    const $modal = $('#modal-id_vehiculo');
+    const $form = $modal.find('form#vehiculoForm');
+
+    if (!$form.length) {
+        console.error('No se encontró el formulario #vehiculoForm dentro del modal.');
+        return;
+    }
+
+    const url = $form.attr('action');
+    const formData = new FormData($form[0]);
+
+    $btn.prop('disabled', true).addClass('disabled').text('Guardando...');
+
+    $.ajax({
+        url: url,
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        headers: {'X-Requested-With': 'XMLHttpRequest'},
+        success: function(data){
+            if (data.success) {
+                // Mostrar mensaje de éxito brevemente
+                if (!$modal.find('#msg-vehiculo').length) {
+                    $modal.find('.modal-body').prepend('<div id="msg-vehiculo"></div>');
+                }
+                $modal.find('#msg-vehiculo').html(
+                    '<div class="alert alert-success">' + data.message + '</div>'
+                );
+
+                // Actualizar el select (compatible con select2)
+                const $select = $('#id_id_vehiculo');
+                
+                // Si es select2, primero agregar la opción y luego actualizar
+                if ($select.hasClass('select2-hidden-accessible')) {
+                    // Crear nueva opción
+                    const newOption = new Option(data.text, data.id, true, true);
+                    $select.append(newOption);
+                    // Disparar el cambio para select2
+                    $select.trigger('change');
+                    $select.trigger('change.select2');
+                } else {
+                    // Select normal
+                    const option = new Option(data.text, data.id, true, true);
+                    $select.append(option).val(data.id).trigger('change');
+                }
+
+                // ✅ CERRAR EL MODAL CORRECTAMENTE - usar setTimeout para que el usuario vea el mensaje
+                setTimeout(function() {
+                    $modal.modal('hide');
+                    $('body').removeClass('modal-open');
+                    $('body').css('padding-right', '');
+                    $('.modal-backdrop').remove();
+                    $modal.removeClass('show');
+                    $modal.css('display', 'none');
+                    
+                    // Limpiar el formulario
+                    $form[0].reset();
+                    $modal.find('#msg-vehiculo').html('');
+                    
+                    // Resetear el botón
+                    $btn.prop('disabled', false).removeClass('disabled').text('Agregar');
+                }, 400); // Espera 400ms para que el usuario vea el mensaje de éxito
+
+            } else {
+                // Manejar errores de validación
+                if (data.html) {
+                    $modal.find('.modal-body').html(data.html);
+                } else {
+                    if (!$modal.find('#msg-vehiculo').length) {
+                        $modal.find('.modal-body').prepend('<div id="msg-vehiculo"></div>');
+                    }
+                    $modal.find('#msg-vehiculo').html(
+                        '<div class="alert alert-danger">' + data.message + '</div>'
+                    );
+                }
+                // Resetear el botón en caso de error
+                $btn.prop('disabled', false).removeClass('disabled').text('Agregar');
+            }
+        },
+        error: function(xhr, status, err) {
+            if (!$modal.find('#msg-vehiculo').length) {
+                $modal.find('.modal-body').prepend('<div id="msg-vehiculo"></div>');
+            }
+            $modal.find('#msg-vehiculo').html(
+                '<div class="alert alert-danger">Error en el servidor. Revisa consola.</div>'
+            );
+            console.error('AJAX error:', status, err);
+            console.error('Response:', xhr.responseText);
+            
+            // Resetear el botón
+            $btn.prop('disabled', false).removeClass('disabled').text('Agregar');
+        }
+    });
+});
+
+// Cuando el modal se cierre, limpiar completamente
+$('#modal-id_vehiculo').on('hidden.bs.modal', function () {
+    const $form = $(this).find('form#vehiculoForm')[0];
+    if ($form) {
+        $form.reset();
+    }
+    // Limpiar mensajes
+    $(this).find('#msg-vehiculo').html('');
+    
+    // Limpiar validaciones de Bootstrap si existen
+    $(this).find('.is-invalid').removeClass('is-invalid');
+    $(this).find('.invalid-feedback').remove();
+    
+    // Resetear el botón por si acaso
+    $('#btnGuardarVehiculo').prop('disabled', false).removeClass('disabled').text('Agregar');
+});
+</script>
+
+{% endblock %}

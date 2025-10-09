@@ -95,7 +95,12 @@ class Marca(models.Model):
 class Repuesto(models.Model):
     id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE)  # LLAVE
     nombre = models.CharField(max_length=100)
-    categoria = models.CharField(max_length=100)
+    CATEGORIA_OPCIONES = [
+        ('automotriz', 'Automotriz'),
+        ('industrial', 'Industrial'),
+    ]
+    categoria = models.CharField(max_length=100, choices=CATEGORIA_OPCIONES)
+    subcategoria = models.CharField(max_length=100, blank=True, null=True)
     fabricante = models.CharField(max_length=100)
     stock = models.IntegerField()
     ubicacion = models.CharField(max_length=100)
@@ -145,7 +150,7 @@ class Insumos(models.Model):
 
     def __str__(self):
 
-        return f"{self.nombre} ({self.id})"
+        return f"{self.id_marca} ({self.cantidad})"
 
 
 # MODULOS STEVEN
@@ -222,6 +227,7 @@ class Administrador(models.Model):
 
 #--------------Modulo Pago Servicio Publicos-----------
 class PagoServiciosPublicos(models.Model):
+    id_servicio = models.AutoField(primary_key=True)
     SERVICIO_OPCIONES = [
         ('luz', 'Luz'),
         ('agua', 'Agua'),
@@ -233,7 +239,6 @@ class PagoServiciosPublicos(models.Model):
         max_length=20,
         choices=SERVICIO_OPCIONES
     )
-    id_servicio = models.AutoField(primary_key=True)
     monto = models.IntegerField(  # 🔹 ENTEROS, sin decimales
         error_messages={
             'invalid': 'Ingrese un número válido para el monto.',
@@ -358,7 +363,7 @@ class Pagos(models.Model):
     id_admin = models.ForeignKey(Administrador, on_delete=models.CASCADE)
     id_herramienta = models.ForeignKey(Herramienta, on_delete=models.CASCADE)
     id_insumos = models.ForeignKey(Insumos, on_delete=models.CASCADE)
-    id_repuestos = models.ForeignKey(Repuesto, on_delete=models.CASCADE)
+    id_repuesto = models.ForeignKey(Repuesto, on_delete=models.CASCADE)
     id_nomina= models.ForeignKey(Nomina, on_delete=models.CASCADE, blank=True, null=True) 
     
     def __str__(self):

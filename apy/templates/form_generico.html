@@ -28,6 +28,7 @@
     </form>
 </div>
 
+
 <script>
     // Función para mostrar alerta de éxito
     function mostrarAdminAgregado() {
@@ -176,5 +177,48 @@
     });
   });
 </script>
+
+
+<!-- SCRIPT PARA Q MARCA APAREZCA EN EL MODAL DE RESPUESTO DENTRO DE INFORMES -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const formMarca = document.getElementById("formMarca");
+  formMarca.addEventListener("submit", function(e) {
+    e.preventDefault();
+    const formData = new FormData(formMarca);
+
+    fetch(formMarca.action, {
+      method: "POST",
+      body: formData,
+      headers: {
+        "X-Requested-With": "XMLHttpRequest"
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Agregar la nueva marca al select
+        const selectMarca = document.getElementById("id_id_marca");
+        const option = new Option(data.nombre, data.id, true, true);
+        selectMarca.append(option);
+
+        // Cerrar modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById("modalMarca"));
+        modal.hide();
+
+        // Reset form
+        formMarca.reset();
+      } else {
+        Swal.fire("Error", "No se pudo guardar la marca", "error");
+      }
+    })
+    .catch(error => {
+      Swal.fire("Error", "Ocurrió un problema", "error");
+    });
+  });
+});
+</script>
+
+
 
 {% endblock content %}

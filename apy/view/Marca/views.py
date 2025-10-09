@@ -6,12 +6,13 @@ from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.urls import reverse_lazy
+from django.template.loader import render_to_string
 from apy.forms import *
 from django.contrib import messages
 
 # Create your views here.
 # --------------Vistas Karol---------------
-
+ 
 def marca(request):
     data = {
         'Marca':'Marca',
@@ -46,6 +47,10 @@ class MarcaCreateView(CreateView):
     template_name = 'Marca/crear_marca.html'
     success_url = reverse_lazy('apy:marca_lista')
     
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+    
     def form_valid(self, form):
         messages.success(self.request, "Marca creada correctamente")
         return super().form_valid(form)
@@ -56,6 +61,7 @@ class MarcaCreateView(CreateView):
         context ['entidad'] = 'Marca'
         context ['listar_url'] = reverse_lazy('apy:marca_lista')
         return context
+    
     
 class MarcaUpdateView(UpdateView):
     model = Marca
@@ -89,3 +95,36 @@ class MarcaDeleteView(DeleteView):
         context['entidad'] = ' Marcas'
         context['listar_url'] = reverse_lazy('apy:marca_lista')
         return context
+
+class MarcaCreateModalView(CreateView):
+    model = Marca
+    form_class = MarcaForm
+    template_name = "Marca/modal_marca.html"
+    success_url = reverse_lazy("apy:marca_lista")
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        try:
+            self.object = form.save()
+            return JsonResponse({
+                "success": True,
+                "id": self.object.id,
+                "text": str(self.object),
+                "message": "Marca registrada correctamente ✅"
+            })
+        except Exception as e:
+            return JsonResponse({
+                "success": False,
+                "message": f"Error al guardar: {str(e)}"
+            }, status=500)
+    
+    def form_invalid(self, form):
+        html = render_to_string(self.template_name, {"form": form}, request=self.request)
+        return JsonResponse({
+            "success": False,
+            "html": html,
+            "message": "Por favor, corrige los errores en el formulario ❌"
+        })

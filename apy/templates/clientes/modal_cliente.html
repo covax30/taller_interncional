@@ -1,9 +1,9 @@
 {% load widget_tweaks %}
 {% block form %}
 
-    <div id="msg-repuesto"></div>  {# Aquí se mostrarán los mensajes #}
+    <div id="msg-cliente"></div>  {# Aquí se mostrarán los mensajes #}
 
-    <form id="repuestoForm" method="post" action="{% url 'apy:repuesto_modal_crear' %}">
+    <form id="clienteForm" method="post" action="{% url 'apy:cliente_modal_crear' %}">
         {% csrf_token %}
     {% for field in form.visible_fields %}
     <div class="form-group mb-3">
@@ -22,13 +22,15 @@
     {% endfor %}
 {% endblock %}
 
-{% block Cancelar %}
-    <button type="button" id="btnGuardarRepuesto" class="btn btn-primary btn-flat">
+    {% block Cancelar %}
+    <button type="button" id="btnGuardarCliente" class="btn btn-primary btn-flat">
         <i class="fas fa-save"></i> Agregar
     </button>
-    <a href="{% url 'apy:repuesto_crear' %}" class="btn btn-default btn-flat float-right">
+    <button type="button" id="btnCancelarCliente" 
+            class="btn btn-default btn-flat float-right" 
+            data-bs-dismiss="modal">
         <i class="fas fa-times"></i> Cancelar
-    </a>
+    </button>
 {% endblock %}
 
 
@@ -36,14 +38,14 @@
 {% block extra_js %}
 <script>
 /* Delegación: captura clicks de botones que aparezcan dinámicamente */
-$(document).on('click', '#btnGuardarRepuesto', function(e){
+$(document).on('click', '#btnGuardarCliente', function(e){
     e.preventDefault();
     const $btn = $(this);
-    const $modal = $('#modal-id_repuesto');
-    const $form = $modal.find('form#repuestoForm');
+    const $modal = $('#modal-id_cliente');
+    const $form = $modal.find('form#clienteForm');
 
     if (!$form.length) {
-        console.error('No se encontró el formulario #repuestoForm dentro del modal.');
+        console.error('No se encontró el formulario #clienteForm dentro del modal.');
         return;
     }
 
@@ -62,13 +64,13 @@ $(document).on('click', '#btnGuardarRepuesto', function(e){
         success: function(data){
          if (data.success) {
         // Mostrar mensaje de éxito
-        if (!$modal.find('#msg-repuesto').length) {
-            $modal.find('.modal-body').prepend('<div id="msg-repuesto"></div>');
+        if (!$modal.find('#msg-cliente').length) {
+            $modal.find('.modal-body').prepend('<div id="msg-cliente"></div>');
         }
-        $modal.find('#msg-repuesto').html('<div class="alert alert-success">' + data.message + '</div>');
+        $modal.find('#msg-cliente').html('<div class="alert alert-success">' + data.message + '</div>');
 
         // Actualizar select en la página principal
-        const $select = $('#id_id_repuesto');
+        const $select = $('#id_id_cliente');
         const option = new Option(data.text, data.id, true, true);
         $select.append(option).val(data.id).trigger('change');
 
@@ -87,16 +89,16 @@ $(document).on('click', '#btnGuardarRepuesto', function(e){
         if (data.html) {
             $modal.find('.modal-body').html(data.html);
         } else {
-            if (!$modal.find('#msg-repuesto').length) {
-                $modal.find('.modal-body').prepend('<div id="msg-repuesto"></div>');
+            if (!$modal.find('#msg-cliente').length) {
+                $modal.find('.modal-body').prepend('<div id="msg-cliente"></div>');
             }
-            $modal.find('#msg-repuesto').html('<div class="alert alert-danger">' + data.message + '</div>');
+            $modal.find('#msg-cliente').html('<div class="alert alert-danger">' + data.message + '</div>');
         }
     }
 },
         error: function(xhr, status, err) {
-            if (!$modal.find('#msg-repuesto').length) $modal.find('.modal-body').prepend('<div id="msg-repuesto"></div>');
-            $modal.find('#msg-repuesto').html('<div class="alert alert-danger">Error en el servidor. Revisa consola.</div>');
+            if (!$modal.find('#msg-cliente').length) $modal.find('.modal-body').prepend('<div id="msg-cliente"></div>');
+            $modal.find('#msg-cliente').html('<div class="alert alert-danger">Error en el servidor. Revisa consola.</div>');
             console.error('AJAX error:', status, err);
         },
         complete: function(){
@@ -106,13 +108,13 @@ $(document).on('click', '#btnGuardarRepuesto', function(e){
 });
 
 // Cuando el modal se cierre, limpiar el formulario
-$('#modal-id_repuesto').on('hidden.bs.modal', function () {
-    const $form = $(this).find('form#repuestoForm')[0];
+$('#modal-id_cliente').on('hidden.bs.modal', function () {
+    const $form = $(this).find('form#clienteForm')[0];
     if ($form) {
         $form.reset(); // resetea todos los inputs
     }
     // limpiar mensajes de validación si los hubiera
-    $(this).find('#msg-repuesto').html('');
+    $(this).find('#msg-cliente').html('');
 });
 </script>
 

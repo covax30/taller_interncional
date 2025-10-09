@@ -3,6 +3,7 @@ from apy.models import *
 from apy.view.vehiculos.views import *
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import JsonResponse
+from django.template.loader import render_to_string
 from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
@@ -116,3 +117,72 @@ def estadisticas_view(request):
 def api_contador_vehiculos(request):
     total_vehiculos = Vehiculo.objects.count()
     return JsonResponse({'total_vehiculos': total_vehiculos})
+
+class VehiculoCreateModalView(CreateView):
+    model = Vehiculo
+    form_class = VehiculoForm
+    template_name = "vehiculos/modal_vehiculo.html"
+    success_url = reverse_lazy("apy:vehiculo_lista")
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        """Override post para manejar peticiones AJAX"""
+        # Verificar si es petición AJAX
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        
+        if not is_ajax:
+            return JsonResponse({
+                "success": False,
+                "message": "Esta vista solo acepta peticiones AJAX"
+            }, status=400)
+        
+        return super().post(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        """Manejar formulario válido"""
+        try:
+            self.object = form.save()
+
+            # ✅ construir texto para el select (usando __str__)
+            vehiculo_text = str(self.object)
+            
+            return JsonResponse({
+                "success": True,
+                "id": self.object.id_vehiculo,
+                "text": vehiculo_text,
+                "message": "Vehículo registrado correctamente ✅"
+            })
+        except Exception as e:
+            # Log del error para debugging
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error al guardar vehículo: {str(e)}", exc_info=True)
+            
+            return JsonResponse({
+                "success": False,
+                "message": f"Error al guardar: {str(e)}"
+            }, status=500)
+    
+    def form_invalid(self, form):
+        """Manejar formulario inválido"""
+        # Renderizar el template con los errores
+        html = render_to_string(
+            self.template_name, 
+            {"form": form}, 
+            request=self.request
+        )
+        
+        # También puedes enviar los errores en formato JSON
+        errors_dict = {}
+        for field, errors in form.errors.items():
+            errors_dict[field] = [{"message": str(error)} for error in errors]
+        
+        return JsonResponse({
+            "success": False,
+            "html": html,
+            "errors": errors_dict,
+            "message": "Por favor, corrige los errores en el formulario ❌"
+        }, status=400)

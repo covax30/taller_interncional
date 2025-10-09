@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.urls import reverse_lazy
+from django.template.loader import render_to_string
 from apy.forms import *
 from django.contrib import messages
 
@@ -94,3 +95,36 @@ class NominaDeleteView(DeleteView):
         context['entidad'] = 'Nomina'
         context['listar_url'] = reverse_lazy('apy:nomina_lista')
         return context
+
+class NominaCreateModalView(CreateView):
+    model = Nomina
+    form_class = NominaForm
+    template_name = "Nomina/modal_nomina.html"
+    success_url = reverse_lazy("apy:nomina_lista")
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        try:
+            self.object = form.save()
+            return JsonResponse({
+                "success": True,
+                "id": self.object.id,
+                "text": str(self.object),
+                "message": "Nomina registrada correctamente ✅"
+            })
+        except Exception as e:
+            return JsonResponse({
+                "success": False,
+                "message": f"Error al guardar: {str(e)}"
+            }, status=500)
+    
+    def form_invalid(self, form):
+        html = render_to_string(self.template_name, {"form": form}, request=self.request)
+        return JsonResponse({
+            "success": False,
+            "html": html,
+            "message": "Por favor, corrige los errores en el formulario ❌"
+        })

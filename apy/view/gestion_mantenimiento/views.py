@@ -4,6 +4,7 @@ from apy.view.Contenidos.views import *
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
+from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.urls import reverse_lazy
 from apy.forms import *
@@ -15,7 +16,7 @@ class MantenimientoListView(ListView):
     model = Mantenimiento
     template_name = 'gestion_mantenimiento/listar.html'
     
-    @method_decorator(csrf_exempt)
+    @method_decorator(csrf_exempt) 
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
     
@@ -75,3 +76,36 @@ class MantenimientoDeleteView(DeleteView):
         context['entidad'] = 'Mantenimiento'
         context['listar_url'] = reverse_lazy('apy:mantenimiento_lista')
         return context
+    
+class MantenimientoCreateModalView(CreateView):
+    model = Mantenimiento
+    form_class = MantenimientoForm
+    template_name = "gestion_mantenimiento/modal_mantenimiento.html"
+    success_url = reverse_lazy("apy:mantenimiento_lista")
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        try:
+            self.object = form.save()
+            return JsonResponse({
+                "success": True,
+                "id": self.object.id,
+                "text": str(self.object),
+                "message": "Mantenimiento registrado correctamente ✅"
+            })
+        except Exception as e:
+            return JsonResponse({
+                "success": False,
+                "message": f"Error al guardar: {str(e)}"
+            }, status=500)
+    
+    def form_invalid(self, form):
+        html = render_to_string(self.template_name, {"form": form}, request=self.request)
+        return JsonResponse({
+            "success": False,
+            "html": html,
+            "message": "Por favor, corrige los errores en el formulario ❌"
+        })
