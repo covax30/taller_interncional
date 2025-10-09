@@ -1,0 +1,34 @@
+{% extends 'body.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card shadow-lg border-0 rounded-lg mt-5">
+                <div class="card-header bg-success text-white text-center">
+                    <h3 class="fw-light my-4">Correo Enviado</h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
+                    </div>
+                    <h5 class="card-title text-center">¡Instrucciones enviadas!</h5>
+                    <p class="card-text text-center mt-3">
+                        Hemos enviado por correo electrónico las instrucciones para cambiar tu contraseña.
+                        Revisa tu bandeja de entrada y la carpeta de **spam** por si acaso.
+                    </p>
+                    <hr>
+                    <p class="text-center small text-muted">
+                        Si no recibes un correo electrónico en unos minutos, asegúrate de haber ingresado
+                        la dirección con la que te registraste.
+                    </p>
+                </div>
+                <div class="card-footer text-center py-3">
+                    <div class="small"><a href="{% url 'login:login' %}">Volver al inicio de sesión</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

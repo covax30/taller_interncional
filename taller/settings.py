@@ -109,7 +109,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'es-co'
 
-TIME_ZONE = 'UTC'
+USE_TZ = True # Asegura que Django use zonas horarias
+
+TIME_ZONE = 'America/Bogota' # Establece la zona horaria a Colombia
 
 USE_I18N = True
 
@@ -137,3 +139,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/login'
 LOGIN_REDIRECT_URL = 'apy:informes_lista'
 LOGOUT_REDIRECT_URL = '/login'
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' 

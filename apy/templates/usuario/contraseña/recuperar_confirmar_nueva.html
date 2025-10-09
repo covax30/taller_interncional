@@ -1,0 +1,77 @@
+{% extends 'body.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card shadow-lg border-0 rounded-lg mt-5">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="fw-light my-4">Establecer Nueva Contraseña</h3>
+                </div>
+                <div class="card-body p-4">
+                    
+                    {% if validlink %}
+                    <p class="mb-4">
+                        Por favor, ingresa tu nueva contraseña dos veces para que podamos verificar que la has escrito correctamente.
+                    </p>
+
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <div class="form-floating mb-3">
+                            {{ form.new_password1 }} 
+                            <label for="{{ form.new_password1.id_for_label }}">Nueva Contraseña</label>
+                            {% if form.new_password1.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.new_password1.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="small text-muted mt-1">{{ form.new_password1.help_text }}</div>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            {{ form.new_password2 }} 
+                            <label for="{{ form.new_password2.id_for_label }}">Confirmar Nueva Contraseña</label>
+                            {% if form.new_password2.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.new_password2.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button class="btn btn-success btn-lg" type="submit">
+                                Cambiar Contraseña
+                            </button>
+                        </div>
+                    </form>
+                    
+                    {% else %}
+                    <div class="alert alert-danger text-center">
+                        El enlace de restablecimiento de contraseña es inválido,
+                        posiblemente porque ya ha sido utilizado. Por favor, solicita
+                        un nuevo restablecimiento de contraseña.
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer text-center py-3">
+                    <div class="small"><a href="{% url 'password_reset' %}">Solicitar nuevo enlace</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

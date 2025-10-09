@@ -33,6 +33,7 @@ from apy.view.Estadisticas.views import *
 from apy.view.main.main import Main
 
 from apy.view.usuario.views import *  
+from apy.view.usuario.contraseña.views import *  
 from apy.view.permisos.views import *
 from apy.view.registro_usuarios.views import *
 
@@ -86,6 +87,7 @@ urlpatterns = [
     
     # --------------urls Usuario y permisos-------------- 
     path('perfil/', PerfilUsuarioUpdateView.as_view(), name='perfil_usuarios'),  
+    path('auth/password_change/', PerfilPasswordChangeView.as_view(), name='password_change'),
 
     path('registro/lista/', RegistroUsuarioListView.as_view(), name='registro_usuario_lista'), 
     path('registro/crear/', RegistroUsuarioCreateView.as_view(), name='registro_usuario_crear'), 
