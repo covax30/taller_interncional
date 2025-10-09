@@ -137,4 +137,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/login'
 LOGIN_REDIRECT_URL = 'apy:informes_lista'
 LOGOUT_REDIRECT_URL = '/login'
-X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+EMAIL_USE_TLS: True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'erickcovisfero@gmail,com'
+EMAIL_HOST_PASSWORD = 'rick300701'
+EMAIL_PORT = 25
+
