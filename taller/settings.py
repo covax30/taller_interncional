@@ -140,6 +140,8 @@ LOGIN_URL = '/login'
 LOGIN_REDIRECT_URL = 'apy:informes_lista'
 LOGOUT_REDIRECT_URL = '/login'
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' 
+
 EMAIL_USE_TLS: True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'erickcovisfero@gmail,com'
