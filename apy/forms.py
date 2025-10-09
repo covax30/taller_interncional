@@ -98,6 +98,95 @@ class FacturaForm(ModelForm):
 
         }
         
+#------- Formulario detalle servicio ---------
+class DetalleServicioForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['descripcion_servicio'].widget.attrs['autofocus'] = True
+        
+    class Meta:
+        model = DetalleServicio
+        fields = '__all__'
+        widgets = {
+            'id_vehiculo':Select(
+                attrs={
+                    'class': 'form-control',
+                }
+            ),
+        
+            'id_tipo_mantenimiento':Select(
+                attrs={
+                    'class': 'form-control',
+                }
+            ),
+            'id_repuestos':Select(
+                attrs={
+                    'class': 'form-control',
+                }
+            ),
+            'id_insumos':Select(
+                attrs={
+                    'class': 'form-control',
+                }
+            ),
+        }
+            
+        error_messages = {
+            'id_vehiculo': {
+                'required': 'El id del vehículo es obligatorio',
+            },
+            'id_tipo_mantenimiento': {
+                'required': 'el id del tipo de mantenimiento es obligatorio',
+            },
+            'id_repuestos': {
+                'required': 'El id de los repuestos es obligatorio',
+            },
+            'id_insumos': {
+                'required': 'El id del insumo es obligatorio',
+            }
+        }
+        
+#-------- formulario repuestos detalle servicio -----------
+class RepuestoscantidadForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['id_repuesto'].widget.attrs['autofocus'] = True
+        
+    class Meta:
+        model = DetalleRepuesto
+        fields = '__all__'
+        widgets = {
+            'id_repuesto':Select(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder':'Ingrese el nombre del repuesto',
+                }
+            ),
+            'cantidad':NumberInput(
+                attrs={
+                    'placeholder':'Ingrese la cantidad del repuesto',
+                }
+            ),
+            'costo':NumberInput(
+                attrs={
+                    'placeholder':'Ingrese el costo del repuesto',
+                    'step': '0.01'
+                }
+            )
+        }
+        error_messages = {
+            'id_repuesto': {
+                'required': 'El nombre del repuesto es obligatorio',
+            },
+            'cantidad': {
+                'required': 'La cantidad del repuesto es obligatoria',
+            },
+            'costo': {
+                'required': 'El costo del repuesto es obligatorio',
+            }
+        }        
+
+        
 # -----------Formulario modelo proveedor------------------        
 class ProveedorForm(ModelForm):
     def __init__(self, *args, **kwargs):
@@ -881,13 +970,14 @@ class MarcaForm(ModelForm):
                     'placeholder':'Ingrese el nombre de la marca',
                 }
             ),
-            'tipo':TextInput(
+            'tipo':Select(
                 attrs={
                     'placeholder':'Ingrese el tipo de la marca',
                 }
             ),
          
        } 
+        
         error_messages = {
             'nombre': {
                 'required': 'El nombre de marca es obligatorio',
@@ -896,6 +986,7 @@ class MarcaForm(ModelForm):
                 'required': 'E tipo de marca es obligatoria',
             },
         }
+
         
 #-----formularo Nomina ---------------
 class   NominaForm(ModelForm):

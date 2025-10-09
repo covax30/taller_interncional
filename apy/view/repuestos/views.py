@@ -124,3 +124,37 @@ class RepuestoCreateModalView(CreateView):
             "html": html,
             "message": "Por favor, corrige los errores en el formulario ❌"
         })
+        
+
+class DetalleRepuestoCreateModalView(CreateView):
+    model = DetalleRepuesto
+    form_class = RepuestoscantidadForm
+    template_name = "repuestos/modal_detallerepuesto.html"
+    success_url = reverse_lazy("apy:detallerepuesto_lista")
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        try:
+            self.object = form.save()
+            return JsonResponse({
+                "success": True,
+                "id": self.object.id,
+                "text": str(self.object),
+                "message": "Repuesto registrado correctamente ✅"
+            })
+        except Exception as e:
+            return JsonResponse({
+                "success": False,
+                "message": f"Error al guardar: {str(e)}"
+            }, status=500)
+    
+    def form_invalid(self, form):
+        html = render_to_string(self.template_name, {"form": form}, request=self.request)
+        return JsonResponse({
+            "success": False,
+            "html": html,
+            "message": "Por favor, corrige los errores en el formulario ❌"
+        })        

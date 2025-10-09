@@ -29,7 +29,8 @@ from apy.view.compras.views import *
 from apy.view.vehiculos.views import *
 from apy.view.entrada_vehiculos.views import *
 from apy.view.salida_vehiculos.views import *
-from apy.view.estadisticas.views import *
+from apy.view.Estadisticas.views import *
+from apy.view.detalle_servicio.views import *
 from apy.view.main.main import Main
 
 app_name = 'apy'
@@ -46,6 +47,13 @@ urlpatterns = [
     path('factura/agregar/', FacturaCreateView.as_view(), name='factura_crear'),
     path('factura/editar/<int:pk>/', FacturaUpdateView.as_view(), name='factura_editar'),
     path('factura/eliminar/<int:pk>/', FacturaDeleteView.as_view(), name='factura_eliminar'),
+    
+    # ------Url modulo detalle servicio----------------
+    path('detalle_servicio/listar/', DetalleServicioListView.as_view(), name='detalle_servicio_lista'),
+    path('detalle_servicio/agregar/', DetalleServicioCreateView.as_view(), name='detalle_servicio_crear'),
+    path('detalle_servicio/editar/<int:pk>/', DetalleServicioUpdateView.as_view(), name='detalle_servicio_editar'),
+    path('detalle_servicio/eliminar/<int:pk>/', DetalleServicioDeleteView.as_view(), name='detalle_servicio_eliminar'),
+
     
     # -------------URL modulo proveedor---------------
     path('Proveedor/listar/', ProveedorListView.as_view(), name='proveedor_lista'),
@@ -168,6 +176,7 @@ urlpatterns = [
     path('repuestos/editar/<int:pk>/', RepuestoUpdateView.as_view() , name='repuesto_editar'),
     path('repuestos/eliminar/<int:pk>/', RepuestoDeleteView.as_view() , name='repuesto_eliminar'),
     path("repuestos/modal/crear/", RepuestoCreateModalView.as_view(), name="repuesto_modal_crear"),
+    path("detallerepuesto/modal/crear/", DetalleRepuestoCreateModalView.as_view(), name="detallerepuesto_modal_crear"),
 
     
     path('main/', Main.as_view(), name='main'),
@@ -177,4 +186,3 @@ urlpatterns = [
     path('api/insumos/count/', api_contador_insumos, name='api_contador_insumos'),
     path('api/gastos/count/', api_contador_gastos, name='api_contador_gastos'),
 ] 
-

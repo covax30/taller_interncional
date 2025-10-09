@@ -77,14 +77,20 @@ class TipoMantenimiento(models.Model):
         return self.nombre
 
    
+ 
 #------- Marca-------- 
 class Marca(models.Model):
+    tipo= [
+        ('Repuesto', 'Repuesto'),
+        ('Herramienta', 'Herramienta'),
+        ('Insumo', 'Insumo'),
+        ('Vehiculo', 'Vehiculo'),
+    ]
     nombre = models.CharField(max_length=100)
-    tipo = models.CharField(max_length=100)
+    tipo = models.CharField(max_length=100, choices=tipo)
 
     def __str__(self):
-        return f"{self.nombre} - {self.tipo}"
-
+        return f"{self.nombre} "
 #------ ENTIDAD REPUESTOS --------3
 class Repuesto(models.Model):
     id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE)  # LLAVE
@@ -171,7 +177,7 @@ class Vehiculo(models.Model):
     color = models.CharField(max_length=100, validators=[color_regex])
 
     def __str__(self):
-        return f"{self.placa} - {self.marca_vehiculo} - {self.modelo_vehiculo}"
+        return f"{self.placa} - {self.marca_vehiculo} - {self.modelo_vehiculo}- {self.color} - {self.id_cliente.nombre}"
     
 
 class EntradaVehiculo(models.Model):
@@ -358,6 +364,37 @@ class Pagos(models.Model):
     def __str__(self):
         return f"{self.id_pago} {self.monto}"
 
+    #---- detalle del servicio -----
+class DetalleServicio(models.Model):
+    
+    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE)
+    id_tipo_mantenimiento = models.ForeignKey(TipoMantenimiento, on_delete=models.CASCADE)
+    id_repuesto = models.ForeignKey(Repuesto, on_delete=models.CASCADE)
+    id_insumos = models.ForeignKey(Insumos, on_delete=models.CASCADE)
+    
+    descripcion_servicio = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"Detalle {self.id_detalle} - {self.descripcion_servicio}"
+    
+    #----- detalle repuesto -----
+class DetalleRepuesto(models.Model):
+    id_repuesto = models.ForeignKey(Repuesto, on_delete=models.CASCADE)
+    cantidad = models.IntegerField()
+    precio_unitario = models.IntegerField(  # 🔹 ENTEROS, sin decimales
+        error_messages={
+            'invalid': 'Ingrese un número válido para el monto.',
+            'required': 'El monto del pago es obligatorio.'
+        } , validators=[validar_monto]
+    )
+    
+    @property
+    def subtotal(self):
+   
+        return self.cantidad * self.precio_unitario
+    
+    def __str__(self):
+        return f"Detalle Repuesto {self.id} - {self.id_repuesto.nombre} - Cantidad: {self.cantidad} - Subtotal: ${self.subtotal}"
 
 #-----------Factura-----------------
 class Factura(models.Model):
@@ -379,6 +416,9 @@ class Factura(models.Model):
 
     def __str__(self):
         return f"Factura {self.id} - {self.tipo_pago or 'Sin pago'}"
+    
+    
+
 
 
 #--------------Modulo Compra (STEVEN)-----------------
@@ -421,5 +461,3 @@ class Caja(models.Model):
     #class meta
         #verbose_name = 'Caja'
         #verbose_name_plural = 'Caja'
-
-
