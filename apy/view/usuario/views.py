@@ -6,6 +6,7 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from apy.forms import PerfilUsuarioForm
 from django.contrib.auth.forms import PasswordChangeForm # Para el formulario de cambio de contraseña
+from apy.forms import PerfilUsuarioForm
 
 # La clase PerfilUsuarioUpdateView debe ir en tu archivo de vistas.
 
