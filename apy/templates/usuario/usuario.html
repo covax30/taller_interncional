@@ -11,7 +11,7 @@
             <span class="font-weight-bold mt-3">
                 <p> {{ user.username }}</p>
             </span>
-            <span class="text-black-50">
+            <span class="">
                 <p> {{ user.email }}</p>
             </span>
             <span class="badge bg-{{ user.is_superuser|yesno:'danger,success' }}">
@@ -38,7 +38,7 @@
                                 
                                 <div class="col-md-6"><h6>Último inicio de sesión:</h6></div>
                                 <div class="col-md-6 text-end">
-                                    <h6 class="text-muted">
+                                    <h6 class="">
                                         {{ user.last_login|default:"Nunca"|localtime|date:"d/m/Y H:i" }}
                                     </h6>
                                 </div>
@@ -152,4 +152,8 @@
         });
     });
 </script>
+
+<!-- JS de Sienna Accessibility -->
+<script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
+<script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
 {% endblock %}
