@@ -10,15 +10,19 @@
     <link rel="preload" href="{% static 'AdminLTE/dist/css/adminlte.css' %}" as="style" />
     <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/adminlte.css' %}" />
     <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/bootstrap.css' %}" />
-    <script src="{% static 'lib/sweetalert2/sweetalert2.all.min.js' %}"></script>
-    <script src="{% static 'lib/datatables-1.10.20/jquery-3.7.1.min.js' %}"></script>
+
+    <link rel="stylesheet" href="{% static 'login/css/custom.css' %}" />
+
   </head>
-  <body class="login-page bg-dark">
+  <body class="login-page ">
+    <div id="slideshow-background">
+    </div>
     <div class="login-box">
-      <div class="login-logo">
-        <a data-bs-theme="dark"><b>Restablecer Contraseña</b>@</a>
-      </div>
+      
       <div class="card">
+        <div class="login-logo">
+        <a data-bs-theme="dark"><b>Restablecer Contraseña</b>@</a>
+        </div>
         <div class="card-body login-card-body">
           <p class="login-box-msg">Ingresa tu dirección de correo electrónico para recibir un enlace de restablecimiento.</p>
 
@@ -56,5 +60,7 @@
         </div>
         </div>
     </div>
+    <script src="{% static 'lib/sweetalert2/sweetalert2.all.min.js' %}"></script>
+    <script src="{% static 'lib/datatables-1.10.20/jquery-3.7.1.min.js' %}"></script>
     </body>
 </html>

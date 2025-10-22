@@ -2,6 +2,7 @@
 from django.urls import path, include 
 from django.contrib.auth import views as auth_views 
 from .views import Login_view, logout_redirect
+from .forms import CustomPasswordResetForm
 
 app_name = 'login'
 urlpatterns = [
@@ -12,15 +13,6 @@ urlpatterns = [
     # ----------------------------------------------------
     # FLUJO DE RESTABLECIMIENTO DE CONTRASEÑA (4 Pasos)
     # ----------------------------------------------------
-    
-    # 1. Solicitar Email
-    path('olvide-contrasena/', auth_views.PasswordResetView.as_view(
-        # ✅ RUTA SIMPLIFICADA
-        template_name='recuperar_solicitar_email.html',
-        email_template_name='email_reset.html', 
-        subject_template_name='email_subject.txt', 
-        success_url='/olvide-contrasena/enviado/',
-    ), name='password_reset'), 
 
     # 2. Correo enviado
     path('olvide-contrasena/enviado/', auth_views.PasswordResetDoneView.as_view(
@@ -40,5 +32,17 @@ urlpatterns = [
         # ✅ RUTA SIMPLIFICADA
         template_name='recuperar_finalizado.html'
     ), name='password_reset_complete'),
+    
+    # 1. Solicitar Email
+    path('olvide-contrasena/', auth_views.PasswordResetView.as_view(
+        template_name='recuperar_solicitar_email.html',
+        email_template_name='email_reset.html', 
+        subject_template_name='email_subject.txt', 
+        success_url='/olvide-contrasena/enviado/',
+        
+        # 🚨 CAMBIO CLAVE: Usar la forma personalizada
+        form_class=CustomPasswordResetForm 
+        
+    ), name='password_reset'),
 
 ]

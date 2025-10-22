@@ -9,13 +9,18 @@
     <link rel="preload" href="{% static 'AdminLTE/dist/css/adminlte.css' %}" as="style" />
     <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/adminlte.css' %}" />
     <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/bootstrap.css' %}" />
+
+    <link rel="stylesheet" href="{% static 'login/css/custom.css' %}" />
   </head>
   <body class="login-page bg-dark">
+    <div id="slideshow-background">
+    </div>
     <div class="login-box">
-      <div class="login-logo">
+      
+      <div class="card">
+        <div class="login-logo">
         <a data-bs-theme="dark"><b>Correo Enviado</b>@</a>
       </div>
-      <div class="card">
         <div class="card-body login-card-body text-center">
           <h4 class="text-success mb-3">✅ ¡Instrucciones Enviadas!</h4>
           <p class="login-box-msg">
