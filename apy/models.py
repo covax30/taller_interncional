@@ -48,8 +48,8 @@ def validar_monto(value):
         raise ValidationError('El monto debe ser mayor o igual a 99')
 
 placa_regex = RegexValidator(
-        regex=r'^[A-Z]{3}\d{3}$',
-        message="La placa debe tener el formato ABC123 (3 letras seguidas de 3 números)."
+        regex=r'^[A-Z0-9]{6}$',
+        message="La placa debe tener exactamente 6 caracteres alfanuméricos (letras mayúsculas o números)."
     )
 
 modelo_regex = RegexValidator(
@@ -97,7 +97,6 @@ class Repuesto(models.Model):
         ('industrial', 'Industrial'),
     ]
     categoria = models.CharField(max_length=100, choices=CATEGORIA_OPCIONES)
-    subcategoria = models.CharField(max_length=100, blank=True, null=True)
     fabricante = models.CharField(max_length=100)
     stock = models.IntegerField()
     ubicacion = models.CharField(max_length=100)
@@ -117,7 +116,13 @@ class Herramienta(models.Model):
 
     nombre = models.CharField(max_length=100)
     color = models.CharField(max_length=100)
-    tipo = models.CharField(max_length=100)
+    TIPO_OPCIONES = [
+        ('manuales', 'Manuales'),
+        ('eléctricas', 'Eléctricas'),
+        ('neumáticas', 'Neumáticas'),
+        ('de medición', 'De Medición'),
+    ]
+    tipo = models.CharField(max_length=100, choices=TIPO_OPCIONES)
     material = models.CharField(max_length=100)
     id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE)
     stock = models.IntegerField()
@@ -287,7 +292,12 @@ class Gastos(models.Model):
         }, validators=[validar_monto]
     )
     descripcion = models.TextField() 
-    tipo_gastos=models.CharField(max_length=100)
+    TIPO_GASTOS_OPCIONES = [
+        ('costo fijo', 'Costo fijo'),
+        ('costo directo', 'Costo directo'),
+        ('costo variable', 'Costo variable'),
+    ]
+    tipo_gastos=models.CharField(max_length=100, choices=TIPO_GASTOS_OPCIONES)
     id_pagos_servicios = models.ForeignKey(PagoServiciosPublicos, on_delete=models.CASCADE)
     def __str__(self):
         return f"{self.tipo_gastos} - ${self.monto}"
@@ -346,8 +356,13 @@ class Informes(models.Model):
     
 #-------- nomina------
 class Nomina(models.Model):
-   
-    rol = models.CharField(max_length=100)
+    
+    TIPO_ROL = [
+        ('administrador', 'Administrador'),
+        ('empleado', 'Empleado'),
+    ]
+    
+    rol = models.CharField(max_length=100, choices=TIPO_ROL)
     monto = models.IntegerField(  # 🔹 ENTEROS, sin decimales
         error_messages={
             'invalid': 'Ingrese un número válido para el monto.',

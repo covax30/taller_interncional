@@ -2,6 +2,7 @@
 {% load humanize %}
 
 {% block titulo %}
+        <i class="fa-solid fa-hammer"></i>
         <h1 class="text-center">Listar Repuestos</h1>
 {% endblock titulo %}
 
@@ -15,7 +16,7 @@
 
         <th>Id Marca</th>
         <th>Nombre</th>
-        <th>Categoria</th>
+        <th>Categoría</th>
         <th>Fabricante</th>
         <th>Stock</th>
         <th>Ubicación</th>
@@ -39,9 +40,20 @@
         <form method="post">
 
           <td>
-            <a href="{% url 'apy:repuesto_editar' r.id %}" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></a>
-            <a href="{% url 'apy:repuesto_eliminar' r.id %}" class="btn btn-danger btn-xs"><i
-                class="fas fa-trash-alt"></i></a>
+                <a href="{% url 'apy:repuesto_editar' r.id %}" 
+              class="btn btn-info btn-xs" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="Editar repuesto">
+              <i class="fas fa-edit"></i>
+            </a>
+            <a href="{% url 'apy:repuesto_eliminar' r.id %}" 
+              class="btn btn-danger btn-xs" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="Eliminar repuesto">
+              <i class="fas fa-trash-alt"></i>
+           </a>
           </td>
       </tr>
       {% endfor %}

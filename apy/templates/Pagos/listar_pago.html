@@ -2,6 +2,7 @@
 {% load humanize %}
 
 {% block titulo %}
+        <i class="fa-solid fa-comments-dollar"></i>
         <h1 class="text-center">Lista de Pagos</h1>
 {% endblock titulo %}
 
@@ -23,7 +24,7 @@
         <th>Id Herramientas</th>
         <th>Id Insumos</th>
         <th>Id Repuestos</th>
-        <th>Id Nomina</th>
+        <th>Id Nómina</th>
         <th>Acciones</th>
 
 {% endblock %}
@@ -46,9 +47,20 @@
         <form method="post">
 
           <td>
-            <a href="{% url 'apy:pagos_editar' p.id_pago %}" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></a>
-            <a href="{% url 'apy:pagos_eliminar' p.id_pago %}" class="btn btn-danger btn-xs"><i
-                class="fas fa-trash-alt"></i></a>
+            <a href="{% url 'apy:pagos_editar' p.id_pago %}" 
+              class="btn btn-info btn-xs" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="Editar pago">
+              <i class="fas fa-edit"></i>
+            </a>
+            <a href="{% url 'apy:pagos_eliminar' p.id_pago %}" 
+              class="btn btn-danger btn-xs" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="Eliminar pago">
+              <i class="fas fa-trash-alt"></i>
+           </a>
           </td>
       </tr>
       {% endfor %}

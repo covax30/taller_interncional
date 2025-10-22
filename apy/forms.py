@@ -291,7 +291,7 @@ class PerfilUsuarioForm(forms.ModelForm):
 class ClienteForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['id_operacion'].widget.attrs['autofocus'] = True
+        self.fields['nombre'].widget.attrs['autofocus'] = True
         
     class Meta:
         model = Cliente
@@ -371,7 +371,7 @@ class VehiculoForm(ModelForm):
             ),
             'placa':TextInput(
                 attrs={
-                    'placeholder':'Ingrese la placa del vehiculo (ej: ABC-123) ',
+                    'placeholder':'Ingrese la placa del vehiculo (ej: ABC123) o (A1C234)',
                 }
             ),
             'modelo_vehiculo':TextInput(
@@ -990,7 +990,7 @@ class GastosForm(ModelForm):
                     'placeholder':'Ingrese la descripcion del gasto',
                 }
             ),
-            'tipo_gastos':TextInput(
+            'tipo_gastos':Select(
                 attrs={
                     'placeholder':'Ingrese el tipo de gasto ',
                 }
@@ -1057,7 +1057,7 @@ class   NominaForm(ModelForm):
         model = Nomina
         fields = '__all__'
         widgets = {
-            'rol':TextInput(
+            'rol':Select(
                 attrs={
                     'placeholder':'Ingrese rol del empleado',
                 }
@@ -1236,7 +1236,7 @@ class HerramientaForm(ModelForm):
                     'placeholder':'Ingrese el color de la herramienta',
                 }
             ),
-            'tipo':TextInput(
+            'tipo':Select(
                 attrs={
                     'placeholder':'Ingrese el tipo de herramienta',
                 }
@@ -1373,9 +1373,6 @@ class RepuestoForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['id_marca'].widget.attrs['autofocus'] = True
-        # Hacer que subcategoría sea solo lectura inicialmente
-        # Las opciones se llenarán dinámicamente con JavaScript
-        self.fields['subcategoria'].required = False
         
     class Meta:
         model = Repuesto
@@ -1397,11 +1394,6 @@ class RepuestoForm(ModelForm):
             'categoria':Select(
                 attrs={
                     'placeholder':'Ingrese la categoria del repuesto',
-                }
-            ),
-            'subcategoria':Select(
-                attrs={
-                    'class': 'form-control',
                 }
             ),
             'fabricante':TextInput(
