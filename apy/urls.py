@@ -36,6 +36,12 @@ from apy.view.usuario.views import *
 from apy.view.usuario.contraseña.views import *  
 from apy.view.permisos.views import *
 from apy.view.registro_usuarios.views import *
+from apy.view.respaldo.views import (
+    RespaldoView, 
+    EjecutarRespaldoManualView, 
+    ConfigurarRespaldoAutomaticoView,
+    DescargarRespaldoView
+)
 
 app_name = 'apy'
 
@@ -193,5 +199,25 @@ urlpatterns = [
     path('api/vehiculos/count/', api_contador_vehiculos, name='api_contador_vehiculos'),
     path('api/insumos/count/', api_contador_insumos, name='api_contador_insumos'),
     path('api/gastos/count/', api_contador_gastos, name='api_contador_gastos'),
+    
+    # ------------------------------------------------------------------
+    # URLs del MÓDULO DE RESPALDO (Ubicadas en la sección de Configuración/Administración)
+    # ------------------------------------------------------------------
+    
+    # 1. URL Principal: Muestra la interfaz del módulo de respaldo (GET)
+    # Nombre usado en el 'redirect' y en 'reverse_lazy'
+    path('configuracion/respaldo/', RespaldoView.as_view(), name='configuracion_respaldo'), 
+    
+    # 2. URL de Acción: Ejecuta el proceso de respaldo manual (POST)
+    # Es la 'action' del formulario de respaldo inmediato
+    path('configuracion/respaldo/ejecutar/', EjecutarRespaldoManualView.as_view(), name='backup_ejecutar'),
+    
+    # 3. URL de Acción: Guarda la configuración de respaldo automático (POST)
+    # Es la 'action' del formulario de programación
+    path('configuracion/respaldo/configurar/', ConfigurarRespaldoAutomaticoView.as_view(), name='backup_configurar'),
+    
+    # 4. URL de Acción: Descarga un archivo de respaldo específico (GET)
+    # Se usa en los botones "Descargar" del historial, requiere un número (pk)
+    path('configuracion/respaldo/descargar/<int:pk>/', DescargarRespaldoView.as_view(), name='backup_descargar'),
 ]
 
