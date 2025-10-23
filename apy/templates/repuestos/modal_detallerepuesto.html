@@ -1,111 +1,332 @@
 {% load widget_tweaks %}
-{% block form %}
+<div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title">
+                <i class="fas fa-cart-plus"></i> Gestión de Repuestos
+            </h5>
+            <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            <div id="msg-repuesto"></div>
 
-    <div id="msg-repuesto"></div>  {# Aquí se mostrarán los mensajes #}
+            <!-- Pestañas para elegir entre modo simple y múltiple -->
+            <ul class="nav nav-tabs mb-4" id="repuestosTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="multiple-tab" data-toggle="tab" href="#multiple" role="tab">
+                        <i class="fas fa-list"></i> Agregar Repuestos
+                    </a>
+                </li>
+            </ul>
 
-    <form id="repuestocantidadForm" method="post" action="{% url 'apy:detallerepuesto_modal_crear' %}">
-        {% csrf_token %}
-    {% for field in form.visible_fields %}
-    <div class="form-group mb-3">
-        <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
-        {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
+            <div class="tab-content" id="repuestosTabContent">
+                <!-- Pestaña Múltiples Repuestos -->
+                <div class="tab-pane fade show active" id="multiple" role="tabpanel">
+                    <!-- Formulario para agregar a la lista -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0"><i class="fas fa-plus-circle"></i> Agregar Repuesto a la Lista</h6>
+                        </div>
+                        <div class="card-body">
+                            <form id="repuestocantidadForm" method="post" action="{% url 'apy:detallerepuesto_modal_crear' %}">
+                                {% csrf_token %}
+                                {% for field in form.visible_fields %}
+                                <div class="form-group mb-3">
+                                    <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
+                                    {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
 
-        {% if field.errors %}
-            <div class="invalid-feedback d-block">
-                {% for error in field.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
+                                    {% if field.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in field.errors %}
+                                            <small>{{ error }}</small><br>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                                
+                                <div class="form-group text-right">
+                                    <button type="button" id="btnAgregarALista" class="btn btn-primary">
+                                        <i class="fas fa-plus"></i> Agregar a Lista
+                                    </button>
+                                    <button type="button" id="btnGuardardetalleRepuesto" class="btn btn-success">
+                                        <i class="fas fa-save"></i> Guardar Repuesto Individual
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Lista de repuestos agregados -->
+                    <div class="card">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">
+                                <i class="fas fa-list"></i> Repuestos en la Lista
+                                <span id="contadorRepuestos" class="badge badge-secondary ml-2">0</span>
+                            </h6>
+                            <div>
+                                <strong>Total: $<span id="totalRepuestos">0.00</span></strong>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div id="listaRepuestos" class="table-responsive">
+                                <table class="table table-sm table-hover mb-0">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th>Repuesto</th>
+                                            <th width="100">Cantidad</th>
+                                            <th width="120">Precio Unit.</th>
+                                            <th width="120">Subtotal</th>
+                                            <th width="80">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbodyRepuestos">
+                                        <!-- Los repuestos se agregarán aquí dinámicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div id="listaVacia" class="text-center py-4">
+                                <i class="fas fa-shopping-cart fa-2x text-muted mb-2"></i>
+                                <p class="text-muted">No hay repuestos en la lista</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        {% endif %}
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" id="btnGuardarMultiples" class="btn btn-success d-none">
+                <i class="fas fa-save"></i> Guardar Todos los Repuestos
+            </button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                <i class="fas fa-times"></i> Cerrar
+            </button>
+        </div>
     </div>
+</div>
 
-    {% endfor %}
-{% endblock %}
-
-    {% block Cancelar %}
-    <button type="button" id="btnGuardardetalleRepuesto" class="btn btn-primary btn-flat">
-        <i class="fas fa-save"></i> Agregar
-    </button>
-    <a href="{% url 'apy:detalle_servicio_lista' %}" class="btn btn-default btn-flat float-right">
-        <i class="fas fa-times"></i> Cancelar
-    </a>
-{% endblock %}
-
-
-
-{% block extra_js %}
 <script>
-/* Delegación: captura clicks de botones que aparezcan dinámicamente */
-$(document).on('click', '#btnGuardardetalleRepuesto', function(e){
-    e.preventDefault();
-    const $btn = $(this);
-    const $modal = $('#modal-id_repuesto');
-    const $form = $modal.find('form#repuestocantidadForm');
+$(document).ready(function() {
+    let repuestosLista = [];
+    let contadorId = 0;
 
-    if (!$form.length) {
-        console.error('No se encontró el formulario #repuestocantidadForm dentro del modal.');
-        return;
-    }
+    // ===== FUNCIONES PARA MÚLTIPLES REPUESTOS =====
+    function actualizarInterfazMultiples() {
+        const tbody = $('#tbodyRepuestos');
+        const listaVacia = $('#listaVacia');
+        const contador = $('#contadorRepuestos');
+        const btnGuardarMultiples = $('#btnGuardarMultiples');
+        const totalRepuestos = $('#totalRepuestos');
 
-    const url = $form.attr('action');
-    const formData = new FormData($form[0]);
+        // Actualizar contador
+        contador.text(repuestosLista.length);
 
-    $btn.prop('disabled', true).addClass('disabled').text('Guardando...');
-
-    $.ajax({
-        url: url,
-        type: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false,
-        headers: {'X-Requested-With': 'XMLHttpRequest'},
-        success: function(data){
-         if (data.success) {
-        // Mostrar mensaje de éxito
-        if (!$modal.find('#msg-repuesto').length) {
-            $modal.find('.modal-body').prepend('<div id="msg-repuesto"></div>');
-        }
-        $modal.find('#msg-repuesto').html('<div class="alert alert-success">' + data.message + '</div>');
-
-        // Actualizar select en la página principal
-        const $select = $('#id_id_repuesto');
-        const option = new Option(data.text, data.id, true, true);
-        $select.append(option).val(data.id).trigger('change');
-
-        // ✅ CERRAR EL MODAL INMEDIATAMENTE
-        
-         $modal.modal('hide');
-         $('body').removeClass('modal-open');
-         $('body').css('padding-right', '');
-         $('.modal-backdrop').remove();
-         $modal.removeClass('show');
-         $modal.css('display', 'none');
-        
-
-    } else {
-        // Manejar errores de validación
-        if (data.html) {
-            $modal.find('.modal-body').html(data.html);
+        // Mostrar/ocultar elementos
+        if (repuestosLista.length === 0) {
+            listaVacia.removeClass('d-none');
+            tbody.addClass('d-none');
+            btnGuardarMultiples.addClass('d-none');
         } else {
-            if (!$modal.find('#msg-repuesto').length) {
-                $modal.find('.modal-body').prepend('<div id="msg-repuesto"></div>');
-            }
-            $modal.find('#msg-repuesto').html('<div class="alert alert-danger">' + data.message + '</div>');
+            listaVacia.addClass('d-none');
+            tbody.removeClass('d-none');
+            btnGuardarMultiples.removeClass('d-none');
+            
+            // Actualizar tabla
+            tbody.empty();
+            let total = 0;
+            
+            repuestosLista.forEach(repuesto => {
+                const subtotal = repuesto.cantidad * repuesto.precio_unitario;
+                total += subtotal;
+                
+                tbody.append(`
+                    <tr data-id="${repuesto.id}">
+                        <td>${repuesto.repuesto_nombre}</td>
+                        <td>${repuesto.cantidad}</td>
+                        <td>$${repuesto.precio_unitario.toFixed(2)}</td>
+                        <td><strong>$${subtotal.toFixed(2)}</strong></td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-danger btn-eliminar-lista" data-id="${repuesto.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `);
+            });
+            
+            totalRepuestos.text(total.toFixed(2));
         }
     }
-},
-        error: function(xhr, status, err) {
-            if (!$modal.find('#msg-repuesto').length) $modal.find('.modal-body').prepend('<div id="msg-repuesto"></div>');
-            $modal.find('#msg-repuesto').html('<div class="alert alert-danger">Error en el servidor. Revisa consola.</div>');
-            console.error('AJAX error:', status, err);
-        },
-        complete: function(){
-            $btn.prop('disabled', false).removeClass('disabled').text('Agregar');
+
+    // Agregar repuesto a la lista múltiple
+    $('#btnAgregarALista').click(function() {
+        const id_repuesto = $('#id_id_repuesto').val();
+        const repuesto_nombre = $('#id_id_repuesto option:selected').text();
+        const cantidad = parseInt($('#id_cantidad').val());
+        const precio_unitario = parseFloat($('#id_precio_unitario').val());
+
+        // Validaciones
+        if (!id_repuesto) {
+            alert('Seleccione un repuesto');
+            return;
         }
+        if (!cantidad || cantidad < 1) {
+            alert('La cantidad debe ser mayor a 0');
+            return;
+        }
+        if (!precio_unitario || precio_unitario <= 99) {
+            alert('El precio unitario debe ser mayor a 99');
+            return;
+        }
+
+        // Verificar si ya existe el repuesto en la lista
+        const existe = repuestosLista.find(r => r.id_repuesto == id_repuesto);
+        if (existe) {
+            if (!confirm('Este repuesto ya está en la lista. ¿Desea actualizar la cantidad?')) {
+                return;
+            }
+            // Actualizar cantidad
+            existe.cantidad = cantidad;
+            existe.precio_unitario = precio_unitario;
+        } else {
+            // Agregar nuevo repuesto
+            const nuevoRepuesto = {
+                id: contadorId++,
+                id_repuesto: id_repuesto,
+                repuesto_nombre: repuesto_nombre,
+                cantidad: cantidad,
+                precio_unitario: precio_unitario
+            };
+            repuestosLista.push(nuevoRepuesto);
+        }
+
+        // Limpiar formulario
+        $('#id_id_repuesto').val('').trigger('change');
+        $('#id_cantidad').val('1');
+        $('#id_precio_unitario').val('');
+        $('#id_cantidad').focus();
+
+        actualizarInterfazMultiples();
     });
+
+    // Eliminar repuesto de la lista múltiple
+    $(document).on('click', '.btn-eliminar-lista', function() {
+        const id = $(this).data('id');
+        repuestosLista = repuestosLista.filter(repuesto => repuesto.id !== id);
+        actualizarInterfazMultiples();
+    });
+
+    // Guardar múltiples repuestos
+    $('#btnGuardarMultiples').click(function() {
+        const $btn = $(this);
+        const $modal = $('.modal'); // Cambiado para seleccionar el modal actual
+
+        if (repuestosLista.length === 0) {
+            alert('No hay repuestos para guardar');
+            return;
+        }
+
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+
+        $.ajax({
+            url: "{% url 'apy:detallerepuesto_modal_crear' %}",
+            type: 'POST',
+            data: {
+                'repuestos_multiples': JSON.stringify(repuestosLista),
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(data) {
+                if (data.success) {
+                    $('#msg-repuesto').html(
+                        '<div class="alert alert-success">' + data.message + '</div>'
+                    );
+                    
+                    // Actualizar select principal con todos los repuestos creados
+                    if (data.objetos_creados) {
+                        const $selectPrincipal = $('#id_id_repuesto');
+                        data.objetos_creados.forEach(repuesto => {
+                            const option = new Option(repuesto.text, repuesto.id, true, true);
+                            $selectPrincipal.append(option);
+                        });
+                        $selectPrincipal.trigger('change');
+                    }
+                    
+                    // Cerrar modal después de 2 segundos
+                    setTimeout(function() {
+                        $modal.modal('hide');
+                    }, 2000);
+                } else {
+                    $('#msg-repuesto').html(
+                        '<div class="alert alert-danger">' + data.message + '</div>'
+                    );
+                }
+            },
+            error: function(xhr, status, error) {
+                $('#msg-repuesto').html(
+                    '<div class="alert alert-danger">Error al guardar: ' + error + '</div>'
+                );
+            },
+            complete: function() {
+                $btn.prop('disabled', false).html('<i class="fas fa-save"></i> Guardar Todos los Repuestos');
+            }
+        });
+    });
+
+    // ===== FUNCIONALIDAD REPUESTO SIMPLE =====
+    $(document).on('click', '#btnGuardardetalleRepuesto', function(e){
+        e.preventDefault();
+        const $btn = $(this);
+        const $modal = $('.modal'); // Cambiado para seleccionar el modal actual
+        const $form = $('#repuestocantidadForm');
+
+        const url = $form.attr('action');
+        const formData = new FormData($form[0]);
+
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
+            success: function(data){
+                if (data.success) {
+                    $('#msg-repuesto').html('<div class="alert alert-success">' + data.message + '</div>');
+
+                    // Actualizar select en la página principal
+                    const $select = $('#id_id_repuesto');
+                    const option = new Option(data.text, data.id, true, true);
+                    $select.append(option).val(data.id).trigger('change');
+
+                    // Cerrar modal después de 1.5 segundos
+                    setTimeout(function(){
+                        $modal.modal('hide');
+                    }, 1500);
+
+                } else {
+                    if (data.html) {
+                        $('.modal-body').html(data.html);
+                    } else {
+                        $('#msg-repuesto').html('<div class="alert alert-danger">' + data.message + '</div>');
+                    }
+                }
+            },
+            error: function(xhr, status, err) {
+                $('#msg-repuesto').html('<div class="alert alert-danger">Error en el servidor</div>');
+                console.error('AJAX error:', status, err);
+            },
+            complete: function(){
+                $btn.prop('disabled', false).html('<i class="fas fa-save"></i> Guardar Repuesto Individual');
+            }
+        });
+    });
+
+    // Inicializar interfaz
+    actualizarInterfazMultiples();
 });
 </script>
-
-
-
-{% endblock %}

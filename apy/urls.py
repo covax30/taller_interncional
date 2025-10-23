@@ -164,6 +164,7 @@ urlpatterns = [
     path('mantenimiento/eliminar/<int:pk>/', MantenimientoDeleteView.as_view() , name='mantenimiento_eliminar'),
     path("mantenimiento/modal/crear/", MantenimientoCreateModalView.as_view(), name="mantenimiento_modal_crear"),
     
+
     path('herramienta/listar/', HerramientaListView.as_view() , name='herramienta_lista'),
     path('herramienta/agregar/', HerramientaCreateView.as_view() , name='herramienta_crear'),
     path('herramienta/editar/<int:pk>/', HerramientaUpdateView.as_view() , name='herramienta_editar'),
@@ -175,12 +176,14 @@ urlpatterns = [
     path('tipo_mantenimiento/editar/<int:pk>/', TipoMantenimientoUpdateView.as_view() , name='tipo_mantenimiento_editar'),
     path('tipo_mantenimiento/eliminar/<int:pk>/', TipoMantenimientoDeleteView.as_view() , name='tipo_mantenimiento_eliminar'),
     path("tipo_mantenimiento/modal/crear/", TipoMantenimientoCreateModalView.as_view(), name="tipo_mantenimiento_modal_crear"),
+    path("detallemantenimiento/modal/crear/", DetalleTipoMantenimientoCreateModalView.as_view(), name="detallemantenimiento_modal_crear"),
     
     path('insumos/listar/', InsumoListView.as_view() , name='insumo_lista'),
     path('insumos/agregar/', InsumoCreateView.as_view() , name='insumo_crear'),
     path('insumos/editar/<int:pk>/', InsumoUpdateView.as_view() , name='insumo_editar'),
     path('insumos/eliminar/<int:pk>/', InsumoDeleteView.as_view() , name='insumo_eliminar'),
     path("insumos/modal/crear/", InsumoCreateModalView.as_view(), name="insumos_modal_crear"),
+    path("detalleinsumos/modal/crear/", InsumoCreateModalView.as_view(), name="detalleinsumos_modal_crear"),
     
     path('repuestos/listar/', RepuestoListView.as_view() , name='repuesto_lista'),
     path('repuestos/agregar/', RepuestoCreateView.as_view() , name='repuesto_crear'),
@@ -196,4 +199,4 @@ urlpatterns = [
     path('api/vehiculos/count/', api_contador_vehiculos, name='api_contador_vehiculos'),
     path('api/insumos/count/', api_contador_insumos, name='api_contador_insumos'),
     path('api/gastos/count/', api_contador_gastos, name='api_contador_gastos'),
-] 
+]

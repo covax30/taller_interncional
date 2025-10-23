@@ -4,7 +4,7 @@
 
     <div id="msg-tipo_mantenimiento"></div>  {# Aquí se mostrarán los mensajes #}
 
-    <form id="tipo_mantenimientoForm" method="post" action="{% url 'apy:tipo_mantenimiento_modal_crear' %}">
+    <form id="detalletipo_mantenimientoForm" method="post" action="{% url 'apy:detallemantenimiento_modal_crear' %}">
         {% csrf_token %}
     {% for field in form.visible_fields %}
     <div class="form-group mb-3">
@@ -24,10 +24,10 @@
 {% endblock %}
 
 {% block Cancelar %}
-    <button type="button" id="btnGuardarTipoMantenimiento" class="btn btn-primary btn-flat">
+    <button type="button" id="btnGuardardetalleTipoMantenimiento" class="btn btn-primary btn-flat">
         <i class="fas fa-save"></i> Agregar
     </button>
-    <a href="{% url 'apy:tipo_mantenimiento_crear' %}" class="btn btn-default btn-flat float-right">
+    <a href="{% url 'apy:detalle_servicio_lista' %}" class="btn btn-default btn-flat float-right">
         <i class="fas fa-times"></i> Cancelar
     </a>
 {% endblock %}
@@ -37,14 +37,14 @@
 {% block extra_js %}
 <script>
 /* Delegación: captura clicks de botones que aparezcan dinámicamente */
-$(document).on('click', '#btnGuardarTipoMantenimiento', function(e){
+$(document).on('click', '#btnGuardardetalleTipoMantenimiento', function(e){
     e.preventDefault();
     const $btn = $(this);
     const $modal = $('#modal-id_tipo_mantenimiento');
-    const $form = $modal.find('form#tipo_mantenimientoForm');
+    const $form = $modal.find('form#detalletipo_mantenimientoForm');
 
     if (!$form.length) {
-        console.error('No se encontró el formulario #tipo_mantenimientoForm dentro del modal.');
+        console.error('No se encontró el formulario #detalletipo_mantenimientoForm dentro del modal.');
         return;
     }
 
@@ -108,7 +108,7 @@ $(document).on('click', '#btnGuardarTipoMantenimiento', function(e){
 
 // Cuando el modal se cierre, limpiar el formulario
 $('#modal-id_tipo_mantenimiento').on('hidden.bs.modal', function () {
-    const $form = $(this).find('form#tipo_mantenimientoForm')[0];
+    const $form = $(this).find('form#detalletipo_mantenimientoForm')[0];
     if ($form) {
         $form.reset(); // resetea todos los inputs
     }

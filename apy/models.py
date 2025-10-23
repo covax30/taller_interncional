@@ -69,7 +69,7 @@ color_regex = RegexValidator(
 
 #------ ENTIDAD de TIPO mantenmimiento ---------1
 class TipoMantenimiento(models.Model):
-    id = models.AutoField(primary_key=True)
+    
     nombre = models.CharField(max_length=50, unique=True)
     descripcion = models.TextField(blank=True, null=True)
 
@@ -382,9 +382,47 @@ class DetalleServicio(models.Model):
     def __str__(self):
         return f"Detalle {self.id_detalle} - {self.descripcion_servicio}"
     
-    #----- detalle repuesto -----
+# En tu models.py
 class DetalleRepuesto(models.Model):
     id_repuesto = models.ForeignKey(Repuesto, on_delete=models.CASCADE)
+    cantidad = models.IntegerField()
+    precio_unitario = models.IntegerField(
+        error_messages={
+            'invalid': 'Ingrese un número válido para el monto.',
+            'required': 'El monto del pago es obligatorio.'
+        }, 
+        validators=[validar_monto]
+    )
+    
+    # ELIMINAR completamente la línea de id_servicio
+    
+    @property
+    def subtotal(self):
+        return self.cantidad * self.precio_unitario
+    
+    def __str__(self):
+        return f"Detalle Repuesto {self.id} - {self.id_repuesto.nombre} - Cantidad: {self.cantidad} - Subtotal: ${self.subtotal}"
+    
+class DetalleTipoMantenimiento(models.Model):
+    id_tipo_mantenimiento = models.ForeignKey(TipoMantenimiento, on_delete=models.CASCADE)
+    cantidad = models.IntegerField()
+    precio_unitario = models.IntegerField(    
+        error_messages={
+            'invalid': 'Ingrese un número válido para el monto.',
+            'required': 'El monto del pago es obligatorio.'
+        } , validators=[validar_monto]
+    )
+    descripcion = models.CharField(max_length=100)
+    
+    @property
+    def subtotal(self):
+        return self.cantidad * self.precio_unitario             
+
+    def __str__(self):
+        return f"Detalle Tipo Mantenimiento {self.id} - {self.descripcion} - Cantidad: {self.cantidad} - Subtotal: ${self.subtotal} "  
+    
+class DetalleInsumos(models.Model):
+    id_insumos = models.ForeignKey(Insumos, on_delete=models.CASCADE)
     cantidad = models.IntegerField()
     precio_unitario = models.IntegerField(  # 🔹 ENTEROS, sin decimales
         error_messages={
@@ -399,7 +437,7 @@ class DetalleRepuesto(models.Model):
         return self.cantidad * self.precio_unitario
     
     def __str__(self):
-        return f"Detalle Repuesto {self.id} - {self.id_repuesto.nombre} - Cantidad: {self.cantidad} - Subtotal: ${self.subtotal}"
+        return f"Detalle Insumo {self.id} - {self.id_insumos.id_marca} - Cantidad: {self.cantidad} - Subtotal: ${self.subtotal}"      
 
 #-----------Factura-----------------
 class Factura(models.Model):
@@ -465,4 +503,4 @@ class Caja(models.Model):
         return f"{self.tipo_movimiento} - {self.monto} en {self.fecha} {self.hora}"   
     #class meta
         #verbose_name = 'Caja'
-        #verbose_name_plural = 'Caja'
+        #verbose_name_plural = 'Caja'")

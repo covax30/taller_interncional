@@ -146,31 +146,35 @@ class DetalleServicioForm(ModelForm):
             }
         }
         
-#-------- formulario repuestos detalle servicio -----------
 class RepuestoscantidadForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['id_repuesto'].widget.attrs['autofocus'] = True
+        # Ya no necesitas eliminar id_servicio porque no existe
         
     class Meta:
         model = DetalleRepuesto
-        fields = '__all__'
+        fields = ['id_repuesto', 'cantidad', 'precio_unitario']  # Solo estos 3 campos
+        # ... el resto del código igual
         widgets = {
-            'id_repuesto':Select(
+            'id_repuesto': Select(
                 attrs={
                     'class': 'form-control',
-                    'placeholder':'Ingrese el nombre del repuesto',
+                    'placeholder': 'Seleccione un repuesto',
                 }
             ),
-            'cantidad':NumberInput(
+            'cantidad': NumberInput(
                 attrs={
-                    'placeholder':'Ingrese la cantidad del repuesto',
+                    'class': 'form-control',
+                    'min': '1',
+                    'value': '1'
                 }
             ),
-            'costo':NumberInput(
+            'precio_unitario': NumberInput(
                 attrs={
-                    'placeholder':'Ingrese el costo del repuesto',
-                    'step': '0.01'
+                    'class': 'form-control',
+                    'step': '0.01',
+                    'placeholder': '0.00'
                 }
             )
         }
@@ -181,11 +185,92 @@ class RepuestoscantidadForm(ModelForm):
             'cantidad': {
                 'required': 'La cantidad del repuesto es obligatoria',
             },
-            'costo': {
+            'precio_unitario': {
                 'required': 'El costo del repuesto es obligatorio',
             }
-        }        
+        }
+        
+class DetalleTipo_MantenimientoForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['id_tipo_mantenimiento'].widget.attrs['autofocus'] = True
+        
+    class Meta:
+        model = DetalleTipoMantenimiento
+        fields = '__all__'
+        widgets = {
+            'id_tipo_mantenimiento': Select(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': 'Ingrese el tipo de mantenimiento',
+                    
+                }
+            ),
+            'cantidad': NumberInput(
+                attrs={
+                    'placeholder': 'Ingrese la cantidad del repuesto',
+                    'class': 'form-control',
+                }
+            ),
+            'precio_unitario': NumberInput(  # Cambiado de 'costo' a 'precio_unitario'
+                attrs={
+                    'placeholder': 'Ingrese el costo del repuesto',
+                    'step': '0.01',
+                    'class': 'form-control',
+                }
+            ),
+            'descripcion': TextInput(
+                attrs={
+                    'placeholder': 'Ingrese la descripción del tipo de mantenimiento',
+                    'class': 'form-control',
+                }
+            ),    
+        }
+        error_messages = {
+            'id_tipo_mantenimiento': {  # Corregido el nombre del campo
+                'required': 'El tipo de mantenimiento es obligatorio',
+            }
+       
+     }
 
+class DetalleInsumoForm(ModelForm):  
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['id_insumos'].widget.attrs['autofocus'] = True
+        
+    class Meta:
+        model = DetalleInsumos
+        fields = '__all__'
+        widgets = {
+            'id_insumos':Select(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder':'Ingrese el nombre del insumo',
+                }
+            ),
+            'cantidad':NumberInput(
+                attrs={
+                    'placeholder':'Ingrese la cantidad del insumo',
+                }
+            ),
+            'costo':NumberInput(
+                attrs={
+                    'placeholder':'Ingrese el costo del insumo',
+                    'step': '0.01'
+                }
+            )
+        }
+        error_messages = {
+            'id_insumos': {
+                'required': 'El nombre del insumo es obligatorio',
+            },
+            'cantidad': {
+                'required': 'La cantidad del insumo es obligatoria',
+            },
+            'costo': {
+                'required': 'El costo del insumo es obligatorio',
+            }
+        }  
         
 # -----------Formulario modelo proveedor------------------        
 class ProveedorForm(ModelForm):

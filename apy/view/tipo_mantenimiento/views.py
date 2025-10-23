@@ -105,3 +105,43 @@ class TipoMantenimientoCreateModalView(CreateView):
             "html": html,
             "message": "Por favor, corrige los errores en el formulario ❌"
         })
+
+class DetalleTipoMantenimientoCreateModalView(CreateView):
+    model = DetalleTipoMantenimiento
+    form_class = DetalleTipo_MantenimientoForm
+    template_name = "tipo_mantenimiento/modal_detalletipo_mantenimiento.html"
+    success_url = reverse_lazy("apy:detalletipo_mantenimiento_lista ")
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            form = self.get_form()
+            html = render_to_string(self.template_name, {"form": form}, request=request)
+            return JsonResponse({"html": html})
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        try:
+            self.object = form.save()
+            return JsonResponse({
+                "success": True,
+                "id": self.object.id,
+                "text": str(self.object),
+                "message": "Detalle de Tipo Mantenimiento registrado correctamente ✅"
+            })
+        except Exception as e:
+            return JsonResponse({
+                "success": False,
+                "message": f"Error al guardar: {str(e)}"
+            }, status=500)
+    
+    def form_invalid(self, form):
+        html = render_to_string(self.template_name, {"form": form}, request=self.request)
+        return JsonResponse({
+            "success": False,
+            "html": html,
+            "message": "Por favor, corrige los errores en el formulario ❌"
+        })
