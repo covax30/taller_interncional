@@ -11,7 +11,6 @@
 {% endblock %}
 
 {% block columnas %}
-
   <th>Id Cliente</th>
   <th>Nombre</th>
   <th>Teléfono</th>
@@ -19,7 +18,6 @@
   <th>Documento</th>
   <th>Fecha de operación</th>
   <th>Monto</th>
-
   <th>Acciones</th>
 {% endblock %}
 
@@ -52,8 +50,7 @@
     </tr>
   {% endfor %}
   
-  <!-- Mensajes con SweetAlert -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
   {% if messages %}
     {% for message in messages %}

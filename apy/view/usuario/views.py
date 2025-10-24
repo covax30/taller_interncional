@@ -1,24 +1,24 @@
-# apy/view/registro_usuarios/views.py
-
 from django.views.generic import UpdateView
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.contrib import messages
+from django.contrib.auth.forms import PasswordChangeForm 
+
+# Importar el Mixin necesario para requerir login
+from django.contrib.auth.mixins import LoginRequiredMixin
+from apy.decorators import PermisoRequeridoMixin
 from apy.forms import PerfilUsuarioForm
-from django.contrib.auth.forms import PasswordChangeForm # Para el formulario de cambio de contraseña
 
-# La clase PerfilUsuarioUpdateView debe ir en tu archivo de vistas.
 
-class PerfilUsuarioUpdateView(UpdateView):
+# Heredamos de LoginRequiredMixin primero para asegurar la protección
+class PerfilUsuarioUpdateView(LoginRequiredMixin, UpdateView):
     model = User
-    # Utiliza el formulario simplificado que creamos (sin campos de rol/contraseña)
     form_class = PerfilUsuarioForm 
-    
-    # Apunta a la plantilla HTML que proporcionaste y corregimos
     template_name = 'usuario/usuario.html' 
-    
-    # Redirige a la misma vista de perfil después de guardar
     success_url = reverse_lazy('apy:perfil_usuarios') 
+    
+    # Redirige a la página de login si el usuario no está autenticado
+    login_url = '/login/' 
 
     def get_object(self):
         """Método CRÍTICO: Asegura que el objeto a editar sea el usuario actual."""
@@ -39,5 +39,5 @@ class PerfilUsuarioUpdateView(UpdateView):
     
     def form_valid(self, form):
         # Muestra un mensaje de éxito después de guardar el perfil
-        messages.success(self.request, "Tu perfil ha sido actualizado con éxito.")
+        messages.success(self.request, "Tu perfil ha sido actualizado con éxito. ✨")
         return super().form_valid(form)

@@ -1,5 +1,6 @@
 {% extends 'body.html' %}
 {% load static %}
+{% load static tz %} 
 
 {% block content %}
 <div class="row">
@@ -10,7 +11,7 @@
             <span class="font-weight-bold mt-3">
                 <p> {{ user.username }}</p>
             </span>
-            <span class="text-black-50">
+            <span class="">
                 <p> {{ user.email }}</p>
             </span>
             <span class="badge bg-{{ user.is_superuser|yesno:'danger,success' }}">
@@ -37,7 +38,9 @@
                                 
                                 <div class="col-md-6"><h6>Último inicio de sesión:</h6></div>
                                 <div class="col-md-6 text-end">
-                                    <h6 class="text-muted">{{ user.last_login|default:"Nunca"|date:"d/m/Y H:i" }}</h6>
+                                    <h6 class="">
+                                        {{ user.last_login|default:"Nunca"|localtime|date:"d/m/Y H:i" }}
+                                    </h6>
                                 </div>
                             </div>
                         </div>
@@ -52,7 +55,7 @@
                     <div class="col-md-6">
                         <div class="form-floating mb-4">
                             {{ form.first_name }} 
-                            <label for="{{ form.first_name.id_for_label }}">First Name</label>
+                            <label for="{{ form.first_name.id_for_label }}">Primer Nombre</label>
                             {% if form.first_name.errors %}<small class="text-danger">{{ form.first_name.errors }}</small>{% endif %}
                         </div>
                     </div>
@@ -60,7 +63,7 @@
                     <div class="col-md-6">
                         <div class="form-floating mb-4">
                             {{ form.last_name }} 
-                            <label for="{{ form.last_name.id_for_label }}">Last Name</label>
+                            <label for="{{ form.last_name.id_for_label }}">Primer Apellido</label>
                             {% if form.last_name.errors %}<small class="text-danger">{{ form.last_name.errors }}</small>{% endif %}
                         </div>
                     </div>
@@ -78,7 +81,7 @@
                     <div class="col-md-6">
                         <div class="form-floating mb-4">
                             {{ form.username }} 
-                            <label for="{{ form.username.id_for_label }}">Username</label>
+                            <label for="{{ form.username.id_for_label }}">Nombre de Usario</label>
                             {% if form.username.errors %}<small class="text-danger">{{ form.username.errors }}</small>{% endif %}
                         </div>
                     </div> 
@@ -149,4 +152,8 @@
         });
     });
 </script>
+
+<!-- JS de Sienna Accessibility -->
+<script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
+<script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
 {% endblock %}

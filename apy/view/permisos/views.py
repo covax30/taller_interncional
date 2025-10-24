@@ -1,36 +1,108 @@
-from django.shortcuts import render
-from apy.models import Module, Permission
+from django.shortcuts import render, redirect, reverse
+from apy.models import Module, Permission 
 from django.contrib.auth.models import User
+from django.contrib import messages
+from django.db import transaction
+# IMPORTACIONES NECESARIAS PARA PROTEGER LA VISTA
+from django.contrib.auth.decorators import login_required, user_passes_test 
+from apy.decorators import PermisoRequeridoMixin
 
+# FUNCIÓN DE PRUEBA: Define la condición de acceso (SOLO SUPERUSUARIO)
+def is_superuser_check(user):
+    """Retorna True si el usuario está autenticado y es un superusuario."""
+    # Usamos user.is_authenticated para asegurarnos de que no es un usuario anónimo
+    return user.is_authenticated and user.is_superuser
+
+# 1. Requiere que el usuario esté logueado.
+# 2. Requiere que pase la prueba (ser Superusuario).
+@login_required(login_url='/login/')
+@user_passes_test(is_superuser_check, login_url='/') # Redirige a la página de inicio (/) si no es Superuser
 def permisos_usuarios(request):
-    # Obtener todos los usuarios
-    users = User.objects.all()
-    reverse_lazy = lambda x: x  # Placeholder for reverse_lazy if needed
-    # Obtener todos los módulos
+    user_to_edit = None
+    
+    # --- 1. Obtener posibles fuentes del ID de usuario ---
+    user_id_from_select = request.POST.get('user') 	# ID del usuario recién seleccionado (via select onchange)
+    user_id_from_hidden = request.POST.get('user_id_to_edit') 	# ID del usuario actualmente cargado (via hidden field)
+    user_id_from_get = request.GET.get('user_id') 	# ID del usuario después de guardar (via redirección GET)
+    
+    selected_user_id = user_id_from_select or user_id_from_hidden or user_id_from_get
+
+    # --- 2. Determinar el tipo de acción (CLAVE) ---
+    is_post = request.method == 'POST'
+    # Solo es acción de guardar si el POST contiene el marcador 'save_permissions'
+    is_save_action = is_post and 'save_permissions' in request.POST 
+
+    # --- 3. Guardado de permisos ---
+    if is_save_action:
+        # Usamos el ID del usuario actualmente cargado, que está en el campo oculto
+        user_id_to_save = user_id_from_hidden 
+        
+        try:
+            user_to_edit = User.objects.get(id=user_id_to_save)
+        except User.DoesNotExist:
+            messages.error(request, "Error: el usuario no existe.")
+            return redirect('apy:permisos_usuarios')
+
+        try:
+            with transaction.atomic():
+                # Borramos permisos previos del usuario
+                Permission.objects.filter(user=user_to_edit).delete()
+
+                for module in Module.objects.all():
+                    # Los nombres de los campos vienen directamente del template (ej: perm_1_view)
+                    view_perm = f'perm_{module.id}_view' in request.POST
+                    add_perm = f'perm_{module.id}_add' in request.POST
+                    change_perm = f'perm_{module.id}_change' in request.POST
+                    delete_perm = f'perm_{module.id}_delete' in request.POST
+
+                    if view_perm or add_perm or change_perm or delete_perm:
+                        Permission.objects.create(
+                            user=user_to_edit,
+                            module=module,
+                            view=view_perm,
+                            add=add_perm,
+                            change=change_perm,
+                            delete=delete_perm
+                        )
+
+            messages.success(request, f"Permisos del usuario {user_to_edit.username} guardados con éxito. ✅")
+            # Redirigimos usando GET para recargar y mostrar los permisos recién guardados
+            return redirect(f"{reverse('apy:permisos_usuarios')}?user_id={user_to_edit.id}")
+
+        except Exception as e:
+            messages.error(request, f"Error al guardar permisos: {e}")
+            return redirect(f"{reverse('apy:permisos_usuarios')}?user_id={user_to_edit.id}")
+
+    # --- 4. Carga del usuario seleccionado/por defecto (GET o POST sin acción de guardar) ---
+    if selected_user_id:
+        try:
+            user_to_edit = User.objects.get(id=selected_user_id)
+        except User.DoesNotExist:
+            user_to_edit = None
+
+    if not user_to_edit:
+        user_to_edit = User.objects.first()
+        if not user_to_edit:
+            messages.warning(request, "No hay usuarios registrados para gestionar permisos.")
+            return render(request, 'Permisos/permisos.html', {'users': [], 'modules': []})
+
+    # --- 5. Construcción del contexto (Igual que antes) ---
+    all_users = User.objects.all().order_by('username')
     modules = Module.objects.all()
 
-    # Consultar los permisos para el usuario actual
-    user_permissions = {}
     for module in modules:
-        permissions = Permission.objects.filter(user=request.user, module=module).first()
-        if permissions:
-            user_permissions[module.id] = {
-                'view': permissions.view,
-                'add': permissions.add,
-                'change': permissions.change,
-                'delete': permissions.delete
-            }
-        else:
-            # Si no tiene permisos, asignamos valores predeterminados
-            user_permissions[module.id] = {
-                'view': False,
-                'add': False,
-                'change': False,
-                'delete': False
-            }
+        permissions = Permission.objects.filter(user=user_to_edit, module=module).first()
+        module.current_permissions = {
+            'view': permissions.view if permissions else False,
+            'add': permissions.add if permissions else False,
+            'change': permissions.change if permissions else False,
+            'delete': permissions.delete if permissions else False,
+        }
 
-    return render(request, 'Permisos/permisos.html', {
-        'users': users,
+    context = {
+        'users': all_users,
         'modules': modules,
-        'user_permissions': user_permissions,  # Pasar permisos de manera explícita
-    })
+        'user_to_edit': user_to_edit,
+    }
+
+    return render(request, 'Permisos/permisos.html', context)
