@@ -291,7 +291,7 @@ class PerfilUsuarioForm(forms.ModelForm):
 class ClienteForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['id_operacion'].widget.attrs['autofocus'] = True
+        self.fields['nombre'].widget.attrs['autofocus'] = True
         
     class Meta:
         model = Cliente

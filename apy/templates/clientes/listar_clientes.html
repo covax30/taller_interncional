@@ -1,9 +1,5 @@
 {% extends "generic_listar.html" %}
-<<<<<<< HEAD:taller_tim/apy/templates/clientes/listar_clientes.html
-=======
 {% load humanize %}
-
->>>>>>> 75b337237e69e84b574d6ceff17babcd22b2ea2b:apy/templates/clientes/listar_clientes.html
 {% block titulo %}
         <h1 class="text-center">Lista de Clientes</h1>
 {% endblock titulo %}
@@ -13,16 +9,13 @@
 {% endblock %}
 
 {% block columnas %}
-
   <th>Id Cliente</th>
   <th>Nombre</th>
   <th>Telefono</th>
   <th>Correo</th>
   <th>Documento</th>
-  <th>Id Operacion</th>
   <th>Fecha de operacion</th>
   <th>Monto</th>
-
   <th>Acciones</th>
 {% endblock %}
 
@@ -43,8 +36,7 @@
     </tr>
   {% endfor %}
   
-  <!-- Mensajes con SweetAlert -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
   {% if messages %}
     {% for message in messages %}
