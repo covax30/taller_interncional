@@ -17,17 +17,6 @@ class Login_view(LoginView):
         context ['titulo'] = 'Iniciar sesion'
         return context
 
-class forgot_view(TemplateView):
-    template_name = "forgot-password.html"
-    
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        
-    
-        context ['titulo'] = 'olvide mi contraseña'
-        return context
-    
 #logout
 
 class logout_redirect(RedirectView):
