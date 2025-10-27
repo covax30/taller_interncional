@@ -186,12 +186,6 @@ class Cliente(models.Model):
     telefono = models.BigIntegerField(validators=[validar_telefono])
     correo = models.EmailField(max_length=100, validators=[validar_email])
     fecha_operacion = models.DateField()
-    monto = models.IntegerField(  # 🔹 ENTEROS, sin decimales
-        error_messages={
-            'invalid': 'Ingrese un número válido para el monto.',
-            'required': 'El monto del cliente es obligatorio.'
-        } , validators=[validar_monto]
-    )
 
     def __str__(self):
         return f"{self.id_cliente} - {self.nombre}"
