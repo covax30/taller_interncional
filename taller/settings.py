@@ -42,6 +42,9 @@ INSTALLED_APPS = [
     'apy',
     'login',
     'widget_tweaks',
+    
+    'celery', 
+    'django_celery_beat'
 ]
 
 MIDDLEWARE = [
@@ -152,4 +155,27 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'soportecnico.t.i.m@gmail.com'
 EMAIL_HOST_PASSWORD = 'pjqmmdgfnredlrtg'
 
+# -----------------------------------------------------
+# ✅ CONFIGURACIÓN DE ARCHIVOS MEDIA (Para Backups)
+# -----------------------------------------------------
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
+# -----------------------------------------------------
+# ✅ CONFIGURACIÓN DE CELERY (Tareas Asíncronas)
+# -----------------------------------------------------
+# Utilizando Redis como broker (el más común)
+# Asegúrate de que Redis esté corriendo en 127.0.0.1:6379
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0' 
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/0' # Para rastrear el resultado de las tareas
+
+# Configuración de serialización (para seguridad y compatibilidad)
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+# Usa la misma zona horaria de Django
+CELERY_TIMEZONE = 'America/Bogota' 
+
+# Indica que Celery Beat debe leer la programación de la base de datos (modelo PeriodicTask)
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
