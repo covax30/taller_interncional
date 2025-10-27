@@ -1,120 +1,344 @@
-
 {% load widget_tweaks %}
-{% block form %}
+<div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title">
+                <i class="fas fa-tools"></i> Gestión de Mantenimientos
+            </h5>
+            <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            <div id="msg-tipo_mantenimiento"></div>
 
-    <div id="msg-tipo_mantenimiento"></div>  {# Aquí se mostrarán los mensajes #}
+            <!-- Pestañas para elegir entre modo simple y múltiple -->
+            <ul class="nav nav-tabs mb-4" id="mantenimientosTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="multiple-tab" data-toggle="tab" href="#multiple" role="tab">
+                        <i class="fas fa-list"></i> Agregar Mantenimientos
+                    </a>
+                </li>
+            </ul>
 
-    <form id="detalletipo_mantenimientoForm" method="post" action="{% url 'apy:detallemantenimiento_modal_crear' %}">
-        {% csrf_token %}
-    {% for field in form.visible_fields %}
-    <div class="form-group mb-3">
-        <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
-        {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
+            <div class="tab-content" id="mantenimientosTabContent">
+                <!-- Pestaña Múltiples Mantenimientos -->
+                <div class="tab-pane fade show active" id="multiple" role="tabpanel">
+                    <!-- Formulario para agregar a la lista -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0"><i class="fas fa-plus-circle"></i> Agregar Mantenimiento a la Lista</h6>
+                        </div>
+                        <div class="card-body">
+                            <form id="detalletipo_mantenimientoForm" method="post" action="{% url 'apy:detallemantenimiento_modal_crear' %}">
+                                {% csrf_token %}
+                                {% for field in form.visible_fields %}
+                                <div class="form-group mb-3">
+                                    <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
+                                    {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
 
-        {% if field.errors %}
-            <div class="invalid-feedback d-block">
-                {% for error in field.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
+                                    {% if field.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in field.errors %}
+                                            <small>{{ error }}</small><br>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                                
+                                <div class="form-group text-right">
+                                    <button type="button" id="btnAgregarALista" class="btn btn-primary">
+                                        <i class="fas fa-plus"></i> Agregar a Lista
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Lista de mantenimientos agregados -->
+                    <div class="card">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">
+                                <i class="fas fa-list"></i> Mantenimientos en la Lista
+                                <span id="contadorMantenimientos" class="badge badge-secondary ml-2">0</span>
+                            </h6>
+                            <div>
+                                <strong>Total: $<span id="totalMantenimientos">0.00</span></strong>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div id="listaMantenimientos" class="table-responsive">
+                                <table class="table table-sm table-hover mb-0">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th>Tipo Mantenimiento</th>
+                                            <th>Descripción</th>
+                                            <th width="100">Cantidad</th>
+                                            <th width="120">Precio Unit.</th>
+                                            <th width="120">Subtotal</th>
+                                            <th width="80">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbodyMantenimientos">
+                                        <!-- Los mantenimientos se agregarán aquí dinámicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div id="listaVacia" class="text-center py-4">
+                                <i class="fas fa-tools fa-2x text-muted mb-2"></i>
+                                <p class="text-muted">No hay mantenimientos en la lista</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        {% endif %}
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" id="btnGuardarMultiples" class="btn btn-success d-none">
+                <i class="fas fa-save"></i> Guardar Todos los Mantenimientos
+            </button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                <i class="fas fa-times"></i> Cerrar
+            </button>
+        </div>
     </div>
+</div>
 
-    {% endfor %}
-{% endblock %}
-
-{% block Cancelar %}
-    <button type="button" id="btnGuardardetalleTipoMantenimiento" class="btn btn-primary btn-flat">
-        <i class="fas fa-save"></i> Agregar
-    </button>
-    <a href="{% url 'apy:detalle_servicio_lista' %}" class="btn btn-default btn-flat float-right">
-        <i class="fas fa-times"></i> Cancelar
-    </a>
-{% endblock %}
-
-
-
-{% block extra_js %}
 <script>
-/* Delegación: captura clicks de botones que aparezcan dinámicamente */
-$(document).on('click', '#btnGuardardetalleTipoMantenimiento', function(e){
-    e.preventDefault();
-    const $btn = $(this);
-    const $modal = $('#modal-id_tipo_mantenimiento');
-    const $form = $modal.find('form#detalletipo_mantenimientoForm');
+$(document).ready(function() {
+    let mantenimientosLista = [];
+    let contadorId = 0;
 
-    if (!$form.length) {
-        console.error('No se encontró el formulario #detalletipo_mantenimientoForm dentro del modal.');
-        return;
-    }
+    // ===== FUNCIONES PARA MÚLTIPLES MANTENIMIENTOS =====
+    function actualizarInterfazMultiples() {
+        const tbody = $('#tbodyMantenimientos');
+        const listaVacia = $('#listaVacia');
+        const contador = $('#contadorMantenimientos');
+        const btnGuardarMultiples = $('#btnGuardarMultiples');
+        const totalMantenimientos = $('#totalMantenimientos');
 
-    const url = $form.attr('action');
-    const formData = new FormData($form[0]);
+        // Actualizar contador
+        contador.text(mantenimientosLista.length);
 
-    $btn.prop('disabled', true).addClass('disabled').text('Guardando...');
-
-    $.ajax({
-        url: url,
-        type: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false,
-        headers: {'X-Requested-With': 'XMLHttpRequest'},
-        success: function(data){
-         if (data.success) {
-        // Mostrar mensaje de éxito
-        if (!$modal.find('#msg-tipo_mantenimiento').length) {
-            $modal.find('.modal-body').prepend('<div id="msg-tipo_mantenimiento"></div>');
-        }
-        $modal.find('#msg-tipo_mantenimiento').html('<div class="alert alert-success">' + data.message + '</div>');
-
-        // Actualizar select en la página principal
-        const $select = $('#id_id_tipo_mantenimiento');
-        const option = new Option(data.text, data.id, true, true);
-        $select.append(option).val(data.id).trigger('change');
-
-        // ✅ CERRAR EL MODAL INMEDIATAMENTE
-        
-         $modal.modal('hide');
-         $('body').removeClass('modal-open');
-         $('body').css('padding-right', '');
-         $('.modal-backdrop').remove();
-         $modal.removeClass('show');
-         $modal.css('display', 'none');
-        
-
-    } else {
-        // Manejar errores de validación
-        if (data.html) {
-            $modal.find('.modal-body').html(data.html);
+        // Mostrar/ocultar elementos
+        if (mantenimientosLista.length === 0) {
+            listaVacia.removeClass('d-none');
+            tbody.addClass('d-none');
+            btnGuardarMultiples.addClass('d-none');
         } else {
-            if (!$modal.find('#msg-tipo_mantenimiento').length) {
-                $modal.find('.modal-body').prepend('<div id="msg-tipo_mantenimiento"></div>');
-            }
-            $modal.find('#msg-tipo_mantenimiento').html('<div class="alert alert-danger">' + data.message + '</div>');
+            listaVacia.addClass('d-none');
+            tbody.removeClass('d-none');
+            btnGuardarMultiples.removeClass('d-none');
+            
+            // Actualizar tabla
+            tbody.empty();
+            let total = 0;
+            
+            mantenimientosLista.forEach(mantenimiento => {
+                const subtotal = mantenimiento.cantidad * mantenimiento.precio_unitario;
+                total += subtotal;
+                
+                tbody.append(`
+                    <tr data-id="${mantenimiento.id}">
+                        <td>${mantenimiento.tipo_mantenimiento_nombre}</td>
+                        <td>${mantenimiento.descripcion}</td>
+                        <td>${mantenimiento.cantidad}</td>
+                        <td>$${mantenimiento.precio_unitario.toFixed(2)}</td>
+                        <td><strong>$${subtotal.toFixed(2)}</strong></td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-danger btn-eliminar-lista" data-id="${mantenimiento.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `);
+            });
+            
+            totalMantenimientos.text(total.toFixed(2));
         }
     }
-},
-        error: function(xhr, status, err) {
-            if (!$modal.find('#msg-tipo_mantenimiento').length) $modal.find('.modal-body').prepend('<div id="msg-tipo_mantenimiento"></div>');
-            $modal.find('#msg-tipo_mantenimiento').html('<div class="alert alert-danger">Error en el servidor. Revisa consola.</div>');
-            console.error('AJAX error:', status, err);
-        },
-        complete: function(){
-            $btn.prop('disabled', false).removeClass('disabled').text('Agregar');
+
+    // Agregar mantenimiento a la lista múltiple
+    $('#btnAgregarALista').click(function() {
+        const id_tipo_mantenimiento = $('#id_id_tipo_mantenimiento').val();
+        const tipo_mantenimiento_nombre = $('#id_id_tipo_mantenimiento option:selected').text();
+        const cantidad = parseInt($('#id_cantidad').val());
+        const precio_unitario = parseFloat($('#id_precio_unitario').val());
+        const descripcion = $('#id_descripcion').val();
+
+        // Validaciones
+        if (!id_tipo_mantenimiento) {
+            alert('Seleccione un tipo de mantenimiento');
+            return;
         }
+        if (!cantidad || cantidad < 1) {
+            alert('La cantidad debe ser mayor a 0');
+            return;
+        }
+        if (!precio_unitario || precio_unitario <= 99) {
+            alert('El precio unitario debe ser mayor a 99');
+            return;
+        }
+        if (!descripcion) {
+            alert('La descripción es obligatoria');
+            return;
+        }
+
+        // Verificar si ya existe el mantenimiento en la lista
+        const existe = mantenimientosLista.find(m => m.id_tipo_mantenimiento == id_tipo_mantenimiento && m.descripcion === descripcion);
+        if (existe) {
+            if (!confirm('Este mantenimiento ya está en la lista. ¿Desea actualizar la cantidad?')) {
+                return;
+            }
+            // Actualizar cantidad
+            existe.cantidad = cantidad;
+            existe.precio_unitario = precio_unitario;
+        } else {
+            // Agregar nuevo mantenimiento
+            const nuevoMantenimiento = {
+                id: contadorId++,
+                id_tipo_mantenimiento: id_tipo_mantenimiento,
+                tipo_mantenimiento_nombre: tipo_mantenimiento_nombre,
+                cantidad: cantidad,
+                precio_unitario: precio_unitario,
+                descripcion: descripcion
+            };
+            mantenimientosLista.push(nuevoMantenimiento);
+        }
+
+        // Limpiar formulario
+        $('#id_id_tipo_mantenimiento').val(null).trigger('change');
+        $('#id_cantidad').val('1');
+        $('#id_precio_unitario').val('');
+        $('#id_descripcion').val('');
+        $('#id_id_tipo_mantenimiento').focus();
+
+        actualizarInterfazMultiples();
+    });
+
+    // Eliminar mantenimiento de la lista múltiple
+    $(document).on('click', '.btn-eliminar-lista', function() {
+        const id = $(this).data('id');
+        mantenimientosLista = mantenimientosLista.filter(mantenimiento => mantenimiento.id !== id);
+        actualizarInterfazMultiples();
+    });
+
+    // Guardar múltiples mantenimientos
+    $('#btnGuardarMultiples').click(function() {
+        const $btn = $(this);
+        const $modal = $('#modal-id_tipo_mantenimiento');
+
+        if (mantenimientosLista.length === 0) {
+            alert('No hay mantenimientos para guardar');
+            return;
+        }
+
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+
+        $.ajax({
+            url: "{% url 'apy:detallemantenimiento_modal_crear' %}",
+            type: 'POST',
+            data: {
+                'mantenimientos_multiples': JSON.stringify(mantenimientosLista),
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(data) {
+                if (data.success) {
+                    $('#msg-tipo_mantenimiento').html(
+                        '<div class="alert alert-success">' + data.message + '</div>'
+                    );
+                    
+                    // Actualizar select principal con todos los mantenimientos creados
+                    if (data.objetos_creados) {
+                        const $selectPrincipal = $('#id_id_tipo_mantenimiento');
+                        data.objetos_creados.forEach(mantenimiento => {
+                            const option = new Option(mantenimiento.text, mantenimiento.id, true, true);
+                            $selectPrincipal.append(option);
+                        });
+                        $selectPrincipal.trigger('change');
+                    }
+                    
+                    // Cerrar modal después de 2 segundos
+                    setTimeout(function() {
+                        $modal.modal('hide');
+                    }, 2000);
+                } else {
+                    $('#msg-tipo_mantenimiento').html(
+                        '<div class="alert alert-danger">' + data.message + '</div>'
+                    );
+                }
+            },
+            error: function(xhr, status, error) {
+                $('#msg-tipo_mantenimiento').html(
+                    '<div class="alert alert-danger">Error al guardar: ' + error + '</div>'
+                );
+            },
+            complete: function() {
+                $btn.prop('disabled', false).html('<i class="fas fa-save"></i> Guardar Todos los Mantenimientos');
+            }
+        });
+    });
+
+    // ===== FUNCIONALIDAD ORIGINAL (MANTENIMIENTO SIMPLE) =====
+    $(document).on('click', '#btnGuardardetalleTipoMantenimiento', function(e){
+        e.preventDefault();
+        const $btn = $(this);
+        const $modal = $('#modal-id_tipo_mantenimiento');
+        const $form = $modal.find('form#detalletipo_mantenimientoForm');
+
+        const url = $form.attr('action');
+        const formData = new FormData($form[0]);
+
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
+            success: function(data){
+                if (data.success) {
+                    $('#msg-tipo_mantenimiento').html('<div class="alert alert-success">' + data.message + '</div>');
+
+                    // Actualizar select en la página principal
+                    const $select = $('#id_id_tipo_mantenimiento');
+                    const option = new Option(data.text, data.id, true, true);
+                    $select.append(option).val(data.id).trigger('change');
+
+                    // Cerrar modal después de 1.5 segundos
+                    setTimeout(function(){
+                        $modal.modal('hide');
+                    }, 1500);
+
+                } else {
+                    if (data.html) {
+                        $modal.find('.modal-body').html(data.html);
+                    } else {
+                        $('#msg-tipo_mantenimiento').html('<div class="alert alert-danger">' + data.message + '</div>');
+                    }
+                }
+            },
+            error: function(xhr, status, err) {
+                $('#msg-tipo_mantenimiento').html('<div class="alert alert-danger">Error en el servidor</div>');
+                console.error('AJAX error:', status, err);
+            },
+            complete: function(){
+                $btn.prop('disabled', false).html('<i class="fas fa-save"></i> Agregar');
+            }
+        });
+    });
+
+    // Inicializar interfaz
+    actualizarInterfazMultiples();
+
+    // Cambio entre pestañas
+    $('#mantenimientosTab a').on('click', function (e) {
+        e.preventDefault();
+        $(this).tab('show');
     });
 });
-
-// Cuando el modal se cierre, limpiar el formulario
-$('#modal-id_tipo_mantenimiento').on('hidden.bs.modal', function () {
-    const $form = $(this).find('form#detalletipo_mantenimientoForm')[0];
-    if ($form) {
-        $form.reset(); // resetea todos los inputs
-    }
-    // limpiar mensajes de validación si los hubiera
-    $(this).find('#msg-tipo_mantenimiento').html('');
-});
 </script>
-
-{% endblock %}

@@ -16,9 +16,6 @@
   <th>Telefono</th>
   <th>Correo</th>
   <th>Documento</th>
-  <th>Fecha de Registro</th>
-  <th>Monto</th>
-
   <th>Acciones</th>
 {% endblock %}
 
@@ -30,8 +27,7 @@
         <td>{{ c.telefono }}</td>
         <td>{{ c.correo }}</td>
         <td>{{ c.documento }}</td>
-        <td>{{ c.fecha_operacion }}</td>
-        <td>{{ c.monto|intcomma }}</td>
+
         <td>
             <a href="{% url 'apy:cliente_editar' c.id_cliente %}" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></a>
             <a href="{% url 'apy:cliente_eliminar' c.id_cliente %}" class="btn btn-danger btn-xs"><i class="fas fa-trash-alt"></i></a>

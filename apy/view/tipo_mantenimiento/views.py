@@ -105,12 +105,11 @@ class TipoMantenimientoCreateModalView(CreateView):
             "html": html,
             "message": "Por favor, corrige los errores en el formulario ❌"
         })
-
+        
 class DetalleTipoMantenimientoCreateModalView(CreateView):
     model = DetalleTipoMantenimiento
     form_class = DetalleTipo_MantenimientoForm
     template_name = "tipo_mantenimiento/modal_detalletipo_mantenimiento.html"
-    success_url = reverse_lazy("apy:detalletipo_mantenimiento_lista ")
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -122,6 +121,47 @@ class DetalleTipoMantenimientoCreateModalView(CreateView):
             html = render_to_string(self.template_name, {"form": form}, request=request)
             return JsonResponse({"html": html})
         return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        # Verificar si es una lista de mantenimientos múltiples
+        if 'mantenimientos_multiples' in request.POST:
+            return self.guardar_mantenimientos_multiples(request)
+        else:
+            # Comportamiento original para un solo mantenimiento
+            return super().post(request, *args, **kwargs)
+
+    def guardar_mantenimientos_multiples(self, request):
+        try:
+            mantenimientos_data = json.loads(request.POST['mantenimientos_multiples'])
+            objetos_creados = []
+            
+            for mantenimiento in mantenimientos_data:
+                # Crear instancia para cada mantenimiento
+                detalle = DetalleTipoMantenimiento(
+                    id_tipo_mantenimiento_id=mantenimiento['id_tipo_mantenimiento'],
+                    cantidad=mantenimiento['cantidad'],
+                    precio_unitario=mantenimiento['precio_unitario'],
+                    descripcion=mantenimiento['descripcion']
+                )
+                detalle.full_clean()
+                detalle.save()
+                objetos_creados.append({
+                    'id': detalle.id,
+                    'text': str(detalle)
+                })
+            
+            return JsonResponse({
+                "success": True,
+                "message": f"Se guardaron {len(objetos_creados)} mantenimientos correctamente ✅",
+                "objetos_creados": objetos_creados,
+                "total_mantenimientos": len(objetos_creados)
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                "success": False,
+                "message": f"Error al guardar los mantenimientos: {str(e)}"
+            }, status=500)
 
     def form_valid(self, form):
         try:

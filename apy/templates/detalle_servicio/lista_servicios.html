@@ -1,0 +1,97 @@
+{% extends "generic_listar.html" %}
+{% load static %}
+
+{% block titulo %}
+<h1 class="text-center"><i class="fas fa-list-alt me-2"></i>Lista de Servicios</h1>
+{% endblock titulo %}
+
+{% block agregar %}
+<a href="{{crear_url}}" class="btn btn-primary">
+    <i class="fas fa-plus me-1"></i>Agregar Servicio
+</a>
+{% endblock %}
+
+{% block estadisticas %}
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ total_servicios }}</h4>
+                        <p>Total Servicios</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-list fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-dark">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ servicios_pendientes }}</h4>
+                        <p>Pendientes</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-clock fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block columnas %}
+    <th>ID</th>
+    <th>Vehículo</th>
+    <th>Cliente</th>
+    <th>Fecha</th>
+    <th>Estado</th>
+    <th>Total</th>
+    <th>Acciones</th>
+{% endblock %}
+
+{% block iterar %}
+    {% for servicio in servicios %}
+    <tr>
+        <td>{{ servicio.id }}</td>
+        <td>
+            <strong>{{ servicio.id_vehiculo.placa }}</strong><br>
+            <small class="text-muted">{{ servicio.id_vehiculo.marca_vehiculo }} {{ servicio.id_vehiculo.modelo_vehiculo }}</small>
+        </td>
+        <td>{{ servicio.id_vehiculo.id_cliente.nombre }}</td>
+        <td>{{ servicio.fecha_creacion|date:"d/m/Y H:i" }}</td>
+        <td>
+            <span class="badge {% if servicio.estado == 'pendiente' %}bg-warning{% else %}bg-success{% endif %}">
+                {{ servicio.estado|title }}
+            </span>
+        </td>
+        <td><strong>${{ servicio.subtotal|floatformat:0 }}</strong></td>
+        <td>
+            <div class="btn-group" role="group">
+                <a href="{% url 'apy:detalle_servicio' servicio.id %}" class="btn btn-info btn-sm" title="Ver detalles">
+                    <i class="fas fa-eye"></i>
+                </a>
+                <a href="{% url 'apy:editar_servicio' servicio.id %}" class="btn btn-warning btn-sm" title="Editar">
+                    <i class="fas fa-edit"></i>
+                </a>
+                <a href="{% url 'apy:eliminar_servicio' servicio.id %}" class="btn btn-danger btn-sm" title="Eliminar">
+                    <i class="fas fa-trash"></i>
+                </a>
+            </div>
+        </td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="7" class="text-center text-muted py-4">
+            <i class="fas fa-inbox fa-3x mb-3"></i><br>
+            No hay servicios registrados
+        </td>
+    </tr>
+    {% endfor %}
+{% endblock %}

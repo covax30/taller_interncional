@@ -49,11 +49,11 @@ urlpatterns = [
     path('factura/eliminar/<int:pk>/', FacturaDeleteView.as_view(), name='factura_eliminar'),
     
     # ------Url modulo detalle servicio----------------
-    path('detalle_servicio/listar/', DetalleServicioListView.as_view(), name='detalle_servicio_lista'),
-    path('detalle_servicio/agregar/', DetalleServicioCreateView.as_view(), name='detalle_servicio_crear'),
-    path('detalle_servicio/editar/<int:pk>/', DetalleServicioUpdateView.as_view(), name='detalle_servicio_editar'),
-    path('detalle_servicio/eliminar/<int:pk>/', DetalleServicioDeleteView.as_view(), name='detalle_servicio_eliminar'),
-
+    path('servicios/', ListaServiciosView.as_view(), name='lista_servicios'),  # ¡ESTA LÍNEA ES CLAVE!
+    path('servicios/crear/', CrearServicioView.as_view(), name='crear_servicio'),
+    path('servicios/editar/<int:pk>/', EditarServicioView.as_view(), name='editar_servicio'),
+    path('servicios/eliminar/<int:pk>/', EliminarServicioView.as_view(), name='eliminar_servicio'),
+    path('servicios/detalle/<int:pk>/', DetalleServicioView.as_view(), name='detalle_servicio'),
     
     # -------------URL modulo proveedor---------------
     path('Proveedor/listar/', ProveedorListView.as_view(), name='proveedor_lista'),
@@ -177,6 +177,7 @@ urlpatterns = [
     path('tipo_mantenimiento/eliminar/<int:pk>/', TipoMantenimientoDeleteView.as_view() , name='tipo_mantenimiento_eliminar'),
     path("tipo_mantenimiento/modal/crear/", TipoMantenimientoCreateModalView.as_view(), name="tipo_mantenimiento_modal_crear"),
     path("detallemantenimiento/modal/crear/", DetalleTipoMantenimientoCreateModalView.as_view(), name="detallemantenimiento_modal_crear"),
+
     
     path('insumos/listar/', InsumoListView.as_view() , name='insumo_lista'),
     path('insumos/agregar/', InsumoCreateView.as_view() , name='insumo_crear'),

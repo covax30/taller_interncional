@@ -1,94 +1,172 @@
-from django.shortcuts import render
-from apy.models import *
-from apy.view.detalle_servicio.views import *
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.http import JsonResponse
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_protect, csrf_exempt
+from django.views.generic import CreateView, UpdateView, ListView, DeleteView, DetailView  # <- Agregar DetailView aquí
 from django.urls import reverse_lazy
-from apy.forms import *
+from django.shortcuts import redirect, get_object_or_404
+from django.db import transaction
 from django.contrib import messages
+from django.http import JsonResponse
+from apy.models import DetalleServicio
+from apy.forms import (
+    DetalleServicioForm, 
+    DetalleRepuestoFormSet, 
+    DetalleTipoMantenimientoFormSet, 
+    DetalleInsumosFormSet
+)
 
-# Create your views here.
-# --------------Vistas Yury---------------
-def detalle_servicio(request):
-    data = {
-        'Detalle_Servicio':'Detalle_Servicio',
-        'titulo':'Lista de Detalle de Servicios',
-        'detalle_servicios': DetalleServicio.objects.all()
-    }
-    return render(request, 'detalle_servicio/cont_detalle_servicio.html', data)
-
-class DetalleServicioListView(ListView):
+class ListaServiciosView(ListView):
     model = DetalleServicio
-    template_name ='detalle_servicio/listar_detalle_servicio.html'
-    
-    # @method_decorator(login_required)
-    @method_decorator(csrf_exempt)
-    def dispatch(self, request, *args, **kwargs):
-       return super().dispatch(request, *args, **kwargs)
-    
-    def post(self, request, *args, **kwargs):
-        nombre = {'nombre' : 'Yury'}
-        return JsonResponse(nombre)
-    
+    template_name = 'detalle_servicio/lista_servicios.html'
+    context_object_name = 'servicios'
+    ordering = ['-fecha_creacion']
+    paginate_by = 10
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['titulo'] = 'Lista de Detalle de Servicios'
-        context['crear_url'] = reverse_lazy('apy:detalle_servicio_crear')
-        context['entidad'] = 'Detalle de Servicio'  
+        # Agregar estadísticas rápidas
+        context['total_servicios'] = DetalleServicio.objects.count()
+        context['servicios_pendientes'] = DetalleServicio.objects.filter(estado='pendiente').count()
         return context
-    
-class DetalleServicioCreateView(CreateView):
+
+class CrearServicioView(CreateView):
     model = DetalleServicio
     form_class = DetalleServicioForm
-    template_name = 'detalle_servicio/crear_detalle_servicio.html'
-    success_url = reverse_lazy('apy:detalle_servicio_lista')
-    
-    def form_valid(self, form):
-        messages.success(self.request, "Detalle de Servicio creado correctamente")
-        return super().form_valid(form)
-    
-    
+    template_name = 'detalle_servicio/crear_servicio.html'
+    success_url = reverse_lazy('lista_servicios')
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context ['titulo'] = 'Crear Detalle de Servicio'
-        context ['entidad'] = 'Detalle de Servicios'
-        context ['listar_url'] = reverse_lazy('apy:detalle_servicio_lista')
-        
+        if self.request.POST:
+            context['repuesto_formset'] = DetalleRepuestoFormSet(self.request.POST, prefix='repuestos')
+            context['mantenimiento_formset'] = DetalleTipoMantenimientoFormSet(self.request.POST, prefix='mantenimientos')
+            context['insumo_formset'] = DetalleInsumosFormSet(self.request.POST, prefix='insumos')
+        else:
+            context['repuesto_formset'] = DetalleRepuestoFormSet(prefix='repuestos')
+            context['mantenimiento_formset'] = DetalleTipoMantenimientoFormSet(prefix='mantenimientos')
+            context['insumo_formset'] = DetalleInsumosFormSet(prefix='insumos')
         return context
-    
-class DetalleServicioUpdateView(UpdateView):
+
+    @transaction.atomic
+    def form_valid(self, form):
+        context = self.get_context_data()
+        repuesto_formset = context['repuesto_formset']
+        mantenimiento_formset = context['mantenimiento_formset']
+        insumo_formset = context['insumo_formset']
+        
+        if (repuesto_formset.is_valid() and 
+            mantenimiento_formset.is_valid() and 
+            insumo_formset.is_valid()):
+            
+            self.object = form.save()
+            repuesto_formset.instance = self.object
+            repuesto_formset.save()
+            
+            mantenimiento_formset.instance = self.object
+            mantenimiento_formset.save()
+            
+            insumo_formset.instance = self.object
+            insumo_formset.save()
+            
+            messages.success(self.request, 'Servicio creado exitosamente!')
+            return redirect(self.success_url)
+        else:
+            messages.error(self.request, 'Por favor corrige los errores en el formulario.')
+            return self.render_to_response(self.get_context_data(form=form))
+
+class EditarServicioView(UpdateView):
     model = DetalleServicio
-    form_class = DetalleServicioForm    
-    template_name = 'detalle_servicio/crear_detalle_servicio.html'
-    success_url = reverse_lazy('apy:detalle_servicio_lista')
-    def form_valid(self, form):
-        messages.success(self.request, "detalle de servicio actualizado correctamente")
-        return super().form_valid(form)
-    
+    form_class = DetalleServicioForm
+    template_name = 'detalle_servicio/editar_servicio.html'
+    success_url = reverse_lazy('lista_servicios')
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context ['titulo'] = 'Editar Detalle de Servicio'
-        context ['entidad'] = 'Detalle de Servicios'
-        context ['listar_url'] = reverse_lazy('apy:detalle_servicio_lista')
+        if self.request.POST:
+            context['repuesto_formset'] = DetalleRepuestoFormSet(
+                self.request.POST, instance=self.object, prefix='repuestos'
+            )
+            context['mantenimiento_formset'] = DetalleTipoMantenimientoFormSet(
+                self.request.POST, instance=self.object, prefix='mantenimientos'
+            )
+            context['insumo_formset'] = DetalleInsumosFormSet(
+                self.request.POST, instance=self.object, prefix='insumos'
+            )
+        else:
+            context['repuesto_formset'] = DetalleRepuestoFormSet(
+                instance=self.object, prefix='repuestos'
+            )
+            context['mantenimiento_formset'] = DetalleTipoMantenimientoFormSet(
+                instance=self.object, prefix='mantenimientos'
+            )
+            context['insumo_formset'] = DetalleInsumosFormSet(
+                instance=self.object, prefix='insumos'
+            )
         
+        # Agregar totales para mostrar en el template
+        context['subtotal'] = self.object.subtotal
         return context
-class DetalleServicioDeleteView(DeleteView):
+
+    @transaction.atomic
+    def form_valid(self, form):
+        context = self.get_context_data()
+        repuesto_formset = context['repuesto_formset']
+        mantenimiento_formset = context['mantenimiento_formset']
+        insumo_formset = context['insumo_formset']
+        
+        if (repuesto_formset.is_valid() and 
+            mantenimiento_formset.is_valid() and 
+            insumo_formset.is_valid()):
+            
+            self.object = form.save()
+            repuesto_formset.instance = self.object
+            repuesto_formset.save()
+            
+            mantenimiento_formset.instance = self.object
+            mantenimiento_formset.save()
+            
+            insumo_formset.instance = self.object
+            insumo_formset.save()
+            
+            messages.success(self.request, 'Servicio actualizado exitosamente!')
+            return redirect(self.success_url)
+        else:
+            messages.error(self.request, 'Por favor corrige los errores en el formulario.')
+            return self.render_to_response(self.get_context_data(form=form))
+
+class EliminarServicioView(DeleteView):
     model = DetalleServicio
-    template_name = 'detalle_servicio/eliminar_detalle_servicio.html'
-    success_url = reverse_lazy('apy:detalle_servicio_lista')
-    
-    def form_valid(self, form):
-        messages.success(self.request, "Detalle de servicio eliminado correctamente")
-        return super().form_valid(form)
-    
+    template_name = 'detalle_servicio/eliminar_servicio.html'
+    success_url = reverse_lazy('lista_servicios')
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, 'Servicio eliminado exitosamente!')
+        return super().delete(request, *args, **kwargs)
+
+# Vista para detalles del servicio - AHORA CORREGIDA
+class DetalleServicioView(DetailView):
+    model = DetalleServicio
+    template_name = 'detalle_servicio/detalle_servicio.html'
+    context_object_name = 'servicio'
+
+    def get_queryset(self):
+        """Optimización: precargar relaciones para evitar consultas N+1"""
+        return DetalleServicio.objects.prefetch_related(
+            'detallerepuesto_set__id_repuesto',
+            'detalletipomantenimiento_set__id_tipo_mantenimiento', 
+            'detalleinsumos_set__id_insumos__id_marca',
+            'id_vehiculo__id_cliente'
+        ).select_related('id_vehiculo')
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context ['titulo'] = 'Eliminar Detalle de Servicio'
-        context ['entidad'] = 'Detalle de Servicios'
-        context ['listar_url'] = reverse_lazy('apy:detalle_servicio_lista')
+        servicio = self.get_object()
+        
+        # Los datos ya vienen precargados gracias al get_queryset
+        context.update({
+            'repuestos': servicio.detallerepuesto_set.all(),
+            'mantenimientos': servicio.detalletipomantenimiento_set.all(),
+            'insumos': servicio.detalleinsumos_set.all(),
+            'subtotal': servicio.subtotal,
+            # Las propiedades total_repuestos, total_mantenimientos, total_insumos
+            # ahora están disponibles directamente del modelo
+        })
         
         return context
-    
-    
