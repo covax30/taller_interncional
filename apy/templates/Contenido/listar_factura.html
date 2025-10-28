@@ -18,11 +18,11 @@
         <th>Id de la Factura</th>
         <th>Tipo Pago</th>
         <th>Id Cliente</th>
-        <th>Id Vehiculo</th>
+        <th>Id Vehículo</th>
         <th>Id Tipo Mantenimiento</th>
         <th>Servicio Prestado</th>
         <th>Nombre Empresa</th>
-        <th>Direccion Empresa</th>
+        <th>Dirección Empresa</th>
         <th>Id Empleado</th>
         <th>Monto</th>
         <th>Acciones</th>
@@ -46,10 +46,21 @@
         <form method="post">
 
           <td>
-            <a href="{% url 'apy:factura_editar' f.id %}" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></a>
-            <a href="{% url 'apy:factura_eliminar' f.id %}" class="btn btn-danger btn-xs"><i
-                class="fas fa-trash-alt"></i></a>
-            <button type="button" class="btn btn-secondary btn-xs" onclick='generarPDFFacturaDesdeDjango({
+            <a href="{% url 'apy:factura_editar' f.id %}" 
+              class="btn btn-info btn-xs" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="Editar factura">
+              <i class="fas fa-edit"></i>
+            </a>
+            <a href="{% url 'apy:factura_eliminar' f.id %}" 
+              class="btn btn-danger btn-xs" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="Eliminar factura">
+              <i class="fas fa-trash-alt"></i>
+           </a>
+            <button type="button" title="Imprimir factura" class="btn btn-secondary btn-xs" onclick='generarPDFFacturaDesdeDjango({
     id: "{{ f.id }}",
     tipo_pago: "{{ f.tipo_pago }}",
     id_cliente: "{{ f.id_cliente }}",

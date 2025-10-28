@@ -1,6 +1,15 @@
 {
     "liveServer.settings.port": 5501,
+<<<<<<< HEAD
     "cSpell.words": [
         "Detalle"
     ]
+=======
+    "vscode-pets.petColor": "white",
+    "vscode-pets.petSize": "medium",
+    "vscode-pets.petType": "fox",
+    "vscode-pets.throwBallWithMouse": true,
+    "vscode-pets.theme": "forest",
+    "vscode-pets.position": "explorer"
+>>>>>>> dayan
 }

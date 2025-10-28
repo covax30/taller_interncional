@@ -223,7 +223,7 @@
                     />
                     <p>
                       {{ user.get_full_name|default:user.username }}
-                      <small>Miembro desde Nov. 2023</small>
+                       <small>Miembro desde {{ user.date_joined|date:"j \d\e M. \d\e Y" }}</small>
                     </p>
                   </li>
                   <li class="user-body">

@@ -1,17 +1,99 @@
+/* =======================================================
+   1. ESTILOS BASE (TEMA CLARO DE ADMINLTE) Y POSICIONAMIENTO
+   ======================================================= */
+
+/* Botón de Menú Principal */
 .asw-menu-btn {
-    background-color: #f8bc02 !important;
-}
-.asw-menu-header {
-    background: #f8bc02 !important;
-    color: #fff;
+    background-color: #007bff !important; 
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5) !important;
+    
+    /* POSICIÓN A LA DERECHA */
+    position: fixed !important;
+    left: auto !important;       
+    right: 20px !important;      
+    bottom: 50px !important;     
 }
 
+/* Fondo del Menú */
+.asw-menu {
+    background: #ffffff !important; /* Base Blanca */
+    color: #212529 !important;      /* Texto Oscuro */
+    border: 1px solid #dee2e6;
+    
+    /* POSICIÓN: Mueve el menú a la derecha */
+    position: fixed !important;
+    left: auto !important;
+    right: 20px !important;
+}
+
+/* Encabezado y Pie de página del menú (BASE: Gris Claro y TEXTO OSCURO) */
+.asw-menu-header,
 .asw-footer {
-    background: #f8bc02 !important;
+    background: #f8f9fa !important; /* Gris muy claro */
+    color: #212529 !important;      /* <-- TEXTO OSCURO POR DEFECTO */
+    border-bottom: 1px solid #dee2e6; 
+}
+
+
+/* Botones dentro del Menú (BASE: Claro) */
+.asw-btn {
+    background: #ffffff !important; 
+    color: #495057 !important;
+    border: 1px solid #dee2e6 !important; 
+    transition: all 0.3s ease;
+}
+
+.asw-btn:hover {
+    background: #e9ecef !important; 
+    border-color: #007bff !important;
+}
+
+/* Botones de ajuste de fuente (+ / -) y Seleccionados */
+.asw-adjust-font div[role=button] {
+    background: #007bff !important; 
     color: #fff;
 }
 
-.asw-adjust-font div[role=button] {
-    background: #ffcd06 !important;
-    color: #fff;
+.asw-btn.asw-selected {
+    background: #20c997 !important; 
+    color: #fff !important;
+    border-color: #20c997 !important;
+    font-weight: bold;
+}
+
+/* =======================================================
+   2. ESTILOS CONDICIONALES (TEMA OSCURO - OVERRIDE)
+   ======================================================= */
+
+/* Selector que se activa cuando el tema Dark está ON (por tu script) */
+html[data-bs-theme="dark"] body.asw-dark-contrast .asw-menu,
+.asw-widget.asw-dark-contrast .asw-menu {
+    background: #1f2d3d !important; 
+    color: #c2c7d0 !important; 
+}
+
+/* APLICAMOS EL COLOR DE TEXTO BLANCO AL ENCABEZADO Y PIE DE PÁGINA */
+html[data-bs-theme="dark"] body.asw-dark-contrast .asw-menu-header,
+html[data-bs-theme="dark"] body.asw-dark-contrast .asw-footer {
+    background: #343a40 !important; 
+    color: #fff !important;             /* <-- ¡EL CAMBIO CRUCIAL! */
+}
+
+html[data-bs-theme="dark"] body.asw-dark-contrast .asw-btn,
+.asw-widget.asw-dark-contrast .asw-btn {
+    background: #343a40 !important; 
+    color: #c2c7d0 !important;
+    border-color: #454d55 !important;
+}
+/* REEMPLAZA el bloque de enlaces anterior con este. */
+
+/* Sobrescribe el color de TODOS los estados del enlace (<a>) dentro del menú en MODO OSCURO. */
+html[data-bs-theme="dark"] body.asw-dark-contrast .asw-menu a,
+html[data-bs-theme="dark"] body.asw-dark-contrast .asw-menu a:link,
+html[data-bs-theme="dark"] body.asw-dark-contrast .asw-menu a:visited,
+html[data-bs-theme="dark"] body.asw-dark-contrast .asw-menu a:hover,
+html[data-bs-theme="dark"] body.asw-dark-contrast .asw-menu a:active {
+    color: #c2c7d0 !important; /* Mantiene la consistencia con el texto claro de AdminLTE */
+    
+    /* Nota: Si #c2c7d0 sigue fallando, cámbialo a color: #ffffff !important; */
 }

@@ -1,0 +1,101 @@
+{% extends 'body.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="p-3 py-5 border">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="text-right">{{ titulo }}</h4> 
+                </div>
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger" role="alert">
+                    {% for error in form.non_field_errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %} 
+                
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-4">
+                            {{ form.username }} 
+                            <label for="{{ form.username.id_for_label }}">Nombre de Usuario</label>
+                            {% if form.username.errors %}<small class="text-danger">{{ form.username.errors }}</small>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-floating mb-4">
+                            {{ form.email }} 
+                            <label for="{{ form.email.id_for_label }}">Email</label>
+                            {% if form.email.errors %}<small class="text-danger">{{ form.email.errors }}</small>{% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-4">
+                            {{ form.role }} 
+                            <label for="{{ form.role.id_for_label }}">Rol en el Sistema</label>
+                            {% if form.role.errors %}<small class="text-danger">{{ form.role.errors }}</small>{% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6"></div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="form-floating password-field mb-4">
+                            {{ form.password }} 
+                            <label for="{{ form.password.id_for_label }}">Contraseña</label>
+                            {% if form.password.errors %}<small class="text-danger">{{ form.password.errors }}</small>{% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-floating password-field mb-4">
+                            {{ form.password2 }} 
+                            <label for="{{ form.password2.id_for_label }}">Confirmar Contraseña</label>
+                            {% if form.password2.errors %}<small class="text-danger">{{ form.password2.errors }}</small>{% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <a href="{{ listar_url }}" class="btn btn-secondary me-2">
+                        <i class="fas fa-undo"></i> Cancelar
+                    </a>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Registrar Usuario
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var formFields = document.querySelectorAll('.form-floating input, .form-floating select');
+        formFields.forEach(function(field) {
+            // Se asegura de que todos los campos del formulario (incluidos los renderizados por Django)
+            // tengan la clase form-control para que funcionen los estilos form-floating.
+            if (!field.classList.contains('form-control')) {
+                field.classList.add('form-control');
+            }
+        });
+    });
+</script>
+
+<!-- JS de Sienna Accessibility -->
+<script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
+<script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
+{% endblock %}

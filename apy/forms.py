@@ -2,6 +2,12 @@ from django import forms
 from django.forms import ModelForm, Select, NumberInput, DateInput, TimeInput, TextInput, EmailInput
 from django.forms import inlineformset_factory
 from decimal import Decimal, InvalidOperation
+
+from django.contrib.auth.hashers import make_password
+from django import forms  # Asegúrate de usar la importación estándar de forms
+from django.contrib.auth.models import User, Permission  # Importación de modelos de Django
+from django.core.exceptions import ValidationError
+
 from apy.models import *
 
 # -----------Formulario modelo factura------------------
@@ -307,7 +313,151 @@ class ProveedorForm(ModelForm):
             }
         }
 # ------------------- FORMS STEVEN -------------------    
+ 
+class RegistroUsuarioForm(forms.ModelForm):
+    # Campos de Contraseña
+    password = forms.CharField(
+        label='Contraseña',
+        widget=forms.PasswordInput(attrs={'placeholder': 'Contraseña', 'class': 'form-control'}),
+        strip=False,
+        required=True # Por defecto, requerido para la CREACIÓN
+    )
+    password2 = forms.CharField(
+        label='Confirmar Contraseña',
+        widget=forms.PasswordInput(attrs={'placeholder': 'Repita la contraseña', 'class': 'form-control'}),
+        strip=False,
+        required=True # Por defecto, requerido para la CREACIÓN
+    )
+    # Campo de Rol
+    role = forms.ChoiceField(
+        label='Rol',
+        choices=[('normal', 'Empleado'), ('admin', 'Gerente')],
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=True
+    )
+    
+    # Atributo para el mensaje de éxito (se puede inicializar aquí o en save)
+    success_message = 'Usuario registrado con éxito.' 
 
+    class Meta:
+        model = User
+        # Solo incluimos los campos del modelo en 'fields'
+        fields = ('username', 'email') 
+        widgets = {
+            'username': forms.TextInput(attrs={'placeholder': 'Nombre de usuario', 'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'placeholder': 'Correo electrónico', 'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Lógica para la EDICIÓN (cuando self.instance.pk existe)
+        if self.instance.pk:
+            # 1. Hacemos las contraseñas opcionales
+            self.fields['password'].required = False
+            self.fields['password2'].required = False
+            
+            # 2. Inicializamos el campo 'role'
+            if self.instance.is_superuser:
+                self.initial['role'] = 'admin'
+            else:
+                self.initial['role'] = 'normal'
+        
+        # Eliminado: Ya lo hiciste correctamente con el widget al definir el campo 'role'
+        # self.fields['role'].widget.attrs['class'] = 'form-control'
+
+    def clean_password2(self):
+        """Valida que las contraseñas coincidan y hashea la nueva."""
+        password = self.cleaned_data.get('password')
+        password2 = self.cleaned_data.get('password2')
+
+        # Si se ingresa una de las dos, la otra es obligatoria y deben coincidir
+        if password or password2:
+            if not (password and password2) or (password != password2):
+                 # Usamos la clase ValidationError importada
+                raise ValidationError("Las contraseñas no coinciden o falta una.") 
+            
+            # Si coinciden, hasheamos la contraseña y la guardamos temporalmente
+            self._password_hash = make_password(password)
+        else:
+            # Si estamos editando y no se proporcionó contraseña, aseguramos que el hash sea None
+            self._password_hash = None
+            
+        # Retorna el valor del campo que se está limpiando
+        return password2
+
+    def save(self, commit=True):
+        user = self.instance # user es self.instance si es UpdateView, o un nuevo objeto si es CreateView
+        
+        if self.instance.pk:
+            # --- LÓGICA DE ACTUALIZACIÓN (UPDATEVIEW) ---
+            user = super().save(commit=False) # Guarda username, email
+            
+            # Si se proporcionó una nueva contraseña hasheada
+            new_password_hash = getattr(self, '_password_hash', None) 
+            if new_password_hash:
+                user.password = new_password_hash
+            
+            # Lógica del Rol (siempre se actualiza en la edición)
+            role = self.cleaned_data.get('role')
+            user.is_staff = (role == 'admin')
+            user.is_superuser = (role == 'admin')
+            self.success_message = f'Usuario {user.username} actualizado con éxito.'
+
+        else:
+            # --- LÓGICA DE CREACIÓN (CREATEVIEW) ---
+            password_hash = getattr(self, '_password_hash')
+            
+            # Usamos create para poder pasar el password hasheado directamente
+            user = User.objects.create( 
+                username=self.cleaned_data['username'],
+                email=self.cleaned_data['email'],
+                password=password_hash
+            )
+            
+            # Lógica del Rol
+            role = self.cleaned_data.get('role')
+            user.is_staff = (role == 'admin')
+            user.is_superuser = (role == 'admin')
+            self.success_message = f'{"Gerente" if role == "admin" else "Empleado"} {user.username} registrado con éxito.'
+
+        if commit:
+            user.save()
+        
+        return user
+    
+class PerfilUsuarioForm(forms.ModelForm):
+    # Campos adicionales del modelo User
+    first_name = forms.CharField(label='Nombre', required=False)
+    last_name = forms.CharField(label='Apellido', required=False)
+    
+    class Meta:
+        model = User
+        # Solo incluimos los campos que el usuario puede cambiar de su propio perfil
+        fields = ('username', 'email', 'first_name', 'last_name') 
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Aplicar clases de Bootstrap y placeholders a todos los campos
+        for name, field in self.fields.items():
+            field.widget.attrs.update({'class': 'form-control'})
+            if name == 'first_name':
+                field.widget.attrs.update({'placeholder': 'Tu nombre'})
+            elif name == 'last_name':
+                field.widget.attrs.update({'placeholder': 'Tu apellido'})
+            elif name == 'username':
+                 field.widget.attrs.update({'placeholder': 'Nombre de Usuario'})
+            elif name == 'email':
+                 field.widget.attrs.update({'placeholder': 'ejemplo@dominio.com'})
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        # Lógica para asegurar que el email sea único, excluyendo al usuario actual (self.instance)
+        if User.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError("Este correo electrónico ya está registrado.")
+        return email
+    
 class ClienteForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -377,7 +527,7 @@ class VehiculoForm(ModelForm):
             ),
             'placa':TextInput(
                 attrs={
-                    'placeholder':'Ingrese la placa del vehiculo (ej: ABC-123) ',
+                    'placeholder':'Ingrese la placa del vehiculo (ej: ABC123) o (A1C234)',
                 }
             ),
             'modelo_vehiculo':TextInput(
@@ -996,7 +1146,7 @@ class GastosForm(ModelForm):
                     'placeholder':'Ingrese la descripcion del gasto',
                 }
             ),
-            'tipo_gastos':TextInput(
+            'tipo_gastos':Select(
                 attrs={
                     'placeholder':'Ingrese el tipo de gasto ',
                 }
@@ -1065,7 +1215,7 @@ class   NominaForm(ModelForm):
         model = Nomina
         fields = '__all__'
         widgets = {
-            'rol':TextInput(
+            'rol':Select(
                 attrs={
                     'placeholder':'Ingrese rol del empleado',
                 }
@@ -1244,7 +1394,7 @@ class HerramientaForm(ModelForm):
                     'placeholder':'Ingrese el color de la herramienta',
                 }
             ),
-            'tipo':TextInput(
+            'tipo':Select(
                 attrs={
                     'placeholder':'Ingrese el tipo de herramienta',
                 }
@@ -1359,14 +1509,28 @@ class InsumoForm(ModelForm):
                 'required': 'La unidad de medida del insumo es obligatoria',
             },
         }
+        error_messages = {
+            'id_marca': {
+                'required': 'El id de la marca es obligatoria',
+            },
+            'nombre': {
+                'required': 'El nombre del insumo es obligatorio',
+            },
+            'costo': {
+                'required': 'El costo del insumo es obligatorio',
+            },
+            'tipo': {
+                'required': 'El tipo de insumo es obligatorio',
+            },
+            'stock': {
+                'required': 'El stock de insumo es obligatorio',
+            },
+        }
 
 class RepuestoForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['id_marca'].widget.attrs['autofocus'] = True
-        # Hacer que subcategoría sea solo lectura inicialmente
-        # Las opciones se llenarán dinámicamente con JavaScript
-        self.fields['subcategoria'].required = False
         
     class Meta:
         model = Repuesto
@@ -1388,11 +1552,6 @@ class RepuestoForm(ModelForm):
             'categoria':Select(
                 attrs={
                     'placeholder':'Ingrese la categoria del repuesto',
-                }
-            ),
-            'subcategoria':Select(
-                attrs={
-                    'class': 'form-control',
                 }
             ),
             'fabricante':TextInput(

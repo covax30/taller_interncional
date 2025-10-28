@@ -2,7 +2,8 @@
 {% load humanize %}
 
 {% block titulo %}
-        <h1 class="text-center">Lista de Nomina</h1>
+        <i class="fa-solid fa-people-group"></i>
+        <h1 class="text-center">Lista de Nómina</h1>
 {% endblock titulo %}
 
 {% block agregar %}
@@ -13,7 +14,7 @@
 
 {% block columnas %}
 
-        <th>Id de la Nomina</th>
+        <th>Id de la nómina</th>
         <th>Rol</th>
         <th>Monto </th>
         <th>Fecha de Pago </th>
@@ -35,9 +36,20 @@
         <form method="post">
 
           <td>
-            <a href="{% url 'apy:nomina_editar' n.id %}" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></a>
-            <a href="{% url 'apy:nomina_eliminar' n.id %}" class="btn btn-danger btn-xs"><i
-                class="fas fa-trash-alt"></i></a>
+                <a href="{% url 'apy:nomina_editar' n.id %}" 
+              class="btn btn-info btn-xs" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="Editar nomina">
+              <i class="fas fa-edit"></i>
+            </a>
+            <a href="{% url 'apy:nomina_eliminar' n.id %}" 
+              class="btn btn-danger btn-xs" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="Eliminar nomina">
+              <i class="fas fa-trash-alt"></i>
+           </a>
           </td>
       </tr>
       {% endfor %}

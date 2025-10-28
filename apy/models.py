@@ -1,6 +1,9 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
+
+from django.contrib.auth.models import User
+
 import re
 from django.core.validators import MinValueValidator, MaxValueValidator
 
@@ -49,8 +52,8 @@ def validar_monto(value):
         raise ValidationError('El monto debe ser mayor o igual a 99')
 
 placa_regex = RegexValidator(
-        regex=r'^[A-Z]{3}\d{3}$',
-        message="La placa debe tener el formato ABC123 (3 letras seguidas de 3 números)."
+        regex=r'^[A-Z0-9]{6}$',
+        message="La placa debe tener exactamente 6 caracteres alfanuméricos (letras mayúsculas o números)."
     )
 
 modelo_regex = RegexValidator(
@@ -104,7 +107,6 @@ class Repuesto(models.Model):
         ('industrial', 'Industrial'),
     ]
     categoria = models.CharField(max_length=100, choices=CATEGORIA_OPCIONES)
-    subcategoria = models.CharField(max_length=100, blank=True, null=True)
     fabricante = models.CharField(max_length=100)
     stock = models.IntegerField()
     ubicacion = models.CharField(max_length=100)
@@ -124,7 +126,13 @@ class Herramienta(models.Model):
 
     nombre = models.CharField(max_length=100)
     color = models.CharField(max_length=100)
-    tipo = models.CharField(max_length=100)
+    TIPO_OPCIONES = [
+        ('manuales', 'Manuales'),
+        ('eléctricas', 'Eléctricas'),
+        ('neumáticas', 'Neumáticas'),
+        ('de medición', 'De Medición'),
+    ]
+    tipo = models.CharField(max_length=100, choices=TIPO_OPCIONES)
     material = models.CharField(max_length=100)
     id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE)
     stock = models.IntegerField()
@@ -158,6 +166,38 @@ class Insumos(models.Model):
 
 
 # MODULOS STEVEN
+class Module(models.Model):
+    name = models.CharField(max_length=100, unique=True, verbose_name="Nombre del Módulo")
+    description = models.TextField(blank=True, verbose_name="Descripción")
+
+    class Meta:
+        verbose_name = "Módulo de Permiso"
+        verbose_name_plural = "Módulos de Permisos"
+        
+    def __str__(self):
+        return self.name
+
+class Permission(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='custom_permissions', verbose_name="Usuario")
+    module = models.ForeignKey(Module, on_delete=models.CASCADE, verbose_name="Módulo")
+    
+    # Campos booleanos para los permisos
+    view = models.BooleanField(default=False, verbose_name="Ver")
+    add = models.BooleanField(default=False, verbose_name="Crear")
+    change = models.BooleanField(default=False, verbose_name="Editar")
+    delete = models.BooleanField(default=False, verbose_name="Eliminar")
+
+    class Meta:
+        # Asegura que un usuario solo tenga un conjunto de permisos por módulo
+        unique_together = ('user', 'module') 
+        verbose_name = "Permiso Personalizado"
+        verbose_name_plural = "Permisos Personalizados"
+
+    def __str__(self):
+        return f"Permisos de {self.user.username} en {self.module.name}"
+
+
+
 
 class Cliente(models.Model):
     id_cliente = models.AutoField(primary_key=True)
@@ -269,7 +309,12 @@ class Gastos(models.Model):
         }, validators=[validar_monto]
     )
     descripcion = models.TextField() 
-    tipo_gastos=models.CharField(max_length=100)
+    TIPO_GASTOS_OPCIONES = [
+        ('costo fijo', 'Costo fijo'),
+        ('costo directo', 'Costo directo'),
+        ('costo variable', 'Costo variable'),
+    ]
+    tipo_gastos=models.CharField(max_length=100, choices=TIPO_GASTOS_OPCIONES)
     id_pagos_servicios = models.ForeignKey(PagoServiciosPublicos, on_delete=models.CASCADE)
     def __str__(self):
         return f"{self.tipo_gastos} - ${self.monto}"
@@ -328,8 +373,13 @@ class Informes(models.Model):
     
 #-------- nomina------
 class Nomina(models.Model):
-   
-    rol = models.CharField(max_length=100)
+    
+    TIPO_ROL = [
+        ('administrador', 'Administrador'),
+        ('empleado', 'Empleado'),
+    ]
+    
+    rol = models.CharField(max_length=100, choices=TIPO_ROL)
     monto = models.IntegerField(  # 🔹 ENTEROS, sin decimales
         error_messages={
             'invalid': 'Ingrese un número válido para el monto.',

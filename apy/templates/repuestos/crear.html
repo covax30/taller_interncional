@@ -46,21 +46,6 @@
         {% endif %}
     </div>
 
-    <!-- Subcategoría -->
-    <div class="form-group mb-3">
-        <label for="{{ form.subcategoria.id_for_label }}">Subcategoría:</label>
-        <div class="input-group">
-            {{ form.subcategoria|add_class:'form-control' }}
-        </div>
-        {% if form.subcategoria.errors %}
-            <div class="invalid-feedback d-block">
-                {% for error in form.subcategoria.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
-            </div>
-        {% endif %}
-    </div>
-
     <!-- Fabricante -->
     <div class="form-group mb-3">
         <label for="{{ form.fabricante.id_for_label }}">Fabricante:</label>
@@ -154,7 +139,7 @@
                 <button type="submit " class="btn btn-primary btn-flat"><i class="fas fa-save"></i>
                     Agregar
                 </button>
-                <a href="{% url 'apy:repuesto_lista' %}" class="btn btn-default btn-flat float-right">
+                <a href="{% url 'apy:repuesto_lista' %}" class="btn btn-danger btn-flat float-right">
                     <i class="fas fa-times"></i> Cancelar
                 </a>
 {% endblock %}

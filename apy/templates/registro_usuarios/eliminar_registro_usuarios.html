@@ -1,0 +1,39 @@
+{% extends 'body.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="p-4 border">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="text-right text-danger">{{ titulo }}</h4> 
+            </div>
+
+            <div class="alert alert-danger text-center" role="alert">
+                <p>Estás a punto de eliminar al siguiente usuario:</p>
+                <h5 class="alert-heading mb-3">
+                    <i class="fas fa-user-times"></i> **{{ object.username }}** (ID: {{ object.id }})
+                </h5>
+                <p class="mb-0">**¿Estás absolutamente seguro de que deseas continuar?**</p>
+                <p>Esta acción no se puede deshacer.</p>
+            </div>
+            
+            <form method="post" class="text-center mt-4">
+                {% csrf_token %}
+                
+                <button type="submit" class="btn btn-danger me-3">
+                    <i class="fas fa-trash-alt"></i> Sí, Eliminar Usuario
+                </button>
+                
+                <a href="{{ listar_url }}" class="btn btn-secondary">
+                    <i class="fas fa-undo"></i> Cancelar
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- JS de Sienna Accessibility -->
+<script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
+<script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
+{% endblock %}

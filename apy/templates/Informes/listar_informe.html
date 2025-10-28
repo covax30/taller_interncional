@@ -2,6 +2,7 @@
 {% load humanize %}
 
 {% block titulo %}
+        <i class="fa-solid fa-file"></i>
         <h1 class="text-center">Lista de Informes</h1>
 {% endblock titulo %}
 
@@ -41,9 +42,20 @@
         <td>{{ i.id_mantenimiento}}</td>
 
           <td>
-            <a href="{% url 'apy:informes_editar' i.id_informe %}" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></a>
-            <a href="{% url 'apy:informes_eliminar' i.id_informe %}" class="btn btn-danger btn-xs"><i
-                class="fas fa-trash-alt"></i></a>
+            <a href="{% url 'apy:informes_editar' i.id_informe %}" 
+              class="btn btn-info btn-xs" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="Editar informe">
+              <i class="fas fa-edit"></i>
+            </a>
+            <a href="{% url 'apy:informes_eliminar' i.id_informe %}" 
+              class="btn btn-danger btn-xs" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="Eliminar informe">
+              <i class="fas fa-trash-alt"></i>
+           </a>
           </td>
       </tr>
       {% endfor %}

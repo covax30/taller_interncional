@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'apy',
     'login',
-    'widget_tweaks'
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
@@ -107,11 +107,15 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-co'
 
-TIME_ZONE = 'UTC'
+USE_TZ = True # Asegura que Django use zonas horarias
+
+TIME_ZONE = 'America/Bogota' # Establece la zona horaria a Colombia
 
 USE_I18N = True
+
+USE_L10N = True
 
 USE_TZ = True
 
@@ -132,7 +136,20 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-LOGIN_URL = '/login'
+LOGIN_URL = 'login:login'
 LOGIN_REDIRECT_URL = 'apy:informes_lista'
-LOGOUT_REDIRECT_URL = '/login'
-X_FRAME_OPTIONS = 'SAMEORIGIN'
+LOGOUT_REDIRECT_URL = ''
+
+# -----------------------------------------------------
+# ✅ CONFIGURACIÓN DE CORREO CORREGIDA Y FINAL
+# -----------------------------------------------------
+# Asegúrate de que esta línea esté presente:
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' 
+# Si usas Gmail (lo más común):
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'soportecnico.t.i.m@gmail.com'
+EMAIL_HOST_PASSWORD = 'pjqmmdgfnredlrtg'
+
+

@@ -1,0 +1,234 @@
+{% extends 'body.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container mt-4 mb-5">
+    
+    <h2 class="mb-4 text-body">
+        <i class="fas fa-lock me-2"></i> Gestión de Permisos del Usuario
+    </h2>
+    <p class="text-muted">Asigne los permisos de Ver, Crear, Editar y Eliminar para cada módulo del sistema.</p>
+    
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" action="{% url 'apy:permisos_usuarios' %}" class="needs-validation" novalidate>
+        {% csrf_token %}
+        
+        <div class="card shadow-sm mb-4 bg-body border-body-tertiary">
+            <div class="card-header text-bg-secondary border-body-tertiary">
+                <h5 class="mb-0">
+                    <i class="fas fa-user-tag me-1"></i> 1. Seleccionar Empleado
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text text-body">
+                    <strong>Paso 1:</strong> Use el menú desplegable para buscar y seleccionar el usuario al que desea modificar los permisos. La tabla de permisos se cargará automáticamente.
+                </p>
+                <div class="row align-items-center">
+                    <label for="id_user" class="col-2 col-form-label fw-bold text-body text-end">Usuario</label>
+                    
+                    <div class="col-10">
+                        <select name="user" class="form-select w-100" id="id_user" onchange="this.form.submit()" required> 
+                            <option value="">-- Seleccione un usuario --</option>
+                            {% for user in users %}
+                                <option value="{{ user.id }}" 
+                                    {% if user_to_edit and user_to_edit.id == user.id %}selected{% endif %}>
+                                    
+                                    {{ user.username }} 
+                                    
+                                    {# CAMBIO CLAVE AQUÍ: Solo muestra (Actual) si el usuario en el bucle es el usuario logueado #}
+                                    {% if user.id == request.user.id %}<span class="text-success fw-bold"> (Usted)</span>{% endif %}
+                                    
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <div class="invalid-feedback">Por favor, seleccione un usuario.</div>
+                        {# Campo oculto CLAVE para enviar el ID del usuario que se está editando al guardar #}
+                        <input type="hidden" name="user_id_to_edit" value="{{ user_to_edit.id|default_if_none:'' }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if user_to_edit %}
+            <div class="card card-default shadow bg-body text-body border-body-tertiary">
+                <div class="card-header text-bg-secondary border-body-tertiary">
+                    <h3 class="card-title">
+                        <i class="fas fa-cubes me-1"></i> 2. Asignar Permisos a Módulos para **{{ user_to_edit.username }}**
+                    </h3>
+                </div>
+                
+                <div class="card-body">
+                    {# ... Contenido de la tabla y lógica de permisos ... #}
+                    <div class="p-3 text-body border-bottom border-body-tertiary mb-3">
+                        <strong>Paso 2:</strong> Marque la casilla debajo de cada acción (Ver, Crear, Editar, Eliminar) para otorgarle ese permiso en el módulo correspondiente.
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped" style="width: 100%;">
+                            <thead>
+                                <tr class="fw-bold text-uppercase bg-body-tertiary text-body">
+                                    <th style="width: 50%;">MÓDULO</th>
+                                    <th class="text-center" style="width: 12.5%;">
+                                        <div class="form-check d-inline-block">
+                                            <input type="checkbox" class="form-check-input global-check" id="global_view_check" data-perm-type="view">
+                                            <label class="form-check-label" for="global_view_check"><i class="fas fa-eye me-1"></i> VER</label>
+                                        </div>
+                                    </th>
+                                    <th class="text-center" style="width: 12.5%;">
+                                        <div class="form-check d-inline-block">
+                                            <input type="checkbox" class="form-check-input global-check" id="global_add_check" data-perm-type="add">
+                                            <label class="form-check-label" for="global_add_check"><i class="fas fa-plus me-1"></i> CREAR</label>
+                                        </div>
+                                    </th>
+                                    <th class="text-center" style="width: 12.5%;">
+                                        <div class="form-check d-inline-block">
+                                            <input type="checkbox" class="form-check-input global-check" id="global_change_check" data-perm-type="change">
+                                            <label class="form-check-label" for="global_change_check"><i class="fas fa-pen me-1"></i> EDITAR</label>
+                                        </div>
+                                    </th>
+                                    <th class="text-center" style="width: 12.5%;">
+                                        <div class="form-check d-inline-block">
+                                            <input type="checkbox" class="form-check-input global-check" id="global_delete_check" data-perm-type="delete">
+                                            <label class="form-check-label" for="global_delete_check"><i class="fas fa-trash me-1"></i> ELIMINAR</label>
+                                        </div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for module in modules %}
+                                <tr>
+                                    <td class="align-middle fw-normal text-body">{{ module.name }}</td>
+
+                                    <td class="text-center align-middle">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input type="checkbox" class="form-check-input perm-view-checkbox" id="perm_{{ module.id }}_view" 
+                                                    name="perm_{{ module.id }}_view"
+                                                    {% if module.current_permissions.view %}checked{% endif %}>
+                                            <label class="form-check-label" for="perm_{{ module.id }}_view"></label>
+                                        </div>
+                                    </td>
+
+                                    <td class="text-center align-middle">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input type="checkbox" class="form-check-input perm-add-checkbox" id="perm_{{ module.id }}_add" 
+                                                    name="perm_{{ module.id }}_add"
+                                                    {% if module.current_permissions.add %}checked{% endif %}>
+                                            <label class="form-check-label" for="perm_{{ module.id }}_add"></label>
+                                        </div>
+                                    </td>
+
+                                    <td class="text-center align-middle">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input type="checkbox" class="form-check-input perm-change-checkbox" id="perm_{{ module.id }}_change" 
+                                                    name="perm_{{ module.id }}_change"
+                                                    {% if module.current_permissions.change %}checked{% endif %}>
+                                            <label class="form-check-label" for="perm_{{ module.id }}_change"></label>
+                                        </div>
+                                    </td>
+
+                                    <td class="text-center align-middle">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input type="checkbox" class="form-check-input perm-delete-checkbox" id="perm_{{ module.id }}_delete" 
+                                                    name="perm_{{ module.id }}_delete"
+                                                    {% if module.current_permissions.delete %}checked{% endif %}>
+                                            <label class="form-check-label" for="perm_{{ module.id }}_delete"></label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-4">
+                                            <i class="fas fa-exclamation-triangle me-2"></i> No hay módulos registrados.
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="card-footer text-end text-bg-secondary border-body-tertiary">
+                    <strong>Paso 3:</strong> Cuando finalice la configuración, haga clic en Guardar.
+                    <button type="submit" name="save_permissions" value="true" class="btn btn-lg btn-primary shadow-sm mt-2">
+                        <i class="fas fa-save me-2"></i> Guardar Permisos
+                    </button>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info text-center shadow-sm" role="alert">
+                Por favor, use el menú desplegable para seleccionar el usuario cuyos permisos desea administrar y comenzar la configuración.
+            </div>
+        {% endif %}
+
+    </form>
+</div>
+
+<style>
+/* Estilo para los checkboxes sin marcar */
+.form-check-input:not(:checked) {
+    /* Fondo blanco para contraste con fondos oscuros */
+    background-color: #ffffff; 
+    /* Borde más grueso y visible (ej. color primario de Bootstrap o un color fuerte) */
+    border: 2px solid #0d6efd; 
+}
+
+/* Estilo para los checkboxes marcados */
+.form-check-input:checked {
+    /* Color de fondo primario de Bootstrap (Azul) para alto contraste */
+    background-color: #0d6efd; 
+    border-color: #0d6efd; 
+}
+
+/* Estilos para mantener la apariencia de AdminLTE en el tema oscuro */
+html[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: rgba(255, 255, 255, 0.05); /* Tono ligeramente más claro para las filas impares */
+}
+
+/* Asegurar que el texto dentro de la tabla se adapte al tema */
+.table th, .table td {
+    color: var(--bs-body-color);
+}
+</style>
+
+<script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
+<script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
+
+<script>
+$(document).ready(function() {
+    // 1. Lógica para el switch global (Marcar/desmarcar todos los checkboxes de un tipo)
+    $('.global-check').on('change', function() {
+        const isChecked = $(this).prop('checked');
+        const permType = $(this).data('perm-type'); // 'view', 'add', 'change', o 'delete'
+        
+        // Seleccionar todos los checkboxes individuales con la clase correspondiente y actualizarlos
+        $('.perm-' + permType + '-checkbox').prop('checked', isChecked);
+    });
+
+    // 2. Lógica para los checkboxes individuales (Actualizar el switch global)
+    $('.form-check-input:not(.global-check)').on('change', function() {
+        const permTypes = ['view', 'add', 'change', 'delete'];
+
+        permTypes.forEach(function(permType) {
+            const allBoxes = $('.perm-' + permType + '-checkbox');
+            if (allBoxes.length > 0) {
+                // Comprueba si el número de checkboxes marcados es igual al total
+                const allChecked = allBoxes.length === allBoxes.filter(':checked').length;
+                $('#global_' + permType + '_check').prop('checked', allChecked);
+            }
+        });
+    });
+
+    // 3. Inicializar el estado de los switches globales al cargar la página
+    $('.form-check-input:not(.global-check)').trigger('change');
+});
+</script>
+{% endblock %}
