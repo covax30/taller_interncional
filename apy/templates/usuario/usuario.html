@@ -103,7 +103,7 @@
                 <h4 class="text-right">Cambiar Contraseña</h4>
             </div>
             
-            <form method="POST" action="{% url 'password_change' %}"> 
+            <form method="POST" action="{% url 'apy:password_change' %}"> 
                 {% csrf_token %}
                 
                 <div class="col-md-12">

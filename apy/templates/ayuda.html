@@ -1,0 +1,106 @@
+{% extends 'body.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="main-content" style="padding: 20px; padding-top: 70px; padding-bottom: 80px; width: 100%;">
+  <div class="col-md-12">
+    <div class="card card-default">
+      <div class="card-header">
+            <h3 class="card-tittle">
+                <i class="fa-solid fa-circle-info"></i>
+                Ayuda
+            </h3>
+        </div>
+
+      <div class="card-body" style="line-height: 1.8; font-size: 16px;">
+        <p>
+          Bienvenido al <strong>Sistema de Gestión del Taller Internacional de Motores</strong>.  
+          Este sistema permite administrar todas las áreas del taller según el rol de cada usuario.
+          A continuación encontrarás una guía breve para aprovecharlo al máximo.
+        </p>
+
+        <h4>🔐 Inicio de Sesión y Recuperación de Contraseña</h4>
+        <p>
+          Ingresa con tu usuario y contraseña asignados.  
+          Si la olvidas, usa la opción <strong>“¿Olvidó su contraseña?”</strong> para recibir un correo con las instrucciones de recuperación.
+        </p>
+
+        <h4>🏠 Navegación General</h4>
+        <p>
+          En el <strong>sidebar izquierdo</strong> encontrarás los accesos a todos los módulos: Facturas, Vehículos, Informes, Compras, Proveedores, Repuestos, entre otros.  
+          Puedes cambiar entre ellos con un solo clic.
+        </p>
+        <p>
+          En la parte superior podrás activar <strong>pantalla completa</strong>, ver tu nombre, usuario y foto de perfil, y cerrar sesión de forma segura.
+        </p>
+
+        <h4>👥 Roles de Usuario</h4>
+        <p>
+          Cada usuario tiene permisos específicos según su rol:  
+          - <strong>Administrador:</strong> Puede crear, editar, eliminar y ver todos los registros.  
+          - <strong>Empleado:</strong> Puede ver y registrar información según su área.  
+          - <strong>Invitado:</strong> Solo puede consultar información.  
+        </p>
+
+        <h4>📋 Listado de Registros</h4>
+        <p>
+          En cada módulo, los datos se muestran en una tabla interactiva.  
+          Puedes:
+        </p>
+        <ul>
+          <li>Usar el cuadro de <strong>búsqueda</strong> para encontrar registros.</li>
+          <li>Seleccionar cuántos registros deseas mostrar.</li>
+          <li>Filtrar información desde los encabezados de cada columna.</li>
+          <li>Editar o eliminar usando los botones de acción.</li>
+        </ul>
+        <p>
+          En modo responsivo (pantalla pequeña), algunos filtros y columnas se ocultan automáticamente para mejorar la visualización.
+        </p>
+
+        <h4>➕ Creación de Registros</h4>
+        <p>
+          Al hacer clic en el botón <strong>“Agregar”</strong>, se abre un formulario donde puedes registrar nuevos datos.  
+          Los campos de fecha y hora usan selectores para facilitar la entrada.  
+          Si necesitas agregar una información relacionada (por ejemplo, un nuevo repuesto o proveedor), puedes hacerlo directamente desde el <strong>modal</strong> y se guardará de inmediato.
+        </p>
+
+        <h4>⚙️ Accesibilidad</h4>
+        <p>
+          El sistema incluye un <strong>módulo de accesibilidad</strong> con herramientas para adaptar la interfaz:
+        </p>
+        <ul>
+          <li>Modo claro / oscuro</li>
+          <li>Ajuste de tamaño de fuente</li>
+          <li>Resaltado de texto, enlaces y títulos</li>
+          <li>Alta o baja saturación, monocromo</li>
+          <li>Guía de lectura, cursor grande y detener animaciones</li>
+        </ul>
+
+        <h4>👨‍💻 Gestión de Usuarios</h4>
+        <p>
+          Desde el módulo <strong>Usuarios</strong> puedes consultar la lista del sistema, editar nombres de usuario o restablecer contraseñas según permisos.
+        </p>
+
+        <h4>💡 Recomendaciones Generales</h4>
+        <ul>
+          <li>Guarda tus cambios antes de salir del formulario.</li>
+          <li>No cierres el navegador mientras se esté enviando información.</li>
+          <li>Revisa tus permisos antes de intentar editar o eliminar registros.</li>
+        </ul>
+
+        <div class="alert alert-info mt-4">
+          <strong>¿Problemas o dudas?</strong> Contacta al administrador del sistema para asistencia técnica.
+        </div>
+        <div class="card-body">
+            <h5>¿Necesitas ayuda?</h5>
+            <p>Si tienes alguna duda o problema, no dudes en contactarnos a través de los siguientes medios:</p>
+            <ul>
+                <li>Email:  soportecnico.t.i.m@gmail.com</li>
+            </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
