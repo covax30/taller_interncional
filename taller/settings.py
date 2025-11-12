@@ -10,11 +10,27 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Cargar variables del entorno ANTES de cualquier configuración
+load_dotenv()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# --- Configuración del Módulo de Backup ---
+# Define la ruta donde se guardarán los backups, dentro del directorio base.
+BACKUP_ROOT = os.path.join(BASE_DIR, 'db_backups') # Usé 'db_backups' por claridad
+try:
+    # Asegúrate de que la carpeta exista y sea escribible.
+    Path(BACKUP_ROOT).mkdir(parents=True, exist_ok=True)
+except OSError as e:
+    # Es bueno loguear si no se pudo crear el directorio.
+    logging.error(f"No se pudo crear el directorio de backups en {BACKUP_ROOT}: {e}")
+# -------------------------------------------
 
 
 # Quick-start development settings - unsuitable for production
@@ -42,6 +58,8 @@ INSTALLED_APPS = [
     'apy',
     'login',
     'widget_tweaks',
+    
+    'backup_module',
 ]
 
 MIDDLEWARE = [
@@ -72,18 +90,18 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'taller.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+# settings.py (CONFIGURACIÓN PERMANENTE MYSQL)
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.getenv('DB_NAME', 'mydatabase'),
+        'USER': os.getenv('DB_USER', 'myuser'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'mypassword'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '3307'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
