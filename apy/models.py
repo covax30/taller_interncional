@@ -205,10 +205,12 @@ class Cliente(models.Model):
     documento = models.BigIntegerField(validators=[validar_identificacion])
     telefono = models.BigIntegerField(validators=[validar_telefono])
     correo = models.EmailField(max_length=100, validators=[validar_email])
-
+    activo = models.BooleanField(default=True, verbose_name="Está activo")
 
     def __str__(self):
         return f"{self.id_cliente} - {self.nombre}"
+    
+
 
 
 class Vehiculo(models.Model):
@@ -253,10 +255,10 @@ class Administrador(models.Model):
     id_admin = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
     apellidos = models.CharField(max_length=100)
-    identificacion = models.IntegerField(max_length=11, unique=True, validators=[validar_identificacion])
+    identificacion = models.IntegerField( unique=True, validators=[validar_identificacion])
     edad = models.PositiveIntegerField(validators=[validar_edad])
     correo = models.EmailField(unique=True, validators=[validar_email])
-    telefono = models.IntegerField(max_length=10, validators=[validar_telefono])
+    telefono = models.IntegerField( validators=[validar_telefono])
     fecha_ingreso = models.DateField()
     
     def __str__(self):
@@ -428,7 +430,7 @@ class DetalleServicio(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     estado = models.CharField(max_length=20, default='pendiente')
     
-    # ✅ PROPIEDADES NUEVAS - AGREGAR ESTAS
+    
     @property
     def total_repuestos(self):
         """Calcula el total de TODOS los repuestos del servicio"""
@@ -453,7 +455,7 @@ class DetalleServicio(models.Model):
         except (AttributeError, TypeError):
             return 0
     
-    # ✅ PROPIDAD EXISTENTE - MANTENER ASÍ
+    
     @property
     def subtotal(self):
         total = 0

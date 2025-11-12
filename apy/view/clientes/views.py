@@ -1,4 +1,5 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views import View
 # Se asume que apy.models, apy.view.clientes.views, y apy.forms contienen las clases necesarias
 from apy.models import *
 # from apy.view.clientes.views import * # Si este archivo contiene estas vistas, esta importación puede ser redundante o generar un conflicto circular. Se recomienda revisar su necesidad.
@@ -12,6 +13,28 @@ from django.urls import reverse_lazy
 from apy.forms import *
 from django.contrib.auth.mixins import AccessMixin
 from apy.decorators import PermisoRequeridoMixin
+
+
+
+## MIXIN PARA EL SOFT DELETE     
+class SoftDeleteMixin:
+    
+    def perform_soft_delete(self, object):
+        if hasattr(object, 'activo'):
+            object.activo = False
+            object.save()
+            return True
+        return False
+    
+    
+    def perform_reactivate(self, object):
+        if hasattr(object, 'activo'):
+            object.activo = True
+            object.save()
+            return True
+        return False 
+    
+       
 
 ## MIXIN DE PERMISOS
 class PermisoRequeridoMixin(AccessMixin):
@@ -77,6 +100,12 @@ class ClienteListView(PermisoRequeridoMixin, ListView):
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
     
+    def get_queryset(self):
+        
+        return Cliente.objects.filter(activo=True).order_by('id_cliente')
+        
+    
+    
     def post(self, request, *args, **kwargs):
         nombre = {'nombre' : 'Cliente'}
         return JsonResponse(nombre)
@@ -86,6 +115,8 @@ class ClienteListView(PermisoRequeridoMixin, ListView):
         context['titulo'] = 'Lista de Clientes'
         context['crear_url'] = reverse_lazy('apy:cliente_crear')
         context['entidad'] = 'Cliente'
+        context['inactivos_url'] = reverse_lazy('apy:cliente_inactivos')
+        context['total_inactivos'] = Cliente.objects.filter(activo=False).count()
         return context
     
 class ClienteCreateView(PermisoRequeridoMixin, CreateView):
@@ -104,7 +135,8 @@ class ClienteCreateView(PermisoRequeridoMixin, CreateView):
         
         # Si la request es AJAX, devolver JSON con el nuevo contador
         if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            total_clientes = Cliente.objects.count()
+            total_clientes = Cliente.objects.filter(activo=True).count() if hasattr(Cliente, 'activo') else Cliente.objects.count()
+            
             return JsonResponse({
                 'success': True, 
                 'total_clientes': total_clientes,
@@ -147,43 +179,77 @@ class ClienteUpdateView(PermisoRequeridoMixin, UpdateView):
         context['listar_url'] = reverse_lazy('apy:cliente_lista')
         return context
     
-class ClienteDeleteView(PermisoRequeridoMixin, DeleteView): 
+class ClienteDeleteView(PermisoRequeridoMixin,  DeleteView): 
     model = Cliente
     template_name = 'clientes/eliminar_clientes.html'
     success_url = reverse_lazy('apy:cliente_lista')
     
-    def form_valid(self, form):
-        messages.success(self.request, "Cliente eliminado correctamente")
-        return super().form_valid(form)
-    
-    # --- Configuración de Permisos ---
     module_name = 'Clientes'
     permission_required = 'delete'
+    
+    def delete(self, request, *args, **kwargs):
+        cliente = self.get_object()
+        
+        cliente.activo = False
+        cliente.save()
+        
+        messages.success(request, f'Cliente "{cliente.nombre}" desactivado correctamente')
+        
+        return redirect(self.success_url)
     
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['titulo'] = 'Eliminar de Clientes'
+        context['titulo'] = 'Desactivar Cliente'
         context['entidad'] = 'Cliente'
         context['listar_url'] = reverse_lazy('apy:cliente_lista')
         return context
+
+## ✅ NUEVAS VISTAS SIMPLIFICADAS
+
+class ClienteInactivosListView(PermisoRequeridoMixin, ListView):
+    model = Cliente
+    template_name = 'clientes/listar_clientes_inactivos.html'
     
-# Vista para mostrar estadísticas
+    module_name = 'Clientes'
+    permission_required = 'view'
+    
+    def get_queryset(self):
+        # Solo clientes inactivos
+        return Cliente.objects.filter(activo=False).order_by('-id_cliente')  # Orden por ID en lugar de fecha
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Clientes Inactivos'
+        context['entidad'] = 'Cliente'
+        context['listar_activos_url'] = reverse_lazy('apy:cliente_lista')
+        return context
+
+class ClienteReactivateView(PermisoRequeridoMixin, SoftDeleteMixin,View):
+    """Vista para reactivar clientes desactivados"""
+    
+    module_name = 'Clientes'
+    permission_required = 'change'
+    
+    def post(self, request, pk):
+        cliente = get_object_or_404(Cliente, pk=pk, activo=False)
+        
+        cliente.activo = True
+        cliente.save()
+        messages.success(request, f'Cliente "{cliente.nombre}" reactivado correctamente')
+        return redirect('apy:cliente_inactivos')
+
+## ✅ VISTAS EXISTENTES ACTUALIZADAS
+
 def estadisticas_view(request):
-    # Contar total de clientes
-    total_clientes = Cliente.objects.count()
-    
-    # Puedes agregar más estadísticas aquí
-    context = {
-        'total_clientes': total_clientes,
-    }
+    total_clientes = Cliente.objects.filter(activo=True).count() if hasattr(Cliente, 'activo') else Cliente.objects.count()
+    context = {'total_clientes': total_clientes}
     return render(request, 'estadisticas.html', context)
 
-# API para actualización dinámica del contador de clientes
 def api_contador_clientes(request):
-    total_clientes = Cliente.objects.count()
+    total_clientes = Cliente.objects.filter(activo=True).count() if hasattr(Cliente, 'activo') else Cliente.objects.count()
     return JsonResponse({'total_clientes': total_clientes})
 
 class ClienteCreateModalView(CreateView):

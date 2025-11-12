@@ -73,6 +73,9 @@ urlpatterns = [
     path('cliente/editar/<int:pk>/', ClienteUpdateView.as_view(), name='cliente_editar'),
     path('cliente/eliminar/<int:pk>/', ClienteDeleteView.as_view(), name='cliente_eliminar'),
     path("cliente/modal/crear/", ClienteCreateModalView.as_view(), name="cliente_modal_crear"),
+    path('cliente/inactivos/', ClienteInactivosListView.as_view(), name='cliente_inactivos'),
+    path('cliente/reactivar/<int:pk>/', ClienteReactivateView.as_view(), name='cliente_reactivar'),
+
 
     path('compra/listar/', CompraListView.as_view(), name='compra_lista'),
     path('compra/agregar/', CompraCreateView.as_view(), name='compra_crear'),
