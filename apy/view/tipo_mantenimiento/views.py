@@ -95,6 +95,10 @@ class TipoMantenimientoCreateView(PermisoRequeridoMixin, CreateView): # ORDEN CO
     permission_required = 'add'
     
     def form_valid(self, form):
+        messages.success(self.request, "Tipo de Mantenimiento creado correctamente")
+        return super().form_valid(form)
+    
+    def form_valid(self, form):
         messages.success(self.request, "tipo de mantnimiento creado correctamente")
         return super().form_valid(form)
     
@@ -115,6 +119,10 @@ class TipoMantenimientoUpdateView(PermisoRequeridoMixin, UpdateView):
     module_name = 'TipoMantenimiento'
     permission_required = 'change'
     
+    def form_valid(self, form):
+        messages.success(self.request, "Tipo de Mantenimiento actualizado correctamente")
+        return super().form_valid(form)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Editar Tipo de Mantenimiento'
@@ -130,6 +138,10 @@ class TipoMantenimientoDeleteView(PermisoRequeridoMixin, DeleteView):
     # --- Configuración de Permisos ---
     module_name = 'TipoMantenimiento'
     permission_required = 'delete'
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Tipo de Mantenimiento eliminado correctamente")
+        return super().form_valid(form)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

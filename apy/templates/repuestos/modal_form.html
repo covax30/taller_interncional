@@ -1,25 +1,49 @@
 {% load widget_tweaks %}
 {% block form %}
 
-    <div id="msg-repuesto"></div>  {# Aquí se mostrarán los mensajes #}
+<div id="msg-repuesto"></div>
 
-    <form id="repuestoForm" method="post" action="{% url 'apy:repuesto_modal_crear' %}">
-        {% csrf_token %}
-    {% for field in form.visible_fields %}
+<form id="repuestoForm" method="post" action="{% url 'apy:repuesto_modal_crear' %}">
+    {% csrf_token %}
+
+    <!-- Campo Marca con botón para abrir modal -->
     <div class="form-group mb-3">
-        <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
-        {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
-
-        {% if field.errors %}
+        <label for="{{ form.id_marca.id_for_label }}">Marca:</label>
+        <div class="input-group">
+            {{ form.id_marca|add_class:'form-control'|attr:'autocomplete:off' }}
+            <div class="input-group-append">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_marca" title="Agregar nueva marca">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+        {% if form.id_marca.errors %}
             <div class="invalid-feedback d-block">
-                {% for error in field.errors %}
+                {% for error in form.id_marca.errors %}
                     <small>{{ error }}</small><br>
                 {% endfor %}
             </div>
         {% endif %}
     </div>
 
+    <!-- Renderiza el resto de los campos, excepto id_marca -->
+    {% for field in form.visible_fields %}
+        {% if field.name != 'id_marca' %}
+            <div class="form-group mb-3">
+                <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
+                {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
+                {% if field.errors %}
+                    <div class="invalid-feedback d-block">
+                        {% for error in field.errors %}
+                            <small>{{ error }}</small><br>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
     {% endfor %}
+</form>
+
 {% endblock %}
 
 {% block Cancelar %}

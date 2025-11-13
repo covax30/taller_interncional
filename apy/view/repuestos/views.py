@@ -137,6 +137,10 @@ class RepuestoUpdateView(UpdateView):
     module_name = 'Repuestos'
     permission_required = 'change'
     
+    def form_valid(self, form):
+        messages.success(self.request, "Repuesto actualizado correctamente")
+        return super().form_valid(form) 
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Editar Repuesto'
@@ -152,6 +156,10 @@ class RepuestoDeleteView(PermisoRequeridoMixin, DeleteView):
     # --- Configuración de Permisos ---
     module_name = 'Repuestos'
     permission_required = 'delete'
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Repuesto eliminado correctamente")
+        return super().form_valid(form)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
