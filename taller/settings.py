@@ -25,8 +25,7 @@ SECRET_KEY = 'django-insecure-1ras&$usy0ocn2u-x=k00^w8o1zda_&vu41u68h3p+(7_*ween
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -124,13 +123,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
+# Directorios donde Django buscará archivos estáticos (Busca en apy/static/)
 STATICFILES_DIRS = [
-    BASE_DIR / "staticfiles", # Añade esta línea
-    BASE_DIR / 'apy' / 'static' / 'AdminLTE' / 'dist',
+    # Reemplaza o asegúrate que esta línea exista para apuntar a la carpeta 'static' dentro de 'apy'
+    os.path.join(BASE_DIR, 'apy', 'static'), 
 ]
-#eSTATIC_ROOT = BASE_DIR / "staticfiles"#Esta variable solo se usa en produccion
+
+#STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

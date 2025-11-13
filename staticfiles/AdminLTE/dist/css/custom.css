@@ -1,0 +1,127 @@
+/* ========================================================= */
+/* ESTILOS ESPECÍFICOS PARA LA PÁGINA 404 (AdminLTE Custom) */
+/* ========================================================= */
+
+#error-404-content {
+    /* Asegura que el contenedor del error ocupe la pantalla completa */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 57px); /* 100vh menos el header de AdminLTE */
+}
+
+.custom-error-container {
+    /* Fondo gris-azul */
+    background-color: #aebfd5; 
+    position: relative;
+    width: 100%;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 50px 20px;
+    overflow: hidden; /* Oculta los engranajes que salgan del área */
+    border-radius: 5px; /* Pequeño redondeo */
+}
+
+.custom-error-text {
+    z-index: 10;
+    color: #333; /* Texto oscuro */
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+.custom-error-text h1 {
+    /* Estilo para "Oh, no! Really?" */
+    font-size: 3.5rem; 
+    font-weight: 700;
+}
+
+.custom-error-text h2 {
+    /* Estilo para "404 Error Page" */
+    font-size: 2.5rem;
+    font-weight: 900;
+}
+
+
+/* --- ⚙️ Estilos de Engranajes --- */
+
+@keyframes rotateGear {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.gear {
+    position: absolute;
+    opacity: 0.3;
+    background-color: #5a7395; /* Color similar al de los coches */
+    border-radius: 50%;
+    /* Utilizamos una máscara de SVG o un PNG de engranaje para producción, 
+       pero aquí simulamos la forma con un simple círculo para el ejemplo. */
+    mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M72.9 50c0-12.7 10.3-23 23-23 1.1 0 2 .9 2 2v42c0 1.1-.9 2-2 2-12.7 0-23-10.3-23-23zM50 72.9c12.7 0 23 10.3 23 23 0 1.1.9 2 2 2h-42c-1.1 0-2-.9-2-2 0-12.7 10.3-23 23-23zM27.1 50c0 12.7-10.3 23-23 23-1.1 0-2-.9-2-2v-42c0-1.1.9-2 2-2 12.7 0 23 10.3 23 23zM50 27.1c-12.7 0-23-10.3-23-23 0-1.1-.9-2-2-2h42c1.1 0 2 .9 2 2 0 12.7-10.3 23-23 23zM47.1 50c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2V48c0-1.1-.9-2-2-2h-2c-1.1 0-2 .9-2 2v2z"/></svg>');
+    -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M72.9 50c0-12.7 10.3-23 23-23 1.1 0 2 .9 2 2v42c0 1.1-.9 2-2 2-12.7 0-23-10.3-23-23zM50 72.9c12.7 0 23 10.3 23 23 0 1.1.9 2 2 2h-42c-1.1 0-2-.9-2-2 0-12.7 10.3-23 23-23zM27.1 50c0 12.7-10.3 23-23 23-1.1 0-2-.9-2-2v-42c0-1.1.9-2 2-2 12.7 0 23 10.3 23 23zM50 27.1c-12.7 0-23-10.3-23-23 0-1.1-.9-2-2-2h42c1.1 0 2 .9 2 2 0 12.7-10.3 23-23 23zM47.1 50c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2V48c0-1.1-.9-2-2-2h-2c-1.1 0-2 .9-2 2v2z"/></svg>');
+    mask-size: cover;
+    -webkit-mask-size: cover;
+
+    animation: rotateGear 20s infinite linear;
+}
+
+/* Posiciones y tamaños */
+.gear.small-1 { top: 10%; left: 5%; width: 50px; height: 50px; }
+.gear.small-2 { top: 25%; right: 10%; width: 60px; height: 60px; animation-duration: 25s; }
+.gear.medium-1 { top: 40%; left: 15%; width: 80px; height: 80px; animation-duration: 18s; }
+.gear.medium-2 { bottom: 20%; right: 5%; width: 70px; height: 70px; animation-duration: 22s; }
+.gear.large-1 { top: 5%; right: 20%; width: 100px; height: 100px; animation-duration: 30s; }
+.gear.large-2 { bottom: 10%; left: 25%; width: 90px; height: 90px; animation-duration: 15s; }
+
+
+/* --- 🚗 Estilos de Colisión de Autos --- */
+
+.cars-collision {
+    position: absolute;
+    bottom: 50px; 
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px; 
+    height: 100px;
+    z-index: 10;
+}
+.car {
+    position: absolute;
+    width: 150px; 
+    height: 70px;
+    background-color: #4a6182; 
+    border-radius: 10px;
+    bottom: 0;
+    clip-path: polygon(0 20%, 10% 0, 90% 0, 100% 20%, 100% 100%, 0 100%); /* Simula la forma del coche */
+}
+.car-left {
+    left: 0;
+    transform: rotateY(180deg);
+}
+.car-right {
+    right: 0;
+}
+/* Detalle de las ventanas */
+.car::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 30px;
+    width: 80px;
+    height: 30px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+}
+/* La "Chispa" de la colisión */
+.spark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    background-color: #ffeb3b; 
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    z-index: 11; /* Encima de los coches */
+}
