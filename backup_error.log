@@ -97,3 +97,21 @@ apy.Administrador.telefono: (fields.W122) 'max_length' is ignored when used with
 	HINT: Remove 'max_length' from field
 Iniciando backup de la base de datos 'taller_internacional'...
 Backup exitoso. Archivo: taller_internacional_backup_20251112_094319.sql (0.05 MB)
+System check identified some issues:
+
+WARNINGS:
+apy.Administrador.identificacion: (fields.W122) 'max_length' is ignored when used with IntegerField.
+	HINT: Remove 'max_length' from field
+apy.Administrador.telefono: (fields.W122) 'max_length' is ignored when used with IntegerField.
+	HINT: Remove 'max_length' from field
+Iniciando backup de la base de datos 'taller_internacional'...
+Backup exitoso. Archivo: taller_internacional_backup_20251113_112738.sql (0.05 MB)
+System check identified some issues:
+
+WARNINGS:
+apy.Administrador.identificacion: (fields.W122) 'max_length' is ignored when used with IntegerField.
+	HINT: Remove 'max_length' from field
+apy.Administrador.telefono: (fields.W122) 'max_length' is ignored when used with IntegerField.
+	HINT: Remove 'max_length' from field
+Iniciando backup de la base de datos 'taller_internacional'...
+Backup exitoso. Archivo: taller_internacional_backup_20251113_121159.sql (0.05 MB)

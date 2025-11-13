@@ -12,6 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.utils import timezone
+import subprocess
 
 # ------------------------------------------------------------------------------
 # ✅ NUEVAS IMPORTACIONES REQUERIDAS PARA EJECUCIÓN ASÍNCRONA NATIVA
@@ -20,76 +21,56 @@ from django.conf import settings
 import os
 import sys         # Para obtener la ruta del intérprete Python
 import subprocess  # Para lanzar el proceso en segundo plano
-# ------------------------------------------------------------------------------
 
+# 🛑 Importaciones específicas para ocultar la consola en Windows
+if sys.platform == "win32":
+    # Estas constantes solo existen en Windows y se necesitan para ocultar la ventana
+    from subprocess import STARTUPINFO, STARTF_USESHOWWINDOW, SW_HIDE
 # ------------------------------------------------------------------------------
 # ✅ FUNCIÓN DE EJECUCIÓN ASÍNCRONA (Reemplaza a Celery.delay())
 # ------------------------------------------------------------------------------
 
 # views.py
 
-def iniciar_respaldo_en_segundo_plano(user_id):
-    """
-    Lanza el Comando de Gestión 'backup_db' de Django como un proceso secundario,
-    capturando la salida y el error en un archivo de log temporal.
-    """
-    # 1. Rutas críticas
-    manage_py_path = os.path.join(settings.BASE_DIR, 'manage.py')
-    
-    # 2. Comando a ejecutar (usando el intérprete Python activo)
-    command = [
-        sys.executable,     # Ruta al intérprete Python activo (del entorno virtual)
-        manage_py_path,
-        'backup_db',        # Llama a 'python manage.py backup_db'
-        f'--user_id={user_id}', # Pasa el ID del usuario para el log
-    ]
-    
-    # Define la ruta para el archivo de log de errores/salida
-    log_file_path = os.path.join(settings.BASE_DIR, 'backup_error.log')
+# views.py (Donde defines las funciones auxiliares)
 
-    # Abre el archivo de log para la salida del proceso secundario (modo 'a' para añadir)
-    with open(log_file_path, 'a') as log_file:
-        
-        # 3. Lanzar el proceso (CLAVE EN WINDOWS)
-        if sys.platform == "win32":
-            subprocess.Popen(command, 
-                             creationflags=subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS,
-                             stdout=log_file, # Redirige la salida estándar al archivo
-                             stderr=log_file) # Redirige el error al archivo
-        else:
-            # Fallback para sistemas Unix (Linux/Mac)
-            subprocess.Popen(command, start_new_session=True, 
-                             stdout=log_file, 
-                             stderr=log_file)
-    
-# ------------------------------------------------------------------------------
-# MIXIN DE RESTRICCIÓN (Asegura que solo Superusuarios accedan)
-# ... (el resto del código sigue igual)
+def iniciar_respaldo_en_segundo_plano(user_id):
     """
     Lanza el Comando de Gestión 'backup_db' de Django como un proceso secundario,
     independiente de la conexión del usuario (Fire-and-forget).
     """
+    
     # 1. Rutas críticas
     manage_py_path = os.path.join(settings.BASE_DIR, 'manage.py')
     
     # 2. Comando a ejecutar (usando el intérprete Python activo)
     command = [
-        sys.executable,  # Ruta al intérprete Python activo (del entorno virtual)
+        sys.executable,  # Ruta al intérprete Python activo
         manage_py_path,
         'backup_db',     # Llama a 'python manage.py backup_db'
         f'--user_id={user_id}', # Pasa el ID del usuario para el log
     ]
     
     # 3. Lanzar el proceso (CLAVE EN WINDOWS)
-    # Las flags aseguran que el proceso no bloquee el servidor web y no muestre una ventana de consola.
     if sys.platform == "win32":
+        
+        # ✅ Configuración para ocultar la ventana de CMD
+        startupinfo = STARTUPINFO()
+        startupinfo.dwFlags |= STARTF_USESHOWWINDOW
+        startupinfo.wShowWindow = SW_HIDE
+        
         subprocess.Popen(command, 
                          creationflags=subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS,
                          stdout=subprocess.DEVNULL,  
-                         stderr=subprocess.DEVNULL)
+                         stderr=subprocess.DEVNULL,
+                         startupinfo=startupinfo) # <-- Objeto para ocultar la ventana
+    
     else:
         # Fallback para sistemas Unix (Linux/Mac)
-        subprocess.Popen(command, start_new_session=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.Popen(command, 
+                         start_new_session=True, 
+                         stdout=subprocess.DEVNULL, 
+                         stderr=subprocess.DEVNULL)
 
 # ------------------------------------------------------------------------------
 # MIXIN DE RESTRICCIÓN (Asegura que solo Superusuarios accedan)
@@ -272,50 +253,24 @@ from django.conf import settings
 class DescargarRespaldoView(SuperuserRequiredMixin, View):
     
     def get(self, request, pk, *args, **kwargs):
-        try:
-            # log ahora usa la tabla correcta (gracias a models.py)
-            log = get_object_or_404(BackupLog, pk=pk)
-            ruta_completa = log.obtener_ruta_archivo() # Usa el método del modelo
-            
-            if not ruta_completa or not os.path.exists(ruta_completa):
-                messages.error(request, f'❌ Error: El archivo físico no fue encontrado en la ruta registrada.')
-                # Asegúrate de que el reverse_lazy usa el nombre correcto
-                return redirect(reverse_lazy('backup_module:configuracion_respaldo')) 
-
-            nombre_archivo = os.path.basename(ruta_completa)
-            
-            # 🛑 Implementación REAL de la descarga
-            response = FileResponse(
-                open(ruta_completa, 'rb'), 
-                as_attachment=True, 
-                filename=nombre_archivo
-            )
-            return response
-            
-        except Http404:
-            messages.error(request, '❌ Error: El log de respaldo no se encuentra.')
-            return redirect(reverse_lazy('backup_module:configuracion_respaldo')) 
-            
-        except Exception as e:
-            messages.error(request, f'❌ Error al intentar descargar el respaldo: {e}')
-            return redirect(reverse_lazy('backup_module:configuracion_respaldo'))
-    
-    def get(self, request, pk, *args, **kwargs):
+        """Maneja la solicitud GET para descargar un archivo de respaldo específico."""
+        
         try:
             # 1. Obtener el registro de la base de datos
             log = get_object_or_404(BackupLog, pk=pk)
             
             # 2. Obtener la ruta física del archivo
+            # Usamos el método que definiste en models.py
             ruta_completa = log.obtener_ruta_archivo()
             
+            # 3. Verificación de existencia del archivo (log y físico)
             if not ruta_completa:
                 messages.error(request, '❌ Error: El log existe, pero el archivo no tiene ruta registrada.')
-                return redirect(reverse_lazy('apy:configuracion_respaldo')) 
+                return redirect(reverse_lazy('backup_module:configuracion_respaldo')) 
 
-            # 3. Verificación de existencia del archivo
             if not os.path.exists(ruta_completa):
                 messages.error(request, f'❌ Error: El archivo físico en la ruta {ruta_completa} no fue encontrado.')
-                return redirect(reverse_lazy('apy:configuracion_respaldo')) 
+                return redirect(reverse_lazy('backup_module:configuracion_respaldo')) 
 
             # 4. Obtener solo el nombre del archivo para la descarga
             nombre_archivo = os.path.basename(ruta_completa)
@@ -327,33 +282,17 @@ class DescargarRespaldoView(SuperuserRequiredMixin, View):
                 as_attachment=True, 
                 filename=nombre_archivo # Nombre que verá el usuario
             )
+            
+            # Opcional: Agregar un mensaje de éxito para la UX
+            messages.success(request, f'✅ Descarga iniciada para {nombre_archivo}.')
+            
             return response
             
         except Http404:
             messages.error(request, '❌ Error: El log de respaldo no se encuentra.')
-            return redirect(reverse_lazy('apy:configuracion_respaldo')) 
+            return redirect(reverse_lazy('backup_module:configuracion_respaldo')) 
             
         except Exception as e:
+            # Captura errores de permisos de lectura, problemas de disco, etc.
             messages.error(request, f'❌ Error al intentar descargar el respaldo: {e}')
-            return redirect(reverse_lazy('apy:configuracion_respaldo'))
-    
-    def get(self, request, pk, *args, **kwargs):
-        try:
-            log = get_object_or_404(BackupLog, pk=pk)
-            
-            # **LÓGICA DE DESCARGA DE ARCHIVOS**
-            # Si el archivo está en el servidor local:
-            # from django.http import FileResponse
-            # return FileResponse(log.obtener_ruta_archivo(), as_attachment=True, filename=log.nombre_archivo)
-            
-            messages.success(request, f'Preparando descarga del respaldo #{pk}...')
-            
-            # En un caso real, esto sería reemplazado por la lógica de FileResponse o StreamingHttpResponse
-            return redirect(reverse_lazy('backup_module:configuracion_respaldo')) 
-            
-        except Http404:
-            messages.error(request, '❌ Error: El archivo de respaldo no se encuentra o la ruta es inválida.')
-            return redirect(reverse_lazy('backup_module:configuracion_respaldo')) 
-        except Exception as e:
-            messages.error(request, '❌ Error: El respaldo solicitado no está disponible o la ruta es incorrecta.')
             return redirect(reverse_lazy('backup_module:configuracion_respaldo'))

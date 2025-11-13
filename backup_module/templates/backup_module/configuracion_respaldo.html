@@ -156,56 +156,50 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Fecha y Hora</th>
-                                    <th>Tipo</th>
-                                    <th>Tamaño</th>
+                                    <th>Hora</th>
+                                    <th>Accion</th>
                                     <th>Estado</th>
-                                    <th>Acción</th>
+                                    <th>Tamaño</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for log in logs %}
-                                <tr>
-                                    <td>{{ log.pk }}</td>
-                                    <td>{{ log.fecha_fin|default:log.fecha_inicio|date:"Y-m-d H:i" }}</td>
-                                    
-                                    <td>
-                                        {% if log.tipo == 'Manual' %}
-                                            <span class="badge bg-warning text-dark">Manual</span>
-                                        {% else %}
-                                            <span class="badge bg-primary">Automático</span>
-                                        {% endif %}
-                                    </td>
-                                    
-                                    <td>{{ log.tamaño_mb|default:"N/A" }} MB</td>
-                                    
-                                    <td>
-                                        {% if log.estado == 'Éxito' %}
-                                            <span class="badge bg-success">Éxito</span>
-                                        {% elif log.estado == 'Fallo' %}
-                                            <span class="badge bg-danger">Fallo</span>
-                                        {% else %}
-                                            <span class="badge bg-info text-dark">En Proceso</span>
-                                        {% endif %}
-                                    </td>
-                                    
-                                    <td>
-                                        {% if log.estado == 'Éxito' %}
-                                            <a href="{% url 'apy:backup_descargar' pk=log.pk %}" class="btn btn-sm btn-outline-dark">
-                                                <i class="fas fa-download"></i> Descargar
-                                            </a>
-                                        {% else %}
-                                            <button class="btn btn-sm btn-outline-secondary" disabled>
-                                                <i class="fas fa-ellipsis-h"></i>
-                                            </button>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="6" class="text-center text-muted">Aún no hay respaldos registrados.</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
+    {% for log in historial_respaldos %} <tr>
+        <td>#{{ log.pk }}</td>
+        <td>{{ log.fecha_inicio|date:"d/m/Y H:i" }}</td>
+        <td>{{ log.fecha_fin|default:"En Curso"|date:"H:i" }}</td>
+        <td>{{ log.tipo }}</td>
+        <td>
+            {% if log.estado == 'Éxito' %}
+                <span class="badge bg-success">Éxito</span>
+            {% elif log.estado == 'Fallo' %}
+                <span class="badge bg-danger">Fallo</span>
+            {% else %}
+                <span class="badge bg-warning text-dark">En Proceso</span>
+            {% endif %}
+        </td>
+        <td>
+            {% if log.tamaño_mb %}
+                {{ log.tamaño_mb|floatformat:2 }} MB
+            {% else %}
+                N/A
+            {% endif %}
+        </td>
+        <td>
+            {% if log.estado == 'Éxito' %}
+                <a href="{% url 'backup_module:backup_descargar' log.pk %}" class="btn btn-sm btn-info" title="Descargar">
+                    <i class="fas fa-download"></i>
+                </a>
+            {% else %}
+                -
+            {% endif %}
+        </td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="7" class="text-center text-muted">Aún no hay respaldos registrados.</td>
+    </tr>
+    {% endfor %}
+</tbody>
                         </table>
                     </div>
                 </div>
