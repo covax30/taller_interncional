@@ -6,20 +6,20 @@
     <form id="mantenimientoForm" method="post" action="{% url 'apy:mantenimiento_modal_crear' %}">
         {% csrf_token %}
 
-    <!-- Campo Vehiculo con botón para abrir modal -->
+    <!-- Campo Empleado con botón para abrir modal -->
     <div class="form-group mb-3">
-        <label for="{{ form.id_vehiculo.id_for_label }}">Id Vehiculo:</label>
+        <label for="{{ form.id_empleado.id_for_label }}">Id Empleado:</label>
         <div class="input-group">
-            {{ form.id_vehiculo|add_class:'form-control'|attr:'autocomplete:off' }}
+            {{ form.id_empleado|add_class:'form-control'|attr:'autocomplete:off' }}
             <div class="input-group-append">
-                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_vehiculo" title="Agregar nuevo vehiculo">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_empleado_mantenimiento" title="Agregar nuevo empleado">
                     <i class="fas fa-plus"></i>
                 </button>
             </div>
         </div>
-        {% if form.id_vehiculo.errors %}
+        {% if form.id_empleado.errors %}
             <div class="invalid-feedback d-block">
-                {% for error in form.id_vehiculo.errors %}
+                {% for error in form.id_empleado.errors %}
                     <small>{{ error }}</small><br>
                 {% endfor %}
             </div>
@@ -28,8 +28,7 @@
 
     <!-- Renderiza el resto de los campos, excepto id_empleado -->
     {% for field in form.visible_fields %}
-       {% if field.name != 'id_empleado' and field.name != 'id_vehiculo' and field.name != 'id_tipo_mantenimiento' %}
-
+        {% if field.name != 'id_empleado' %}
             <div class="form-group mb-3">
                 <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
                 {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
@@ -120,6 +119,17 @@ $(document).off('click', '#btnGuardarMantenimiento').on('click', '#btnGuardarMan
         },
         complete: function() {
             $btn.prop('disabled', false).removeClass('disabled').text('Agregar');
+        }
+    });
+});
+
+// Script para cargar el modal de empleado dentro del mantenimiento
+$("#modal-empleado_mantenimiento").on("show.bs.modal", function(){
+    var modal = $(this);
+    $.ajax({
+        url: "{% url 'apy:empleado_modal_crear' %}",
+        success: function(data){
+            modal.find(".modal-body").html(data.html || data);
         }
     });
 });
