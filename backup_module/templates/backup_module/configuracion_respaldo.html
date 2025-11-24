@@ -3,15 +3,16 @@
 {% load static tz %} 
 
 {% block content %}
-<div class="row"> <div class="col-md-3 border-right">
+<div class="row"> 
+    <div class="col-md-3 border-right">
         <div class="d-flex flex-column align-items-center text-center p-3 py-5">
             <i class="fas fa-server fa-5x mt-5 text-primary"></i> 
             
             <span class="font-weight-bold mt-3">
-                <p>Estado del Servidor</p>
+                Estado del Servidor
             </span>
             <span class="badge bg-success">
-                <p>Funcionamiento Óptimo</p>
+                Funcionamiento Óptimo
             </span>
             
             <span class="mt-4">
@@ -20,15 +21,12 @@
             <span class="font-weight-bold">
                 <p>{{ ultimo_backup_fecha|default:"N/A"|date:"d/m/Y H:i" }}</p>
             </span>
-            
-            <button class="btn btn-warning mt-3" type="button">
-                <i class="fas fa-undo-alt"></i> Restaurar Sistema
-            </button>
         </div>
     </div>
     
     <div class="col-md-5 border-end">
-        <div class="p-3 py-5"> <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="p-3 py-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="text-right">Ajustes y Ejecución de Respaldo</h4>
             </div>
             
@@ -97,7 +95,8 @@
     </div>
     
     <div class="col-md-4">
-        <div class="p-3 py-5"> <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="p-3 py-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="text-right">Programación y Mantenimiento</h4>
             </div>
             
@@ -146,7 +145,8 @@
 
 <div class="row mt-5">
     <div class="col-md-12">
-        <div class="py-4"> <h3 class="text-primary mb-4">Historial de Copias de Seguridad</h3>
+        <div class="py-4">
+            <h3 class="text-primary mb-4">Historial de Copias de Seguridad</h3>
             
             <div class="card shadow-sm">
                 <div class="card-body">
@@ -160,10 +160,12 @@
                                     <th>Accion</th>
                                     <th>Estado</th>
                                     <th>Tamaño</th>
+                                    <th>Acciones</th> 
                                 </tr>
                             </thead>
                             <tbody>
-    {% for log in historial_respaldos %} <tr>
+    {% for log in historial_respaldos %} 
+    <tr>
         <td>#{{ log.pk }}</td>
         <td>{{ log.fecha_inicio|date:"d/m/Y H:i" }}</td>
         <td>{{ log.fecha_fin|default:"En Curso"|date:"H:i" }}</td>
@@ -186,11 +188,21 @@
         </td>
         <td>
             {% if log.estado == 'Éxito' %}
-                <a href="{% url 'backup_module:backup_descargar' log.pk %}" class="btn btn-sm btn-info" title="Descargar">
+                <a href="{% url 'backup_module:backup_descargar' log.pk %}" class="btn btn-sm btn-info me-1" title="Descargar">
                     <i class="fas fa-download"></i>
                 </a>
+                
+                <form method="POST" action="{% url 'backup_module:backup_restaurar' log.pk %}" style="display:inline;" 
+                    onsubmit="return confirm('⚠️ ADVERTENCIA CRÍTICA: ¿Estás ABSOLUTAMENTE SEGURO de que quieres restaurar el sistema a este punto ({{ log.fecha_fin|date:"d/m/Y H:i" }})? Esto REEMPLAZARÁ TODOS los datos actuales. ¡Esta acción es irreversible!');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-warning" title="Restaurar Sistema">
+                        <i class="fas fa-undo-alt"></i>
+                    </button>
+                </form>
             {% else %}
-                -
+                <button type="button" class="btn btn-sm btn-light border" title="No Disponible" disabled>
+                    <i class="fas fa-download"></i>
+                </button>
             {% endif %}
         </td>
     </tr>

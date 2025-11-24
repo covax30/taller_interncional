@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # --- Configuración del Módulo de Backup ---
 # Define la ruta donde se guardarán los backups, dentro del directorio base.
-BACKUP_ROOT = os.path.join(BASE_DIR, 'db_backups') # Usé 'db_backups' por claridad
+BACKUP_ROOT = BASE_DIR / 'db_backups' # Usé 'db_backups' por claridad
 try:
     # Asegúrate de que la carpeta exista y sea escribible.
     Path(BACKUP_ROOT).mkdir(parents=True, exist_ok=True)

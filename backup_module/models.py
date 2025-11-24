@@ -1,3 +1,5 @@
+# models.py - ARCHIVO COMPLETO
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone # Importación necesaria si usas timezone
@@ -7,7 +9,6 @@ from django.utils import timezone # Importación necesaria si usas timezone
 # ------------------------------------------------------------------
 
 class ConfiguracionRespaldo(models.Model):
-    # ... (Copia aquí el cuerpo de la clase ConfiguracionRespaldo)
     FRECUENCIA_OPCIONES = [
         ('diario', 'Diario'),
         ('semanal', 'Semanal'),
@@ -27,14 +28,12 @@ class ConfiguracionRespaldo(models.Model):
     )
 
     class Meta:
-        # 🛑 Cambiar esto si antes era 'Configuración de Respaldo'
         db_table = 'backup_module_configuracionrespaldo' 
         verbose_name = 'Configuración de Respaldo'
         verbose_name_plural = 'Configuraciones de Respaldo'
 
 
 class BackupLog(models.Model):
-    # ... (Copia aquí el cuerpo de la clase BackupLog)
     TIPO_OPCIONES = [
         ('Manual', 'Manual'),
         ('Automático', 'Automático'),
@@ -62,7 +61,6 @@ class BackupLog(models.Model):
         return f"{self.get_tipo_display()} - {self.fecha_inicio.strftime('%Y-%m-%d %H:%M')}"
     
     class Meta:
-        # 🛑 ESTO GARANTIZA QUE EL ORM BUSCA EN EL LUGAR CORRECTO 🛑
         db_table = 'backup_module_backuplog' 
         verbose_name = 'Registro de Respaldo'
         verbose_name_plural = 'Registros de Respaldos'

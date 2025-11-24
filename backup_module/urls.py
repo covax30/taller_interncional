@@ -16,4 +16,6 @@ urlpatterns = [
     
     # 4. URL de Acción: Descarga un archivo de respaldo específico (GET)
     path('descargar/<int:pk>/', views.DescargarRespaldoView.as_view(), name='backup_descargar'),
+    
+    path('restaurar/<int:pk>/', views.RestaurarSistemaView.as_view(), name='backup_restaurar'),
 ]
