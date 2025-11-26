@@ -1,7 +1,10 @@
-# backup_module/urls.py
-
 from django.urls import path
 from . import views # Importa las vistas desde el mismo directorio
+# Importa también la nueva vista SubirRestaurarView si no está ya en views
+from .views import (
+    RespaldoView, EjecutarRespaldoManualView, ConfigurarRespaldoAutomaticoView, 
+    DescargarRespaldoView, RestaurarSistemaView, SubirRestaurarView # <- ¡Añadir esta importación!
+)
 
 app_name = 'backup_module'
 urlpatterns = [
@@ -17,5 +20,9 @@ urlpatterns = [
     # 4. URL de Acción: Descarga un archivo de respaldo específico (GET)
     path('descargar/<int:pk>/', views.DescargarRespaldoView.as_view(), name='backup_descargar'),
     
+    # URL de Restauración de Logs del Historial
     path('restaurar/<int:pk>/', views.RestaurarSistemaView.as_view(), name='backup_restaurar'),
+
+    # 🚨 5. NUEVA URL: Subir y Restaurar Respaldo Externo (POST) 🚨
+    path('restaurar/subir/', views.SubirRestaurarView.as_view(), name='subir_restaurar'),
 ]

@@ -51,6 +51,7 @@ class BackupLog(models.Model):
     tamaño_mb = models.FloatField(null=True, blank=True, verbose_name="Tamaño (MB)")
     usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Ejecutado por")
     ruta_archivo = models.CharField(max_length=255, null=True, blank=True, verbose_name="Ruta")
+
     
     def obtener_ruta_archivo(self):
         """Devuelve la ruta absoluta del archivo de respaldo."""
