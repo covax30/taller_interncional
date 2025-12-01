@@ -1,11 +1,7 @@
 from django.urls import path
 from . import views # Importa las vistas desde el mismo directorio
 # Importa también la nueva vista SubirRestaurarView si no está ya en views
-from .views import (
-    RespaldoView, EjecutarRespaldoManualView, ConfigurarRespaldoAutomaticoView, 
-    DescargarRespaldoView, RestaurarSistemaView, SubirRestaurarView # <- ¡Añadir esta importación!
-)
-
+from .views import *
 app_name = 'backup_module'
 urlpatterns = [
     # 1. URL Principal: Muestra la interfaz del módulo de respaldo (GET)
@@ -24,5 +20,5 @@ urlpatterns = [
     path('restaurar/<int:pk>/', views.RestaurarSistemaView.as_view(), name='backup_restaurar'),
 
     # 🚨 5. NUEVA URL: Subir y Restaurar Respaldo Externo (POST) 🚨
-    path('restaurar/subir/', views.SubirRestaurarView.as_view(), name='subir_restaurar'),
+    path('subir/', views.SubirRespaldoExternoView.as_view(), name='subir_respaldo'), # Cambiado
 ]

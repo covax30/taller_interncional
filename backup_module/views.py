@@ -19,6 +19,7 @@ from django.template.loader import render_to_string
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 import uuid
+from django.utils import timezone
 
 # ------------------------------------------------------------------------------
 # Se usa try-except para importar las constantes de Windows solo si están disponibles
@@ -341,57 +342,50 @@ class RestaurarSistemaView(SuperuserRequiredMixin, View):
             return redirect(reverse_lazy('backup_module:configuracion_respaldo'))
         
 # ------------------------------------------------------------------------------
-# 6. VIEW PARA SUBIR Y RESTAURAR UN RESPALDO EXTERNO
+# 6. VIEW PARA SUBIR UN RESPALDO EXTERNO (SOLO SUBIDA)
 # ------------------------------------------------------------------------------
-class SubirRestaurarView(SuperuserRequiredMixin, View):
+class SubirRespaldoExternoView(SuperuserRequiredMixin, View):
     
-    @method_decorator(csrf_exempt)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
-
     def post(self, request, *args, **kwargs):
         archivo_respaldo = request.FILES.get('archivo_restauracion')
         
         if not archivo_respaldo:
-            messages.error(request, '❌ Debe seleccionar un archivo SQL o GZ para la restauración.')
+            messages.error(request, '❌ Debe seleccionar un archivo SQL o GZ para subir.')
             return redirect(reverse_lazy('backup_module:configuracion_respaldo'))
 
-        # Validar tipo de archivo (opcional pero recomendado)
+        # Validar tipo de archivo
         if not archivo_respaldo.name.lower().endswith(('.sql', '.gz', '.zip')):
             messages.error(request, '❌ Formato de archivo no válido. Solo se permiten .sql, .gz o .zip.')
             return redirect(reverse_lazy('backup_module:configuracion_respaldo'))
         
         try:
-            # 1. Preparar el directorio de almacenamiento y el nombre único
-            fs = FileSystemStorage(location=settings.BACKUP_ROOT) # Usa tu directorio de backups
+            # 1. Preparar y guardar el archivo subido en el directorio de backups
+            fs = FileSystemStorage(location=settings.BACKUP_ROOT)
             nombre_base = os.path.splitext(archivo_respaldo.name)[0]
             extension = os.path.splitext(archivo_respaldo.name)[1]
-            nombre_final = f"{nombre_base}_{uuid.uuid4().hex[:8]}{extension}"
+            nombre_final = f"EXTERNAL_{nombre_base}_{uuid.uuid4().hex[:6]}{extension}"
             
-            # 2. Guardar el archivo subido en el directorio de backups
             filename = fs.save(nombre_final, archivo_respaldo)
             ruta_completa_sql = os.path.join(settings.BACKUP_ROOT, filename)
             
-            # 3. Crear un nuevo log temporario en la BD (tipo 'Externo')
-            # Es vital crear el log primero para que el comando pueda actualizar el estado
+            # Calcular el tamaño
+            tamaño_bytes = os.path.getsize(ruta_completa_sql)
+            tamaño_mb = tamaño_bytes / (1024 * 1024)
+            
+            # 2. Crear el log en la BD (marcado como Éxito porque el archivo está listo)
             nuevo_log = BackupLog.objects.create(
                 fecha_inicio=timezone.now(),
-                tipo='Externo',
-                estado='En Proceso', # O 'Pendiente'
+                fecha_fin=timezone.now(),
+                tipo='Externo', # Tipo: Externo
+                estado='Éxito', # Estado: Listo para restaurar
                 ruta_archivo=ruta_completa_sql,
                 usuario=request.user,
-                # El tamaño_mb y fecha_fin se actualizarán después
+                tamaño_mb=tamaño_mb,
             )
             
-            # 4. Lanzar el proceso de restauración asíncrona
-            lanzado = iniciar_restauracion_en_segundo_plano(ruta_completa_sql, nuevo_log.pk)
-            
-            if lanzado:
-                messages.warning(request, f'⚠️ **Restauración Externa INICIADA** (Log #{nuevo_log.pk}). El proceso se ejecuta en segundo plano. Consulte el historial.')
-            else:
-                messages.error(request, '❌ Error crítico al lanzar el proceso de restauración. Revise los logs de subprocess.')
+            messages.success(request, f'✅ Archivo **{archivo_respaldo.name}** subido correctamente. Ya está disponible en el Historial (Log #{nuevo_log.pk}) para su restauración.')
             
         except Exception as e:
-            messages.error(request, f'❌ Error al procesar el archivo o iniciar la restauración: {e}')
+            messages.error(request, f'❌ Error al procesar o guardar el archivo: {e}')
         
         return redirect(reverse_lazy('backup_module:configuracion_respaldo'))
