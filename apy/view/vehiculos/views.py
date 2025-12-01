@@ -1,32 +1,78 @@
-from django.shortcuts import render
-from apy.models import *
-from apy.view.vehiculos.views import *
+from django.shortcuts import render, redirect
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import JsonResponse
-from django.contrib import messages
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_protect, csrf_exempt
+from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse_lazy
 from apy.forms import *
+from django.contrib import messages
+from django.contrib.auth.mixins import AccessMixin
+# Importar modelos necesarios para el Mixin y la vista
+from apy.models import Vehiculo, Module, Permission 
+from apy.decorators import PermisoRequeridoMixin
 
+# PERMISO REQUERIDO MIXIN 
+class PermisoRequeridoMixin(AccessMixin):
+    """
+    Mixin para verificar los permisos del usuario actual.
+    Requiere que se definan 'module_name' y 'permission_required'.
+    """
+    module_name = None      
+    permission_required = None 
 
-def lista_vehiculos(request):
-    data = {
-        'vehiculos': 'vehiculos',
-        'titulo': 'Lista de Vehiculos',
-        'vehiculos': Vehiculo.objects.all()
-    }
-    return render(request, 'vehiculos/listar_vehiculos.html', data)
+    def dispatch(self, request, *args, **kwargs):
+        # 1. Verificar Autenticación
+        if not request.user.is_authenticated:
+            return self.handle_no_permission() 
 
-# vistas basadas en clases
-class VehiculoListView(ListView):
+        # 2. Permitir Superusuario
+        if request.user.is_superuser:
+            return super().dispatch(request, *args, **kwargs)
+
+        # 3. Verificar Configuración
+        if self.module_name is None or self.permission_required is None:
+            raise NotImplementedError(
+                f'{self.__class__.__name__} debe definir module_name y permission_required.'
+            )
+
+        # 4. Lógica de Permisos Personalizados
+        try:
+            # Asumiendo que Module y Permission son los modelos correctos
+            module = Module.objects.get(name=self.module_name)
+            permission_obj = Permission.objects.filter(user=request.user, module=module).first()
+            
+            has_permission = False
+            if permission_obj:
+                # Usa getattr para verificar el permiso (ej: permission_obj.view)
+                has_permission = getattr(permission_obj, self.permission_required, False)
+                
+            if has_permission:
+                return super().dispatch(request, *args, **kwargs)
+            else:
+                messages.warning(request, f"Acceso denegado. No tienes permiso de {self.permission_required.upper()} para el módulo '{self.module_name}'.")
+                return redirect(self.get_permission_denied_url())
+                
+        except Module.DoesNotExist:
+            messages.error(request, f"Error de configuración: Módulo '{self.module_name}' no encontrado.")
+            return redirect(self.get_permission_denied_url())
+
+    def get_permission_denied_url(self):
+        # Redirige a la lista de vehículos como fallback
+        return reverse_lazy('apy:vehiculo_lista') 
+
+# --------------Vistas de Vehículos---------------
+
+class VehiculoListView(PermisoRequeridoMixin, ListView):
     model = Vehiculo
     template_name = 'vehiculos/listar_vehiculos.html'
 
-        # @method_decorator(login_required)
+    # --- Configuración de Permisos ---
+    module_name = 'Vehiculos' 
+    permission_required = 'view'
+    
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
-       return super().dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
     
     def post(self, request, *args, **kwargs):
         nombre = {'nombre' : 'Vehiculo'}
@@ -36,14 +82,18 @@ class VehiculoListView(ListView):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Lista de Vehiculos'
         context['crear_url'] = reverse_lazy('apy:vehiculo_crear')
-        context['entidad'] = 'Vehiculo'  
+        context['entidad'] = 'Vehiculo'
         return context
 
-class VehiculoCreateView(CreateView):
+class VehiculoCreateView(PermisoRequeridoMixin, CreateView): 
     model = Vehiculo
     form_class = VehiculoForm
     template_name = 'vehiculos/crear_vehiculos.html'
     success_url = reverse_lazy('apy:vehiculo_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Vehiculos'
+    permission_required = 'add'
     
     def form_valid(self, form):
         messages.success(self.request, "Vehiculo creado correctamente")
@@ -63,15 +113,19 @@ class VehiculoCreateView(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Crear de Vehiculos'
-        context['entidad'] = 'Vehiculo'  
+        context['entidad'] = 'Vehiculo'
         context['listar_url'] = reverse_lazy('apy:vehiculo_lista')
         return context
 
-class VehiculoUpdateView(UpdateView):
+class VehiculoUpdateView(PermisoRequeridoMixin, UpdateView): # ORDEN CORREGIDO
     model = Vehiculo
     form_class = VehiculoForm
     template_name = 'vehiculos/crear_vehiculos.html'
     success_url = reverse_lazy('apy:vehiculo_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Vehiculos'
+    permission_required = 'change'
     
     def form_valid(self, form):
         messages.success(self.request, "Vehiculo actualizado correctamente")
@@ -80,14 +134,18 @@ class VehiculoUpdateView(UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Editar de Vehiculos'
-        context['entidad'] = 'Vehiculo'  
+        context['entidad'] = 'Vehiculo' 
         context['listar_url'] = reverse_lazy('apy:vehiculo_lista')
         return context
 
-class VehiculoDeleteView(DeleteView):
+class VehiculoDeleteView(PermisoRequeridoMixin, DeleteView): 
     model = Vehiculo
     template_name = 'vehiculos/eliminar_vehiculos.html'
     success_url = reverse_lazy('apy:vehiculo_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Vehiculos'
+    permission_required = 'delete'
     
     def form_valid(self, form):
         messages.success(self.request, "Vehiculo eliminado correctamente")
@@ -97,11 +155,10 @@ class VehiculoDeleteView(DeleteView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Eliminar de Vehiculos'
-        context['entidad'] = 'Vehiculo'  
+        context['entidad'] = 'Vehiculo'
         context['listar_url'] = reverse_lazy('apy:vehiculo_lista')
         return context
-    
-# Vista para mostrar estadísticas
+  
 def estadisticas_view(request):
     # Contar total de vehiculos
     total_vehiculos = Vehiculo.objects.count()
@@ -112,7 +169,6 @@ def estadisticas_view(request):
     }
     return render(request, 'estadisticas.html', context)
 
-# API para actualización dinámica del contador de vehiculos
 def api_contador_vehiculos(request):
     total_vehiculos = Vehiculo.objects.count()
     return JsonResponse({'total_vehiculos': total_vehiculos})
