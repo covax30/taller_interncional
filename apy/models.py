@@ -457,4 +457,7 @@ class Caja(models.Model):
         #verbose_name = 'Caja'
         #verbose_name_plural = 'Caja'
 
+# D:\Users\User\Desktop\taller_interncional\apy\models.py (Añadir al final del archivo)
+# Se asume que User está importado al inicio: from django.contrib.auth.models import User
 
+# ------------------------------------------------------------------

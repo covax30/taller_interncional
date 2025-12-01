@@ -42,6 +42,18 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
+            name='ConfiguracionRespaldo',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('frecuencia', models.CharField(choices=[('diario', 'Diario'), ('semanal', 'Semanal'), ('mensual', 'Mensual'), ('inactivo', 'Desactivado')], default='semanal', max_length=10, verbose_name='Frecuencia')),
+                ('hora_ejecucion', models.TimeField(default='03:00:00', verbose_name='Hora de Ejecución')),
+            ],
+            options={
+                'verbose_name': 'Configuración de Respaldo',
+                'verbose_name_plural': 'Configuraciones de Respaldo',
+            },
+        ),
+        migrations.CreateModel(
             name='Empleado',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
@@ -96,6 +108,24 @@ class Migration(migrations.Migration):
                 ('nombre', models.CharField(max_length=50, unique=True)),
                 ('descripcion', models.TextField(blank=True, null=True)),
             ],
+        ),
+        migrations.CreateModel(
+            name='BackupLog',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('fecha_inicio', models.DateTimeField(auto_now_add=True, verbose_name='Inicio')),
+                ('fecha_fin', models.DateTimeField(blank=True, null=True, verbose_name='Fin')),
+                ('tipo', models.CharField(choices=[('Manual', 'Manual'), ('Automático', 'Automático')], max_length=10)),
+                ('estado', models.CharField(choices=[('Éxito', 'Éxito'), ('Fallo', 'Fallo'), ('En Proceso', 'En Proceso')], default='En Proceso', max_length=10)),
+                ('tamaño_mb', models.FloatField(blank=True, null=True, verbose_name='Tamaño (MB)')),
+                ('ruta_archivo', models.CharField(blank=True, max_length=255, null=True, verbose_name='Ruta')),
+                ('usuario', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL, verbose_name='Ejecutado por')),
+            ],
+            options={
+                'verbose_name': 'Registro de Respaldo',
+                'verbose_name_plural': 'Registros de Respaldo',
+                'ordering': ['-fecha_inicio'],
+            },
         ),
         migrations.CreateModel(
             name='Factura',

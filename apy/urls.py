@@ -193,5 +193,5 @@ urlpatterns = [
     path('api/vehiculos/count/', api_contador_vehiculos, name='api_contador_vehiculos'),
     path('api/insumos/count/', api_contador_insumos, name='api_contador_insumos'),
     path('api/gastos/count/', api_contador_gastos, name='api_contador_gastos'),
-]
 
+ ]
