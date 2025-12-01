@@ -281,7 +281,7 @@ This release modernizes AdminLTE to ES2022 standards and implements comprehensiv
 // Initialize accessibility features
 const a11y = initAccessibility({
   announcements: true,      // Enable live announcements
-  skipLinks: true,         // Add skip navigation links
+  skipLinks: false,         // Add skip navigation links
   focusManagement: true,   // Enhanced focus handling
   keyboardNavigation: true, // Full keyboard support
   reducedMotion: true      // Respect motion preferences

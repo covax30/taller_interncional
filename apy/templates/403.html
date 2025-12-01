@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/all.min.css' %}">
     <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/adminlte.min.css' %}">
     <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/custom.css' %}">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700">
+    <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/fonts-sans.css' %}">
 
     <style>
         body {
@@ -59,13 +59,13 @@
     <div class="error-wrapper">
         <div class="error-content">
             <div class="error-code">403</div>
-            <div class="error-message">¡Página no encontrada!</div>
+            <div class="error-message">¡NO TIENE ACCESO!</div>
             <div class="error-description">
-                Ups... parece que not tienes acceso a este modulo. <br>
-                ´Pidele los permisos necesarios al administrador.
+                Ups... parece que no tienes acceso a este modulo. <br>
+                Solicite los permisos necesarios al administrador para acceder.
             </div>
             <div class="error-image">
-                <img src="{% static 'img/img404.png' %}" alt="Persona revisando el motor del coche">
+                <img src="{% static 'img/img403.png' %}" alt="Persona revisando el motor del coche">
             </div>
             <a href="/" class="btn btn-dark btn-back">
                 <i class="fas fa-arrow-left mr-2"></i> Volver
@@ -73,7 +73,7 @@
         </div>
     </div>
 
-    <script src="{% static 'AdminLTE/plugins/jquery/jquery.min.js' %}"></script>
-    <script src="{% static 'AdminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'AdminLTE/dist/js/jquery-3.7.1.min.js' %}"></script>
+    <script src="{% static 'AdminLTE/dist/js/bootstrap.bundle.min.js' %}"></script>
 </body>
 </html>

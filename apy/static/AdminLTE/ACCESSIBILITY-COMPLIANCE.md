@@ -206,7 +206,7 @@ import { initAccessibility } from './accessibility.js'
 // Initialize with full features
 const accessibilityManager = initAccessibility({
   announcements: true,
-  skipLinks: true,
+  skipLinks: false,
   focusManagement: true,
   keyboardNavigation: true,
   reducedMotion: true
@@ -315,7 +315,7 @@ accessibilityManager.announce("New message received", "assertive")
 // Initialize with custom settings
 const accessibility = initAccessibility({
   announcements: true,     // Enable screen reader announcements
-  skipLinks: true,         // Add skip navigation links
+  skipLinks: false,         // Add skip navigation links
   focusManagement: true,   // Enhanced focus handling
   keyboardNavigation: true, // Arrow key navigation
   reducedMotion: false     // Disable if animations are critical

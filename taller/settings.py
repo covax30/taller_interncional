@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-1ras&$usy0ocn2u-x=k00^w8o1zda_&vu41u68h3p+(7_*ween
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] 
 
 
 # Application definition
@@ -40,11 +40,15 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'apy',
     'login',
-    'widget_tweaks',
+               'widget_tweaks',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    
+    # Enable WhiteNoise middleware for serving static files
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -122,16 +126,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-# Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 
-# Directorios donde Django buscará archivos estáticos (Busca en apy/static/)
 STATICFILES_DIRS = [
-    # Reemplaza o asegúrate que esta línea exista para apuntar a la carpeta 'static' dentro de 'apy'
-    os.path.join(BASE_DIR, 'apy', 'static'), 
+    os.path.join(BASE_DIR, 'apy', 'static'),
+    os.path.join(BASE_DIR, 'login', 'static'), 
 ]
 
-#STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -154,3 +156,9 @@ EMAIL_HOST_USER = 'soportecnico.t.i.m@gmail.com'
 EMAIL_HOST_PASSWORD = 'pjqmmdgfnredlrtg'
 
 
+# WhiteNoise static files storage
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
