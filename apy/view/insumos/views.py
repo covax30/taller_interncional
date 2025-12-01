@@ -1,18 +1,26 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from apy.models import * # Necesitas importar los modelos, incluyendo 'Insumos', 'Module', y 'Permission'
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_protect, csrf_exempt
+from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse_lazy
 from apy.forms import *
 from django.contrib import messages
+# Se elimina la importación local de AccessMixin
 
-# Create your views here.
-# --------------Vistas erick---------------
+# Importar las herramientas de permisos centralizadas
+from apy.decorators import PermisoRequeridoMixin, permiso_requerido_fbv 
 
-class InsumoListView(ListView):
+# --------------Vistas de Insumos (CBVs)---------------
+
+class InsumoListView(PermisoRequeridoMixin, ListView): 
     model = Insumos
     template_name = 'insumos/listar.html'
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Insumos' 
+    permission_required = 'view'
     
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -25,11 +33,15 @@ class InsumoListView(ListView):
         context['entidad'] = 'Insumo'
         return context
     
-class InsumoCreateView(CreateView):
+class InsumoCreateView(PermisoRequeridoMixin, CreateView): 
     model = Insumos
     form_class = InsumoForm
     template_name = 'insumos/crear.html'
     success_url = reverse_lazy('apy:insumo_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Insumos' 
+    permission_required = 'add'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -38,11 +50,15 @@ class InsumoCreateView(CreateView):
         context['listar_url'] = reverse_lazy('apy:insumo_lista')
         return context
     
-class InsumoUpdateView(UpdateView):
+class InsumoUpdateView(PermisoRequeridoMixin, UpdateView):
     model = Insumos
     form_class = InsumoForm
     template_name = 'insumos/crear.html'
     success_url = reverse_lazy('apy:insumo_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Insumos' 
+    permission_required = 'change'
     
     def form_valid(self, form):
         messages.success(self.request, "Insumo actualizado correctamente")
@@ -55,10 +71,14 @@ class InsumoUpdateView(UpdateView):
         context['listar_url'] = reverse_lazy('apy:insumo_lista')
         return context
     
-class InsumoDeleteView(DeleteView):
+class InsumoDeleteView(PermisoRequeridoMixin, DeleteView): 
     model = Insumos
     template_name = 'insumos/eliminar.html'
     success_url = reverse_lazy('apy:insumo_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Insumos' 
+    permission_required = 'delete'
     
     def form_valid(self, form):
         messages.success(self.request, "Insumo eliminado correctamente")
@@ -71,7 +91,10 @@ class InsumoDeleteView(DeleteView):
         context['listar_url'] = reverse_lazy('apy:insumo_lista')
         return context
     
-# Vista para mostrar estadísticas
+# --------------Vistas de Insumos (VBFs estandarizadas)---------------
+
+# Proteger la vista de estadísticas
+@permiso_requerido_fbv(module_name='Insumos', permission_required='view') 
 def estadisticas_view(request):
     # Contar total de insumos
     total_insumos = Insumos.objects.count()
@@ -82,7 +105,8 @@ def estadisticas_view(request):
     }
     return render(request, 'estadisticas.html', context)
 
-# API para actualización dinámica del contador de insumos
+# API para actualización dinámica del contador de insumos (Proteger la API)
+@permiso_requerido_fbv(module_name='Insumos', permission_required='view', api=True)
 def api_contador_insumos(request):
     total_insumos = Insumos.objects.count()
     return JsonResponse({'total_insumos': total_insumos})

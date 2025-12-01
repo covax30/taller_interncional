@@ -1,33 +1,29 @@
-from django.shortcuts import render
-from apy.models import *
-from apy.view.proveedor.view import *
+from django.shortcuts import render, redirect
+from apy.models import * # Importa Proveedores, Module, Permission
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_protect, csrf_exempt
+from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse_lazy
 from apy.forms import *
 from django.contrib import messages
-
+# Se elimina la importación local de AccessMixin
+# Se mantiene la importación del Mixin centralizado (aunque estaba duplicada, ahora solo se usa la importada)
+from apy.decorators import PermisoRequeridoMixin 
 
 # --------------Vistas Proveedor---------------
-
-def proveedor(request):
-    data = {
-        'proveedor':'proveedor',
-        'titulo':'Lista de proveedores',
-        'proveedor': Proveedores.objects.all()
-    }
-    return render(request, 'Proveedores/listar_proveedores.html', data)
-
-class ProveedorListView(ListView):
+class ProveedorListView(PermisoRequeridoMixin, ListView): 
     model = Proveedores
     template_name ='Proveedores/listar_proveedores.html'
     
-    # @method_decorator(login_required)
+    # --- Configuración de Permisos ---
+    module_name = 'Proveedores' 
+    permission_required = 'view' 
+    # --------------------------------
+    
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
-       return super().dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
     
     def post(self, request, *args, **kwargs):
         nombre = {'nombre' : 'Proveedor'}
@@ -37,14 +33,18 @@ class ProveedorListView(ListView):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Lista de Proveedores'
         context['crear_url'] = reverse_lazy('apy:proveedor_crear')
-        context['entidad'] = 'Proveedor'  
+        context['entidad'] = 'Proveedor'
         return context
     
-class ProveedorCreateView(CreateView):
+class ProveedorCreateView(PermisoRequeridoMixin, CreateView): 
     model = Proveedores
     form_class = ProveedorForm
     template_name = 'Proveedores/crear_proveedor.html'
     success_url = reverse_lazy('apy:proveedor_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Proveedores'
+    permission_required = 'add'
     
     def form_valid(self, form):
         messages.success(self.request, "Proveedor creado correctamente")
@@ -57,11 +57,15 @@ class ProveedorCreateView(CreateView):
         context ['listar_url'] = reverse_lazy('apy:proveedor_lista')
         return context
     
-class ProveedorUpdateView(UpdateView):
+class ProveedorUpdateView(PermisoRequeridoMixin, UpdateView):
     model = Proveedores
     form_class = ProveedorForm
     template_name = 'Proveedores/crear_proveedor.html'
     success_url = reverse_lazy('apy:proveedor_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Proveedores'
+    permission_required = 'change'
     
     def form_valid(self, form):
         messages.success(self.request, "Proveedor actualizado correctamente")
@@ -74,13 +78,17 @@ class ProveedorUpdateView(UpdateView):
         context['listar_url'] = reverse_lazy('apy:proveedor_lista')
         return context
 
-class ProveedorDeleteView(DeleteView):
+class ProveedorDeleteView(PermisoRequeridoMixin, DeleteView): 
     model = Proveedores
     template_name = 'Proveedores/eliminar_proveedor.html'
     success_url = reverse_lazy('apy:proveedor_lista')
     
+    # --- Configuración de Permisos ---
+    module_name = 'Proveedores'
+    permission_required = 'delete'
+    
     def form_valid(self, form):
-        messages.success(self.request, "Proveedor actualizado correctamente")
+        messages.success(self.request, "Proveedor eliminado correctamente")
         return super().form_valid(form)
     
     def get_context_data(self, **kwargs):

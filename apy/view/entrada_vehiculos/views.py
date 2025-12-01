@@ -1,35 +1,28 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from apy.models import *
-from apy.view.entrada_vehiculos.views import *
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import JsonResponse
-from django.contrib import messages
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_protect, csrf_exempt
+from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse_lazy
 from apy.forms import *
+from django.contrib import messages
+# Se elimina la importación local de AccessMixin
+from apy.decorators import PermisoRequeridoMixin # Usando el Mixin centralizado
 
+# --------------Vistas de Entrada de Vehículos---------------
 
-from apy.models import Cliente
-
-
-def lista_entrada_vehiculos(request):
-    data = {
-        'entrada_vehiculos': 'entrada_vehiculos',
-        'titulo': 'Lista de Entrada de Vehiculos',
-        'entrada_vehiculos': EntradaVehiculo.objects.all()
-    }
-    return render(request, 'entrada_vehiculos/listar_entrada_vehiculos.html', data)
-
-# vistas basadas en clases
-class EntradaVehiculoListView(ListView):
+class EntradaVehiculoListView(PermisoRequeridoMixin, ListView):
     model = EntradaVehiculo
     template_name = 'entrada_vehiculos/listar_entrada_vehiculos.html'
 
-        # @method_decorator(login_required)
+    # --- Configuración de Permisos ---
+    module_name = 'Entrada Vehiculo' 
+    permission_required = 'view'
+    
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
-       return super().dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
     
     def post(self, request, *args, **kwargs):
         nombre = {'nombre' : 'Entrada de Vehiculos'}
@@ -39,14 +32,18 @@ class EntradaVehiculoListView(ListView):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Lista de Entrada de Vehiculos'
         context['crear_url'] = reverse_lazy('apy:entrada_vehiculo_crear')
-        context['entidad'] = 'Entrada de Vehiculos'  
+        context['entidad'] = 'Entrada de Vehiculos'
         return context
 
-class EntradaVehiculoCreateView(CreateView):
+class EntradaVehiculoCreateView(PermisoRequeridoMixin, CreateView): 
     model = EntradaVehiculo
     form_class = EntradaVehiculoForm
     template_name = 'entrada_vehiculos/crear_entrada_vehiculos.html'
     success_url = reverse_lazy('apy:entrada_vehiculo_lista')
+
+    # --- Configuración de Permisos ---
+    module_name = 'Entrada Vehiculo'
+    permission_required = 'add'
 
     def form_valid(self, form):
         messages.success(self.request, "Entrada de Vehiculo creada correctamente")
@@ -55,15 +52,19 @@ class EntradaVehiculoCreateView(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Crear de Entrada de Vehiculos'
-        context['entidad'] = 'Entrada de Vehiculos'  
+        context['entidad'] = 'Entrada de Vehiculos'
         context['listar_url'] = reverse_lazy('apy:entrada_vehiculo_lista')
         return context
 
-class EntradaVehiculoUpdateView(UpdateView):
+class EntradaVehiculoUpdateView(PermisoRequeridoMixin, UpdateView):
     model = EntradaVehiculo
     form_class = EntradaVehiculoForm
     template_name = 'entrada_vehiculos/crear_entrada_vehiculos.html'
     success_url = reverse_lazy('apy:entrada_vehiculo_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Entrada Vehiculo'
+    permission_required = 'change'
     
     def form_valid(self, form):
         messages.success(self.request, "Entrada de Vehiculo actualizada correctamente")
@@ -72,14 +73,18 @@ class EntradaVehiculoUpdateView(UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Editar de Entrada de Vehiculos'
-        context['entidad'] = 'Entrada de Vehiculos'  
+        context['entidad'] = 'Entrada de Vehiculos' 
         context['listar_url'] = reverse_lazy('apy:entrada_vehiculo_lista')
         return context
 
-class EntradaVehiculoDeleteView(DeleteView):
+class EntradaVehiculoDeleteView(PermisoRequeridoMixin, DeleteView): 
     model = EntradaVehiculo
     template_name = 'entrada_vehiculos/eliminar_entrada_vehiculos.html'
     success_url = reverse_lazy('apy:entrada_vehiculo_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Entrada Vehiculo'
+    permission_required = 'delete'
     
     def form_valid(self, form):
         messages.success(self.request, "Entrada de Vehiculo eliminada correctamente")
@@ -88,6 +93,6 @@ class EntradaVehiculoDeleteView(DeleteView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Eliminar de Entrada de Vehiculos'
-        context['entidad'] = 'Entrada de Vehiculos'  
+        context['entidad'] = 'Entrada de Vehiculos'
         context['listar_url'] = reverse_lazy('apy:entrada_vehiculo_lista')
         return context

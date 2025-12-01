@@ -1,32 +1,29 @@
-from django.shortcuts import render
-from apy.models import *
-from apy.view.informes.views import *
+from django.shortcuts import render, redirect
+from apy.models import Informes, Module, Permission 
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import JsonResponse, HttpResponseRedirect
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_protect, csrf_exempt
+from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse_lazy
 from apy.forms import *
 from django.contrib import messages
+# Se elimina la importación de AccessMixin ya que no se usa localmente.
+from apy.decorators import PermisoRequeridoMixin
 
 # --------------Vistas de informes---------------
 
-def informes(request):
-    data = {
-        'informe':'informe',
-        'titulo':'Lista de informes',
-        'informe': Administrador.objects.all()
-    }
-    return render(request, 'Informes/listar_administradores.html', data)
-
-class InformesListView(ListView):
+class InformesListView(PermisoRequeridoMixin, ListView): 
     model = Informes
     template_name ='Informes/listar_informe.html'
     
-    # @method_decorator(login_required)
+    # --- Configuración de Permisos ---
+    module_name = 'Informes' 
+    permission_required = 'view'
+    
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
-       return super().dispatch(request, *args, **kwargs)
+        # Usa el Mixin importado de apy.decorators
+        return super().dispatch(request, *args, **kwargs)
     
     def post(self, request, *args, **kwargs):
         nombre = {'nombre' : 'Informes'}
@@ -36,14 +33,18 @@ class InformesListView(ListView):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Lista de Informes'
         context['crear_url'] = reverse_lazy('apy:informes_crear')
-        context['entidad'] = 'Informes'  
+        context['entidad'] = 'Informes'
         return context
     
-class InformesCreateView(CreateView):
+class InformesCreateView(PermisoRequeridoMixin, CreateView): 
     model = Informes
     form_class = InformeForm
     template_name = 'Informes/crear_informe.html'
     success_url = reverse_lazy('apy:informes_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Informes'
+    permission_required = 'add'
     
     def form_valid(self, form):
         messages.success(self.request, "Informe creado correctamente")
@@ -56,11 +57,15 @@ class InformesCreateView(CreateView):
         context ['listar_url'] = reverse_lazy('apy:informes_lista')
         return context
     
-class InformesUpdateView(UpdateView):
+class InformesUpdateView(PermisoRequeridoMixin, UpdateView): 
     model = Informes
     form_class = InformeForm
     template_name = 'Informes/crear_informe.html'
     success_url = reverse_lazy('apy:informes_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Informes'
+    permission_required = 'change'
     
     def form_valid(self, form):
         messages.success(self.request, "Informe actualizado correctamente")
@@ -73,19 +78,23 @@ class InformesUpdateView(UpdateView):
         context['listar_url'] = reverse_lazy('apy:informes_lista')
         return context
 
-class InformesDeleteView(DeleteView):
+class InformesDeleteView(PermisoRequeridoMixin, DeleteView): 
     model = Informes
     template_name = 'Informes/eliminar_informe.html'
     success_url = reverse_lazy('apy:informes_lista')
-    context_object_name = 'object'  # Esto asegura que el objeto esté disponible en el template
+    context_object_name = 'object'
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Informes'
+    permission_required = 'delete'
     
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
     
-    def form_valid(self, form):
+    def form_valid(self, form): 
         messages.success(self.request, "Informe eliminado correctamente")
-        return super().form_valid(form)  
+        return super().form_valid(form)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

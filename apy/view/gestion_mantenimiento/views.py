@@ -1,22 +1,30 @@
-from django.shortcuts import render
-from apy.models import *
-from apy.view.Contenidos.views import *
+from django.shortcuts import render, redirect
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_protect, csrf_exempt
+from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse_lazy
 from apy.forms import *
+from django.contrib import messages
+# Se elimina la importación de AccessMixin ya que no se usa localmente.
 
-# Create your views here.
-# --------------Vistas erick---------------
+# Importar modelos necesarios para la vista
+from apy.models import Mantenimiento 
+# Importar el Mixin Corregido (que lanza 403)
+from apy.decorators import PermisoRequeridoMixin
 
-class MantenimientoListView(ListView):
+# --------------Vistas de Mantenimiento---------------
+class MantenimientoListView(PermisoRequeridoMixin, ListView):
     model = Mantenimiento
     template_name = 'gestion_mantenimiento/listar.html'
     
+    # --- Configuración de Permisos ---
+    module_name = 'Mantenimientos' 
+    permission_required = 'view'
+    
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
+        # Usa el Mixin importado de apy.decorators
         return super().dispatch(request, *args, **kwargs)
     
     def get_context_data(self, **kwargs):
@@ -26,11 +34,15 @@ class MantenimientoListView(ListView):
         context['entidad'] = 'Mantenimiento'
         return context
 
-class MantenimientoCreateView(CreateView):
+class MantenimientoCreateView(PermisoRequeridoMixin, CreateView): 
     model = Mantenimiento
     form_class = MantenimientoForm
     template_name = 'gestion_mantenimiento/crear.html'
     success_url = reverse_lazy('apy:mantenimiento_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Mantenimientos'
+    permission_required = 'add'
     
     def form_valid(self, form):
         messages.success(self.request, "Mantenimiento creado correctamente")
@@ -43,11 +55,15 @@ class MantenimientoCreateView(CreateView):
         context['listar_url'] = reverse_lazy('apy:mantenimiento_lista')
         return context
     
-class MantenimientoUpdateView(UpdateView):
+class MantenimientoUpdateView(PermisoRequeridoMixin, UpdateView):
     model = Mantenimiento
     form_class = MantenimientoForm
     template_name = 'gestion_mantenimiento/crear.html'
     success_url = reverse_lazy('apy:mantenimiento_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Mantenimientos'
+    permission_required = 'change'
     
     def form_valid(self, form):
         messages.success(self.request, "Mantenimiento editado correctamente")
@@ -60,10 +76,14 @@ class MantenimientoUpdateView(UpdateView):
         context['listar_url'] = reverse_lazy('apy:mantenimiento_lista')
         return context
 
-class MantenimientoDeleteView(DeleteView):
+class MantenimientoDeleteView(PermisoRequeridoMixin, DeleteView):
     model = Mantenimiento
     template_name = 'gestion_mantenimiento/eliminar.html'
     success_url = reverse_lazy('apy:mantenimiento_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Mantenimientos'
+    permission_required = 'delete'
     
     def form_valid(self, form):
         messages.success(self.request, "Mantenimiento eliminado correctamente")

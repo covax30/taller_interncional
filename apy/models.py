@@ -147,21 +147,34 @@ class Insumos(models.Model):
 
 # MODULOS STEVEN
 class Module(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True, verbose_name="Nombre del Módulo")
+    description = models.TextField(blank=True, verbose_name="Descripción")
 
+    class Meta:
+        verbose_name = "Módulo de Permiso"
+        verbose_name_plural = "Módulos de Permisos"
+        
     def __str__(self):
         return self.name
 
 class Permission(models.Model):
-    module = models.ForeignKey(Module, related_name='perms', on_delete=models.CASCADE)
-    user = models.ForeignKey(User, related_name='permissions', on_delete=models.CASCADE)
-    view = models.BooleanField(default=False)
-    add = models.BooleanField(default=False)
-    change = models.BooleanField(default=False)
-    delete = models.BooleanField(default=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='custom_permissions', verbose_name="Usuario")
+    module = models.ForeignKey(Module, on_delete=models.CASCADE, verbose_name="Módulo")
+    
+    # Campos booleanos para los permisos
+    view = models.BooleanField(default=False, verbose_name="Ver")
+    add = models.BooleanField(default=False, verbose_name="Crear")
+    change = models.BooleanField(default=False, verbose_name="Editar")
+    delete = models.BooleanField(default=False, verbose_name="Eliminar")
+
+    class Meta:
+        # Asegura que un usuario solo tenga un conjunto de permisos por módulo
+        unique_together = ('user', 'module') 
+        verbose_name = "Permiso Personalizado"
+        verbose_name_plural = "Permisos Personalizados"
 
     def __str__(self):
-        return f"{self.user.username} - {self.module.name}"
+        return f"Permisos de {self.user.username} en {self.module.name}"
 
 
 
@@ -173,12 +186,6 @@ class Cliente(models.Model):
     telefono = models.BigIntegerField(validators=[validar_telefono])
     correo = models.EmailField(max_length=100, validators=[validar_email])
     fecha_operacion = models.DateField()
-    monto = models.IntegerField(  # 🔹 ENTEROS, sin decimales
-        error_messages={
-            'invalid': 'Ingrese un número válido para el monto.',
-            'required': 'El monto del cliente es obligatorio.'
-        } , validators=[validar_monto]
-    )
 
     def __str__(self):
         return f"{self.id_cliente} - {self.nombre}"
