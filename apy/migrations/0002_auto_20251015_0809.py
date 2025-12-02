@@ -2,6 +2,8 @@
 
 from django.db import migrations
 from django.db.models import F
+from django.db import models
+
 
 # Función que contiene la lógica para crear los registros de Module
 def create_initial_modules(apps, schema_editor):
@@ -50,10 +52,24 @@ def create_initial_modules(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('apy', '0001_initial'), # Asegúrate que este número de migración es correcto
+        ('apy', '0001_initial'), 
     ]
 
     operations = [
-        # Ejecuta la función de creación de datos
+        # ==========================================================
+        # 1. PASO CRUCIAL: AGREGAR EL CAMPO A LA BASE DE DATOS
+        # ==========================================================
+        migrations.AddField(
+            model_name='module',
+            name='description',
+            # **IMPORTANTE**: Ajusta este campo para que coincida exactamente
+            # con la definición de 'description' en tu models.py, por ejemplo:
+            field=models.TextField(verbose_name='Descripción', blank=True, default=''), 
+            # Si tu models.py lo tiene con 'null=True' o sin 'default', úsalo.
+        ),
+        
+        # ==========================================================
+        # 2. PASO: EJECUTAR EL CÓDIGO PYTHON (AHORA LA COLUMNA EXISTE)
+        # ==========================================================
         migrations.RunPython(create_initial_modules, migrations.RunPython.noop),
     ]

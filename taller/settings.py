@@ -158,7 +158,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = 'login:login'
-LOGIN_REDIRECT_URL = 'apy:informes_lista'
+LOGIN_REDIRECT_URL = 'apy:estadisticas'
 LOGOUT_REDIRECT_URL = ''
 
 # -----------------------------------------------------
