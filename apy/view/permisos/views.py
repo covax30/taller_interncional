@@ -4,37 +4,31 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db import transaction
 # IMPORTACIONES NECESARIAS PARA PROTEGER LA VISTA
-from django.contrib.auth.decorators import login_required, user_passes_test 
-from apy.decorators import PermisoRequeridoMixin
+from django.contrib.auth.decorators import login_required 
+from apy.decorators import permiso_requerido_fbv # <-- Usamos el decorador FBV
 
-# FUNCIÓN DE PRUEBA: Define la condición de acceso (SOLO SUPERUSUARIO)
-def is_superuser_check(user):
-    """Retorna True si el usuario está autenticado y es un superusuario."""
-    # Usamos user.is_authenticated para asegurarnos de que no es un usuario anónimo
-    return user.is_authenticated and user.is_superuser
-
-# 1. Requiere que el usuario esté logueado.
-# 2. Requiere que pase la prueba (ser Superusuario).
-@login_required(login_url='/login/')
-@user_passes_test(is_superuser_check, login_url='/') # Redirige a la página de inicio (/) si no es Superuser
+# Usamos el decorador de función que lanza el 403
+# Requerimos el permiso 'view' para el módulo 'Permisos'
+@permiso_requerido_fbv(module_name='Permisos', permission_required='view')
 def permisos_usuarios(request):
     user_to_edit = None
     
     # --- 1. Obtener posibles fuentes del ID de usuario ---
-    user_id_from_select = request.POST.get('user') 	# ID del usuario recién seleccionado (via select onchange)
-    user_id_from_hidden = request.POST.get('user_id_to_edit') 	# ID del usuario actualmente cargado (via hidden field)
-    user_id_from_get = request.GET.get('user_id') 	# ID del usuario después de guardar (via redirección GET)
+    user_id_from_select = request.POST.get('user') 
+    user_id_from_hidden = request.POST.get('user_id_to_edit') 
+    user_id_from_get = request.GET.get('user_id')  
     
     selected_user_id = user_id_from_select or user_id_from_hidden or user_id_from_get
 
     # --- 2. Determinar el tipo de acción (CLAVE) ---
     is_post = request.method == 'POST'
-    # Solo es acción de guardar si el POST contiene el marcador 'save_permissions'
     is_save_action = is_post and 'save_permissions' in request.POST 
 
     # --- 3. Guardado de permisos ---
+    # NOTA: No se requiere una protección 'add/change' aquí porque 
+    # solo los superusuarios o aquellos con permisos de 'Permisos:view' 
+    # pueden acceder a esta URL, y la lógica de guardado está dentro.
     if is_save_action:
-        # Usamos el ID del usuario actualmente cargado, que está en el campo oculto
         user_id_to_save = user_id_from_hidden 
         
         try:
@@ -49,7 +43,6 @@ def permisos_usuarios(request):
                 Permission.objects.filter(user=user_to_edit).delete()
 
                 for module in Module.objects.all():
-                    # Los nombres de los campos vienen directamente del template (ej: perm_1_view)
                     view_perm = f'perm_{module.id}_view' in request.POST
                     add_perm = f'perm_{module.id}_add' in request.POST
                     change_perm = f'perm_{module.id}_change' in request.POST
@@ -66,7 +59,6 @@ def permisos_usuarios(request):
                         )
 
             messages.success(request, f"Permisos del usuario {user_to_edit.username} guardados con éxito. ✅")
-            # Redirigimos usando GET para recargar y mostrar los permisos recién guardados
             return redirect(f"{reverse('apy:permisos_usuarios')}?user_id={user_to_edit.id}")
 
         except Exception as e:
@@ -103,6 +95,7 @@ def permisos_usuarios(request):
         'users': all_users,
         'modules': modules,
         'user_to_edit': user_to_edit,
+        'titulo': 'Administración de Permisos'
     }
 
     return render(request, 'Permisos/permisos.html', context)

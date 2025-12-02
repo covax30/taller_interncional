@@ -1,0 +1,288 @@
+{% extends 'body.html' %}
+{% load static %}
+{% load static tz %} 
+
+{% block content %}
+<div class="row"> 
+    <h3 class="text-primary mb-4">Gestión de Respaldos</h3>
+
+    <h4 class="text-primary mb-3">Estadísticas Rápidas</h4>
+    <div class="card mb-4 bg-light text-dark shadow-sm m-15">
+        <div class="card-body">
+            <div class="row align-items-center text-center">
+                <div class="col-sm-4 border-end">
+                    <i class="fas fa-save fa-2x text-primary"></i> 
+                    <span class="d-block mt-2">Programados:</span>
+                    <span class="font-weight-bold">{{ cantidad_programados|default:"0" }}</span>
+                </div>
+                <div class="col-sm-4 border-end">
+                    <i class="fas fa-hdd fa-2x text-danger"></i> 
+                    <span class="d-block mt-2">Espacio Ocupado:</span>
+                    <span class="font-weight-bold">{{ espacio_ocupado|default:"0 MB" }}</span>
+                </div>
+                <div class="col-sm-4">
+                    <i class="fas fa-clock fa-2x text-success"></i> 
+                    <span class="d-block mt-2">Último Éxito:</span>
+                    <span class="font-weight-bold">{{ ultimo_backup_fecha|default:"N/A"|date:"d/m/Y H:i" }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <h4 class="text-primary mb-3">Respaldo Manual</h4>
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-cloud-upload-alt"></i> Generar Respaldo Ahora</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{% url 'backup_module:backup_ejecutar' %}">
+                    {% csrf_token %} 
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-check mb-4 mt-3">
+                                <input class="form-check-input" type="checkbox" id="incluirDB" name="incluirDB" checked>
+                                <label class="form-check-label" for="incluirDB">Incluir Base de Datos</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check mb-4 mt-3">
+                                <input class="form-check-input" type="checkbox" id="incluirArchivos" name="incluirArchivos">
+                                <label class="form-check-label" for="incluirArchivos">Incluir Archivos</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-floating mb-4">
+                        <select class="form-select" id="ubicacion" name="ubicacion" required>
+                            <option value="local">Servidor Local</option>
+                            <option value="cloud">Nube (AWS/GCP)</option>
+                        </select>
+                        <label for="ubicacion">Destino del Respaldo</label>
+                    </div>
+                    
+                    <div class="text-center mt-3">
+                        <button type="submit" class="btn btn-success btn-lg w-100">
+                            <i class="fas fa-save"></i> Generar Respaldo Ahora
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <h4 class="text-primary mb-3">Programación Automática</h4>
+        
+        <div class="card shadow mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-clock"></i> Configurar Frecuencia</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{% url 'backup_module:backup_configurar' %}"> 
+                    {% csrf_token %}
+                    
+                    <div class="form-floating mb-4">
+                        <select class="form-select" id="frecuencia" name="frecuencia" required>
+                            <option value="diario">Diario</option>
+                            <option value="semanal" selected>Semanal</option>
+                            <option value="mensual">Mensual</option>
+                            <option value="inactivo">Desactivado</option>
+                        </select>
+                        <label for="frecuencia">Frecuencia de Respaldo</label>
+                    </div>
+                    
+                    <div class="form-floating mb-4">
+                        <input type="time" class="form-control" id="hora" name="hora" value="03:00" required>
+                        <label for="hora">Hora de Ejecución (HH:MM)</label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-info w-100">
+                        <i class="fas fa-tools"></i> Guardar Programación
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-12 mb-4">
+        <h4 class="text-primary mb-3">Archivos Externos</h4>
+        <div class="card shadow"> <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-upload"></i> Subir Respaldo Externo</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Agregue archivos `.sql`, `.gz` o `.zip` para restauración.</p>
+                <form method="POST" action="{% url 'backup_module:subir_respaldo' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="form-group mb-3">
+                        <label for="archivo_restauracion" class="form-label">Archivo de respaldo:</label>
+                        <input type="file" class="form-control" id="archivo_restauracion" name="archivo_restauracion" accept=".sql,.gz,.zip" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary mt-3 w-100">
+                        <i class="fas fa-file-upload"></i> Subir Archivo
+                    </button>
+                </form>
+            </div>
+        </div> </div>
+    
+    <div class="col-md-12 mb-4">
+        <h3 class="text-primary mb-4 center">Historial de Copias de Seguridad</h3>
+        
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="backupTable" class="table table-striped table-hover w-100">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Fecha y Hora</th>
+                                <th>Fin</th>
+                                <th>Tipo</th>
+                                <th>Estado</th>
+                                <th>Tamaño</th>
+                                <th>Ejecutado por</th> 
+                                <th data-orderable="false">Acciones</th> 
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in historial_respaldos %} 
+                            <tr>
+                                <td>#{{ log.pk }}</td>
+                                <td>{{ log.fecha_inicio|date:"d/m/Y H:i" }}</td> 
+                                <td>{{ log.fecha_fin|default:"N/A"|date:"H:i" }}</td>
+                                <td>{{ log.tipo }}</td>
+                                <td>
+                                    {% if log.estado == 'Éxito' %}
+                                        <span class="badge bg-success">Éxito</span>
+                                    {% elif log.estado == 'Fallo' %}
+                                        <span class="badge bg-danger">Fallo</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">En Proceso</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if log.tamaño_mb %}
+                                        {{ log.tamaño_mb|floatformat:2 }} MB
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                                <td>{{ log.usuario.username|default:"Sistema" }}</td> 
+                                <td>
+                                    {% if log.estado == 'Éxito' %}
+                                        <a href="{% url 'backup_module:backup_descargar' log.pk %}" class="btn btn-sm btn-info me-1" title="Descargar">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                        
+                                        <form method="POST" action="{% url 'backup_module:backup_restaurar' log.pk %}" style="display:inline;" 
+                                            onsubmit="return confirm('⚠️ ADVERTENCIA CRÍTICA: ¿Estás ABSOLUTAMENTE SEGURO de que quieres restaurar el sistema a este punto ({{ log.fecha_inicio|date:"d/m/Y H:i" }})? Esto REEMPLAZARÁ TODOS los datos actuales. ¡Esta acción es irreversible!');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-danger" title="Restaurar Sistema">
+                                                <i class="fas fa-undo-alt"></i>
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <button type="button" class="btn btn-sm btn-secondary" title="No Disponible" disabled>
+                                            <i class="fas fa-ban"></i>
+                                        </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center text-muted">Aún no hay respaldos registrados.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> <style>
+/* =======================================================
+SOLUCIÓN: SINCRONIZACIÓN DE DATATABLES CON TEMA OSCURO
+======================================================= */
+/* Sobrescribe los colores de texto cuando el tema oscuro está activo */
+html[data-bs-theme="dark"] .dataTables_wrapper .dataTables_length,
+html[data-bs-theme="dark"] .dataTables_wrapper .dataTables_filter,
+html[data-bs-theme="dark"] .dataTables_wrapper .dataTables_info,
+html[data-bs-theme="dark"] .dataTables_wrapper .dataTables_processing,
+html[data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate,
+html[data-bs-theme="dark"] .dataTable { 
+    color: #c2c7d0 !important; /* Texto claro de AdminLTE Dark */
+}
+
+/* Sobrescribe el color del campo de búsqueda a blanco en tema oscuro */
+html[data-bs-theme="dark"] .dataTables_filter input {
+    background-color: #343a40 !important; /* Fondo oscuro de AdminLTE */
+    color: #c2c7d0 !important;            /* Texto claro */
+    border-color: #454d55 !important;
+}
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Script para asegurar las clases de formularios de Bootstrap 5/4
+        var formFields = document.querySelectorAll('.form-floating input, .form-floating select, .form-control-file');
+        formFields.forEach(function(field) {
+            if (!field.classList.contains('form-control') && !field.classList.contains('form-select') && field.type !== 'checkbox') {
+                field.classList.add('form-control'); 
+            }
+        });
+        
+        // **Asegurar que los selectores y checkboxes tengan la clase correcta**
+        // Nota: Estas líneas son redundantes si el HTML usa 'form-select' y 'form-check-input' correctamente, 
+        // pero se mantienen para asegurar la compatibilidad.
+        document.getElementById('ubicacion').classList.add('form-select');
+        document.getElementById('frecuencia').classList.add('form-select');
+        document.getElementById('incluirDB').classList.add('form-check-input');
+        document.getElementById('incluirArchivos').classList.add('form-check-input');
+
+        // 🚨 INICIALIZACIÓN DE DATATABLE 🚨
+if (typeof $.fn.DataTable !== 'undefined') {
+    $('#backupTable').DataTable({
+        responsive: true,
+        order: [[ 0, "desc" ]], 
+        pageLength: 25, // 👈 CORRECCIÓN: Muestra 25 filas por defecto
+        lengthMenu: [
+            [10, 25, 50, -1],
+            [10, 25, 50, "Todo"]
+        ],
+        language: {
+url: "../../../static/lenguajes/espanol.json"        }
+    });
+    // ...
+}
+        
+        // 🚨 CÓDIGO PARA CONVERTIR ALERTAS DE DJANGO A POPUPS 🚨
+        const alertContainer = document.getElementById('django-alerts-root');
+    
+        if (alertContainer) {
+            const alerts = alertContainer.querySelectorAll('.alert');
+            
+            alerts.forEach(alert => {
+                const tagsMatch = alert.className.match(/alert-(success|error|warning|info)/);
+                const type = tagsMatch ? tagsMatch[1] : 'info';
+                let message = alert.textContent.replace('×', '').trim();
+                
+                if (typeof showCustomAlert === 'function') { 
+                    showCustomAlert(type, message);
+                } else {
+                    console.warn(`Función showCustomAlert no definida. La alerta solo se verá como barra de Bootstrap.`);
+                }
+            });
+
+            // Oculta las barras de alerta de Bootstrap
+            alertContainer.style.display = 'none';
+        }
+    });
+</script>
+
+<script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
+<script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
+    
+{% endblock content %}

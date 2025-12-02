@@ -8,61 +8,13 @@ from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse_lazy
 from apy.forms import *
 from django.contrib import messages
-from django.contrib.auth.mixins import AccessMixin
+# Se elimina la importación local de AccessMixin
 # Importar modelos necesarios para el Mixin y la vista
 from apy.models import Vehiculo, Module, Permission 
-from apy.decorators import PermisoRequeridoMixin
+# Importar el Mixin y el Decorador centralizados
+from apy.decorators import PermisoRequeridoMixin, permiso_requerido_fbv 
 
-# PERMISO REQUERIDO MIXIN 
-class PermisoRequeridoMixin(AccessMixin):
-    """
-    Mixin para verificar los permisos del usuario actual.
-    Requiere que se definan 'module_name' y 'permission_required'.
-    """
-    module_name = None      
-    permission_required = None 
-
-    def dispatch(self, request, *args, **kwargs):
-        # 1. Verificar Autenticación
-        if not request.user.is_authenticated:
-            return self.handle_no_permission() 
-
-        # 2. Permitir Superusuario
-        if request.user.is_superuser:
-            return super().dispatch(request, *args, **kwargs)
-
-        # 3. Verificar Configuración
-        if self.module_name is None or self.permission_required is None:
-            raise NotImplementedError(
-                f'{self.__class__.__name__} debe definir module_name y permission_required.'
-            )
-
-        # 4. Lógica de Permisos Personalizados
-        try:
-            # Asumiendo que Module y Permission son los modelos correctos
-            module = Module.objects.get(name=self.module_name)
-            permission_obj = Permission.objects.filter(user=request.user, module=module).first()
-            
-            has_permission = False
-            if permission_obj:
-                # Usa getattr para verificar el permiso (ej: permission_obj.view)
-                has_permission = getattr(permission_obj, self.permission_required, False)
-                
-            if has_permission:
-                return super().dispatch(request, *args, **kwargs)
-            else:
-                messages.warning(request, f"Acceso denegado. No tienes permiso de {self.permission_required.upper()} para el módulo '{self.module_name}'.")
-                return redirect(self.get_permission_denied_url())
-                
-        except Module.DoesNotExist:
-            messages.error(request, f"Error de configuración: Módulo '{self.module_name}' no encontrado.")
-            return redirect(self.get_permission_denied_url())
-
-    def get_permission_denied_url(self):
-        # Redirige a la lista de vehículos como fallback
-        return reverse_lazy('apy:vehiculo_lista') 
-
-# --------------Vistas de Vehículos---------------
+# --------------Vistas de Vehículos (CBVs)---------------
 
 class VehiculoListView(PermisoRequeridoMixin, ListView):
     model = Vehiculo
@@ -119,7 +71,7 @@ class VehiculoCreateView(PermisoRequeridoMixin, CreateView):
         context['listar_url'] = reverse_lazy('apy:vehiculo_lista')
         return context
 
-class VehiculoUpdateView(PermisoRequeridoMixin, UpdateView): # ORDEN CORREGIDO
+class VehiculoUpdateView(PermisoRequeridoMixin, UpdateView): 
     model = Vehiculo
     form_class = VehiculoForm
     template_name = 'vehiculos/crear_vehiculos.html'
@@ -153,14 +105,16 @@ class VehiculoDeleteView(PermisoRequeridoMixin, DeleteView):
         messages.success(self.request, "Vehiculo eliminado correctamente")
         return super().form_valid(form)
 
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Eliminar de Vehiculos'
         context['entidad'] = 'Vehiculo'
         context['listar_url'] = reverse_lazy('apy:vehiculo_lista')
         return context
-  
+    
+# --------------Vistas de Vehículos (FBVs)---------------
+
+@permiso_requerido_fbv(module_name='Dashboard', permission_required='view') # Proteger la vista de estadísticas
 def estadisticas_view(request):
     # Contar total de vehiculos
     total_vehiculos = Vehiculo.objects.count()
@@ -171,6 +125,7 @@ def estadisticas_view(request):
     }
     return render(request, 'estadisticas.html', context)
 
+@permiso_requerido_fbv(module_name='Dashboard', permission_required='view', api=True) # Proteger la API
 def api_contador_vehiculos(request):
     total_vehiculos = Vehiculo.objects.count()
     return JsonResponse({'total_vehiculos': total_vehiculos})

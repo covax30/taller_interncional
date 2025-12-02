@@ -15,7 +15,6 @@ from apy.view.gen_index.views import index
 from apy.views import *
 
 from apy.view.proveedor.view import *
-from apy.view.administrador.views import *
 from apy.view.informes.views import *
 from apy.view.pago_servicios.views import *
 from apy.view.pagos.views import *
@@ -131,12 +130,6 @@ urlpatterns = [
   
   
   
-    #--------URL modulo administrador----------------
-    path('administrador/listar/', AdministradorListView.as_view() , name='administrador_lista'),
-    path('administrador/agregar/', AdministradorCreateView.as_view() , name='administrador_crear'),
-    path('administrador/editar/<int:pk>/', AdministradorUpdateView.as_view() , name='administrador_editar'),
-    path('administrador/eliminar/<int:pk>/', AdministradorDeleteView.as_view() , name='administrador_eliminar'),
-    path("administrador/modal/crear/", AdministradorCreateModalView.as_view(), name="administrador_modal_crear"),
     
     #--------URL modulo informes----------------
     path('informes/listar/', InformesListView.as_view() , name='informes_lista'),
