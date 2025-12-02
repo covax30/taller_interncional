@@ -41,8 +41,7 @@ SECRET_KEY = 'django-insecure-1ras&$usy0ocn2u-x=k00^w8o1zda_&vu41u68h3p+(7_*ween
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] 
 
 
 # Application definition
@@ -64,6 +63,10 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    
+    # Enable WhiteNoise middleware for serving static files
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -141,21 +144,21 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    BASE_DIR / "staticfiles", # Añade esta línea
-    BASE_DIR / 'apy' / 'static' / 'AdminLTE' / 'dist',
+    os.path.join(BASE_DIR, 'apy', 'static'),
+    os.path.join(BASE_DIR, 'login', 'static'), 
 ]
-#eSTATIC_ROOT = BASE_DIR / "staticfiles"#Esta variable solo se usa en produccion
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = 'login:login'
-LOGIN_REDIRECT_URL = 'apy:informes_lista'
+LOGIN_REDIRECT_URL = 'apy:estadisticas'
 LOGOUT_REDIRECT_URL = ''
 
 # -----------------------------------------------------
@@ -176,21 +179,9 @@ EMAIL_HOST_PASSWORD = 'pjqmmdgfnredlrtg'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# -----------------------------------------------------
-# ✅ CONFIGURACIÓN DE CELERY (Tareas Asíncronas)
-# -----------------------------------------------------
-# Utilizando Redis como broker (el más común)
-# Asegúrate de que Redis esté corriendo en 127.0.0.1:6379
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0' 
-CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/0' # Para rastrear el resultado de las tareas
-
-# Configuración de serialización (para seguridad y compatibilidad)
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-
-# Usa la misma zona horaria de Django
-CELERY_TIMEZONE = 'America/Bogota' 
-
-# Indica que Celery Beat debe leer la programación de la base de datos (modelo PeriodicTask)
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+# WhiteNoise static files storage
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}

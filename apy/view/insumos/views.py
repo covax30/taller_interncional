@@ -8,58 +8,12 @@ from django.urls import reverse_lazy
 from django.template.loader import render_to_string
 from apy.forms import *
 from django.contrib import messages
-from django.contrib.auth.mixins import AccessMixin
+# Se elimina la importación local de AccessMixin
 
-# PERMISO REQUERIDO MIXIN
-class PermisoRequeridoMixin(AccessMixin):
-    """
-    Mixin para verificar los permisos del usuario actual.
-    Requiere que se definan 'module_name' y 'permission_required'.
-    """
-    module_name = None      
-    permission_required = None 
+# Importar las herramientas de permisos centralizadas
+from apy.decorators import PermisoRequeridoMixin, permiso_requerido_fbv 
 
-    def dispatch(self, request, *args, **kwargs):
-        # 1. Verificar Autenticación
-        if not request.user.is_authenticated:
-            return self.handle_no_permission() 
-
-        # 2. Permitir Superusuario
-        if request.user.is_superuser:
-            return super().dispatch(request, *args, **kwargs)
-
-        # 3. Verificar Configuración
-        if self.module_name is None or self.permission_required is None:
-            raise NotImplementedError(
-                f'{self.__class__.__name__} debe definir module_name y permission_required.'
-            )
-
-        # 4. Lógica de Permisos Personalizados
-        try:
-            # Asumiendo que Module y Permission son los modelos correctos
-            module = Module.objects.get(name=self.module_name)
-            permission_obj = Permission.objects.filter(user=request.user, module=module).first()
-            
-            has_permission = False
-            if permission_obj:
-                # Usa getattr para verificar el permiso (ej: permission_obj.view)
-                has_permission = getattr(permission_obj, self.permission_required, False)
-                
-            if has_permission:
-                return super().dispatch(request, *args, **kwargs)
-            else:
-                messages.warning(request, f"Acceso denegado. No tienes permiso de {self.permission_required.upper()} para el módulo '{self.module_name}'.")
-                return redirect(self.get_permission_denied_url())
-                
-        except Module.DoesNotExist:
-            messages.error(request, f"Error de configuración: Módulo '{self.module_name}' no encontrado.")
-            return redirect(self.get_permission_denied_url())
-
-    def get_permission_denied_url(self):
-        # Redirige a la lista de insumos como fallback
-        return reverse_lazy('apy:insumo_lista') 
-
-# --------------Vistas de Insumos---------------
+# --------------Vistas de Insumos (CBVs)---------------
 
 class InsumoListView(PermisoRequeridoMixin, ListView): 
     model = Insumos
@@ -71,7 +25,6 @@ class InsumoListView(PermisoRequeridoMixin, ListView):
     
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
-        # El dispatch del Mixin se ejecuta antes
         return super().dispatch(request, *args, **kwargs)
     
     def get_context_data(self, **kwargs):
@@ -124,7 +77,7 @@ class InsumoUpdateView(PermisoRequeridoMixin, UpdateView):
         context['listar_url'] = reverse_lazy('apy:insumo_lista')
         return context
     
-class InsumoDeleteView(PermisoRequeridoMixin, DeleteView): # ORDEN CORREGIDO
+class InsumoDeleteView(PermisoRequeridoMixin, DeleteView): 
     model = Insumos
     template_name = 'insumos/eliminar.html'
     success_url = reverse_lazy('apy:insumo_lista')
@@ -144,7 +97,10 @@ class InsumoDeleteView(PermisoRequeridoMixin, DeleteView): # ORDEN CORREGIDO
         context['listar_url'] = reverse_lazy('apy:insumo_lista')
         return context
     
-# Vista para mostrar estadísticas (No se aplica Mixin)
+# --------------Vistas de Insumos (VBFs estandarizadas)---------------
+
+# Proteger la vista de estadísticas
+@permiso_requerido_fbv(module_name='Insumos', permission_required='view') 
 def estadisticas_view(request):
     # Contar total de insumos
     total_insumos = Insumos.objects.count()
@@ -155,7 +111,8 @@ def estadisticas_view(request):
     }
     return render(request, 'estadisticas.html', context)
 
-# API para actualización dinámica del contador de insumos (No se aplica Mixin)
+# API para actualización dinámica del contador de insumos (Proteger la API)
+@permiso_requerido_fbv(module_name='Insumos', permission_required='view', api=True)
 def api_contador_insumos(request):
     total_insumos = Insumos.objects.count()
     return JsonResponse({'total_insumos': total_insumos})

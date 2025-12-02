@@ -43,21 +43,48 @@ class Command(BaseCommand):
         }
 
     def handle(self, *args, **options):
-        # 1. Obtener la configuración de la base de datos
+        # 0. Inicializar variables para manejo de errores y logs
+        log_pk = options['log_pk']
+        log = None
+        estado_final = 'Fallo' # Asumimos fallo por defecto
+        error_msg = None
+        
+        # 1. Intentar obtener el log y establecer el estado de inicio (BLOQUEO)
+        if log_pk:
+            try:
+                log = BackupLog.objects.get(pk=log_pk)
+                # Establecer el estado 'En Proceso' (Inicio del bloqueo)
+                log.estado = 'En Proceso'
+                log.fecha_inicio = timezone.now()
+                log.save()
+            except BackupLog.DoesNotExist:
+                self.stderr.write(self.style.ERROR(f"BackupLog con PK={log_pk} no encontrado."))
+                return # No podemos continuar sin el log
+            except Exception as e:
+                self.stderr.write(self.style.ERROR(f"Error al iniciar el log: {e}"))
+                return # Error grave, no podemos continuar
+
+        # --- PREPARACIÓN Y VERIFICACIÓN ---
+        
+        # 2. Obtener la configuración y verificar la ruta
         try:
             db_config = self._get_db_config()
         except CommandError as e:
-            self.stderr.write(self.style.ERROR(str(e)))
-            return
-
-        # 2. Verificar la ruta del archivo
-        # 💡 CORRECCIÓN 2: Normalizar y resolver la ruta para compatibilidad con Windows
+            error_msg = str(e)
+            estado_final = 'Fallo'
+            if log: pass 
+            else: return 
+        
+        # La lógica de verificación de ruta también debe estar dentro del try para que el finally la maneje si es un error
         backup_path = str(Path(options['path']).resolve())
-        
         if not os.path.exists(backup_path):
-            raise CommandError(f"El archivo de respaldo no se encontró en la ruta: {backup_path}")
-        
-        # 3. Preparar el comando de restauración 'mysql'
+            error_msg = f"El archivo de respaldo no se encontró en la ruta: {backup_path}"
+            self.stderr.write(self.style.ERROR(error_msg))
+            estado_final = 'Fallo'
+            if log: pass 
+            else: return 
+
+        # 3. Preparar el comando 'mysql'
         command = [
             'mysql',
             f'-h{db_config["HOST"]}',
@@ -66,41 +93,64 @@ class Command(BaseCommand):
             f'{db_config["NAME"]}',
             '--default-character-set=utf8mb4'
         ]
-        
         if db_config['PASSWORD']:
             command.append(f'-p{db_config["PASSWORD"]}')
 
         self.stdout.write(self.style.NOTICE(f"⚠️ Iniciando restauración desde: {os.path.basename(backup_path)}"))
         
-        # 4. Cerrar las conexiones existentes a la DB (CRÍTICO)
+        # 4. Cerrar las conexiones existentes (CRÍTICO)
         connection.close() 
         self.stdout.write(self.style.WARNING("Conexión a la base de datos de Django cerrada temporalmente."))
 
-        # 5. Ejecutar la restauración
+        # --- EJECUCIÓN CON try...except...finally ---
+        
         try:
-            # ✅ El comando de gestión abre y maneja el archivo SQL
+            # ✅ LÓGICA CRÍTICA DENTRO DEL TRY
             with open(backup_path, 'r', encoding='utf-8') as f:
                 
-                # Ejecutar el comando. stdin=f canaliza el contenido del archivo SQL a mysql.
                 process = subprocess.run(
                     command,
                     stdin=f, 
                     stdout=subprocess.PIPE, 
                     stderr=subprocess.PIPE,
-                    check=False # No lanza error si el código de retorno no es 0
+                    check=False
                 )
 
-            # 6. Manejo de resultados
+            # 5. Manejo de resultados
             if process.returncode == 0:
                 self.stdout.write(self.style.SUCCESS(f"✅ Restauración exitosa."))
+                estado_final = 'Éxito' 
             else:
                 error_output = process.stderr.decode('utf-8').strip()
-                raise CommandError(f"Error al ejecutar la restauración (código {process.returncode}): {error_output}")
+                self.stderr.write(self.style.ERROR(f"Error al ejecutar la restauración (código {process.returncode}): {error_output}"))
+                error_msg = f"Error MySQL: {error_output}"
+                estado_final = 'Fallo' 
 
-        except CommandError as e:
-            self.stderr.write(self.style.ERROR(str(e)))
         except FileNotFoundError:
             error_msg = "El ejecutable 'mysql' no se encontró. Asegúrate de que esté en el PATH del sistema."
             self.stderr.write(self.style.ERROR(error_msg))
+            estado_final = 'Fallo'
+
         except Exception as e:
-            self.stderr.write(self.style.ERROR(f"Error inesperado durante la restauración: {e}"))
+            # Captura cualquier otro error durante la ejecución (incluido CommandError si ocurre aquí)
+            error_msg = f"Error inesperado durante la restauración: {e}"
+            self.stderr.write(self.style.ERROR(error_msg))
+            estado_final = 'Fallo' 
+
+        # ----------------------------------------------------
+        # 6. FINALIZACIÓN (Bloque finally)
+        # ----------------------------------------------------
+        finally:
+            if log:
+                # 💡 La clave de la solución de tu profesor:
+                # Si el proceso falla, liberamos el bloqueo y lo marcamos como 'Éxito' para que sea reutilizable.
+                if estado_final == 'Fallo':
+                    log.estado = 'Éxito' # Vuelve a ser utilizable
+                else:
+                    log.estado = estado_final
+                    
+                log.fecha_fin = timezone.now()
+                log.mensaje_error = error_msg # Se guarda el error_msg (si lo hay)
+                log.save()
+                
+            self.stdout.write(self.style.NOTICE("Proceso de restauración finalizado y estado del log actualizado."))

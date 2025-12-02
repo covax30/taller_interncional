@@ -1,0 +1,99 @@
+/* Reset mínimo y fuente */
+:root{
+  --bg:#f6f8fc;
+  --card:#ffffff;
+  --ink:#17223b;
+  --muted:#6b7a99;
+  --primary:#3aa0ff;
+  --accent:#ea5b5b;
+  --ring:#e9eef6;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,sans-serif;color:var(--ink)}
+
+/* Contenedor full */
+.err-wrap{
+  min-height:100dvh;
+  display:grid;
+  place-items:center;
+  position:relative;
+  padding:32px;
+}
+
+/* número gigante translúcido */
+.err-shadow{
+  position:absolute;
+  inset:auto 0 6%;
+  text-align:center;
+  font-size:clamp(120px, 22vw, 320px);
+  font-weight:800;
+  letter-spacing:-0.04em;
+  color:#dfe7f3;
+  user-select:none;
+  z-index:0;
+}
+
+/* Tarjeta */
+.err-card{
+  width:min(900px, 100%);
+  background:var(--card);
+  border-radius:18px;
+  box-shadow:0 20px 50px rgba(23,34,59,.08), 0 6px 16px rgba(23,34,59,.06);
+  padding: clamp(20px, 4vw, 40px);
+  text-align:center;
+  position:relative;
+  z-index:1;
+}
+
+/* Ilustración */
+.err-illustration{
+  width:min(520px, 100%);
+  margin-inline:auto;
+  margin-bottom:20px;
+}
+.err-svg{width:100%;height:auto;display:block}
+
+/* Textos */
+.err-title{
+  font-size:clamp(28px, 4vw, 40px);
+  margin: 6px 0 0;
+  font-weight:800;
+}
+.err-sub{
+  margin:6px 0 10px;
+  font-weight:600;
+  color:var(--ink);
+}
+.err-desc{
+  margin:0 auto 22px;
+  color:var(--muted);
+  max-width:56ch;
+  line-height:1.55;
+}
+
+/* Botones */
+.err-actions{
+  display:flex;
+  gap:12px;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+.err-btn{
+  appearance:none;
+  display:inline-flex;
+  align-items:center;
+  gap:.6rem;
+  padding:.9rem 1.2rem;
+  border-radius:10px;
+  border:1px solid #dbe3ef;
+  color:var(--ink);
+  background:#fff;
+  font-weight:600;
+  text-decoration:none;
+  box-shadow:0 1px 0 #eef3fb inset;
+  transition:transform .08s ease, box-shadow .2s ease, background .2s ease;
+}
+.err-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(23,34,59,.06)}
+.err-btn--primary{background:var(--primary);color:#fff;border-color:transparent}
+.err-btn--primary:hover{box-shadow:0 10px 26px rgba(58,160,255,.25)}
