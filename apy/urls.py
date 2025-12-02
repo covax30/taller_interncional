@@ -138,6 +138,8 @@ urlpatterns = [
     path('empleado/editar/<int:pk>/', EmpleadoUpdateView.as_view(), name='empleado_editar'),
     path('empleado/eliminar/<int:pk>/', EmpleadoDeleteView.as_view(), name='empleado_eliminar'),
     path("empleado/modal/crear/", EmpleadoCreateModalView.as_view(), name="empleado_modal_crear"),
+    path("empleado/modal/mantenimiento/crear/", EmpleadoCreateModalMantenimientoView.as_view(), name="empleado_modal_crear_mantenimiento"),
+
     #----------url Gastos-------
     path('gasto/listar/', GastosListView.as_view() , name='gasto_lista'),
     path('gasto/agregar/', GastosCreateView.as_view(), name='gasto_crear'),

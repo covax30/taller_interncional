@@ -331,6 +331,21 @@ class Empleado(models.Model):
     #class meta
         #verbose_name = 'Empleado'
         #verbose_name_plural = 'Empleado'
+        
+
+#-------- Empleado-------
+class Empleado_Mantenimiento(models.Model): 
+    id_empleado_mantenimiento = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=100)
+    telefono = models.CharField(max_length=15, validators=[validar_telefono])
+    identificacion = models.CharField(max_length=20, unique=True, validators=[validar_identificacion]) 
+    Correo= models.EmailField(max_length=254, unique=True, validators=[validar_email])
+    direccion = models.CharField(max_length=255)
+    def __str__(self):
+        return f"{self.nombre} ({self.identificacion})"
+    #class meta
+        #verbose_name = 'Empleado'
+        #verbose_name_plural = 'Empleado'
 
 
 

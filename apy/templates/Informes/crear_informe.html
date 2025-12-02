@@ -183,70 +183,6 @@
         </div>
     </div>
 
-    <!-- Modal Marca -->
-    <div class="modal fade" id="modal-id_marca" tabindex="-1" role="dialog" data-backdrop="static">
-        <div class="modal-dialog modal-md" role="document">
-            <div class="modal-content">
-            <div class="modal-header d-flex justify-content-between align-items-center">
-                <h5 class="modal-title mb-0">Crear Marca</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
-                        style="background-color: #dc3545; color: white; border: none; 
-                                border-radius: 50%; width: 35px; height: 35px;
-                                font-size: 1.5rem; line-height: 1; 
-                                display: flex; justify-content: center; align-items: center;">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body"></div>
-        </div>
-    </div>
-
-    <!-- Modal Vehiculo -->
-    <div class="modal fade" id="modal-id_vehiculo" tabindex="-1" role="dialog" data-backdrop="static">
-        <div class="modal-dialog modal-md" role="document">
-            <div class="modal-content">
-            <div class="modal-header d-flex justify-content-between align-items-center">
-                <h5 class="modal-title mb-0">Crear Vehiculo</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
-                        style="background-color: #dc3545; color: white; border: none; 
-                                border-radius: 50%; width: 35px; height: 35px;
-                                font-size: 1.5rem; line-height: 1; 
-                                display: flex; justify-content: center; align-items: center;">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body"></div>
-        </div>
-    </div>
-    </div>
-
-
-    <!-- Script Marca. -->
-    <script>
-        $("#modal-id_marca").on("show.bs.modal", function(){
-            var modal = $(this);
-            $.ajax({
-                url: "{% url 'apy:marca_modal_crear' %}",
-                success: function(data){
-                    modal.find(".modal-body").html(data.html || data);
-            }
-        });
-    });
-    </script>
-
-    <!-- Script Vehiculo. -->
-    <script>
-        $("#modal-id_vehiculo").on("show.bs.modal", function(){
-            var modal = $(this);
-            $.ajax({
-                url: "{% url 'apy:vehiculo_modal_crear' %}",
-                success: function(data){
-                    modal.find(".modal-body").html(data.html || data);
-            }
-        });
-    });
-    </script>
-
     <!-- Script Repuesto. -->
     <script>
         $("#modal-id_repuesto").on("show.bs.modal", function(){
@@ -297,4 +233,34 @@
                 <a href="{% url 'apy:informes_lista' %}" class="btn btn-danger btn-flat float-right" title="Cancelar registro de informe">
                     <i class="fas fa-times"></i> Cancelar
                 </a>
+{% endblock %}
+
+{% block modals %}
+
+    {% include "apy/repuestos/modal_form.html" %}
+    {% include "apy/Empleado/modal_empleado.html" %}
+    {% include "apy/gestion_mantenimiento/modal_mantenimiento.html" %}
+    {% include "apy/Marca/modal_marca.html" %}
+    {% include "apy/Empleado/modal_empleado_mantenimiento.html" %}
+    {% include "apy/vehiculos/modal_vehiculo.html" %}
+    {% include "apy/tipo_mantenimiento/modal_tipo_mantenimiento.html" %}
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    $("#modal-id_repuesto").on("show.bs.modal", function(){
+        var modal = $(this);
+        $.ajax({
+            url: "{% url 'apy:repuesto_modal_crear' %}",
+            success: function(data){
+                modal.find(".modal-body").html(data.html || data);
+            }
+        });
+    });
+</script>
+
+... y todos los demás scripts ...
+
 {% endblock %}

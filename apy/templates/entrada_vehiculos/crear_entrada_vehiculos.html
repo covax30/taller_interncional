@@ -2,18 +2,7 @@
 {% load widget_tweaks%}
 {% block form %}
     {% csrf_token %}
-    <!-- Id Vehiculo con modal -->
-    <div class="form-group mb-3">
-        <label for="{{ form.id_vehiculo.id_for_label }}">Vehículo:</label>
-        <div class="input-group">
-            {{ form.id_vehiculo }}
-            <div class="input-group-append">
-                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_vehiculo">
-                    <i class="fas fa-plus"></i>
-                </button>
-            </div>
-        </div>
-    </div>
+    
 
     <!-- Id Cliente con modal -->
     <div class="form-group mb-3">
@@ -22,6 +11,19 @@
             {{ form.id_cliente }}
             <div class="input-group-append">
                 <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_cliente">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Id Vehiculo con modal -->
+    <div class="form-group mb-3">
+        <label for="{{ form.id_vehiculo.id_for_label }}">Vehículo:</label>
+        <div class="input-group">
+            {{ form.id_vehiculo }}
+            <div class="input-group-append">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_vehiculo">
                     <i class="fas fa-plus"></i>
                 </button>
             </div>
