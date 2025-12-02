@@ -207,4 +207,3 @@ urlpatterns = [
     path('api/gastos/count/', api_contador_gastos, name='api_contador_gastos'),
     path('ayuda/', ayuda, name='ayuda'),
 ]
-
