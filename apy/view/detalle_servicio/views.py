@@ -53,7 +53,7 @@ class CrearServicioView(CreateView):
         
         context['repuestos'] = Repuesto.objects.all()
         context['tipos_mantenimiento'] = TipoMantenimiento.objects.all()
-        context['insumos'] = Insumos.objects.all()  # ← CON "S"
+        context['insumos'] = Insumos.objects.all()  
         
         return context
 

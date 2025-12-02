@@ -15,15 +15,15 @@ from apy.models import *
 class FacturaForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['tipo_pago'].widget.attrs['autofocus'] = True
+        self.fields['metodo_pago'].widget.attrs['autofocus'] = True
         
     class Meta:
         model = Factura
         fields = '__all__'
         widgets = {
-            'tipo_pago': TextInput(
+            'id_empleado': Select(
                 attrs={
-                    'placeholder': 'Ingrese el tipo de pago',
+                    'class': 'form-control',
                 }
             ),
             'id_cliente': Select(
@@ -31,42 +31,19 @@ class FacturaForm(ModelForm):
                     'class': 'form-control',
                 }
             ),
-            'id_vehiculo': Select(
+            'id_Detalles_servicios': Select(
                 attrs={
                     'class': 'form-control',
                 }
             ),
-            'id_tipo_mantenimiento': Select(
+            'metodo_pago': Select(
                 attrs={
                     'class': 'form-control',
                 }
             ),
-            'servicio_prestado': TextInput(
-                attrs={
-                    'placeholder': 'Ingrese el servicio prestado',
-                }
-            ),
-            'nombre_empresa': TextInput(
-                attrs={
-                    'placeholder': 'Ingrese el nombre de la empresa',
-                }
-            ),
-            'direccion_empresa': TextInput(
-                attrs={
-                    'placeholder': 'Ingrese la direccion de la empresa',
-                }
-            ),
-            'id_empleado': Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-            'monto': NumberInput(
-                attrs={
-                    'placeholder': 'Ingrese el monto total del servicio prestado',
-                }
-            )
         }
+
+
         error_messages = {
             'id_operacion': {
                 'required': 'El id de la operacion es obligatorio',
@@ -97,6 +74,55 @@ class FacturaForm(ModelForm):
             },
             'monto': {
                 'required': 'El monto es obligatorio',
+            }
+        }
+        
+
+class EmpresaForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs.update({
+                'class': 'form-control',  
+                'autocomplete': 'off'
+            })
+        
+        self.fields['nombre'].widget.attrs.update({'autofocus': True})
+    
+    class Meta:
+        model = Empresa
+        fields = ['nombre', 'nit', 'direccion', 'telefono']  
+        widgets = {
+            'nombre': TextInput(
+                attrs={
+                    'class': 'form-control'
+                    }),
+            'nit': NumberInput(
+                attrs={
+                    'class': 'form-control', 'min': '1'
+                    }),
+            'direccion': TextInput(
+                attrs={
+                    'class': 'form-control', 'placeholder': '0.00', 'step': '0.01'
+                    }),
+            'telefono': NumberInput(
+                attrs={
+                    'class': 'form-control', 'min': '1'
+                    }),
+        }
+        
+        error_messages = {
+            'nombre': {
+                'required': 'El nombre de la empresa  es obligatorio',
+            },
+            'nit': {
+                'required': 'El Número de Identificación Tributaria es oblicatorio',
+            },
+            'direccion ': {
+                'required': 'La direccion de la empresa es  obligatorio',
+            },
+            'telefono': {
+                'required': 'El telefono de la empresa es  obligatorio',
             }
         }
 
@@ -962,7 +988,7 @@ class PagoServiciosForm(ModelForm):
             'monto': {
                 'required': 'El monto de pago es obligatorio',
             },
-         }
+         } 
         
 # -----------Formulario modelo pagos------------------    
 class PagosForm(ModelForm):

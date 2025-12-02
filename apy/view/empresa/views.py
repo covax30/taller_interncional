@@ -1,8 +1,6 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views import View
-# Se asume que apy.models, apy.view.clientes.views, y apy.forms contienen las clases necesarias
-from apy.models import *
-# from apy.view.clientes.views import * # Si este archivo contiene estas vistas, esta importación puede ser redundante o generar un conflicto circular. Se recomienda revisar su necesidad.
+from apy.models import Empresa, Cliente  # Importa explícitamente
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib import messages
@@ -10,11 +8,11 @@ from django.utils.decorators import method_decorator
 from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.urls import reverse_lazy
-from apy.forms import *
+from apy.forms import EmpresaForm  # Importa explícitamente
 from django.contrib.auth.mixins import AccessMixin
 from apy.decorators import PermisoRequeridoMixin
 
-## MIXIN DE PERMISOS
+## MIXIN DE PERMISOS (sin cambios)
 class PermisoRequeridoMixin(AccessMixin):
     """
     Mixin para verificar los permisos del usuario actual.
@@ -24,24 +22,20 @@ class PermisoRequeridoMixin(AccessMixin):
     permission_required = None 
 
     def dispatch(self, request, *args, **kwargs):
-        # 1. Verificar Autenticación
         if not request.user.is_authenticated:
-            # Llama a la lógica de AccessMixin para redirigir al login
             return self.handle_no_permission() 
 
-        # 2. Permitir Superusuario
         if request.user.is_superuser:
             return super().dispatch(request, *args, **kwargs)
 
-        # 3. Verificar Configuración
         if self.module_name is None or self.permission_required is None:
             raise NotImplementedError(
                 f'{self.__class__.__name__} debe definir module_name y permission_required.'
             )
 
-        # 4. Lógica de Permisos Personalizados
         try:
-            # Asegurar que Module y Permission son los modelos correctos
+            # Asegúrate de importar Module y Permission
+            from apy.models import Module, Permission
             module = Module.objects.get(name=self.module_name)
             permission_obj = Permission.objects.filter(user=request.user, module=module).first()
             
@@ -60,61 +54,61 @@ class PermisoRequeridoMixin(AccessMixin):
             return redirect(self.get_permission_denied_url())
 
     def get_permission_denied_url(self):
-        return reverse_lazy('apy:cliente_lista')
+        return reverse_lazy('apy:empresa_lista')  # Cambié de cliente_lista a empresa_lista
     
 
 ## VISTAS BASADAS EN CLASES (CBVs)
 
-class ClienteListView(PermisoRequeridoMixin, ListView):
-    model = Cliente
-    template_name = 'clientes/listar_clientes.html'
+class EmpresaListView(PermisoRequeridoMixin, ListView):
+    model = Empresa
+    template_name = 'empresa/listar_empresas.html'
     
     # --- Configuración de Permisos ---
-    module_name = 'Clientes' 
+    module_name = 'Empresa' 
     permission_required = 'view' 
     # --------------------------------
     
     def get_queryset(self):
-        return Cliente.objects.filter(estado=True)
+        return Empresa.objects.filter(estado=True)
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
     
     def post(self, request, *args, **kwargs):
-        nombre = {'nombre' : 'Cliente'}
+        nombre = {'nombre' : 'Empresa'}
         return JsonResponse(nombre)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['titulo'] = 'Lista de Clientes'
-        context['crear_url'] = reverse_lazy('apy:cliente_crear')
-        context['entidad'] = 'Cliente'
+        context['titulo'] = 'Lista de Empresas'
+        context['crear_url'] = reverse_lazy('apy:empresa_crear')
+        context['entidad'] = 'Empresa'
         
         return context
     
-class ClienteCreateView(PermisoRequeridoMixin, CreateView):
-    model = Cliente
-    form_class = ClienteForm
-    template_name = 'clientes/crear_clientes.html'
-    success_url = reverse_lazy('apy:cliente_lista')
+class EmpresaCreateView(PermisoRequeridoMixin, CreateView):
+    model = Empresa
+    form_class = EmpresaForm
+    template_name = 'empresa/crear_empresa.html'
+    success_url = reverse_lazy('apy:empresa_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Clientes'
+    module_name = 'Empresa'
     permission_required = 'add'
     
     def form_valid(self, form):
         form.instance.estado = True 
-        messages.success(self.request, "Cliente creado correctamente")
+        messages.success(self.request, "Empresa agregada correctamente")
         response = super().form_valid(form)
         
-        # Si la request es AJAX, devolver JSON con el nuevo contador
+        # CORRECCIÓN: Devuelve total de empresas, no clientes
         if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            total_clientes = Cliente.objects.count()
+            total_empresas = Empresa.objects.count()
             return JsonResponse({
                 'success': True, 
-                'total_clientes': total_clientes,
-                'message': 'Cliente creado correctamente'
+                'total_empresas': total_empresas,  
+                'message': 'Empresa creada correctamente'  
             })
         
         return response
@@ -124,23 +118,23 @@ class ClienteCreateView(PermisoRequeridoMixin, CreateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['titulo'] = 'Crear de Clientes'
-        context['entidad'] = 'Cliente'
-        context['listar_url'] = reverse_lazy('apy:cliente_lista')
+        context['titulo'] = 'Crear Empresa'  # Corregido texto
+        context['entidad'] = 'Empresa'
+        context['listar_url'] = reverse_lazy('apy:empresa_lista')  # minúsculas
         return context
     
-class ClienteUpdateView(PermisoRequeridoMixin, UpdateView):
-    model = Cliente
-    form_class = ClienteForm
-    template_name = 'clientes/crear_clientes.html'
-    success_url = reverse_lazy('apy:cliente_lista')
+class EmpresaUpdateView(PermisoRequeridoMixin, UpdateView):
+    model = Empresa
+    form_class = EmpresaForm
+    template_name = 'empresa/crear_empresa.html'
+    success_url = reverse_lazy('apy:empresa_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Clientes'
+    module_name = 'Empresa'
     permission_required = 'change'
     
     def form_valid(self, form):
-        messages.success(self.request, "Cliente actualizado correctamente")
+        messages.success(self.request, "Empresa actualizada correctamente")
         return super().form_valid(form)
     
     def dispatch(self, request, *args, **kwargs):
@@ -148,18 +142,17 @@ class ClienteUpdateView(PermisoRequeridoMixin, UpdateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['titulo'] = 'Editar de Clientes'
-        context['entidad'] = 'Cliente'
-        context['listar_url'] = reverse_lazy('apy:cliente_lista')
+        context['titulo'] = 'Editar Empresa'  # Corregido texto
+        context['entidad'] = 'Empresa'
+        context['listar_url'] = reverse_lazy('apy:empresa_lista')
         return context
     
-class ClienteDeleteView(PermisoRequeridoMixin, DeleteView): 
-    model = Cliente
-    template_name = 'clientes/eliminar_clientes.html'
-    success_url = reverse_lazy('apy:cliente_lista')
+class EmpresaDeleteView(PermisoRequeridoMixin, DeleteView): 
+    model = Empresa
+    template_name = 'empresa/eliminar_empresa.html'
+    success_url = reverse_lazy('apy:empresa_lista')
     
     def post(self, request, *args, **kwargs):
-        
         self.object = self.get_object()
         success_url = self.get_success_url()
         
@@ -167,12 +160,11 @@ class ClienteDeleteView(PermisoRequeridoMixin, DeleteView):
         self.object.estado = False
         self.object.save()
         
-        messages.success(self.request, f"Cliente {self.object.nombre} desactivado ")
+        messages.success(self.request, f"Empresa {self.object.nombre} desactivada")  # Corregido
         return HttpResponseRedirect(success_url)
    
-    
     # --- Configuración de Permisos ---
-    module_name = 'Clientes'
+    module_name = 'Empresa'
     permission_required = 'delete'
     
     def dispatch(self, request, *args, **kwargs):
@@ -180,51 +172,57 @@ class ClienteDeleteView(PermisoRequeridoMixin, DeleteView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['titulo'] = 'Eliminar de Clientes'
-        context['entidad'] = 'Cliente'
-        context['listar_url'] = reverse_lazy('apy:cliente_lista')
+        context['titulo'] = 'Eliminar Empresa'  # Corregido texto
+        context['entidad'] = 'Empresa'
+        context['listar_url'] = reverse_lazy('apy:empresa_lista')  # minúsculas
         return context
     
-class ClienteInactivosListView(View):
+class EmpresaInactivosListView(View):
     def get(self, request):
-        inactivos = Cliente.objects.filter(estado=False).values("id_cliente", "nombre")
+        # CORRECCIÓN: Usa 'id' no 'id_empresa'
+        inactivos = Empresa.objects.filter(estado=False).values("id", "nombre")
         return JsonResponse(list(inactivos), safe=False)
     
     
-def activar_cliente(request):
+def activar_empresa(request):
     if request.method == "POST":
-        id_cliente = request.POST.get("id_cliente")
-        cliente = Cliente.objects.filter(id_cliente=id_cliente).first()
+        # CORRECCIÓN: Usa 'id' no 'id_empresa'
+        id = request.POST.get("id")
+        empresa = Empresa.objects.filter(id=id).first()
 
-        if cliente:
-            cliente.estado = True
-            cliente.save()
-            return JsonResponse({"success": True, "message": "Cliente activado correctamente"})
+        if empresa:
+            empresa.estado = True
+            empresa.save()
+            return JsonResponse({"success": True, "message": "Empresa activada correctamente"})  # Cambiado
 
-        return JsonResponse({"success": False, "message": "Cliente no encontrado"})
+        return JsonResponse({"success": False, "message": "Empresa no encontrada"})  # Cambiado
 
     return JsonResponse({"success": False, "message": "Método inválido"})
-# Vista para mostrar estadísticas
-def estadisticas_view(request):
-    # Contar total de clientes
-    total_clientes = Cliente.objects.count()
+
+# Vista para mostrar estadísticas de empresas
+def estadisticas_empresas_view(request):
+    # Contar total de empresas
+    total_empresas = Empresa.objects.count()
+    activas = Empresa.objects.filter(estado=True).count()
+    inactivas = Empresa.objects.filter(estado=False).count()
     
-    # Puedes agregar más estadísticas aquí
     context = {
-        'total_clientes': total_clientes,
+        'total_empresas': total_empresas,
+        'activas': activas,
+        'inactivas': inactivas,
     }
-    return render(request, 'estadisticas.html', context)
+    return render(request, 'empresa/estadisticas.html', context)
 
-# API para actualización dinámica del contador de clientes
-def api_contador_clientes(request):
-    total_clientes = Cliente.objects.count()
-    return JsonResponse({'total_clientes': total_clientes})
+# API para actualización dinámica del contador de empresas
+def api_contador_empresas(request):
+    total_empresas = Empresa.objects.count()
+    return JsonResponse({'total_empresas': total_empresas})
 
-class ClienteCreateModalView(CreateView):
-    model = Cliente
-    form_class = ClienteForm
-    template_name = "clientes/modal_cliente.html"
-    success_url = reverse_lazy("apy:cliente_lista")
+class EmpresaCreateModalView(CreateView):
+    model = Empresa
+    form_class = EmpresaForm
+    template_name = "empresa/modal_empresa.html"
+    success_url = reverse_lazy("apy:empresa_lista")
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -233,11 +231,12 @@ class ClienteCreateModalView(CreateView):
     def form_valid(self, form):
         try:
             self.object = form.save()
+            # CORRECCIÓN: Usa self.object.id, no self.object.id_cliente
             return JsonResponse({
                 "success": True,
-                "id": self.object.id_cliente,
+                "id": self.object.id,  # Cambiado
                 "text": str(self.object),
-                "message": "Cliente registrado correctamente ✅"
+                "message": "Empresa registrada correctamente"
             })
         except Exception as e:
             return JsonResponse({
@@ -250,5 +249,5 @@ class ClienteCreateModalView(CreateView):
         return JsonResponse({
             "success": False,
             "html": html,
-            "message": "Por favor, corrige los errores en el formulario ❌"
+            "message": "Por favor, corrige los errores en el formulario"
         })

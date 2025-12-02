@@ -6,7 +6,7 @@
 
 
     <div class="form-group mb-3">
-        <label for ="{{form.nombre.id_for_label}}">Nombre Cliente:</label>
+        <label for ="{{form.nombre.id_for_label}}">Nombre de la empresa:</label>
         <div class= "input-group">
             {{form.nombre|add_class:'form-control'|attr:'autocomplete:off'}}
         </div>
@@ -21,14 +21,14 @@
     </div>
     
     <div class="form-group mb-3">
-        <label for ="{{form.documento.id_for_label}}">Documento:</label>
+        <label for ="{{form.nit.id_for_label}}">Nit:</label>
         <div class= "input-group">
-            {{form.documento|add_class:'form-control'|attr:'autocomplete:off'}}
+            {{form.nit|add_class:'form-control'|attr:'autocomplete:off'}}
         </div>
 
-        {% if form.documento.errors %} 
+        {% if form.nit.errors %} 
             <div class="invalid-feedback d-block">
-                {% for error in form.documento.errors%} 
+                {% for error in form.nit.errors%} 
                 <small> {{error}} </small> <br>
                 {%endfor%}    
                 </div>
@@ -39,7 +39,22 @@
 
 
     <div class="form-group mb-3">
-        <label for ="{{form.telefono.id_for_label}}">Telefono:</label>
+        <label for ="{{form.direccion.id_for_label}}">Direccion:</label>
+        <div class= "input-group">
+            {{form.direccion|add_class:'form-control'|attr:'autocomplete:off'}}
+        </div>
+
+        {% if form.direccion.errors %} 
+            <div class="invalid-feedback d-block">
+                {% for error in form.direccion.errors%} 
+                <small> {{error}} </small> <br>
+                {%endfor%}    
+                </div>
+        {% endif%}             
+    </div>
+
+    <div class="form-group mb-3">
+        <label for ="{{form.telefono.id_for_label}}"> Telefono:</label>
         <div class= "input-group">
             {{form.telefono|add_class:'form-control'|attr:'autocomplete:off'}}
         </div>
@@ -53,28 +68,13 @@
         {% endif%}             
     </div>
 
-    <div class="form-group mb-3">
-        <label for ="{{form.correo.id_for_label}}"> Correo:</label>
-        <div class= "input-group">
-            {{form.correo|add_class:'form-control'|attr:'autocomplete:off'}}
-        </div>
-
-        {% if form.correo.errors %} 
-            <div class="invalid-feedback d-block">
-                {% for error in form.correo.errors%} 
-                <small> {{error}} </small> <br>
-                {%endfor%}    
-                </div>
-        {% endif%}             
-    </div>
-
 {% endblock %}
 
 {% block Cancelar %}
                 <button type="submit " class="btn btn-primary btn-flat"><i class="fas fa-save"></i>
                     Agregar
                 </button>
-                <a href="{% url 'apy:cliente_lista' %}" class="btn btn-danger btn-flat float-right">
+                <a href="{% url 'apy:empresa_lista' %}" class="btn btn-danger btn-flat float-right">
                     <i class="fas fa-times"></i> Cancelar
                 </a>
 {% endblock %}

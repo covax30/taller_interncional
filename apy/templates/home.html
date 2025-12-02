@@ -26,9 +26,15 @@
     <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/bootstrap.css' %}" />
 
 
+
     <!-- Estilos para DataTables responsivos -->
     <link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/css/jquery.dataTables.min.css' %}">
     <link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/css/responsive.bootstrap4.min.css' %}">
+    
+
+
+
+
 
     <!-- BLOQUE PARA ESTILOS ADICIONALES DE PÁGINAS ESPECÍFICAS -->
     {% block extra_head %}
@@ -45,30 +51,36 @@
     <script src="{% static 'lib/datatables-1.10.20/datatables.min.js' %}"></script>
     <script src="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/js/dataTables.responsive.min.js' %}"></script>
     <script src="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/js/responsive.bootstrap4.min.js' %}"></script>
+
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
     <!-- CSS de Sienna Accessibility -->
     <link rel="stylesheet" href="{% static 'js/sienna-accessibility/custom.css' %}">
+
+    
+
     <script>
-// === Configuración global de CSRF ===
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== "") {
-        const cookies = document.cookie.split(";");
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + "=")) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
+    // === Configuración global de CSRF ===
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
             }
         }
+        return cookieValue;
     }
-    return cookieValue;
-}
-const csrftoken = getCookie("csrftoken");
-$.ajaxSetup({
-    headers: { "X-CSRFToken": csrftoken }
-});
-</script>
+    const csrftoken = getCookie("csrftoken");
+    $.ajaxSetup({
+        headers: { "X-CSRFToken": csrftoken }
+    });
+    </script>
 
   </head>
 

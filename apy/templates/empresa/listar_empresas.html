@@ -1,0 +1,52 @@
+{% extends "generic_listar.html" %}
+{% load humanize %}
+{% block titulo %}
+        <h1 class="text-center">Lista de empresas</h1>
+{% endblock titulo %}
+
+{% block agregar %}
+        <a href="{% url 'apy:empresa_crear' %}" class="btn btn-primary">Agregar empresa</a>
+        <a href="{% url 'apy:empresa_activar' %}" class="btn btn-primary">Agregar empresa</a>
+       
+{% endblock %}
+
+{% block columnas %}
+  <th>Id empresa</th>
+  <th>Nombre</th>
+  <th>NIT</th>
+  <th>Direccion</th>
+  <th>Telefono</th>
+
+  <th>Acciones</th>
+{% endblock %}
+
+{% block iterar %}
+  {% for emp in object_list %}
+    <tr>
+        <td>{{ emp.id }}</td>
+        <td>{{ emp.nombre }}</td>
+        <td>{{ emp.nit }}</td>
+        <td>{{ emp.direccion }}</td>
+        <td>{{ emp.telefono }}</td>
+
+        <td>
+            <a href="{% url 'apy:empresa_editar' emp.id %}" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></a>
+            <a href="{% url 'apy:empresa_eliminar' emp.id%}" class="btn btn-danger btn-xs"><i class="fas fa-trash-alt"></i></a>
+        </td>
+    </tr>
+  {% endfor %}
+  
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  {% if messages %}
+    {% for message in messages %}
+      Swal.fire({
+        icon: '{% if "success" in message.tags %}success{% elif "error" in message.tags %}error{% else %}info{% endif %}',
+        title: '{{ message|escapejs }}',
+        timer: 2500,
+        showConfirmButton: false
+      });
+    {% endfor %}
+  {% endif %}
+</script>
+{% endblock %} 

@@ -9,7 +9,7 @@ from apy.models import Module, Permission
 class PermisoRequeridoMixin(AccessMixin):
     """
     Mixin para verificar los permisos del usuario actual.
-    """
+    """ 
     module_name = None      
     permission_required = None 
     redirect_url = reverse_lazy('apy:vehiculo_lista') # Default fallback URL

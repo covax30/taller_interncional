@@ -205,7 +205,8 @@ class Cliente(models.Model):
     documento = models.BigIntegerField(validators=[validar_identificacion])
     telefono = models.BigIntegerField(validators=[validar_telefono])
     correo = models.EmailField(max_length=100, validators=[validar_email])
-    activo = models.BooleanField(default=True, verbose_name="Está activo")
+    estado = models.BooleanField(default=True)   
+   
 
     def __str__(self):
         return f"{self.id_cliente} - {self.nombre}"
@@ -513,26 +514,56 @@ class DetalleInsumos(models.Model):
     
     def __str__(self):
         return f"Insumo: {self.id_insumos} - Cantidad: {self.cantidad}"
+    
+ #-----Empresa----------------------
+class Empresa(models.Model):
+    nombre = models.CharField(max_length=255 )
+    nit = models.CharField(max_length=50)
+    direccion = models.TextField(max_length=100)
+    telefono = models.CharField(max_length=100)
+    estado = models.BooleanField(default=True) 
+
+    
+    def __str__(self):
+        return self.nombre
+    
+#----- modulo de cliente base para factura----
+class ClienteFcatura(models.Model):
+    TIPO_CLIENTE= [
+        ('cliente particular', 'Cliente Particular'),
+        ('empresa', 'Empresa'),
+    ]
+    tipo = models.CharField(max_length=20, choices=TIPO_CLIENTE)   
+    nombre = models.CharField(max_length=255, verbose_name="Nombre/Razón Social")
+    identificacion = models.CharField(max_length=50,  unique=True, verbose_name="Documento/NIT") 
+    telefono = models.CharField(max_length=20)
+    email = models.EmailField(validators=[validar_email])
+    direccion = models.TextField(verbose_name="Dirección")
+    estado = models.BooleanField(default=True, verbose_name="Activo")
 #-----------Factura-----------------
 class Factura(models.Model):
     
-    tipo_pago = models.CharField(max_length=45)
-    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
-    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE)
-    id_tipo_mantenimiento = models.ForeignKey(TipoMantenimiento, on_delete=models.CASCADE)
-    servicio_prestado = models.CharField(max_length=45)
-    nombre_empresa = models.CharField(max_length=45)
-    direccion_empresa = models.CharField(max_length=45)
-    id_empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE)
-    monto = models.IntegerField(  # 🔹 ENTEROS, sin decimales
-        error_messages={
-            'invalid': 'Ingrese un número válido para el monto.',
-            'required': 'El monto de la factura es obligatorio.'
-        } , validators=[validar_monto]
-    )
+    Nombre= models.CharField(default= "Taller Mecanica Diesel Internacional Arturo Patiño" )
+    NIT = models.CharField(default="74.187366-2")
+    Dirección = models.CharField(default="calle 9 #32-37 Barrio La Isla")
+    Telefono = models.CharField(default="3118112714 - 3133342841", max_length=50)
+    Fecha = models.DateField()
+    id_Detalles_servicios = models.ForeignKey(DetalleServicio,max_length=45,on_delete=models.PROTECT)
+    id_empleado = models.ForeignKey(Empleado, on_delete=models.PROTECT )
+    OPCIONES_CLIENTE = [
+        ('cliente', 'Cliente'),
+        ('empresa', 'Empresa'),
+    ]
+    Cliente = models.CharField(max_length=50, choices=OPCIONES_CLIENTE)
+    opciones_pago = [
+        ('efectivo','Efectivo'),
+        ('transferencia','Transferencia'),
+    ]
+    metodo_pago = models.CharField(max_length=50, choices=opciones_pago)
+   
 
     def __str__(self):
-        return f"Factura {self.id} - {self.tipo_pago or 'Sin pago'}"
+        return f"Factura {self.id} - {self.cliente}"
     
     
 
