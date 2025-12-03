@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import AccessMixin
 from django.core.exceptions import PermissionDenied
+from django.urls import reverse_lazy
 from apy.models import Module, Permission 
 from functools import wraps
 from django.shortcuts import redirect

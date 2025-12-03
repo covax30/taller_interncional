@@ -519,7 +519,7 @@ class DetalleInsumos(models.Model):
 class Empresa(models.Model):
     nombre = models.CharField(max_length=255 )
     nit = models.CharField(max_length=50)
-    direccion = models.TextField(max_length=100)
+    direccion = models.TextField()
     telefono = models.CharField(max_length=100)
     estado = models.BooleanField(default=True) 
 
@@ -528,7 +528,7 @@ class Empresa(models.Model):
         return self.nombre
     
 #----- modulo de cliente base para factura----
-class ClienteFcatura(models.Model):
+class ClienteFactura(models.Model):
     TIPO_CLIENTE= [
         ('cliente particular', 'Cliente Particular'),
         ('empresa', 'Empresa'),
@@ -543,12 +543,12 @@ class ClienteFcatura(models.Model):
 #-----------Factura-----------------
 class Factura(models.Model):
     
-    Nombre= models.CharField(default= "Taller Mecanica Diesel Internacional Arturo Patiño" )
-    NIT = models.CharField(default="74.187366-2")
-    Dirección = models.CharField(default="calle 9 #32-37 Barrio La Isla")
+    Nombre= models.CharField(default= "Taller Mecanica Diesel Internacional Arturo Patiño" , max_length=150)
+    NIT = models.CharField(default="74.187366-2", max_length=25)
+    Dirección = models.CharField(default="calle 9 #32-37 Barrio La Isla", max_length=200)
     Telefono = models.CharField(default="3118112714 - 3133342841", max_length=50)
     Fecha = models.DateField()
-    id_Detalles_servicios = models.ForeignKey(DetalleServicio,max_length=45,on_delete=models.PROTECT)
+    id_Detalles_servicios = models.ForeignKey(DetalleServicio,on_delete=models.PROTECT)
     id_empleado = models.ForeignKey(Empleado, on_delete=models.PROTECT )
     OPCIONES_CLIENTE = [
         ('cliente', 'Cliente'),
