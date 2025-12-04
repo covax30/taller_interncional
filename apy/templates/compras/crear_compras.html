@@ -3,27 +3,103 @@
 {% block form %}
     {% csrf_token %}
 
-    {% for field in form.visible_fields %}
+    <!-- Id Factura con modal -->
     <div class="form-group mb-3">
-        <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
-        {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
+        <label for="{{ form.id_factura_compra.id_for_label }}">Factura:</label>
+        <div class="input-group">
+            {{ form.id_factura_compra }}
+            <div class="input-group-append">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-form.id_factura_compra">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+    </div>
 
-        {% if field.errors %}
+    <!-- Id proveedor con modal -->
+    <div class="form-group mb-3">
+        <label for="{{ form.id_proveedor.id_for_label }}">Proveedor:</label>
+        <div class="input-group">
+            {{ form.id_proveedor }}
+            <div class="input-group-append">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_proveedor">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+ 
+    <!-- Fecha -->
+    <div class="form-group mb-3">
+        <label for="{{ form.fecha_compra.id_for_label }}">Fecha:</label>
+        <div class="input-group">
+            {{ form.fecha_compra|add_class:'form-control' }}
+        </div>
+        {% if form.fecha_compra.errors %}
             <div class="invalid-feedback d-block">
-                {% for error in field.errors %}
+                {% for error in form.fecha.errors %}
                     <small>{{ error }}</small><br>
                 {% endfor %}
             </div>
         {% endif %}
     </div>
-    {% endfor %}
+
+    <!-- Hora -->
+    <div class="form-group mb-3">
+        <label for="{{ form.hora_compra.id_for_label }}">Hora:</label>
+        <div class="input-group">
+            {{ form.hora_compra|add_class:'form-control' }}
+        </div>
+        {% if form.hora_compra.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.hora_compra.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Modal Proveedor -->
+    <div class="modal fade" id="modal-id_proveedor" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Proveedor</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                        style="background-color: #dc3545; color: white; border: none; 
+                                border-radius: 50%; width: 35px; height: 35px;
+                                font-size: 1.5rem; line-height: 1; 
+                                display: flex; justify-content: center; align-items: center;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Proveedor. -->
+    <script>
+        $("#modal-id_proveedor").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:proveedor_modal_crear' %}",
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+                }
+            });
+        });
+    </script>
 {% endblock %}
 
 {% block Cancelar %}
-                <button type="submit " class="btn btn-primary btn-flat"><i class="fas fa-save"></i>
+                <button type="submit " class="btn btn-primary btn-flat" title="Agregar compra">
+                    <i class="fas fa-save"></i>
                     Agregar
                 </button>
-                <a href="{% url 'apy:compra_lista' %}" class="btn btn-danger btn-flat float-right">
+                <a href="{% url 'apy:compra_lista' %}" class="btn btn-danger btn-flat float-right" title="Cancelar registro de compra">
                     <i class="fas fa-times"></i> Cancelar
                 </a>
 {% endblock %}

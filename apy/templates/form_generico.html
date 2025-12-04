@@ -8,7 +8,7 @@
         <div class="card card-default">
             <div class="card-header">
                 <h3 class="card-tittle">
-                    <i class="fas fa-search"></i>
+                    <i class="fa-solid fa-pen-to-square"></i>
                     {{titulo}}
                 </h3>
             </div>
@@ -28,6 +28,7 @@
         </div>
     </form>
 </div>
+
 
 <script>
     // Función para mostrar alerta de éxito
@@ -122,48 +123,68 @@
 <!-- JS de Sienna Accessibility -->
 <script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
 <script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
+
 <!-- Bootstrap Icons -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<link rel="stylesheet" href="{% static 'AdminLTE-4.0.0-rc3/css/bootstrap-icons.min.css' %}">
 
 <!-- Flatpickr -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+<link rel="stylesheet" href="{% static 'css/flatpickr.min.css' %}">
+<script src="{% static 'lib-fecha/flatpickr.min.js' %}"></script>
+<script src="{% static 'lib-fecha/es.js' %}"></script>
 
+<!-- JS para el selector de fecha -->
 <script>
-  
-  document.addEventListener("DOMContentLoaded", function() {
-    // Buscar todos los inputs tipo "date"
+document.addEventListener("DOMContentLoaded", function() {
     document.querySelectorAll('input[type="date"]').forEach(function(input) {
-      
-      // Inicializar flatpickr
-      const fp = flatpickr(input, {
-        dateFormat: "m/d/Y",
-        allowInput: true
-      });
+        // ... tu código existente para el wrapper ...
+        
+        const wrapper = document.createElement("div");
+        wrapper.classList.add("input-group", "mb-3");
+        input.parentNode.insertBefore(wrapper, input);
+        wrapper.appendChild(input);
 
-      // Crear contenedor input-group
-      const wrapper = document.createElement("div");
-      wrapper.classList.add("input-group");
+        const span = document.createElement("button");
+        span.type = "button";
+        span.classList.add("input-group-text", "btn", "btn-dark");
+        span.innerHTML = `<i class="bi bi-calendar-event"></i>`;
+        wrapper.appendChild(span);
 
-      // Reemplazar input original en el DOM
-      const parent = input.parentNode;
-      parent.insertBefore(wrapper, input);
-      wrapper.appendChild(input);
+        // Flatpickr sin tema forzado - se adaptará automáticamente
+        const fp = flatpickr(input, {
+            altInput: true,
+            altFormat: "d/m/Y",
+            dateFormat: "Y-m-d",
+            defaultDate: input.value,
+            allowInput: true,
+            locale: "es"
+            // 🔹 Sin theme específico - usa el por defecto
+        });
 
-      // Crear el span con el ícono
-      const span = document.createElement("span");
-      span.classList.add("input-group-text");
-      span.innerHTML = `<i class="bi bi-calendar-event"></i>`;
-      wrapper.appendChild(span);
-
-      // Hacer que el ícono abra el calendario
-      span.addEventListener("click", function() {
-        fp.open();
-      });
+        span.addEventListener("click", function() {
+            fp.open();
+        });
     });
-  });
+});
 </script>
+
+<style>
+/* Estilos base para Flatpickr que funcionan en ambos modos */
+.flatpickr-calendar {
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+.flatpickr-day.selected {
+    background: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.input-group-text {
+    cursor: pointer;
+    background-color: #343a40;
+    color: white;
+}
+</style>
 
 <!-- JS para el selector de hora -->
 

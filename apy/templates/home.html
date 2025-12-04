@@ -49,14 +49,207 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <!-- CSS de Sienna Accessibility -->
     <link rel="stylesheet" href="{% static 'js/sienna-accessibility/custom.css' %}">
+    <script>
+// === Configuración global de CSRF ===
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie("csrftoken");
+$.ajaxSetup({
+    headers: { "X-CSRFToken": csrftoken }
+});
+</script>
+
   </head>
 
   <!-- Inclusión del encabezado desde otra plantilla -->
   {% include 'header.html' %}
 
-  <!-- Bloque editable para el contenido principal -->
+  <body class="layout-fixed sidebar-expand-lg sidebar-mini sidebar-collapse bg-body-tertiary">
   {% block body %}{% endblock %}
 
-  <!-- Inclusión del pie de página desde otra plantilla -->
   {% include 'footer.html' %}
+
+
+<!-- Sub-Modal Marca -->
+    <div class="modal fade" id="modal-id_marca" tabindex="-1" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Marca</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                        style="background-color: #dc3545; color: white; border: none; 
+                                border-radius: 50%; width: 35px; height: 35px;
+                                font-size: 1.5rem; line-height: 1; 
+                                display: flex; justify-content: center; align-items: center;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body"></div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Sub-Modal Empleado para Mantenimiento -->
+<div class="modal fade" id="modal-id_empleado_mantenimiento" tabindex="-1" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Empleado</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                        style="background-color: #dc3545; color: white; border: none; 
+                               border-radius: 50%; width: 35px; height: 35px;
+                               font-size: 1.5rem; line-height: 1; 
+                               display: flex; justify-content: center; align-items: center;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body"></div>
+
+        </div>
+    </div>
+    </div>
+
+
+    <!-- Sub-Modal Vehiculo. -->
+    <div class="modal fade" id="modal-id_vehiculo" tabindex="-1" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Vehiculo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                        style="background-color: #dc3545; color: white; border: none; 
+                                border-radius: 50%; width: 35px; height: 35px;
+                                font-size: 1.5rem; line-height: 1; 
+                                display: flex; justify-content: center; align-items: center;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body"></div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Sub-Modal Tipo Mantenimiento. -->
+    <div class="modal fade" id="modal-id_tipo_mantenimiento" tabindex="-1" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Tipo Mantenimiento</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                        style="background-color: #dc3545; color: white; border: none; 
+                                border-radius: 50%; width: 35px; height: 35px;
+                                font-size: 1.5rem; line-height: 1; 
+                                display: flex; justify-content: center; align-items: center;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body"></div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Sub-Modal Cliente -->
+    <div class="modal fade" id="modal-id_cliente" tabindex="-1" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-md" role="document">
+
+            <div class="modal-content">
+
+                <div class="modal-header d-flex justify-content-between align-items-center">
+                    <h5 class="modal-title mb-0">Crear Cliente</h5>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                            style="background-color: #dc3545; color: white; border: none;
+                                   border-radius: 50%; width: 35px; height: 35px;
+                                font-size: 1.5rem; line-height: 1;
+                                display: flex; justify-content: center; align-items: center;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+            <div class="modal-body"></div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Script Marca. -->
+    <script>
+        $("#modal-id_marca").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:marca_modal_crear' %}",
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+            }
+        });
+    });
+    </script>
+
+    <!-- Script Vehiculo. -->
+    <script>
+        $("#modal-id_vehiculo").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:vehiculo_modal_crear' %}",
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+            }
+        });
+    });
+    </script>
+
+    <!-- Script Tipo Mantenimiento. -->
+    <script>
+        $("#modal-id_tipo_mantenimiento").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:tipo_mantenimiento_modal_crear' %}",
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+            }
+        });
+    });
+    </script>
+
+    <!-- Script Empleado Mantenimiento. -->
+    <script>
+        $("#modal-id_empleado_mantenimiento").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:empleado_modal_crear_mantenimiento' %}",
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+                }
+            });
+        });
+    </script>
+
+    <script>
+        $("#modal-id_cliente").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:cliente_modal_crear' %}",
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+                }
+            });
+        });
+    </script>
+
+</body>
+
+
 </html>

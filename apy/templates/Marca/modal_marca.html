@@ -1,0 +1,109 @@
+{% load widget_tweaks %}
+{% block form %}
+
+    <div id="msg-marca"></div>  {# Aquí se mostrarán los mensajes #}
+
+    <form id="marcaForm" method="post" action="{% url 'apy:marca_modal_crear' %}">
+        {% csrf_token %}
+    {% for field in form.visible_fields %}
+    <div class="form-group mb-3">
+        <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
+        {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
+
+        {% if field.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in field.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    {% endfor %}
+    </form>
+{% endblock %}
+
+    {% block Cancelar %}
+    <button type="button" id="btnGuardarMarca" class="btn btn-primary btn-flat" title="Agregar marca">
+        <i class="fas fa-save"></i> Agregar
+    </button>
+{% endblock %}
+
+
+
+{% block extra_js %}
+<script>
+/* ✅ Evita duplicar eventos y asegura consistencia */
+$(document).off('click', '#btnGuardarMarca').on('click', '#btnGuardarMarca', function(e) {
+    e.preventDefault();
+
+    const $btn = $(this);
+    const $modal = $('#modal-id_marca');
+    const $form = $modal.find('form#marcaForm');
+
+    if (!$form.length) {
+        console.error('No se encontró el formulario #marcaForm dentro del modal.');
+        return;
+    }
+
+    const url = $form.attr('action');
+    const formData = new FormData($form[0]);
+
+    $btn.prop('disabled', true).addClass('disabled').text('Guardando...');
+
+    $.ajax({
+        url: url,
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        success: function(data) {
+            if (data.success) {
+                // ✅ Mensaje de éxito
+                const $msg = $modal.find('#msg-marca');
+                $msg.html('<div class="alert alert-success">' + data.message + '</div>');
+
+                // ✅ Actualizar el select principal
+                const $select = $('#id_id_marca');
+                if ($select.find('option[value="' + data.id + '"]').length === 0) {
+                    const option = new Option(data.text, data.id, true, true);
+                    $select.append(option).val(data.id).trigger('change');
+                } else {
+                    $select.val(data.id).trigger('change');
+                }
+
+                // ✅ Cerrar el modal correctamente (sin duplicados)
+                $modal.modal('hide');
+                $('body').removeClass('modal-open').css('padding-right', '');
+                $('.modal-backdrop').remove();
+                $modal.removeClass('show').css('display', 'none');
+            } else {
+                // ❌ Si hay errores de validación, los reemplazamos en el cuerpo del modal
+                if (data.html) {
+                    $modal.find('.modal-body').html(data.html);
+                } else {
+                    $modal.find('#msg-marca').html('<div class="alert alert-danger">' + data.message + '</div>');
+                }
+            }
+        },
+        error: function(xhr, status, err) {
+            const $msg = $modal.find('#msg-marca');
+            $msg.html('<div class="alert alert-danger">Error en el servidor. Revisa consola.</div>');
+            console.error('AJAX error:', status, err);
+        },
+        complete: function() {
+            $btn.prop('disabled', false).removeClass('disabled').text('Agregar');
+        }
+    });
+});
+
+/* ✅ Limpiar el formulario y mensajes al cerrar el modal */
+$('#modal-id_marca').on('hidden.bs.modal', function() {
+    const $form = $(this).find('form#marcaForm')[0];
+    if ($form) $form.reset();
+    $(this).find('#msg-marca').html('');
+});
+</script>
+
+{% endblock %}

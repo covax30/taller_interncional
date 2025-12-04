@@ -297,11 +297,6 @@ class ClienteForm(ModelForm):
         model = Cliente
         fields = '__all__'
         widgets = {
-            'id_cliente':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
             'nombre':TextInput(
                 attrs={
                     'placeholder':'Ingrese el nombre del cliente',
@@ -362,28 +357,26 @@ class VehiculoForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['id_cliente'].widget.attrs['autofocus'] = True
         
+        
     class Meta:
         model = Vehiculo
         fields = '__all__'
         widgets = {
-            'id_vehiculo':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
             'id_cliente':Select(
                 attrs={
                     'class': 'form-control',
+                    'class': 'form-control foreign-key-field',
+                    'autofocus': True
                 }
             ),
             'placa':TextInput(
                 attrs={
-                    'placeholder':'Ingrese la placa del vehiculo',
+                    'placeholder':'Ingrese la placa del vehiculo (ej: ABC123) o (A1C234)',
                 }
             ),
             'modelo_vehiculo':TextInput(
                 attrs={
-                    'placeholder':'Ingrese el modelo del vehiculo',
+                    'placeholder':'Ingrese el modelo del vehiculo (ej: 2024)',
                 }
             ),
             'marca_vehiculo':TextInput(
@@ -415,6 +408,18 @@ class VehiculoForm(ModelForm):
                 'required': 'El color del vehiculo es obligatorio',
             },
         }
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # ✅ Configura cómo se muestran los clientes en el select
+        self.fields['id_cliente'].label_from_instance = (
+            lambda obj: f"{obj.id_cliente} - {obj.nombre}"
+        )
+
+        # ✅ Enfoca automáticamente el campo cliente (si aplica)
+        self.fields['id_cliente'].widget.attrs['autofocus'] = True
+        
         
 class EntradaVehiculoForm(ModelForm):
     def __init__(self, *args, **kwargs):
@@ -962,6 +967,65 @@ class EmpleadoForm(ModelForm):
                 'required': 'La direccion del empleado es obligatoria',
             },
         }
+        
+        
+class Empleado_Mantenimiento_Form(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['nombre'].widget.attrs['autofocus'] = True
+        
+    class Meta:
+        model = Empleado_Mantenimiento
+        fields = '__all__'
+        widgets = {
+            'nombre':TextInput(
+                attrs={
+                    'placeholder':'Ingrese el nombre del empleado',
+                }
+            ),
+            'telefono':NumberInput(
+                attrs={
+                    'placeholder':'Ingrese el telefono del empleado',
+                }
+            ),
+            'identificacion':NumberInput(
+                attrs={
+                    'placeholder':'Ingrese la identificacion del empleado',
+                }
+            ),
+            'Correo':TextInput(
+                attrs={
+                    'placeholder':'Ingrese el correo del empleado',
+                }
+            ),
+            'direccion':TextInput(
+                attrs={
+                    'placeholder':'Ingrese la direccion del empleado',
+                }
+            )
+            
+       }  
+        error_messages = {
+            'nombre': {
+                'required': 'El nombre del empleado es obligatorio',
+            },
+            'telefono': {
+                'required': 'El telefono del empleado es obligatorio',
+            },
+            'identificacion': {
+                'required': 'La identificacion del empleado es obligatoria',
+            },
+            'Correo': {
+                'required': 'El correo del empleado es obligatorio',
+                'invalid': 'El correo no tiene un formato válido',
+                'unique': 'Ya existe un administrador con ese correo',
+            },
+            'direccion': {
+                'required': 'La direccion del empleado es obligatoria',
+            },
+        }
+
+
  #------- formulario Gastos -------     
         
 class GastosForm(ModelForm):
@@ -985,7 +1049,7 @@ class GastosForm(ModelForm):
                     'placeholder':'Ingrese la descripcion del gasto',
                 }
             ),
-            'tipo_gastos':TextInput(
+            'tipo_gastos':Select(
                 attrs={
                     'placeholder':'Ingrese el tipo de gasto ',
                 }
@@ -1052,7 +1116,7 @@ class   NominaForm(ModelForm):
         model = Nomina
         fields = '__all__'
         widgets = {
-            'rol':TextInput(
+            'rol':Select(
                 attrs={
                     'placeholder':'Ingrese rol del empleado',
                 }
@@ -1187,6 +1251,11 @@ class MantenimientoForm(ModelForm):
                     'class': 'form-control',
                 }
             ),
+            'id_empleado_mantenimiento':Select(
+                attrs={
+                    'class': 'form-control',
+                }
+            ),
             'id_tipo_mantenimiento':Select(
                 attrs={
                     'class': 'form-control',
@@ -1231,7 +1300,7 @@ class HerramientaForm(ModelForm):
                     'placeholder':'Ingrese el color de la herramienta',
                 }
             ),
-            'tipo':TextInput(
+            'tipo':Select(
                 attrs={
                     'placeholder':'Ingrese el tipo de herramienta',
                 }
@@ -1376,6 +1445,9 @@ class RepuestoForm(ModelForm):
             'id_marca':Select(
                 attrs={
                     'placeholder':'Ingrese la marca del repuesto',
+                    'class': 'form-select',
+                    'data-bs-toggle': 'modal',
+                    'data-bs-target': '#modalMarca'
                 }
             ),
             'nombre':TextInput(
@@ -1383,7 +1455,7 @@ class RepuestoForm(ModelForm):
                     'placeholder':'Ingrese el nombre de el repuesto',
                 }   
             ),
-            'categoria':TextInput(
+            'categoria':Select(
                 attrs={
                     'placeholder':'Ingrese la categoria del repuesto',
                 }

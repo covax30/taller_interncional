@@ -1,0 +1,109 @@
+{% load widget_tweaks %}
+{% block form %}
+
+    <div id="msg-empleado"></div>  {# Aquí se mostrarán los mensajes #}
+
+    <form id="empleadoForm" method="post" action="{% url 'apy:empleado_modal_crear' %}">
+        {% csrf_token %}
+    {% for field in form.visible_fields %}
+    <div class="form-group mb-3">
+        <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
+        {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
+
+        {% if field.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in field.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    {% endfor %}
+{% endblock %}
+
+    {% block Cancelar %}
+    <button type="button" id="btnGuardarEmpleado" class="btn btn-primary btn-flat">
+        <i class="fas fa-save"></i> Agregar
+    </button>
+{% endblock %}
+
+
+
+{% block extra_js %}
+<script>
+/* ✅ Evita duplicar eventos (clave del arreglo) */
+$(document).off('click', '#btnGuardarEmpleado').on('click', '#btnGuardarEmpleado', function(e) {
+    e.preventDefault();
+
+    const $btn = $(this);
+    const $modal = $('#modal-id_empleado');
+    const $form = $modal.find('form#empleadoForm');
+
+    if (!$form.length) {
+        console.error('No se encontró el formulario #empleadoForm dentro del modal.');
+        return;
+    }
+
+    const url = $form.attr('action');
+    const formData = new FormData($form[0]);
+
+    $btn.prop('disabled', true).addClass('disabled').text('Guardando...');
+
+    $.ajax({
+        url: url,
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        success: function(data) {
+            if (data.success) {
+                // Mensaje de éxito
+                const $msg = $modal.find('#msg-empleado');
+                $msg.html('<div class="alert alert-success">' + data.message + '</div>');
+
+                // Actualizar select en la página principal
+                const $select = $('#id_id_empleado');
+                if ($select.find('option[value="' + data.id + '"]').length === 0) {
+                    const option = new Option(data.text, data.id, true, true);
+                    $select.append(option).val(data.id).trigger('change');
+                } else {
+                    $select.val(data.id).trigger('change');
+                }
+
+                // Cerrar el modal correctamente
+                $modal.modal('hide');
+                $modal.modal('hide');
+                $('body').removeClass('modal-open');
+                $('body').css('padding-right', '');
+                $('.modal-backdrop').remove();
+                $modal.removeClass('show');
+                $modal.css('display', 'none');
+            } else {
+                if (data.html) {
+                    $modal.find('.modal-body').html(data.html);
+                } else {
+                    $modal.find('#msg-empleado').html('<div class="alert alert-danger">' + data.message + '</div>');
+                }
+            }
+        },
+        error: function(xhr, status, err) {
+            const $msg = $modal.find('#msg-empleado');
+            $msg.html('<div class="alert alert-danger">Error en el servidor. Revisa consola.</div>');
+            console.error('AJAX error:', status, err);
+        },
+        complete: function() {
+            $btn.prop('disabled', false).removeClass('disabled').text('Agregar');
+        }
+    });
+});
+
+/* ✅ Limpiar el formulario y mensajes al cerrar */
+$('#modal-id_empleado').on('hidden.bs.modal', function() {
+    const $form = $(this).find('form#empleadoForm')[0];
+    if ($form) $form.reset();
+    $(this).find('#msg-empleado').html('');
+});
+</script>
+{% endblock %}

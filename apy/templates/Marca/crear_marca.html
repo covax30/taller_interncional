@@ -20,10 +20,57 @@
 {% endblock %}
 
 {% block Cancelar %}
-                <button type="submit " class="btn btn-primary btn-flat"><i class="fas fa-save"></i>
+                <button type="submit " class="btn btn-primary btn-flat" title="Agregar marca">
+                    <i class="fas fa-save"></i>
                     Agregar
                 </button>
-                <a href="{% url 'apy:marca_lista' %}" class="btn btn-danger btn-flat float-right">
+                <a href="{% url 'apy:marca_lista' %}" class="btn btn-danger btn-flat float-right" title="Cancelar registro de marca">
                     <i class="fas fa-times"></i> Cancelar
                 </a>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.querySelector("form");
+    const btnGuardar = document.getElementById("btnGuardarMarca");
+
+     // Manejar el envío del formulario
+
+    form.addEventListener("submit", function (e) {
+        e.preventDefault(); // no recarga el iframe
+
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Buscar el select en la página padre
+                const select = window.parent.document.getElementById("id_id_marca");
+
+                // Crear nueva opción
+                const option = new Option(data.nombre, data.id, true, true);
+
+                // Agregar al select y seleccionarla
+                select.add(option);
+                select.value = data.id;
+
+                // Cerrar modal
+                const modal = window.parent.$("#modal-id_marca");
+                modal.modal("hide");
+            } else {
+                alert("Error al guardar la marca.");
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+});
+</script>
 {% endblock %}

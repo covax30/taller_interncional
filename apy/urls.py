@@ -36,6 +36,8 @@ from apy.view.usuario.contraseña.views import *
 from apy.view.permisos.views import *
 from apy.view.registro_usuarios.views import *
 
+from apy.view.ayuda.views import *
+
 app_name = 'apy'
 
 urlpatterns = [
@@ -56,12 +58,14 @@ urlpatterns = [
     path('Proveedor/agregar/', ProveedorCreateView.as_view(), name='proveedor_crear'),
     path('Proveedor/editar/<int:pk>/', ProveedorUpdateView.as_view(), name='proveedor_editar'),
     path('Proveedor/eliminar/<int:pk>/', ProveedorDeleteView.as_view(), name='proveedor_eliminar'),
+    path("proveedor/modal/crear/", ProveedorCreateModalView.as_view(), name="proveedor_modal_crear"),
 
     # -------------urls Steven--------------
     path('cliente/listar/', ClienteListView.as_view(), name='cliente_lista'),
     path('cliente/agregar/', ClienteCreateView.as_view(), name='cliente_crear'),
     path('cliente/editar/<int:pk>/', ClienteUpdateView.as_view(), name='cliente_editar'),
     path('cliente/eliminar/<int:pk>/', ClienteDeleteView.as_view(), name='cliente_eliminar'),
+    path("cliente/modal/crear/", ClienteCreateModalView.as_view(), name="cliente_modal_crear"),
 
     path('compra/listar/', CompraListView.as_view(), name='compra_lista'),
     path('compra/agregar/', CompraCreateView.as_view(), name='compra_crear'),
@@ -73,6 +77,7 @@ urlpatterns = [
     path('vehiculo/agregar/', VehiculoCreateView.as_view(), name='vehiculo_crear'),
     path('vehiculo/editar/<int:pk>/', VehiculoUpdateView.as_view(), name='vehiculo_editar'),
     path('vehiculo/eliminar/<int:pk>/', VehiculoDeleteView.as_view(), name='vehiculo_eliminar'),
+    path("vehiculo/modal/crear/", VehiculoCreateModalView.as_view(), name="vehiculo_modal_crear"),
     
     path('entrada_vehiculo/listar/', EntradaVehiculoListView.as_view(), name='entrada_vehiculo_lista'),
     path('entrada_vehiculo/agregar/', EntradaVehiculoCreateView.as_view(), name='entrada_vehiculo_crear'),
@@ -110,17 +115,13 @@ urlpatterns = [
     path('PagoServicios/agregar/', PagoServiciosCreateView.as_view() , name='pago_servicios_crear'),
     path('PagoServicios/editar/<int:pk>/', PagoServiciosUpdateView.as_view() , name='pago_servicios_editar'),
     path('PagoServicios/eliminar/<int:pk>/', PagoServiciosDeleteView.as_view() , name='pago_servicios_eliminar'),
+    path("PagoServicios/modal/crear/", PagoServiciosCreateModalView.as_view(), name="PagoServicios_modal_crear"),
     
     #--------URL modulo pagos----------------
     path('Pagos/listar/', PagosListView.as_view() , name='pagos_lista'),
     path('Pagos/agregar/', PagosCreateView.as_view() , name='pagos_crear'),
     path('Pagos/editar/<int:pk>/', PagosUpdateView.as_view() , name='pagos_editar'),
     path('Pagos/eliminar/<int:pk>/', PagosDeleteView.as_view() , name='pagos_eliminar'),
-
-
-
-
-
 
     #--------------urls Yury
     #----------url Empleado -------
@@ -129,6 +130,9 @@ urlpatterns = [
     path('empleado/agregar/', EmpleadoCreateView.as_view(), name='empleado_crear'),
     path('empleado/editar/<int:pk>/', EmpleadoUpdateView.as_view(), name='empleado_editar'),
     path('empleado/eliminar/<int:pk>/', EmpleadoDeleteView.as_view(), name='empleado_eliminar'),
+    path("empleado/modal/crear/", EmpleadoCreateModalView.as_view(), name="empleado_modal_crear"),
+    path("empleado/modal/mantenimiento/crear/", EmpleadoCreateModalMantenimientoView.as_view(), name="empleado_modal_crear_mantenimiento"),
+
     #----------url Gastos-------
     path('gasto/listar/', GastosListView.as_view() , name='gasto_lista'),
     path('gasto/agregar/', GastosCreateView.as_view(), name='gasto_crear'),
@@ -139,12 +143,13 @@ urlpatterns = [
     path('marca/agregar/',     MarcaCreateView.as_view(), name='marca_crear'),
     path('marca/editar/<int:pk>/',   MarcaUpdateView.as_view(), name='marca_editar'),
     path('marca/eliminar/<int:pk>/', MarcaDeleteView.as_view(), name='marca_eliminar'),
-    
+    path("marca/modal/crear/", MarcaCreateModalView.as_view(), name="marca_modal_crear"),
     #----------url Nomina-------
     path('nomina/listar/', NominaListView.as_view() , name='nomina_lista'),
     path('nomina/agregar/', NominaCreateView.as_view(), name='nomina_crear'),
     path('nomina/editar/<int:pk>/', NominaUpdateView.as_view(), name='nomina_editar'),
     path('nomina/eliminar/<int:pk>/', NominaDeleteView.as_view(), name='nomina_eliminar'),  
+    path("nomina/modal/crear/", NominaCreateModalView.as_view(), name="nomina_modal_crear"),
     
     #-------------urls Caja---------------
      path('caja/listar/', CajaListView.as_view() , name='caja_lista'),
@@ -160,26 +165,32 @@ urlpatterns = [
     path('mantenimiento/agregar/', MantenimientoCreateView.as_view() , name='mantenimiento_crear'),
     path('mantenimiento/editar/<int:pk>/', MantenimientoUpdateView.as_view() , name='mantenimiento_editar'),
     path('mantenimiento/eliminar/<int:pk>/', MantenimientoDeleteView.as_view() , name='mantenimiento_eliminar'),
+    path("mantenimiento/modal/crear/", MantenimientoCreateModalView.as_view(), name="mantenimiento_modal_crear"),
     
     path('herramienta/listar/', HerramientaListView.as_view() , name='herramienta_lista'),
     path('herramienta/agregar/', HerramientaCreateView.as_view() , name='herramienta_crear'),
     path('herramienta/editar/<int:pk>/', HerramientaUpdateView.as_view() , name='herramienta_editar'),
     path('herramienta/eliminar/<int:pk>/', HerramientaDeleteView.as_view() , name='herramienta_eliminar'),
+    path("herramienta/modal/crear/", HerramientaCreateModalView.as_view(), name="herramienta_modal_crear"),
     
     path('tipo_mantenimiento/listar/', TipoMantenimientoListView.as_view() , name='tipo_mantenimiento_lista'),
     path('tipo_mantenimiento/agregar/', TipoMantenimientoCreateView.as_view() , name='tipo_mantenimiento_crear'),
     path('tipo_mantenimiento/editar/<int:pk>/', TipoMantenimientoUpdateView.as_view() , name='tipo_mantenimiento_editar'),
     path('tipo_mantenimiento/eliminar/<int:pk>/', TipoMantenimientoDeleteView.as_view() , name='tipo_mantenimiento_eliminar'),
+    path("tipo_mantenimiento/modal/crear/", TipoMantenimientoCreateModalView.as_view(), name="tipo_mantenimiento_modal_crear"),
     
     path('insumos/listar/', InsumoListView.as_view() , name='insumo_lista'),
     path('insumos/agregar/', InsumoCreateView.as_view() , name='insumo_crear'),
     path('insumos/editar/<int:pk>/', InsumoUpdateView.as_view() , name='insumo_editar'),
     path('insumos/eliminar/<int:pk>/', InsumoDeleteView.as_view() , name='insumo_eliminar'),
+    path("insumos/modal/crear/", InsumoCreateModalView.as_view(), name="insumos_modal_crear"),
     
     path('repuestos/listar/', RepuestoListView.as_view() , name='repuesto_lista'),
     path('repuestos/agregar/', RepuestoCreateView.as_view() , name='repuesto_crear'),
     path('repuestos/editar/<int:pk>/', RepuestoUpdateView.as_view() , name='repuesto_editar'),
     path('repuestos/eliminar/<int:pk>/', RepuestoDeleteView.as_view() , name='repuesto_eliminar'),
+    path("repuestos/modal/crear/", RepuestoCreateModalView.as_view(), name="repuesto_modal_crear"),
+
     
     path('main/', Main.as_view(), name='main'),
     path('estadisticas/', estadisticas, name='estadisticas'),
@@ -187,5 +198,5 @@ urlpatterns = [
     path('api/vehiculos/count/', api_contador_vehiculos, name='api_contador_vehiculos'),
     path('api/insumos/count/', api_contador_insumos, name='api_contador_insumos'),
     path('api/gastos/count/', api_contador_gastos, name='api_contador_gastos'),
-
- ]
+    path('ayuda/', ayuda, name='ayuda'),
+]

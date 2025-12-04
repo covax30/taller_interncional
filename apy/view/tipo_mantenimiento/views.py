@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
+from django.template.loader import render_to_string
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.urls import reverse_lazy
 from apy.forms import *
 from django.contrib import messages
@@ -43,6 +44,10 @@ class TipoMantenimientoCreateView(PermisoRequeridoMixin, CreateView):
     permission_required = 'add'
     
     def form_valid(self, form):
+        messages.success(self.request, "Tipo de Mantenimiento creado correctamente")
+        return super().form_valid(form)
+    
+    def form_valid(self, form):
         messages.success(self.request, "tipo de mantnimiento creado correctamente")
         return super().form_valid(form)
     
@@ -63,6 +68,10 @@ class TipoMantenimientoUpdateView(PermisoRequeridoMixin, UpdateView):
     module_name = 'Tipo Mantenimiento'
     permission_required = 'change'
     
+    def form_valid(self, form):
+        messages.success(self.request, "Tipo de Mantenimiento actualizado correctamente")
+        return super().form_valid(form)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Editar Tipo de Mantenimiento'
@@ -79,9 +88,46 @@ class TipoMantenimientoDeleteView(PermisoRequeridoMixin, DeleteView):
     module_name = 'Tipo Mantenimiento'
     permission_required = 'delete'
     
+    def form_valid(self, form):
+        messages.success(self.request, "Tipo de Mantenimiento eliminado correctamente")
+        return super().form_valid(form)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Eliminar tipo de mantenimiento'
         context['entidad'] = 'tipo de mantenimiento'
         context['listar_url'] = reverse_lazy('apy:tipo_mantenimiento_lista')
         return context
+
+class TipoMantenimientoCreateModalView(CreateView):
+    model = TipoMantenimiento
+    form_class = TipoMantenimientoForm
+    template_name = "tipo_mantenimiento/modal_tipo_mantenimiento.html"
+    success_url = reverse_lazy("apy:tipo_mantenimiento_lista")
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        try:
+            self.object = form.save()
+            return JsonResponse({
+                "success": True,
+                "id": self.object.id,
+                "text": str(self.object),
+                "message": "Tipo de Mantenimiento registrado correctamente ✅"
+            })
+        except Exception as e:
+            return JsonResponse({
+                "success": False,
+                "message": f"Error al guardar: {str(e)}"
+            }, status=500)
+    
+    def form_invalid(self, form):
+        html = render_to_string(self.template_name, {"form": form}, request=self.request)
+        return JsonResponse({
+            "success": False,
+            "html": html,
+            "message": "Por favor, corrige los errores en el formulario ❌"
+        })

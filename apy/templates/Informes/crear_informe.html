@@ -1,37 +1,266 @@
 {% extends "form_generico.html" %}
+{% load static %}
 {% load widget_tweaks %}
 {% block form %}
     {% csrf_token %}
 
-    {% for field in form.visible_fields %}
+    <!-- Repuestos usados -->
     <div class="form-group mb-3">
-        <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
-        {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
-
-        {% if field.errors %}
+        <label for="{{ form.repuestos_usados.id_for_label }}">Repuestos usados:</label>
+        <div class="input-group">
+            {{ form.repuestos_usados|add_class:'form-control'|attr:'autocomplete:off' }}
+        </div>
+        {% if form.repuestos_usados.errors %}
             <div class="invalid-feedback d-block">
-                {% for error in field.errors %}
+                {% for error in form.repuestos_usados.errors %}
                     <small>{{ error }}</small><br>
                 {% endfor %}
             </div>
         {% endif %}
     </div>
-    {% endfor %}
+
+    <!-- Costo mano de obra -->
+    <div class="form-group mb-3">
+        <label for="{{ form.costo_mano_obra.id_for_label }}">Costo de mano de obra:</label>
+        <div class="input-group">
+            {{ form.costo_mano_obra|add_class:'form-control' }}
+        </div>
+        {% if form.costo_mano_obra.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.costo_mano_obra.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Fecha -->
+    <div class="form-group mb-3">
+        <label for="{{ form.fecha.id_for_label }}">Fecha:</label>
+        <div class="input-group">
+            {{ form.fecha|add_class:'form-control' }}
+        </div>
+        {% if form.fecha.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.fecha.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Hora -->
+    <div class="form-group mb-3">
+        <label for="{{ form.hora.id_for_label }}">Hora:</label>
+        <div class="input-group">
+            {{ form.hora|add_class:'form-control' }}
+        </div>
+        {% if form.hora.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.hora.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    
+    <!-- id_repuesto con modal -->
+    <div class="form-group mb-3">
+        <label for="{{ form.id_repuesto.id_for_label }}">Repuesto:</label>
+        <div class="input-group">
+            {{ form.id_repuesto }}
+            <div class="input-group-append">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_repuesto">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- id_empleado con modal -->
+    <div class="form-group mb-3">
+        <label for="{{ form.id_empleado.id_for_label }}">Empleado:</label>
+        <div class="input-group">
+            {{ form.id_empleado }}
+            <div class="input-group-append">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_empleado">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tipo informe -->
+    <div class="form-group mb-3">
+        <label for="{{ form.tipo_informe.id_for_label }}">Tipo de informe:</label>
+        <div class="input-group">
+            {{ form.tipo_informe|add_class:'form-control' }}
+        </div>
+        {% if form.tipo_informe.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.tipo_informe.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- id_mantenimiento con modal -->
+    <div class="form-group mb-3">
+        <label for="{{ form.id_mantenimiento.id_for_label }}">Mantenimiento:</label>
+        <div class="input-group">
+            {{ form.id_mantenimiento }}
+            <div class="input-group-append">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_mantenimiento">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal Repuesto -->
+    <div class="modal fade" id="modal-id_repuesto" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Repuesto</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                        style="background-color: #dc3545; color: white; border: none; 
+                                border-radius: 50%; width: 35px; height: 35px;
+                                font-size: 1.5rem; line-height: 1; 
+                                display: flex; justify-content: center; align-items: center;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Empleado -->
+    <div class="modal fade" id="modal-id_empleado" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Empleado</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                        style="background-color: #dc3545; color: white; border: none; 
+                                border-radius: 50%; width: 35px; height: 35px;
+                                font-size: 1.5rem; line-height: 1; 
+                                display: flex; justify-content: center; align-items: center;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Mantenimiento -->
+    <div class="modal fade" id="modal-id_mantenimiento" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Mantenimiento</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                        style="background-color: #dc3545; color: white; border: none; 
+                                border-radius: 50%; width: 35px; height: 35px;
+                                font-size: 1.5rem; line-height: 1; 
+                                display: flex; justify-content: center; align-items: center;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Repuesto. -->
+    <script>
+        $("#modal-id_repuesto").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:repuesto_modal_crear' %}",
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+                }
+            });
+        });
+    </script>
+
+    <!-- Script empleado. -->
+    <script>
+        $("#modal-id_empleado").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:empleado_modal_crear' %}",
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+                }
+            });
+        });
+    </script>
+
+    <!-- Script mantenimiento. -->
+    <script>
+        $("#modal-id_mantenimiento").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:mantenimiento_modal_crear' %}",
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+                }
+            });
+        });
+    </script>
+
 {% endblock %}
 
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-default">
-  Abrir Modal
-</button>
 
 {% block Cancelar %}
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-default">
-  Abrir Modal
-</button>
-                <button type="submit " class="btn btn-primary btn-flat"><i class="fas fa-save"></i>
+                <button type="submit " class="btn btn-primary btn-flat" title="Agregar informe">
+                    <i class="fas fa-save"></i>
                     Agregar
                 </button>
-                <a href="{% url 'apy:informes_lista' %}" class="btn btn-danger btn-flat float-right">
+                <a href="{% url 'apy:informes_lista' %}" class="btn btn-danger btn-flat float-right" title="Cancelar registro de informe">
                     <i class="fas fa-times"></i> Cancelar
                 </a>
-                
+{% endblock %}
+
+{% block modals %}
+
+    {% include "apy/repuestos/modal_form.html" %}
+    {% include "apy/Empleado/modal_empleado.html" %}
+    {% include "apy/gestion_mantenimiento/modal_mantenimiento.html" %}
+    {% include "apy/Marca/modal_marca.html" %}
+    {% include "apy/Empleado/modal_empleado_mantenimiento.html" %}
+    {% include "apy/vehiculos/modal_vehiculo.html" %}
+    {% include "apy/tipo_mantenimiento/modal_tipo_mantenimiento.html" %}
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    $("#modal-id_repuesto").on("show.bs.modal", function(){
+        var modal = $(this);
+        $.ajax({
+            url: "{% url 'apy:repuesto_modal_crear' %}",
+            success: function(data){
+                modal.find(".modal-body").html(data.html || data);
+            }
+        });
+    });
+</script>
+
+... y todos los demás scripts ...
+
 {% endblock %}

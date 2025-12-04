@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse_lazy
+from django.template.loader import render_to_string
 from apy.forms import *
 from django.contrib import messages
 # Se elimina la importación local de AccessMixin
@@ -97,3 +98,36 @@ class ProveedorDeleteView(PermisoRequeridoMixin, DeleteView):
         context['entidad'] = 'Proveedores'
         context['listar_url'] = reverse_lazy('apy:proveedor_lista')
         return context
+    
+class ProveedorCreateModalView(CreateView):
+    model = Proveedores
+    form_class = ProveedorForm
+    template_name = "Proveedores/modal_proveedores.html"
+    success_url = reverse_lazy("apy:proveedor_lista")
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        try:
+            self.object = form.save()
+            return JsonResponse({
+                "success": True,
+                "id": self.object.id_proveedor,
+                "text": str(self.object),
+                "message": "Proveedor registrado correctamente ✅"
+            })
+        except Exception as e:
+            return JsonResponse({
+                "success": False,
+                "message": f"Error al guardar: {str(e)}"
+            }, status=500)
+    
+    def form_invalid(self, form):
+        html = render_to_string(self.template_name, {"form": form}, request=self.request)
+        return JsonResponse({
+            "success": False,
+            "html": html,
+            "message": "Por favor, corrige los errores en el formulario ❌"
+        })

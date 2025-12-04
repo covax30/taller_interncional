@@ -3,27 +3,431 @@
 {% block form %}
     {% csrf_token %}
 
-    {% for field in form.visible_fields %}
+    <!-- Tipo pago -->
     <div class="form-group mb-3">
-        <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
-        {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
-
-        {% if field.errors %}
+        <label for="{{ form.tipo_pago.id_for_label }}">Tipo de pago:</label>
+        <div class="input-group">
+            {{ form.tipo_pago|add_class:'form-control'|attr:'autocomplete:off' }}
+        </div>
+        {% if form.tipo_pago.errors %}
             <div class="invalid-feedback d-block">
-                {% for error in field.errors %}
+                {% for error in form.tipo_pago.errors %}
                     <small>{{ error }}</small><br>
                 {% endfor %}
             </div>
         {% endif %}
     </div>
-    {% endfor %}
+
+    <!-- Fecha -->
+    <div class="form-group mb-3">
+        <label for="{{ form.fecha.id_for_label }}">Fecha:</label>
+        <div class="input-group">
+            {{ form.fecha|add_class:'form-control' }}
+        </div>
+        {% if form.fecha.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.fecha.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Hora -->
+    <div class="form-group mb-3">
+        <label for="{{ form.hora.id_for_label }}">Hora:</label>
+        <div class="input-group">
+            {{ form.hora|add_class:'form-control' }}
+        </div>
+        {% if form.hora.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.hora.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Monto -->
+    <div class="form-group mb-3">
+        <label for="{{ form.monto.id_for_label }}">Monto:</label>
+        <div class="input-group">
+            {{ form.monto|add_class:'form-control' }}
+        </div>
+        {% if form.monto.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.monto.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Id proveedor con modal -->
+    <div class="form-group mb-3">
+        <label for="{{ form.id_proveedor.id_for_label }}">Proveedor:</label>
+        <div class="input-group">
+            {{ form.id_proveedor }}
+            <div class="input-group-append">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_proveedor">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Id administrador con modal -->
+    <div class="form-group mb-3">
+        <label for="{{ form.id_admin.id_for_label }}">Administrador:</label>
+        <div class="input-group">
+            {{ form.id_admin }}
+            <div class="input-group-append">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_admin">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Id herramienta con modal -->
+    <div class="form-group mb-3">
+        <label for="{{ form.id_herramienta.id_for_label }}">Herramienta:</label>
+        <div class="input-group">
+            {{ form.id_herramienta }}
+            <div class="input-group-append">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_herramienta">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Id insumos con modal -->
+    <div class="form-group mb-3">
+        <label for="{{ form.id_insumos.id_for_label }}">Insumo:</label>
+        <div class="input-group">
+            {{ form.id_insumos }}
+            <div class="input-group-append">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_insumos">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Id repuesto con modal -->
+    <div class="form-group mb-3">
+        <label for="{{ form.id_repuesto.id_for_label }}">Repuesto:</label>
+        <div class="input-group">
+            {{ form.id_repuesto|add_class:'form-control' }}
+            <div class="input-group-append">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_repuesto">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+        {% if form.id_repuesto.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.id_repuesto.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Id nómina con modal -->
+    <div class="form-group mb-3">
+        <label for="{{ form.id_nomina.id_for_label }}">Nómina:</label>
+        <div class="input-group">
+            {{ form.id_nomina }}
+            <div class="input-group-append">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_nomina">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal proveedor -->
+    <div class="modal fade" id="modal-id_proveedor" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Proveedor</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                        style="background-color: #dc3545; color: white; border: none; 
+                                border-radius: 50%; width: 35px; height: 35px;
+                                font-size: 1.5rem; line-height: 1; 
+                                display: flex; justify-content: center; align-items: center;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal administrador -->
+    <div class="modal fade" id="modal-id_admin" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Administrador</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                        style="background-color: #dc3545; color: white; border: none; 
+                                border-radius: 50%; width: 35px; height: 35px;
+                                font-size: 1.5rem; line-height: 1; 
+                                display: flex; justify-content: center; align-items: center;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal herramienta -->
+    <div class="modal fade" id="modal-id_herramienta" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Herramienta</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                        style="background-color: #dc3545; color: white; border: none; 
+                                border-radius: 50%; width: 35px; height: 35px;
+                                font-size: 1.5rem; line-height: 1; 
+                                display: flex; justify-content: center; align-items: center;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal insumos -->
+    <div class="modal fade" id="modal-id_insumos" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Insumo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                        style="background-color: #dc3545; color: white; border: none; 
+                                border-radius: 50%; width: 35px; height: 35px;
+                                font-size: 1.5rem; line-height: 1; 
+                                display: flex; justify-content: center; align-items: center;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Repuesto -->
+    <div class="modal fade" id="modal-id_repuesto" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Repuesto</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                        style="background-color: #dc3545; color: white; border: none; 
+                                border-radius: 50%; width: 35px; height: 35px;
+                                font-size: 1.5rem; line-height: 1; 
+                                display: flex; justify-content: center; align-items: center;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal nómina -->
+    <div class="modal fade" id="modal-id_nomina" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Nómina</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                        style="background-color: #dc3545; color: white; border: none; 
+                                border-radius: 50%; width: 35px; height: 35px;
+                                font-size: 1.5rem; line-height: 1; 
+                                display: flex; justify-content: center; align-items: center;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sub-Modal Marca -->
+    <div class="modal fade" id="modal-id_marca" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Marca</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                        style="background-color: #dc3545; color: white; border: none; 
+                                border-radius: 50%; width: 35px; height: 35px;
+                                font-size: 1.5rem; line-height: 1; 
+                                display: flex; justify-content: center; align-items: center;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SubModal Empleado -->
+    <div class="modal fade" id="modal-id_empleado" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Empleado</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                        style="background-color: #dc3545; color: white; border: none; 
+                                border-radius: 50%; width: 35px; height: 35px;
+                                font-size: 1.5rem; line-height: 1; 
+                                display: flex; justify-content: center; align-items: center;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script sub-modal marca. -->
+    <script>
+        $("#modal-id_marca").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:marca_modal_crear' %}",  // <-- endpoint para crear Marca
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+                }
+            });
+        });
+    </script>
+
+    <!-- Script sub-modal empleado. -->
+    <script>
+        $("#modal-id_empleado").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:empleado_modal_crear' %}",  // <-- endpoint para crear Empleado
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+                }
+            });
+        });
+    </script>
+
+    <!-- Script proveedor. -->
+    <script>
+        $("#modal-id_proveedor").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:proveedor_modal_crear' %}",
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+                }
+            });
+        });
+    </script>
+
+    <!-- Script administrador -->
+    <script>
+        $("#modal-id_admin").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:administrador_modal_crear' %}",
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+                }
+            });
+        });
+    </script>
+
+    <!-- Script herramienta -->
+    <script>
+        $("#modal-id_herramienta").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:herramienta_modal_crear' %}",
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+                }
+            });
+        });
+    </script>
+
+    <!-- Script insumos -->
+    <script>
+        $("#modal-id_insumos").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:insumos_modal_crear' %}",
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+                }
+            });
+        });
+    </script>
+
+    <!-- Script Repuesto. -->
+    <script>
+        $("#modal-id_repuesto").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:repuesto_modal_crear' %}",
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+                }
+            });
+        });
+    </script>
+
+    <!-- Script nomina -->
+    <script>
+        $("#modal-id_nomina").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:nomina_modal_crear' %}",
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+                }
+            });
+        });
+    </script>
+
 {% endblock %}
 
 {% block Cancelar %}
-                <button type="submit " class="btn btn-primary btn-flat"><i class="fas fa-save"></i>
+                <button type="submit " class="btn btn-primary btn-flat" title="Agregar pago">
+                    <i class="fas fa-save"></i>
                     Agregar
                 </button>
-                <a href="{% url 'apy:pagos_lista' %}" class="btn btn-danger btn-flat float-right">
+                <a href="{% url 'apy:pagos_lista' %}" class="btn btn-danger btn-flat float-right" title="Cancelar registro de pago">
                     <i class="fas fa-times"></i> Cancelar
                 </a>
 {% endblock %}

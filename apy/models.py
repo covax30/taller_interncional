@@ -48,8 +48,8 @@ def validar_monto(value):
         raise ValidationError('El monto debe ser mayor o igual a 99')
 
 placa_regex = RegexValidator(
-        regex=r'^[A-Z]{3}\d{3}$',
-        message="La placa debe tener el formato ABC123 (3 letras seguidas de 3 números)."
+        regex=r'^[A-Z0-9]{6}$',
+        message="La placa debe tener exactamente 6 caracteres alfanuméricos (letras mayúsculas o números)."
     )
 
 modelo_regex = RegexValidator(
@@ -92,7 +92,11 @@ class Marca(models.Model):
 class Repuesto(models.Model):
     id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE)  # LLAVE
     nombre = models.CharField(max_length=100)
-    categoria = models.CharField(max_length=100)
+    CATEGORIA_OPCIONES = [
+        ('automotriz', 'Automotriz'),
+        ('industrial', 'Industrial'),
+    ]
+    categoria = models.CharField(max_length=100, choices=CATEGORIA_OPCIONES)
     fabricante = models.CharField(max_length=100)
     stock = models.IntegerField()
     ubicacion = models.CharField(max_length=100)
@@ -112,7 +116,13 @@ class Herramienta(models.Model):
 
     nombre = models.CharField(max_length=100)
     color = models.CharField(max_length=100)
-    tipo = models.CharField(max_length=100)
+    TIPO_OPCIONES = [
+        ('manuales', 'Manuales'),
+        ('eléctricas', 'Eléctricas'),
+        ('neumáticas', 'Neumáticas'),
+        ('de medición', 'De Medición'),
+    ]
+    tipo = models.CharField(max_length=100, choices=TIPO_OPCIONES)
     material = models.CharField(max_length=100)
     id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE)
     stock = models.IntegerField()
@@ -142,7 +152,7 @@ class Insumos(models.Model):
 
     def __str__(self):
 
-        return f"{self.nombre} ({self.id})"
+        return f"{self.id_marca} ({self.cantidad})"
 
 
 # MODULOS STEVEN
@@ -245,6 +255,7 @@ class Administrador(models.Model):
 
 #--------------Modulo Pago Servicio Publicos-----------
 class PagoServiciosPublicos(models.Model):
+    id_servicio = models.AutoField(primary_key=True)
     SERVICIO_OPCIONES = [
         ('luz', 'Luz'),
         ('agua', 'Agua'),
@@ -256,7 +267,6 @@ class PagoServiciosPublicos(models.Model):
         max_length=20,
         choices=SERVICIO_OPCIONES
     )
-    id_servicio = models.AutoField(primary_key=True)
     monto = models.IntegerField(  # 🔹 ENTEROS, sin decimales
         error_messages={
             'invalid': 'Ingrese un número válido para el monto.',
@@ -289,7 +299,12 @@ class Gastos(models.Model):
         }, validators=[validar_monto]
     )
     descripcion = models.TextField() 
-    tipo_gastos=models.CharField(max_length=100)
+    TIPO_GASTOS_OPCIONES = [
+        ('costo fijo', 'Costo fijo'),
+        ('costo directo', 'Costo directo'),
+        ('costo variable', 'Costo variable'),
+    ]
+    tipo_gastos=models.CharField(max_length=100, choices=TIPO_GASTOS_OPCIONES)
     id_pagos_servicios = models.ForeignKey(PagoServiciosPublicos, on_delete=models.CASCADE)
     def __str__(self):
         return f"{self.tipo_gastos} - ${self.monto}"
@@ -300,6 +315,21 @@ class Gastos(models.Model):
 #-------- Empleado-------
 class Empleado(models.Model): 
    
+    nombre = models.CharField(max_length=100)
+    telefono = models.CharField(max_length=15, validators=[validar_telefono])
+    identificacion = models.CharField(max_length=20, unique=True, validators=[validar_identificacion]) 
+    Correo= models.EmailField(max_length=254, unique=True, validators=[validar_email])
+    direccion = models.CharField(max_length=255)
+    def __str__(self):
+        return f"{self.nombre} ({self.identificacion})"
+    #class meta
+        #verbose_name = 'Empleado'
+        #verbose_name_plural = 'Empleado'
+        
+
+#-------- Empleado-------
+class Empleado_Mantenimiento(models.Model): 
+    id_empleado_mantenimiento = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
     telefono = models.CharField(max_length=15, validators=[validar_telefono])
     identificacion = models.CharField(max_length=20, unique=True, validators=[validar_identificacion]) 
@@ -348,8 +378,13 @@ class Informes(models.Model):
     
 #-------- nomina------
 class Nomina(models.Model):
-   
-    rol = models.CharField(max_length=100)
+    
+    TIPO_ROL = [
+        ('administrador', 'Administrador'),
+        ('empleado', 'Empleado'),
+    ]
+    
+    rol = models.CharField(max_length=100, choices=TIPO_ROL)
     monto = models.IntegerField(  # 🔹 ENTEROS, sin decimales
         error_messages={
             'invalid': 'Ingrese un número válido para el monto.',
@@ -381,7 +416,7 @@ class Pagos(models.Model):
     id_admin = models.ForeignKey(Administrador, on_delete=models.CASCADE)
     id_herramienta = models.ForeignKey(Herramienta, on_delete=models.CASCADE)
     id_insumos = models.ForeignKey(Insumos, on_delete=models.CASCADE)
-    id_repuestos = models.ForeignKey(Repuesto, on_delete=models.CASCADE)
+    id_repuesto = models.ForeignKey(Repuesto, on_delete=models.CASCADE)
     id_nomina= models.ForeignKey(Nomina, on_delete=models.CASCADE, blank=True, null=True) 
     
     def __str__(self):

@@ -1,11 +1,12 @@
 {% extends "generic_listar.html" %}
 
 {% block titulo %}
+        <i class="fa-solid fa-user"></i>
         <h1 class="text-center">Lista de Empleados</h1>
 {% endblock titulo %}
 
 {% block agregar %}
-<a href="{{crear_url}}" class=" btn btn-primary btn btn-xs"><i class="fas fa-plus"></i>
+<a href="{{crear_url}}" class=" btn btn-primary btn btn-xs" title="Agregar empleado"><i class="fas fa-plus"></i>
           Agregar
 </a>
 {% endblock %}
@@ -14,10 +15,10 @@
 
         <th>Id del Empleado</th>
         <th>Nombre</th>
-        <th>Telefono</th>
-        <th>Identificacion</th>
+        <th>Teléfono</th>
+        <th>Identificación</th>
         <th>Correo</th>
-        <th>Direccion</th>
+        <th>Dirección</th>
         <th>Acciones</th>
 
 {% endblock %}
@@ -36,9 +37,20 @@
         <form method="post">
 
           <td>
-            <a href="{% url 'apy:empleado_editar' em.id %}" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></a>
-            <a href="{% url 'apy:empleado_eliminar' em.id %}" class="btn btn-danger btn-xs"><i
-                class="fas fa-trash-alt"></i></a>
+            <a href="{% url 'apy:empleado_editar' em.id %}" 
+              class="btn btn-info btn-xs" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="Editar empleado">
+              <i class="fas fa-edit"></i>
+            </a>
+            <a href="{% url 'apy:empleado_eliminar' em.id %}" 
+              class="btn btn-danger btn-xs" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="Eliminar empleado">
+              <i class="fas fa-trash-alt"></i>
+           </a>
           </td>
       </tr>
       {% endfor %}

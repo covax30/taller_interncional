@@ -3,7 +3,8 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import JsonResponse
 from django.contrib import messages
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
+from django.template.loader import render_to_string
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import AccessMixin # Solo necesaria si defines mixins locales
 # Importaciones de modelos, formularios y Mixin corregido
@@ -138,3 +139,36 @@ def api_contador_clientes(request):
     """Retorna el total de clientes para actualización AJAX."""
     total_clientes = Cliente.objects.count()
     return JsonResponse({'total_clientes': total_clientes})
+
+class ClienteCreateModalView(CreateView):
+    model = Cliente
+    form_class = ClienteForm
+    template_name = "clientes/modal_cliente.html"
+    success_url = reverse_lazy("apy:cliente_lista")
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        try:
+            self.object = form.save()
+            return JsonResponse({
+                "success": True,
+                "id": self.object.id_cliente,
+                "text": str(self.object),
+                "message": "Cliente registrado correctamente ✅"
+            })
+        except Exception as e:
+            return JsonResponse({
+                "success": False,
+                "message": f"Error al guardar: {str(e)}"
+            }, status=500)
+    
+    def form_invalid(self, form):
+        html = render_to_string(self.template_name, {"form": form}, request=self.request)
+        return JsonResponse({
+            "success": False,
+            "html": html,
+            "message": "Por favor, corrige los errores en el formulario ❌"
+        })

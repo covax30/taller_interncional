@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied # <-- NUEVA IMPORTACIÓN PARA ERRORES 403
 from apy.models import Caja, Module, Permission 
 from apy.decorators import PermisoRequeridoMixin
+from django.urls import reverse_lazy
 
 from django.http import HttpResponse
 
