@@ -5,21 +5,82 @@
 
     <form id="mantenimientoForm" method="post" action="{% url 'apy:mantenimiento_modal_crear' %}">
         {% csrf_token %}
-    {% for field in form.visible_fields %}
-    <div class="form-group mb-3">
-        <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
-        {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
 
-        {% if field.errors %}
+    <!-- Campo Empleado con botón para abrir modal -->
+    <div class="form-group mb-3">
+        <label for="{{ form.id_empleado_mantenimiento.id_for_label }}">Id Empleado:</label>
+        <div class="input-group">
+            {{ form.id_empleado|add_class:'form-control'|attr:'autocomplete:off' }}
+            <div class="input-group-append">
+            </div>
+        </div>
+        {% if form.id_empleado_mantenimiento.errors %}
             <div class="invalid-feedback d-block">
-                {% for error in field.errors %}
+                {% for error in form.id_empleado_mantenimiento.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>    
+
+    <!-- Campo Vehículo con botón para abrir modal -->
+    <div class="form-group mb-3">
+        <label for="{{ form.id_vehiculo.id_for_label }}">Id Vehículo:</label>
+        <div class="input-group">
+            {{ form.id_vehiculo|add_class:'form-control'|attr:'autocomplete:off' }}
+            <div class="input-group-append">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_vehiculo" title="Agregar nuevo vehículo">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+        {% if form.id_vehiculo.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.id_vehiculo.errors %}
                     <small>{{ error }}</small><br>
                 {% endfor %}
             </div>
         {% endif %}
     </div>
 
+    <!-- Campo Tipo Mantenimiento con botón para abrir modal -->
+    <div class="form-group mb-3">
+        <label for="{{ form.id_tipo_mantenimiento.id_for_label }}">Tipo Mantenimiento:</label>
+        <div class="input-group">
+            {{ form.id_tipo_mantenimiento|add_class:'form-control'|attr:'autocomplete:off' }}
+            <div class="input-group-append">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_tipo_mantenimiento" title="Agregar nuevo tipo de mantenimiento">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>         
+        </div>
+        {% if form.id_tipo_mantenimiento.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.id_tipo_mantenimiento.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Renderiza el resto de los campos, excepto id_vehiculo -->
+    {% for field in form.visible_fields %}
+        {% if field.name != 'id_empleado' and field.name != 'id_vehiculo' and field.name != 'id_tipo_mantenimiento' %}
+            <div class="form-group mb-3">
+                <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
+                {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
+                {% if field.errors %}
+                    <div class="invalid-feedback d-block">
+                        {% for error in field.errors %}
+                            <small>{{ error }}</small><br>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
     {% endfor %}
+</form>
+
 {% endblock %}
 
 {% block Cancelar %}

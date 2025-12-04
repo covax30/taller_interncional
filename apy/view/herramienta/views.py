@@ -47,7 +47,7 @@ class HerramientaCreateView(PermisoRequeridoMixin, CreateView):
     permission_required = 'add'
     
     def form_valid(self, form):
-        messages.success(self.request, "herramienta creada correctamente")
+        messages.success(self.request, "Herramienta creada correctamente")
         return super().form_valid(form)
     
     def get_context_data(self, **kwargs):
@@ -67,6 +67,10 @@ class HerramientaUpdateView(PermisoRequeridoMixin, UpdateView):
     module_name = 'Herramientas'
     permission_required = 'change'
     
+    def form_valid(self, form):
+        messages.success(self.request, "Herramienta actualizada correctamente")
+        return super().form_valid(form)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Editar Herramienta'
@@ -82,6 +86,10 @@ class HerramientaDeleteView(PermisoRequeridoMixin, DeleteView):
     # --- Configuración de Permisos ---
     module_name = 'Herramientas'
     permission_required = 'delete'
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Herramienta eliminada correctamente")
+        return super().form_valid(form)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

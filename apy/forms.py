@@ -2,7 +2,7 @@ from django import forms
 from django.forms import ModelForm, Select, NumberInput, DateInput, TimeInput, TextInput, EmailInput
 from django.forms import inlineformset_factory
 from decimal import Decimal, InvalidOperation
-
+# apy/forms.py (Asegúrate de importar esto)
 from django.contrib.auth.hashers import make_password
 from django import forms  # Asegúrate de usar la importación estándar de forms
 from django.contrib.auth.models import User, Permission  # Importación de modelos de Django
@@ -1167,6 +1167,65 @@ class EmpleadoForm(ModelForm):
                 'required': 'La direccion del empleado es obligatoria',
             },
         }
+        
+        
+class Empleado_Mantenimiento_Form(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['nombre'].widget.attrs['autofocus'] = True
+        
+    class Meta:
+        model = Empleado_Mantenimiento
+        fields = '__all__'
+        widgets = {
+            'nombre':TextInput(
+                attrs={
+                    'placeholder':'Ingrese el nombre del empleado',
+                }
+            ),
+            'telefono':NumberInput(
+                attrs={
+                    'placeholder':'Ingrese el telefono del empleado',
+                }
+            ),
+            'identificacion':NumberInput(
+                attrs={
+                    'placeholder':'Ingrese la identificacion del empleado',
+                }
+            ),
+            'Correo':TextInput(
+                attrs={
+                    'placeholder':'Ingrese el correo del empleado',
+                }
+            ),
+            'direccion':TextInput(
+                attrs={
+                    'placeholder':'Ingrese la direccion del empleado',
+                }
+            )
+            
+       }  
+        error_messages = {
+            'nombre': {
+                'required': 'El nombre del empleado es obligatorio',
+            },
+            'telefono': {
+                'required': 'El telefono del empleado es obligatorio',
+            },
+            'identificacion': {
+                'required': 'La identificacion del empleado es obligatoria',
+            },
+            'Correo': {
+                'required': 'El correo del empleado es obligatorio',
+                'invalid': 'El correo no tiene un formato válido',
+                'unique': 'Ya existe un administrador con ese correo',
+            },
+            'direccion': {
+                'required': 'La direccion del empleado es obligatoria',
+            },
+        }
+
+
  #------- formulario Gastos -------     
         
 class GastosForm(ModelForm):
@@ -1390,6 +1449,11 @@ class MantenimientoForm(ModelForm):
                 }
             ),
             'id_empleado':Select(
+                attrs={
+                    'class': 'form-control',
+                }
+            ),
+            'id_empleado_mantenimiento':Select(
                 attrs={
                     'class': 'form-control',
                 }

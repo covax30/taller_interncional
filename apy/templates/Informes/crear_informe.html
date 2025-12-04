@@ -226,11 +226,41 @@
 
 
 {% block Cancelar %}
-                <button type="submit " class="btn btn-primary btn-flat"><i class="fas fa-save"></i>
+                <button type="submit " class="btn btn-primary btn-flat" title="Agregar informe">
+                    <i class="fas fa-save"></i>
                     Agregar
                 </button>
-                <a href="{% url 'apy:informes_lista' %}" class="btn btn-danger btn-flat float-right">
+                <a href="{% url 'apy:informes_lista' %}" class="btn btn-danger btn-flat float-right" title="Cancelar registro de informe">
                     <i class="fas fa-times"></i> Cancelar
                 </a>
-                
+{% endblock %}
+
+{% block modals %}
+
+    {% include "apy/repuestos/modal_form.html" %}
+    {% include "apy/Empleado/modal_empleado.html" %}
+    {% include "apy/gestion_mantenimiento/modal_mantenimiento.html" %}
+    {% include "apy/Marca/modal_marca.html" %}
+    {% include "apy/Empleado/modal_empleado_mantenimiento.html" %}
+    {% include "apy/vehiculos/modal_vehiculo.html" %}
+    {% include "apy/tipo_mantenimiento/modal_tipo_mantenimiento.html" %}
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    $("#modal-id_repuesto").on("show.bs.modal", function(){
+        var modal = $(this);
+        $.ajax({
+            url: "{% url 'apy:repuesto_modal_crear' %}",
+            success: function(data){
+                modal.find(".modal-body").html(data.html || data);
+            }
+        });
+    });
+</script>
+
+... y todos los demás scripts ...
+
 {% endblock %}

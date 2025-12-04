@@ -15,6 +15,7 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
+
 # Cargar variables del entorno ANTES de cualquier configuración
 load_dotenv()
 

@@ -108,10 +108,11 @@
 {% endblock %}
 
 {% block Cancelar %}
-                <button type="submit " class="btn btn-primary btn-flat"><i class="fas fa-save"></i>
+                <button type="submit " class="btn btn-primary btn-flat" title="Agregar vehículo">
+                    <i class="fas fa-save"></i>
                     Agregar
                 </button>
-                <a href="{% url 'apy:vehiculo_lista' %}" class="btn btn-default btn-flat float-right">
+                <a href="{% url 'apy:vehiculo_lista' %}" class="btn btn-danger btn-flat float-right" title="Cancelar registro de vehículo">
                     <i class="fas fa-times"></i> Cancelar
                 </a>
 {% endblock %}

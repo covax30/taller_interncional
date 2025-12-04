@@ -146,3 +146,29 @@ class EmpleadoCreateModalView(CreateView):
             "html": html,
             "message": "Por favor, corrige los errores en el formulario ❌"
         })
+
+class EmpleadoCreateModalMantenimientoView(CreateView):
+    model = Empleado_Mantenimiento
+    form_class = Empleado_Mantenimiento_Form
+    template_name = "Empleado/empleado_mantenimiento_form.html"
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        self.object = form.save()
+        return JsonResponse({
+            "success": True,
+            "id": self.object.id_empleado_mantenimiento,
+            "text": str(self.object),
+            "message": "Empleado registrado correctamente"
+        })
+
+    def form_invalid(self, form):
+        html = render_to_string(self.template_name, {"form": form}, request=self.request)
+        return JsonResponse({
+            "success": False,
+            "html": html,
+            "message": "Por favor corrige los errores"
+        })
