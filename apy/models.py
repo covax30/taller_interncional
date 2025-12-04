@@ -100,7 +100,7 @@ class Marca(models.Model):
         return f"{self.nombre} "
 #------ ENTIDAD REPUESTOS --------3
 class Repuesto(models.Model):
-    id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE)  # LLAVE
+    id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE) 
     nombre = models.CharField(max_length=100)
     CATEGORIA_OPCIONES = [
         ('automotriz', 'Automotriz'),
@@ -110,7 +110,7 @@ class Repuesto(models.Model):
     fabricante = models.CharField(max_length=100)
     stock = models.IntegerField()
     ubicacion = models.CharField(max_length=100)
-    precio = models.IntegerField(  # 🔹 ENTEROS, sin decimales
+    precio = models.IntegerField( 
         error_messages={
             'invalid': 'Ingrese un número válido para el precio.',
             'required': 'El precio del repuesto es obligatorio.'
@@ -200,14 +200,23 @@ class Permission(models.Model):
 
 
 class Cliente(models.Model):
-    id_cliente = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=100)
-    documento = models.BigIntegerField(validators=[validar_identificacion])
-    telefono = models.BigIntegerField(validators=[validar_telefono])
-    correo = models.EmailField(max_length=100, validators=[validar_email])
+
+    TIPO_CLIENTE = [
+        ('cliente particular', 'Cliente Particular'),
+        ('empresa', 'Empresa'),
+    ]
+    tipo = models.CharField(max_length=20, choices=TIPO_CLIENTE, blank=True, null=True)
+    nombre = models.CharField(max_length=255, verbose_name="Nombre/Razón Social", blank=True, null=True)
+    identificacion = models.CharField(max_length=50, unique=True, verbose_name="Documento/NIT", blank=True, null=True)
+    telefono = models.CharField(max_length=20, blank=True, null=True)
+    correo = models.EmailField(validators=[validar_email], blank=True, null=True)
+    direccion = models.TextField(verbose_name="Dirección", blank=True, null=True)
+    estado = models.BooleanField(default=True, verbose_name="Activo")
 
     def __str__(self):
-        return f"{self.id_cliente} - {self.nombre}"
+        return f"{self.id} - {self.nombre}"
+    
+
 
 
 class Vehiculo(models.Model):
@@ -252,10 +261,10 @@ class Administrador(models.Model):
     id_admin = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
     apellidos = models.CharField(max_length=100)
-    identificacion = models.IntegerField(max_length=11, unique=True, validators=[validar_identificacion])
+    identificacion = models.IntegerField( unique=True, validators=[validar_identificacion])
     edad = models.PositiveIntegerField(validators=[validar_edad])
     correo = models.EmailField(unique=True, validators=[validar_email])
-    telefono = models.IntegerField(max_length=10, validators=[validar_telefono])
+    telefono = models.IntegerField( validators=[validar_telefono])
     fecha_ingreso = models.DateField()
     
     def __str__(self):
@@ -442,7 +451,7 @@ class DetalleServicio(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     estado = models.CharField(max_length=20, default='pendiente')
     
-    # ✅ PROPIEDADES NUEVAS - AGREGAR ESTAS
+    
     @property
     def total_repuestos(self):
         """Calcula el total de TODOS los repuestos del servicio"""
@@ -467,7 +476,7 @@ class DetalleServicio(models.Model):
         except (AttributeError, TypeError):
             return 0
     
-    # ✅ PROPIDAD EXISTENTE - MANTENER ASÍ
+    
     @property
     def subtotal(self):
         total = 0
@@ -525,31 +534,50 @@ class DetalleInsumos(models.Model):
     
     def __str__(self):
         return f"Insumo: {self.id_insumos} - Cantidad: {self.cantidad}"
+    
+ #-----Empresa----------------------
+class Empresa(models.Model):
+    nombre = models.CharField(max_length=255,default= "Taller Mecanica Diesel Internacional Arturo Patiño"  )
+    nit = models.CharField(max_length=50,default="74.187366-2")
+    direccion =  models.CharField(default="calle 9 #32-37 Barrio La Isla", max_length=200)
+    telefono = models.CharField(default="3118112714 - 3133342841", max_length=50)
+    estado = models.BooleanField(default=True) 
+
+    
+    def __str__(self):
+        return self.nombre
+    
+#----- modulo de cliente base para factura----
+class ClienteFactura(models.Model):
+    TIPO_CLIENTE= [
+        ('cliente particular', 'Cliente Particular'),
+        ('empresa', 'Empresa'),
+    ]
+    tipo = models.CharField(max_length=20, choices=TIPO_CLIENTE)   
+    nombre = models.CharField(max_length=255, verbose_name="Nombre/Razón Social")
+    identificacion = models.CharField(max_length=50,  unique=True, verbose_name="Documento/NIT") 
+    telefono = models.CharField(max_length=20)
+    email = models.EmailField(validators=[validar_email])
+    direccion = models.TextField(verbose_name="Dirección")
+    estado = models.BooleanField(default=True, verbose_name="Activo")
 #-----------Factura-----------------
 class Factura(models.Model):
-    
-    tipo_pago = models.CharField(max_length=45)
-    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
-    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE)
-    id_tipo_mantenimiento = models.ForeignKey(TipoMantenimiento, on_delete=models.CASCADE)
-    servicio_prestado = models.CharField(max_length=45)
-    nombre_empresa = models.CharField(max_length=45)
-    direccion_empresa = models.CharField(max_length=45)
-    id_empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE)
-    monto = models.IntegerField(  # 🔹 ENTEROS, sin decimales
-        error_messages={
-            'invalid': 'Ingrese un número válido para el monto.',
-            'required': 'El monto de la factura es obligatorio.'
-        } , validators=[validar_monto]
-    )
+    id_empresa = models.ForeignKey(Empresa, on_delete=models.PROTECT, null=True, blank=True)  # Agregado null/blank
+    Fecha = models.DateField(null=True, blank=True)  # Agregado
+    id_Detalles_servicios = models.ForeignKey(DetalleServicio, on_delete=models.PROTECT, null=True, blank=True)  # Agregado
+    id_empleado = models.ForeignKey(Empleado, on_delete=models.PROTECT, null=True, blank=True)  # Agregado
+    id_cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT, null=True, blank=True)
+    opciones_pago = [
+        ('efectivo', 'Efectivo'),
+        ('transferencia', 'Transferencia'),
+    ]
+    metodo_pago = models.CharField(max_length=50, choices=opciones_pago, null=True, blank=True)  # Agregado
 
     def __str__(self):
-        return f"Factura {self.id} - {self.tipo_pago or 'Sin pago'}"
+        cliente_nombre = self.id_cliente.nombre if self.id_cliente else "Sin cliente"
+        return f"Factura {self.id} - {cliente_nombre}"
+
     
-    
-
-
-
 #--------------Modulo Compra (STEVEN)-----------------
 class Compra(models.Model):
     id_compra = models.AutoField(primary_key=True)

@@ -1,4 +1,5 @@
 from django.urls import path
+from apy.view.empresa.views import EmpresaCreateModalView, EmpresaCreateView, EmpresaDeleteView, EmpresaInactivosListView, EmpresaListView, EmpresaUpdateView, activar_empresa
 from apy.views import *
 from apy.view.Contenidos.views import *
 from apy.view.proveedor.view import *
@@ -74,6 +75,24 @@ urlpatterns = [
     path('cliente/editar/<int:pk>/', ClienteUpdateView.as_view(), name='cliente_editar'),
     path('cliente/eliminar/<int:pk>/', ClienteDeleteView.as_view(), name='cliente_eliminar'),
     path("cliente/modal/crear/", ClienteCreateModalView.as_view(), name="cliente_modal_crear"),
+    path("clientes/inactivos/", ClienteInactivosListView.as_view(), name="cliente_inactivos"),
+    path("clientes/activar/", activar_cliente, name="cliente_activar"),
+    
+    
+    #---------urls empresa---------
+    path('empresa/listar/', EmpresaListView.as_view(), name='empresa_lista'),
+    path('empresa/agregar/', EmpresaCreateView.as_view(), name='empresa_crear'),
+    path('empresa/editar/<int:pk>/', EmpresaUpdateView.as_view(), name='empresa_editar'),
+    path('empresa/eliminar/<int:pk>/', EmpresaDeleteView.as_view(), name='empresa_eliminar'),
+    path("empresa/modal/crear/", EmpresaCreateModalView.as_view(), name="empresa_modal_crear"),
+    path("empresa/inactivos/", EmpresaInactivosListView.as_view(), name="empresa_inactivos"),
+    path("empresa/activar/", activar_empresa, name="empresa_activar"),
+
+    
+    
+    
+
+
 
     path('compra/listar/', CompraListView.as_view(), name='compra_lista'),
     path('compra/agregar/', CompraCreateView.as_view(), name='compra_crear'),

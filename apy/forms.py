@@ -15,15 +15,22 @@ from apy.models import *
 class FacturaForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['tipo_pago'].widget.attrs['autofocus'] = True
+        self.fields['metodo_pago'].widget.attrs['autofocus'] = True
         
     class Meta:
         model = Factura
         fields = '__all__'
         widgets = {
-            'tipo_pago': TextInput(
+            'Fecha':DateInput(
                 attrs={
-                    'placeholder': 'Ingrese el tipo de pago',
+                    'type': 'date',
+                    'placeholder':'Ingrese la fecha',
+                }
+            ),
+            
+            'id_empleado': Select(
+                attrs={
+                    'class': 'form-control',
                 }
             ),
             'id_cliente': Select(
@@ -31,42 +38,19 @@ class FacturaForm(ModelForm):
                     'class': 'form-control',
                 }
             ),
-            'id_vehiculo': Select(
+            'id_Detalles_servicios': Select(
                 attrs={
                     'class': 'form-control',
                 }
             ),
-            'id_tipo_mantenimiento': Select(
+            'metodo_pago': Select(
                 attrs={
                     'class': 'form-control',
                 }
             ),
-            'servicio_prestado': TextInput(
-                attrs={
-                    'placeholder': 'Ingrese el servicio prestado',
-                }
-            ),
-            'nombre_empresa': TextInput(
-                attrs={
-                    'placeholder': 'Ingrese el nombre de la empresa',
-                }
-            ),
-            'direccion_empresa': TextInput(
-                attrs={
-                    'placeholder': 'Ingrese la direccion de la empresa',
-                }
-            ),
-            'id_empleado': Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-            'monto': NumberInput(
-                attrs={
-                    'placeholder': 'Ingrese el monto total del servicio prestado',
-                }
-            )
         }
+
+
         error_messages = {
             'id_operacion': {
                 'required': 'El id de la operacion es obligatorio',
@@ -97,6 +81,55 @@ class FacturaForm(ModelForm):
             },
             'monto': {
                 'required': 'El monto es obligatorio',
+            }
+        }
+        
+
+class EmpresaForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs.update({
+                'class': 'form-control',  
+                'autocomplete': 'off'
+            })
+        
+        self.fields['nombre'].widget.attrs.update({'autofocus': True})
+    
+    class Meta:
+        model = Empresa
+        fields = ['nombre', 'nit', 'direccion', 'telefono']  
+        widgets = {
+            'nombre': TextInput(
+                attrs={
+                    'class': 'form-control'
+                    }),
+            'nit': NumberInput(
+                attrs={
+                    'class': 'form-control', 'min': '1'
+                    }),
+            'direccion': TextInput(
+                attrs={
+                    'class': 'form-control', 'placeholder': '0.00', 'step': '0.01'
+                    }),
+            'telefono': NumberInput(
+                attrs={
+                    'class': 'form-control', 'min': '1'
+                    }),
+        }
+        
+        error_messages = {
+            'nombre': {
+                'required': 'El nombre de la empresa  es obligatorio',
+            },
+            'nit': {
+                'required': 'El Número de Identificación Tributaria es oblicatorio',
+            },
+            'direccion ': {
+                'required': 'La direccion de la empresa es  obligatorio',
+            },
+            'telefono': {
+                'required': 'El telefono de la empresa es  obligatorio',
             }
         }
 
@@ -467,12 +500,20 @@ class ClienteForm(ModelForm):
         model = Cliente
         fields = '__all__'
         widgets = {
+            'tipo':Select(
+                attrs={
+                    'class': 'form-control',
+                    'class': 'form-control foreign-key-field',
+                    'autofocus': True
+                }
+            ),
+            
             'nombre':TextInput(
                 attrs={
                     'placeholder':'Ingrese el nombre del cliente',
                 }
             ),
-            'documento':NumberInput(
+            'identificacion':NumberInput(
                 attrs={
                     'placeholder':'Ingrese el documento del cliente',
                 }
@@ -483,6 +524,11 @@ class ClienteForm(ModelForm):
                 }
             ),
             'correo':TextInput(
+                attrs={
+                    'placeholder':'Ingrese el correo del cliente',
+                }
+            ),
+            'direccion':TextInput(
                 attrs={
                     'placeholder':'Ingrese el correo del cliente',
                 }
@@ -507,48 +553,57 @@ class ClienteForm(ModelForm):
             },
            
         }
-        
 class VehiculoForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['id_cliente'].widget.attrs['autofocus'] = True
         
+        # Configura cómo se muestran los clientes en el select
+        if 'id_cliente' in self.fields:
+            self.fields['id_cliente'].label_from_instance = (
+                lambda obj: f"{obj.id} - {obj.nombre}"  # ← CAMBIADO de obj.id_cliente a obj.id
+            )
+            self.fields['id_cliente'].widget.attrs.update({
+                'class': 'form-control foreign-key-field',
+                'autofocus': True
+            })
         
     class Meta:
         model = Vehiculo
         fields = '__all__'
         widgets = {
-            'id_cliente':Select(
+            'id_cliente': Select(
+                attrs={
+                    'class': 'form-control foreign-key-field',  # ← Solo una clase
+                }
+            ),
+            'placa': TextInput(
                 attrs={
                     'class': 'form-control',
-                    'class': 'form-control foreign-key-field',
-                    'autofocus': True
+                    'placeholder': 'Ingrese la placa del vehiculo (ej: ABC123) o (A1C234)',
                 }
             ),
-            'placa':TextInput(
+            'modelo_vehiculo': TextInput(
                 attrs={
-                    'placeholder':'Ingrese la placa del vehiculo (ej: ABC123) o (A1C234)',
+                    'class': 'form-control',
+                    'placeholder': 'Ingrese el modelo del vehiculo (ej: 2024)',
                 }
             ),
-            'modelo_vehiculo':TextInput(
+            'marca_vehiculo': TextInput(
                 attrs={
-                    'placeholder':'Ingrese el modelo del vehiculo (ej: 2024)',
+                    'class': 'form-control',
+                    'placeholder': 'Ingrese la marca del vehiculo',
                 }
             ),
-            'marca_vehiculo':TextInput(
+            'color': TextInput(
                 attrs={
-                    'placeholder':'Ingrese la marca del vehiculo',
-                }
-            ),
-            'color':TextInput(
-                attrs={
-                    'placeholder':'Ingrese el color del vehiculo',
+                    'class': 'form-control',
+                    'placeholder': 'Ingrese el color del vehiculo',
                 }
             ),
         }
         error_messages = {
             'id_cliente': {
-                'required': 'El id del cliente es obligatorio',
+                'required': 'El cliente es obligatorio',
             },
             'placa': {
                 'required': 'La placa del vehiculo es obligatoria',
@@ -564,17 +619,6 @@ class VehiculoForm(ModelForm):
                 'required': 'El color del vehiculo es obligatorio',
             },
         }
-        
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # ✅ Configura cómo se muestran los clientes en el select
-        self.fields['id_cliente'].label_from_instance = (
-            lambda obj: f"{obj.id_cliente} - {obj.nombre}"
-        )
-
-        # ✅ Enfoca automáticamente el campo cliente (si aplica)
-        self.fields['id_cliente'].widget.attrs['autofocus'] = True
         
         
 class EntradaVehiculoForm(ModelForm):
@@ -962,7 +1006,7 @@ class PagoServiciosForm(ModelForm):
             'monto': {
                 'required': 'El monto de pago es obligatorio',
             },
-         }
+         } 
         
 # -----------Formulario modelo pagos------------------    
 class PagosForm(ModelForm):
