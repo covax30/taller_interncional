@@ -12,4 +12,4 @@ __pycache__/
 *.pyd
 .idea
 .env
-.sql
+db_backups/
