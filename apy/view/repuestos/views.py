@@ -12,6 +12,8 @@ from django.db.models import F
 from apy.models import Repuesto, Module, Permission
 from apy.forms import RepuestoForm
 from django.contrib import messages
+import json
+from django.db import transaction
 
 # Importar las herramientas de permisos centralizadas
 from apy.decorators import PermisoRequeridoMixin, permiso_requerido_fbv 
@@ -61,12 +63,11 @@ class RepuestoCreateView(PermisoRequeridoMixin, CreateView):
     def form_valid(self, form):
         self.object = form.save()
 
-        #  forma de detectar 
         if self.request.headers.get("x-requested-with") == "XMLHttpRequest":
             return JsonResponse({
                 "success": True,
                 "id": self.object.id,
-                "nombre": str(self.object.nombre)  # usa __str__ del modelo
+                "nombre": str(self.object.nombre)
             })
 
         return super().form_valid(form)
@@ -174,3 +175,49 @@ class RepuestoCreateModalView(CreateView):
             "html": html,
             "message": "Por favor, corrige los errores en el formulario ❌"
         })
+class DetalleRepuestoCreateModalView(CreateView):
+    model = DetalleRepuesto
+    form_class = RepuestoscantidadForm
+    template_name = "repuestos/modal_detallerepuesto.html"
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            context['repuestos'] = Repuesto.objects.all()
+            print("✅ Repuestos cargados correctamente")
+        except Exception as e:
+            print(f"❌ Error cargando repuestos: {e}")
+            context['repuestos'] = []
+        return context
+
+    def get(self, request, *args, **kwargs):
+        print("🔍 GET request recibido para modal")
+        try:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                print("✅ Es una petición AJAX")
+                form = self.get_form()
+                print("✅ Formulario creado")
+                context = self.get_context_data(form=form)
+                print("✅ Contexto creado")
+                html = render_to_string(self.template_name, context, request=request)
+                print("✅ Template renderizado")
+                return JsonResponse({'html': html})
+            print("❌ No es AJAX, usando comportamiento normal")
+            return super().get(request, *args, **kwargs)
+        except Exception as e:
+            print(f"❌ ERROR en GET: {str(e)}")
+            import traceback
+            print("TRACEBACK COMPLETO:")
+            print(traceback.format_exc())
+            return JsonResponse({
+                'success': False,
+                'message': f'Error al cargar el formulario: {str(e)}'
+            }, status=500)
+
+    # Temporalmente comenta el método post para probar solo el GET
+    # def post(self, request, *args, **kwargs):
+    #     pass

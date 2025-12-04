@@ -1,0 +1,277 @@
+{% load static %}
+<div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title">
+                <i class="fas fa-tools"></i> Gestión Completa de Servicio
+            </h5>
+            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <!-- Mensajes -->
+            <div id="msg-global"></div>
+
+            <!-- Pestañas para los diferentes tipos -->
+            <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="repuestos-tab" data-toggle="tab" href="#repuestos" role="tab">
+                        <i class="fas fa-cog"></i> Repuestos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="insumos-tab" data-toggle="tab" href="#insumos" role="tab">
+                        <i class="fas fa-flask"></i> Insumos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="mantenimiento-tab" data-toggle="tab" href="#mantenimiento" role="tab">
+                        <i class="fas fa-wrench"></i> Tipos de Mantenimiento
+                    </a>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="myTabContent">
+                <!-- Pestaña REPUESTOS -->
+                <div class="tab-pane fade show active" id="repuestos" role="tabpanel">
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0"><i class="fas fa-plus-circle"></i> Agregar Repuesto</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label>Repuesto:</label>
+                                        <select id="select-repuesto" class="form-control">
+                                            <option value="">-- Seleccione --</option>
+                                            {% for repuesto in repuestos %}
+                                            <option value="{{ repuesto.id }}">
+                                                {{ repuesto.nombre }} - Stock: {{ repuesto.stock }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label>Cantidad:</label>
+                                        <input type="number" id="cantidad-repuesto" class="form-control" value="1" min="1">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Precio Unitario:</label>
+                                        <input type="number" id="precio-repuesto" class="form-control" step="0.01" min="99">
+                                    </div>
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button type="button" id="btn-agregar-repuesto" class="btn btn-primary w-100">
+                                        <i class="fas fa-plus"></i> Agregar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lista de repuestos -->
+                    <div class="card">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">Repuestos en la Lista</h6>
+                            <div>
+                                <strong>Total: $<span id="total-repuestos">0.00</span></strong>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-sm table-hover mb-0">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th>Repuesto</th>
+                                            <th width="100">Cantidad</th>
+                                            <th width="120">Precio Unit.</th>
+                                            <th width="120">Subtotal</th>
+                                            <th width="80">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="lista-repuestos">
+                                        <!-- Repuestos se agregarán aquí -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="lista-vacia-repuestos" class="text-center py-4">
+                                <p class="text-muted">No hay repuestos en la lista</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pestaña INSUMOS -->
+                <div class="tab-pane fade" id="insumos" role="tabpanel">
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0"><i class="fas fa-plus-circle"></i> Agregar Insumo</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label>Insumo:</label>
+                                        <select id="select-insumo" class="form-control">
+                                            <option value="">-- Seleccione --</option>
+                                            {% for insumo in insumos %}
+                                            <option value="{{ insumo.id }}">
+                                                {{ insumo.id_marca.nombre }} - {{ insumo.cantidad }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label>Cantidad:</label>
+                                        <input type="number" id="cantidad-insumo" class="form-control" value="1" min="1">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Precio Unitario:</label>
+                                        <input type="number" id="precio-insumo" class="form-control" step="0.01" min="99">
+                                    </div>
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button type="button" id="btn-agregar-insumo" class="btn btn-primary w-100">
+                                        <i class="fas fa-plus"></i> Agregar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lista de insumos -->
+                    <div class="card">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">Insumos en la Lista</h6>
+                            <div>
+                                <strong>Total: $<span id="total-insumos">0.00</span></strong>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-sm table-hover mb-0">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th>Insumo</th>
+                                            <th width="100">Cantidad</th>
+                                            <th width="120">Precio Unit.</th>
+                                            <th width="120">Subtotal</th>
+                                            <th width="80">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="lista-insumos">
+                                        <!-- Insumos se agregarán aquí -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="lista-vacia-insumos" class="text-center py-4">
+                                <p class="text-muted">No hay insumos en la lista</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pestaña TIPOS DE MANTENIMIENTO -->
+                <div class="tab-pane fade" id="mantenimiento" role="tabpanel">
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0"><i class="fas fa-plus-circle"></i> Agregar Tipo de Mantenimiento</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Tipo de Mantenimiento:</label>
+                                        <select id="select-mantenimiento" class="form-control">
+                                            <option value="">-- Seleccione --</option>
+                                            {% for tipo in tipos_mantenimiento %}
+                                            <option value="{{ tipo.id }}">{{ tipo.nombre }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label>Cantidad:</label>
+                                        <input type="number" id="cantidad-mantenimiento" class="form-control" value="1" min="1">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Precio Unitario:</label>
+                                        <input type="number" id="precio-mantenimiento" class="form-control" step="0.01" min="99">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Descripción:</label>
+                                        <input type="text" id="descripcion-mantenimiento" class="form-control" placeholder="Descripción del trabajo">
+                                    </div>
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button type="button" id="btn-agregar-mantenimiento" class="btn btn-primary w-100">
+                                        <i class="fas fa-plus"></i> Agregar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lista de mantenimientos -->
+                    <div class="card">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">Tipos de Mantenimiento en la Lista</h6>
+                            <div>
+                                <strong>Total: $<span id="total-mantenimientos">0.00</span></strong>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-sm table-hover mb-0">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th>Tipo Mantenimiento</th>
+                                            <th width="100">Cantidad</th>
+                                            <th width="120">Precio Unit.</th>
+                                            <th width="120">Subtotal</th>
+                                            <th width="80">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="lista-mantenimientos">
+                                        <!-- Mantenimientos se agregarán aquí -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="lista-vacia-mantenimientos" class="text-center py-4">
+                                <p class="text-muted">No hay tipos de mantenimiento en la lista</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" id="btn-guardar-todo" class="btn btn-success">
+                <i class="fas fa-save"></i> Guardar Todo
+            </button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                <i class="fas fa-times"></i> Cerrar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Incluir el JavaScript completo -->
+<script src="{% static 'js/modal_unificado.js' %}"></script>

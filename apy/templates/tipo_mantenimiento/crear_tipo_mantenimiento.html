@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Crear Tipo Mantenimiento</h3>
+    </div>
+    
+    <div class="card-body">
+        <!-- Formulario principal -->
+        <form id="tipoMantenimientoForm" method="post">
+            {% csrf_token %}
+            
+            <!-- ID Tipo Mantenimiento con botón modal -->
+            <div class="form-group mb-3">
+                <label for="{{ form.id_tipo_mantenimiento.id_for_label }}">Tipo Mantenimiento:</label>
+                <div class="input-group">
+                    {{ form.id_tipo_mantenimiento|add_class:"form-control" }}
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-id_tipo_mantenimiento">
+                            <i class="fas fa-plus"></i> Agregar
+                        </button>
+                    </div>
+                </div>
+                {% if form.id_tipo_mantenimiento.errors %}
+                    <div class="invalid-feedback d-block">
+                        {% for error in form.id_tipo_mantenimiento.errors %}
+                            <small>{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Cantidad -->
+            <div class="form-group mb-3">
+                <label for="{{ form.cantidad.id_for_label }}">Cantidad:</label>
+                {{ form.cantidad|add_class:"form-control"|attr:"placeholder:Ingrese la cantidad"|attr:"min:1"|attr:"value:1" }}
+            </div>
+
+            <!-- Precio Unitario -->
+            <div class="form-group mb-3">
+                <label for="{{ form.precio_unitario.id_for_label }}">Precio unitario:</label>
+                {{ form.precio_unitario|add_class:"form-control"|attr:"placeholder:Ingrese el costo"|attr:"step:0.01" }}
+            </div>
+
+            <!-- Descripción -->
+            <div class="form-group mb-3">
+                <label for="{{ form.descripcion.id_for_label }}">Descripción:</label>
+                {{ form.descripcion|add_class:"form-control"|attr:"placeholder:Ingrese la descripción" }}
+            </div>
+
+            <!-- Botón para agregar a la lista -->
+            <div class="form-group">
+                <button type="button" id="btnAgregarALista" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Agregar a la Lista
+                </button>
+            </div>
+        </form>
+
+        <!-- Lista de items agregados -->
+        <div class="mt-4">
+            <h5>Tipos de Mantenimiento en la Lista <span id="total" class="badge badge-info">Total: $0.00</span></h5>
+            
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped" id="tablaTipoMantenimiento">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Tipo Mantenimiento</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unit.</th>
+                            <th>Subtotal</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-lista">
+                        <!-- Aquí se agregarán los items dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Botones finales -->
+        <div class="form-group mt-3">
+            <button type="button" id="btnGuardarTodo" class="btn btn-primary">
+                <i class="fas fa-save"></i> Guardar Todo
+            </button>
+            <a href="{% url 'apy:detalle_servicio_lista' %}" class="btn btn-default">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para agregar Tipo Mantenimiento -->
+<div class="modal fade" id="modal-id_tipo_mantenimiento" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <!-- El contenido se carga por AJAX -->
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    let itemsTipoMantenimiento = [];
+    let contadorId = 0;
+
+    // Cargar modal cuando se abre
+    $("#modal-id_tipo_mantenimiento").on("show.bs.modal", function(){
+        var modal = $(this);
+        $.ajax({
+            url: "{% url 'apy:detallemantenimiento_modal_crear' %}",
+            type: 'GET',
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
+            success: function(data){
+                modal.find(".modal-content").html(data);
+            },
+            error: function() {
+                modal.find(".modal-content").html(
+                    '<div class="modal-header">' +
+                    '<h5 class="modal-title">Error</h5>' +
+                    '<button type="button" class="close" data-dismiss="modal">&times;</button>' +
+                    '</div>' +
+                    '<div class="modal-body">' +
+                    '<div class="alert alert-danger">Error al cargar el formulario</div>' +
+                    '</div>'
+                );
+            }
+        });
+    });
+
+    // Agregar item a la lista
+    $('#btnAgregarALista').click(function() {
+        const tipoMantenimientoId = $('#id_id_tipo_mantenimiento').val();
+        const tipoMantenimientoTexto = $('#id_id_tipo_mantenimiento option:selected').text();
+        const cantidad = $('#id_cantidad').val();
+        const precioUnitario = $('#id_precio_unitario').val();
+        const descripcion = $('#id_descripcion').val();
+
+        // Validaciones
+        if (!tipoMantenimientoId) {
+            alert('Por favor seleccione un tipo de mantenimiento');
+            return;
+        }
+        if (!cantidad || cantidad < 1) {
+            alert('Por favor ingrese una cantidad válida');
+            return;
+        }
+        if (!precioUnitario || precioUnitario <= 0) {
+            alert('Por favor ingrese un precio unitario válido');
+            return;
+        }
+
+        const subtotal = cantidad * precioUnitario;
+        const itemId = contadorId++;
+
+        // Agregar a array
+        itemsTipoMantenimiento.push({
+            id: itemId,
+            tipo_mantenimiento_id: tipoMantenimientoId,
+            tipo_mantenimiento_texto: tipoMantenimientoTexto,
+            cantidad: cantidad,
+            precio_unitario: precioUnitario,
+            descripcion: descripcion,
+            subtotal: subtotal
+        });
+
+        // Actualizar tabla
+        actualizarTabla();
+        
+        // Limpiar formulario (excepto tipo mantenimiento)
+        $('#id_cantidad').val('1');
+        $('#id_precio_unitario').val('');
+        $('#id_descripcion').val('');
+    });
+
+    // Eliminar item de la lista
+    $(document).on('click', '.btn-eliminar-item', function() {
+        const itemId = $(this).data('id');
+        itemsTipoMantenimiento = itemsTipoMantenimiento.filter(item => item.id != itemId);
+        actualizarTabla();
+    });
+
+    // Actualizar tabla y total
+    function actualizarTabla() {
+        const tbody = $('#tbody-lista');
+        tbody.empty();
+
+        let total = 0;
+
+        itemsTipoMantenimiento.forEach(item => {
+            total += item.subtotal;
+            
+            const fila = `
+                <tr>
+                    <td>${item.tipo_mantenimiento_texto}</td>
+                    <td>${item.cantidad}</td>
+                    <td>$${parseFloat(item.precio_unitario).toFixed(2)}</td>
+                    <td>$${item.subtotal.toFixed(2)}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm btn-eliminar-item" data-id="${item.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+            tbody.append(fila);
+        });
+
+        $('#total').text(`Total: $${total.toFixed(2)}`);
+    }
+
+    // Guardar todo
+    $('#btnGuardarTodo').click(function() {
+        if (itemsTipoMantenimiento.length === 0) {
+            alert('No hay items para guardar');
+            return;
+        }
+
+        const $btn = $(this);
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+
+        // Aquí iría la lógica para guardar todos los items
+        // Por ahora solo mostramos un mensaje
+        setTimeout(function() {
+            alert('Datos guardados exitosamente');
+            itemsTipoMantenimiento = [];
+            actualizarTabla();
+            $btn.prop('disabled', false).html('<i class="fas fa-save"></i> Guardar Todo');
+        }, 1000);
+    });
+});
+</script>
+{% endblock %}

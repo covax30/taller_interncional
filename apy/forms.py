@@ -1,9 +1,6 @@
-from dataclasses import fields 
-from django.forms import *
-from django.forms import DateInput
-from django.forms import TimeInput
-from django.forms import ModelForm
-from django.forms import TextInput, Select
+from django import forms
+from django.forms import ModelForm, Select, NumberInput, DateInput, TimeInput, TextInput, EmailInput
+from django.forms import inlineformset_factory
 from decimal import Decimal, InvalidOperation
 # apy/forms.py (Asegúrate de importar esto)
 from django.contrib.auth.hashers import make_password
@@ -14,6 +11,7 @@ from django.core.exceptions import ValidationError
 from apy.models import *
 
 # -----------Formulario modelo factura------------------
+# -----------Formulario modelo factura------------------
 class FacturaForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -23,49 +21,49 @@ class FacturaForm(ModelForm):
         model = Factura
         fields = '__all__'
         widgets = {
-            'tipo_pago':TextInput(
+            'tipo_pago': TextInput(
                 attrs={
-                    'placeholder':'Ingrese el tipo de pago',
+                    'placeholder': 'Ingrese el tipo de pago',
                 }
             ),
-            'id_cliente':Select(
+            'id_cliente': Select(
                 attrs={
                     'class': 'form-control',
                 }
             ),
-            'id_vehiculo':Select(
+            'id_vehiculo': Select(
                 attrs={
                     'class': 'form-control',
                 }
             ),
-            'id_tipo_mantenimiento':Select(
+            'id_tipo_mantenimiento': Select(
                 attrs={
                     'class': 'form-control',
                 }
             ),
-            'servicio_prestado':TextInput(
+            'servicio_prestado': TextInput(
                 attrs={
-                    'placeholder':'Ingrese el servicio prestado',
+                    'placeholder': 'Ingrese el servicio prestado',
                 }
             ),
-            'nombre_empresa':TextInput(
+            'nombre_empresa': TextInput(
                 attrs={
-                    'placeholder':'Ingrese el nombre de la empresa',
+                    'placeholder': 'Ingrese el nombre de la empresa',
                 }
             ),
-            'direccion_empresa':TextInput(
+            'direccion_empresa': TextInput(
                 attrs={
-                    'placeholder':'Ingrese la direccion de la empresa',
+                    'placeholder': 'Ingrese la direccion de la empresa',
                 }
             ),
-            'id_empleado':Select(
+            'id_empleado': Select(
                 attrs={
                     'class': 'form-control',
                 }
             ),
-            'monto':NumberInput(
+            'monto': NumberInput(
                 attrs={
-                    'placeholder':'Ingrese el monto total del servicio prestado',
+                    'placeholder': 'Ingrese el monto total del servicio prestado',
                 }
             )
         }
@@ -73,35 +71,207 @@ class FacturaForm(ModelForm):
             'id_operacion': {
                 'required': 'El id de la operacion es obligatorio',
             },
-            'tipo_pago':{
-                    'required': 'El tipo de pago es obligatorio',
-                },
-            'id_cliente':{
-                    'required': 'El id del cliente es obligatorio',
-                },
-            'id_vehiculo':{
-                    'required': 'El id del vehiculo es obligatorio',
-                },
-            'id_tipo_mantenimiento':{
-                    'required': 'El id de tipo de mantenimiento es obligatorio',
-                },
-            'servicio_prestado':{
-                    'required': 'El servicio prestado es obligatorio',
-                },
-            'nombre_empresa':{
-                    'required': 'El nombre de la empresa es obligatorio',
-                },
-            'direccion_empresa':{
-                    'required': 'La direccion de la empresa es obligatoria',
-                },
-            'id_empleado':{
-                    'required': 'El id del empleado es obligatorio',
-                },
-            'monto':{
-                    'required': 'El monto es obligatorio',
-                }
-
+            'tipo_pago': {
+                'required': 'El tipo de pago es obligatorio',
+            },
+            'id_cliente': {
+                'required': 'El id del cliente es obligatorio',
+            },
+            'id_vehiculo': {
+                'required': 'El id del vehiculo es obligatorio',
+            },
+            'id_tipo_mantenimiento': {
+                'required': 'El id de tipo de mantenimiento es obligatorio',
+            },
+            'servicio_prestado': {
+                'required': 'El servicio prestado es obligatorio',
+            },
+            'nombre_empresa': {
+                'required': 'El nombre de la empresa es obligatorio',
+            },
+            'direccion_empresa': {
+                'required': 'La direccion de la empresa es obligatoria',
+            },
+            'id_empleado': {
+                'required': 'El id del empleado es obligatorio',
+            },
+            'monto': {
+                'required': 'El monto es obligatorio',
+            }
         }
+
+class RepuestoscantidadForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['id_repuesto'].queryset = Repuesto.objects.all()
+        self.fields['id_repuesto'].widget.attrs.update({
+            'class': 'form-control',
+            'autofocus': True
+        })
+
+    class Meta:
+        model = DetalleRepuesto
+        fields = ['id_repuesto', 'cantidad', 'precio_unitario']
+        widgets = {
+            'id_repuesto': Select(attrs={'class': 'form-control'}),
+            'cantidad': NumberInput(attrs={'class': 'form-control', 'min': '1'}),
+            'precio_unitario': NumberInput(attrs={'class': 'form-control', 'placeholder': '0.00', 'step': '0.01'}),
+        }
+        
+        error_messages = {
+            'id_repuesto': {
+                'required': 'El nombre del repuesto es obligatorio',
+            },
+            'cantidad': {
+                'required': 'La cantidad del repuesto es obligatoria',
+            },
+            'precio_unitario': {
+                'required': 'El costo del repuesto es obligatorio',
+            }
+        }
+
+class DetalleTipo_MantenimientoForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['id_tipo_mantenimiento'].queryset = TipoMantenimiento.objects.all()
+        self.fields['id_tipo_mantenimiento'].widget.attrs.update({
+            'class': 'form-control',
+            'autofocus': True
+        })
+        
+    class Meta:
+        model = DetalleTipoMantenimiento
+        fields = ['id_tipo_mantenimiento', 'cantidad', 'precio_unitario']
+        widgets = {
+            'id_tipo_mantenimiento': Select(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': 'Ingrese el tipo de mantenimiento',
+                }
+            ),
+            'cantidad': NumberInput(
+                attrs={
+                    'placeholder': 'Ingrese la cantidad',
+                    'class': 'form-control',
+                    'min': '1'
+                }
+            ),
+            'precio_unitario': NumberInput(
+                attrs={
+                    'placeholder': 'Ingrese el precio unitario',
+                    'step': '0.01',
+                    'class': 'form-control',
+                }
+            ),  
+        }
+        error_messages = {
+            'id_tipo_mantenimiento': {
+                'required': 'El tipo de mantenimiento es obligatorio',
+            },
+            'cantidad': {
+                'required': 'La cantidad es obligatoria',
+            },
+            'precio_unitario': {
+                'required': 'El precio unitario es obligatorio',
+            }
+        }
+
+class DetalleInsumoForm(ModelForm):  
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['id_insumos'].queryset = Insumos.objects.all()
+        self.fields['id_insumos'].widget.attrs.update({
+            'class': 'form-control',
+            'autofocus': True
+        })
+           
+    class Meta:
+        model = DetalleInsumos
+        fields = ['id_insumos', 'cantidad', 'precio_unitario']
+        widgets = {
+            'id_insumos': Select(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': 'Ingrese el nombre del insumo',
+                }
+            ),
+            'cantidad': NumberInput(
+                attrs={
+                    'placeholder': 'Ingrese la cantidad del insumo',
+                }
+            ),
+            'precio_unitario': NumberInput(
+                attrs={
+                    'placeholder': 'Ingrese el costo del insumo',
+                    'step': '0.01'
+                }
+            )
+        }
+        error_messages = {
+            'id_insumos': {
+                'required': 'El nombre del insumo es obligatorio',
+            },
+            'cantidad': {
+                'required': 'La cantidad del insumo es obligatoria',
+            },
+            'precio_unitario': {
+                'required': 'El costo del insumo es obligatorio',
+            }
+        }
+
+# Formulario detalle servicio
+class DetalleServicioForm(ModelForm):
+    class Meta:
+        model = DetalleServicio
+        fields = ['id_vehiculo']
+        widgets = {
+            'id_vehiculo': Select(attrs={
+                'class': 'form-control',
+                'placeholder': 'Seleccione un vehículo'
+            }),
+        }
+        error_messages = {
+            'id_vehiculo': {
+                'required': 'El vehículo es obligatorio.',
+            },
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Configurar cómo se muestran los vehículos en el select
+        self.fields['id_vehiculo'].label_from_instance = (
+            lambda obj: f"{obj.placa} - {obj.marca_vehiculo} {obj.modelo_vehiculo} - {obj.color}"
+        )
+
+# Formsets definidos fuera de las clases
+DetalleRepuestoFormSet = inlineformset_factory(
+    DetalleServicio,
+    DetalleRepuesto,
+    form=RepuestoscantidadForm,
+    fields=('id_repuesto', 'cantidad', 'precio_unitario'),
+    extra=1, 
+    can_delete=True
+)
+
+DetalleTipoMantenimientoFormSet = inlineformset_factory(
+    DetalleServicio,
+    DetalleTipoMantenimiento,
+    form=DetalleTipo_MantenimientoForm,
+    fields=('id_tipo_mantenimiento', 'cantidad', 'precio_unitario'),
+    extra=1, 
+    can_delete=True
+)
+
+DetalleInsumosFormSet = inlineformset_factory(
+    DetalleServicio,
+    DetalleInsumos,
+    form=DetalleInsumoForm,
+    fields=('id_insumos', 'cantidad', 'precio_unitario'),
+    extra=1, 
+    can_delete=True
+)
+
+  
         
 # -----------Formulario modelo proveedor------------------        
 class ProveedorForm(ModelForm):
@@ -317,17 +487,8 @@ class ClienteForm(ModelForm):
                     'placeholder':'Ingrese el correo del cliente',
                 }
             ),
-            'fecha_operacion':DateInput(
-                attrs={
-                    'type': 'date',
-                    'placeholder': 'Ingrese la fecha de operacion',
-                }
-            ),
-            'monto':NumberInput(
-                attrs={
-                    'placeholder':'Ingrese el monto del cliente',
-                }
-            )
+            
+            
         }
         error_messages = {
             'documento': {
@@ -344,12 +505,7 @@ class ClienteForm(ModelForm):
                 'invalid': 'El correo no tiene un formato válido',
                 'unique': 'Ya existe un cliente con ese correo',
             },
-            'fecha_operacion': {
-                'required': 'La fecha de operacion es obligatoria',
-            },
-            'monto': {
-                'required': 'El monto es obligatorio',
-            },
+           
         }
         
 class VehiculoForm(ModelForm):
@@ -1090,13 +1246,14 @@ class MarcaForm(ModelForm):
                     'placeholder':'Ingrese el nombre de la marca',
                 }
             ),
-            'tipo':TextInput(
+            'tipo':Select(
                 attrs={
                     'placeholder':'Ingrese el tipo de la marca',
                 }
             ),
          
        } 
+        
         error_messages = {
             'nombre': {
                 'required': 'El nombre de marca es obligatorio',
@@ -1105,6 +1262,7 @@ class MarcaForm(ModelForm):
                 'required': 'E tipo de marca es obligatoria',
             },
         }
+
         
 #-----formularo Nomina ---------------
 class   NominaForm(ModelForm):
