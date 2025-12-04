@@ -167,7 +167,7 @@ class Command(BaseCommand):
             if log:
                 # Lógica del profesor: Si el resultado fue 'Fallo', lo marca como 'Éxito' para reutilizarlo.
                 if estado_final == 'Fallo':
-                    log.estado = 'Éxito' 
+                    log.estado = 'fallo' 
                 else:
                     log.estado = estado_final
                     
