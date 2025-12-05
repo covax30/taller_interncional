@@ -2,28 +2,294 @@
 {% load widget_tweaks %}
 {% block form %}
     {% csrf_token %}
-
-    {% for field in form.visible_fields %}
+ 
+    <!-- id_marca con modal -->
     <div class="form-group mb-3">
-        <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
-        {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
+        <label for="{{ form.id_marca.id_for_label }}">Marca:</label>
+        <div class="input-group">
+            {{ form.id_marca|add_class:'form-control' }}
+            <div class="input-group-append">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_marca">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+    </div>
 
-        {% if field.errors %}
+    <!-- Nombre -->
+    <div class="form-group mb-3">
+        <label for="{{ form.nombre.id_for_label }}">Nombre:</label>
+        <div class="input-group">
+            {{ form.nombre|add_class:'form-control'|attr:'autocomplete:off' }}
+        </div>
+        {% if form.nombre.errors %}
             <div class="invalid-feedback d-block">
-                {% for error in field.errors %}
+                {% for error in form.nombre.errors %}
                     <small>{{ error }}</small><br>
                 {% endfor %}
             </div>
         {% endif %}
     </div>
-    {% endfor %}
+
+    <!-- Categoría -->
+    <div class="form-group mb-3">
+        <label for="{{ form.categoria.id_for_label }}">Categoría:</label>
+        <div class="input-group">
+            {{ form.categoria|add_class:'form-control' }}
+        </div>
+        {% if form.categoria.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.categoria.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Fabricante -->
+    <div class="form-group mb-3">
+        <label for="{{ form.fabricante.id_for_label }}">Fabricante:</label>
+        <div class="input-group">
+            {{ form.fabricante|add_class:'form-control' }}
+        </div>
+        {% if form.fabricante.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.fabricante.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Stock -->
+    <div class="form-group mb-3">
+        <label for="{{ form.stock.id_for_label }}">Stock:</label>
+        <div class="input-group">
+            {{ form.stock|add_class:'form-control' }}
+        </div>
+        {% if form.stock.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.stock.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Ubicación -->
+    <div class="form-group mb-3">
+        <label for="{{ form.ubicacion.id_for_label }}">Ubicación:</label>
+        <div class="input-group">
+            {{ form.ubicacion|add_class:'form-control' }}
+        </div>
+        {% if form.ubicacion.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.ubicacion.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Precio -->
+    <div class="form-group mb-3">
+        <label for="{{ form.precio.id_for_label }}">Precio:</label>
+        <div class="input-group">
+            {{ form.precio|add_class:'form-control' }}
+        </div>
+        {% if form.precio.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.precio.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Modal Marca -->
+    <div class="modal fade" id="modal-id_marca" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Marca</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                        style="background-color: #dc3545; color: white; border: none; 
+                                border-radius: 50%; width: 35px; height: 35px;
+                                font-size: 1.5rem; line-height: 1; 
+                                display: flex; justify-content: center; align-items: center;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script marca. -->
+    <script>
+        $("#modal-id_marca").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:marca_modal_crear' %}",  // <-- endpoint para crear Marca
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+                }
+            });
+        });
+    </script>
 {% endblock %}
 
 {% block Cancelar %}
-                <button type="submit " class="btn btn-primary btn-flat"><i class="fas fa-save"></i>
+                <button type="submit " class="btn btn-primary btn-flat" title="Agregar repuesto">
+                    <i class="fas fa-save"></i>
                     Agregar
                 </button>
-                <a href="{% url 'apy:repuesto_lista' %}" class="btn btn-danger btn-flat float-right">
+                <a href="{% url 'apy:repuesto_lista' %}" class="btn btn-danger btn-flat float-right" title="Cancelar registro de repuesto">
                     <i class="fas fa-times"></i> Cancelar
                 </a>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.querySelector("form");
+    const categoriaSelect = document.getElementById("id_categoria");
+    const subcategoriaSelect = document.getElementById("id_subcategoria");
+    const subcategoriaDiv = document.getElementById("div_subcategoria");
+    
+    console.log("Categoria Select:", categoriaSelect);
+    console.log("Subcategoria Select:", subcategoriaSelect);
+    console.log("Subcategoria Div:", subcategoriaDiv);
+    
+    // ----- SUBCATEGORÍAS DEPENDIENTES -----
+    const subcategorias = {
+        'automotriz': [
+            {value: 'motor', text: 'Motor'},
+            {value: 'frenos', text: 'Frenos'},
+            {value: 'suspension', text: 'Suspensión'},
+            {value: 'direccion', text: 'Dirección'},
+            {value: 'transmision', text: 'Transmisión'},
+            {value: 'electrico', text: 'Sistema Eléctrico'}
+        ],
+        'industrial': [
+            {value: 'hidraulica', text: 'Hidráulica'},
+            {value: 'neumatica', text: 'Neumática'},
+            {value: 'electronica', text: 'Electrónica'},
+            {value: 'mecanica', text: 'Mecánica'},
+            {value: 'rodamientos', text: 'Rodamientos'},
+            {value: 'bandas', text: 'Bandas y Correas'}
+        ]
+    };
+    
+    // Guardar el valor original de subcategoría si existe (modo edición)
+    const subcategoriaOriginal = subcategoriaSelect ? subcategoriaSelect.value : '';
+    
+    // Ocultar subcategoría al inicio si no hay categoría seleccionada
+    if (subcategoriaDiv && categoriaSelect) {
+        if (!categoriaSelect.value || categoriaSelect.value === '') {
+            subcategoriaDiv.style.display = 'none';
+        }
+    }
+    
+    // Función para actualizar subcategorías
+    function actualizarSubcategorias(valorCategoria, mantenerValor = false) {
+        if (!subcategoriaSelect) {
+            console.error("No se encontró el select de subcategoría");
+            return;
+        }
+        
+        console.log("Actualizando subcategorías para:", valorCategoria);
+        
+        // Limpiar todas las opciones
+        subcategoriaSelect.innerHTML = "";
+        
+        // Agregar opción por defecto
+        const optionDefault = document.createElement("option");
+        optionDefault.value = "";
+        optionDefault.textContent = "Seleccione subcategoría";
+        subcategoriaSelect.appendChild(optionDefault);
+        
+        if (valorCategoria && subcategorias[valorCategoria]) {
+            // Mostrar el div de subcategoría
+            if (subcategoriaDiv) {
+                subcategoriaDiv.style.display = 'block';
+            }
+            
+            // Agregar opciones correspondientes
+            subcategorias[valorCategoria].forEach(item => {
+                let option = document.createElement("option");
+                option.value = item.value;
+                option.textContent = item.text;
+                subcategoriaSelect.appendChild(option);
+            });
+            
+            console.log("Opciones agregadas:", subcategorias[valorCategoria].length);
+            
+            // Restaurar valor si se está editando
+            if (mantenerValor && subcategoriaOriginal) {
+                subcategoriaSelect.value = subcategoriaOriginal;
+            }
+        } else {
+            // Ocultar si no hay categoría o no es válida
+            if (subcategoriaDiv) {
+                subcategoriaDiv.style.display = 'none';
+            }
+            console.log("Categoría no válida o vacía");
+        }
+    }
+    
+    // Cargar subcategorías si ya hay una categoría seleccionada (modo edición)
+    if (categoriaSelect && categoriaSelect.value && categoriaSelect.value !== '') {
+        console.log("Cargando subcategorías para valor inicial:", categoriaSelect.value);
+        actualizarSubcategorias(categoriaSelect.value, true);
+    }
+    
+    // Listener para cambios en categoría
+    if (categoriaSelect) {
+        categoriaSelect.addEventListener("change", function () {
+            console.log("Cambio en categoría detectado:", this.value);
+            actualizarSubcategorias(this.value, false);
+        });
+    } else {
+        console.error("No se encontró el select de categoría con id 'id_categoria'");
+    }
+
+    form.addEventListener("submit", function (e) {
+        e.preventDefault(); // no recarga el iframe
+
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Buscar el select en la página padre
+                const select = window.parent.document.getElementById("id_id_repuesto");
+
+                // Crear nueva opción
+                const option = new Option(data.nombre, data.id, true, true);
+
+                // Agregar al select y seleccionarla
+                select.add(option);
+                select.value = data.id;
+
+                // Cerrar modal
+                const modal = window.parent.$("#modal-id_repuesto");
+                modal.modal("hide");
+            } else {
+                alert("Error al guardar el repuesto.");
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+});
+</script>
 {% endblock %}

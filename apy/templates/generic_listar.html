@@ -7,7 +7,6 @@
     <div class="card card-default">
       <div class="card-header">
         <h3 class="card-title">
-          <i class="fas fa-exclamation-triangle"></i>
           {% block titulo %}
           {% endblock titulo %}
         </h3>
@@ -17,7 +16,7 @@
           {% block agregar %}
           {% endblock %}
         </div>
-        <table id="example1" class="table table-bordered table-striped">
+        <table id="example1" class="table table-bordered table-striped" responsive="true">
           <thead>
             <tr>
               {% block columnas %}
@@ -51,6 +50,52 @@
       color: #c2c7d0 !important;            /* Texto claro */
       border-color: #454d55 !important;
   }
+
+
+
+  /* =======================================================
+   ESTILOS PARA DATATABLES (CLARO + OSCURO)
+   ======================================================= */
+
+/* 🎨 Modo claro (por defecto) */
+.dataTables_filter input,
+.dataTables_wrapper select,
+.dataTables_wrapper input {
+  background-color: #fff !important;
+  color: #212529 !important;
+  border: 1px solid #ced4da !important;
+}
+
+/* 🌑 Modo oscuro */
+html[data-bs-theme="dark"] .dataTables_wrapper .dataTables_length,
+html[data-bs-theme="dark"] .dataTables_wrapper .dataTables_filter,
+html[data-bs-theme="dark"] .dataTables_wrapper .dataTables_info,
+html[data-bs-theme="dark"] .dataTables_wrapper .dataTables_processing,
+html[data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate,
+html[data-bs-theme="dark"] .dataTable {
+  color: #c2c7d0 !important;
+}
+
+html[data-bs-theme="dark"] .dataTables_filter input,
+html[data-bs-theme="dark"] .dataTables_wrapper select,
+html[data-bs-theme="dark"] .dataTables_wrapper input {
+  background-color: #343a40 !important;
+  color: #c2c7d0 !important;
+  border-color: #454d55 !important;
+}
+
+/* Inputs por columna */
+#example1 thead input {
+  border-radius: 4px;
+  padding: 3px 6px;
+  font-size: 13px;
+}
+
+/* Centrar encabezados */
+#example1 thead th {
+  text-align: center;
+  vertical-align: middle;
+}
         </style>
       </div>
     </div>
@@ -62,15 +107,53 @@
 <script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
 <!-- ================== LIBRERÍAS CSS ================== -->
 
-<!-- ================== LIBRERÍAS JS ================== -->
-<!-- 1. JQUERY -->
-<!--<script src="{% static 'lib/datatables-1.10.20/js/jquery.dataTables.min.js' %}"></script>-->
 
-<!-- 2. BOOTSTRAP -->
-<!-- <script src="{% static 'lib/datatables-1.10.20/plugins/bootstrap-4-4.1.1/js/bootstrap.min.js' %}"></script>-->
 
-<!-- 3. DATATABLES + PLUGINS -->
-<!-- 4. ADMINLTE -->
+<!-- ================== SCRIPTS PARA FILTROS EN COLUMNAS ================== -->
+<script>
+$(document).ready(function() {
+
+  var table = $('#example1').DataTable({
+      responsive: true,
+      autoWidth: false,
+      orderCellsTop: true,
+      fixedHeader: true,
+      language: {
+          url: "../../../static/lenguajes/espanol.json"
+      },
+      initComplete: function () {
+          var api = this.api();
+
+          // Insertar filtros dentro del mismo th
+          api.columns().every(function (colIdx) {
+              var column = this;
+              var th = $(column.header());
+              var title = th.text().trim();
+
+              if (title && title !== 'Acciones') {
+                  // Limpiamos el th y agregamos el título + input debajo
+                  th.html(`
+                    <div style="display:flex; flex-direction:column; align-items:center;">
+                      <span style="font-weight:600;">${title}</span>
+                      <input type="text" placeholder="Buscar ${title}" style="width:100%; font-size:12px; margin-top:4px; border-radius:4px; padding:3px;">
+                    </div>
+                  `);
+
+                  $('input', th).on('keyup change clear', function () {
+                      if (column.search() !== this.value) {
+                          column.search(this.value).draw();
+                      }
+                  });
+              }
+          });
+      }
+  });
+
+});
+
+</script>
+
+
 
 <!-- 5. SWEETALERT2 -->
 {% if messages %}
@@ -87,18 +170,6 @@
 </script>
 {% endif %}
 
-<!-- 6. SCRIPT PERSONALIZADO -->
-<script>
-  $(function() {
-    $("#example1").DataTable({
-      "responsive": true,
-      "autoWidth": false,
-         language: {
-            url: "../../../static/lenguajes/espanol.json"
-        }
-    });
-  });
-</script>
 
 <!-- 7. BLOQUE EXTRA -->
 {% block extra_js %}

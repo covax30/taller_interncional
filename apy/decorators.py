@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import AccessMixin
 from django.core.exceptions import PermissionDenied
+from django.urls import reverse_lazy
 from apy.models import Module, Permission 
 from functools import wraps
 from django.shortcuts import redirect
@@ -12,12 +13,11 @@ from django.http import JsonResponse
 
 class PermisoRequeridoMixin(AccessMixin):
     """
-    Mixin para verificar los permisos del usuario actual en CBVs.
-    Lanza PermissionDenied (HTTP 403) si no hay permiso.
-    Requiere que se definan 'module_name' y 'permission_required'.
-    """
-    module_name = None       
-    permission_required = None
+    Mixin para verificar los permisos del usuario actual.
+    """ 
+    module_name = None      
+    permission_required = None 
+    redirect_url = reverse_lazy('apy:vehiculo_lista') # Default fallback URL
 
     def dispatch(self, request, *args, **kwargs):
         # 1. Verificar Autenticación (maneja redirección a login)

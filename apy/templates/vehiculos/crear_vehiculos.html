@@ -2,28 +2,117 @@
 {% load widget_tweaks%}
 {% block form %}
     {% csrf_token %}
-
-    {% for field in form.visible_fields %}
+    <!-- Id Cliente con modal -->
     <div class="form-group mb-3">
-        <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
-        {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
+        <label for="{{ form.id_cliente.id_for_label }}">Cliente:</label>
+        <div class="input-group">
+            {{ form.id_cliente }}
+            <div class="input-group-append">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_cliente">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+    </div>
 
-        {% if field.errors %}
+    <!-- Placa -->
+    <div class="form-group mb-3">
+        <label for="{{ form.placa.id_for_label }}">Placa:</label>
+        <div class="input-group">
+            {{ form.placa|add_class:'form-control'|attr:'autocomplete:off' }}
+        </div>
+        {% if form.placa.errors %}
             <div class="invalid-feedback d-block">
-                {% for error in field.errors %}
+                {% for error in form.placa.errors %}
                     <small>{{ error }}</small><br>
                 {% endfor %}
             </div>
         {% endif %}
     </div>
-    {% endfor %}
+
+    <!-- Modelo vehiculo -->
+    <div class="form-group mb-3">
+        <label for="{{ form.modelo_vehiculo.id_for_label }}">Modelo vehiculo:</label>
+        <div class="input-group">
+            {{ form.modelo_vehiculo|add_class:'form-control'|attr:'autocomplete:off' }}
+        </div>
+        {% if form.modelo_vehiculo.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.modelo_vehiculo.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Marca Vehiculo -->
+    <div class="form-group mb-3">
+        <label for="{{ form.marca_vehiculo.id_for_label }}">Marca vehiculo:</label>
+        <div class="input-group">
+            {{ form.marca_vehiculo|add_class:'form-control'|attr:'autocomplete:off' }}
+        </div>
+        {% if form.marca_vehiculo.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.marca_vehiculo.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Color -->
+    <div class="form-group mb-3">
+        <label for="{{ form.color.id_for_label }}">Color:</label>
+        <div class="input-group">
+            {{ form.color|add_class:'form-control'|attr:'autocomplete:off' }}
+        </div>
+        {% if form.color.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.color.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Modal Cliente -->
+    <div class="modal fade" id="modal-id_cliente" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Crear Cliente</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Cliente. -->
+    <script>
+        $("#modal-id_cliente").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:cliente_modal_crear' %}",
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+                }
+            });
+        });
+        /*$('#id_id_cliente').select2({
+            theme: 'bootstrap-5',
+        });*/
+    </script>
 {% endblock %}
 
 {% block Cancelar %}
-                <button type="submit " class="btn btn-primary btn-flat"><i class="fas fa-save"></i>
+                <button type="submit " class="btn btn-primary btn-flat" title="Agregar vehículo">
+                    <i class="fas fa-save"></i>
                     Agregar
                 </button>
-                <a href="{% url 'apy:vehiculo_lista' %}" class="btn btn-default btn-flat float-right">
+                <a href="{% url 'apy:vehiculo_lista' %}" class="btn btn-danger btn-flat float-right" title="Cancelar registro de vehículo">
                     <i class="fas fa-times"></i> Cancelar
                 </a>
 {% endblock %}

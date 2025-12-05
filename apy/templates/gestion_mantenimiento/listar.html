@@ -2,11 +2,12 @@
 {% extends "generic_listar.html" %}
 
 {% block titulo %}
+        <i class="fa-solid fa-gears"></i>
         <h1 class="text-center">Listar Mantenimientos</h1>
 {% endblock titulo %}
 
 {% block agregar %}
-<a href="{{crear_url}}" class=" btn btn-primary btn btn-xs"><i class="fas fa-plus"></i>
+<a href="{{crear_url}}" class=" btn btn-primary btn btn-xs" title="Agregar mantenimiento"><i class="fas fa-plus"></i>
           Agregar
 </a>
 {% endblock %}
@@ -15,8 +16,8 @@
 
         <th>Fallas</th>
         <th>Procesos</th>
-        <th>Id Vehiculo</th>
-        <th>Id Empledo</th>
+        <th>Id Vehículo</th>
+        <th>Id Empleado</th>
         <th>Id Tipo Mantenimiento</th>
         <th>Acciones</th>
 
@@ -35,9 +36,20 @@
         <form method="post">
 
           <td>
-            <a href="{% url 'apy:mantenimiento_editar' g.id %}" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></a>
-            <a href="{% url 'apy:mantenimiento_eliminar' g.id %}" class="btn btn-danger btn-xs"><i
-                class="fas fa-trash-alt"></i></a>
+            <a href="{% url 'apy:mantenimiento_editar' g.id %}" 
+              class="btn btn-info btn-xs" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="Editar mantenimiento">
+              <i class="fas fa-edit"></i>
+            </a>
+            <a href="{% url 'apy:mantenimiento_eliminar' g.id %}" 
+              class="btn btn-danger btn-xs" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="Eliminar mantenimiento">
+              <i class="fas fa-trash-alt"></i>
+           </a>
           </td>
       </tr>
       {% endfor %}

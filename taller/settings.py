@@ -10,23 +10,38 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
-from pathlib import Path
+import logging
 import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+
+# Cargar variables del entorno ANTES de cualquier configuración
+load_dotenv()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# --- Configuración del Módulo de Backup ---
+# Define la ruta donde se guardarán los backups, dentro del directorio base.
+BACKUP_ROOT = BASE_DIR / 'db_backups' # Usé 'db_backups' por claridad
+try:
+    # Asegúrate de que la carpeta exista y sea escribible.
+    Path(BACKUP_ROOT).mkdir(parents=True, exist_ok=True)
+except OSError as e:
+    # Es bueno loguear si no se pudo crear el directorio.
+    logging.error(f"No se pudo crear el directorio de backups en {BACKUP_ROOT}: {e}")
+# -------------------------------------------
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-1ras&$usy0ocn2u-x=k00^w8o1zda_&vu41u68h3p+(7_*ween'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] 
-
+# En settings.py:
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-fallback-key')
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 # Application definition
 
@@ -40,7 +55,9 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'apy',
     'login',
-               'widget_tweaks',
+    'widget_tweaks',
+    
+    'backup_module',
 ]
 
 MIDDLEWARE = [
@@ -75,18 +92,18 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'taller.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+# settings.py (CONFIGURACIÓN PERMANENTE MYSQL)
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.getenv('DB_NAME', 'mydatabase'),
+        'USER': os.getenv('DB_USER', 'myuser'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'mypassword'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '3307'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -140,7 +157,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = 'login:login'
-LOGIN_REDIRECT_URL = 'apy:informes_lista'
+LOGIN_REDIRECT_URL = 'apy:estadisticas'
 LOGOUT_REDIRECT_URL = ''
 
 # -----------------------------------------------------
@@ -155,6 +172,11 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'soportecnico.t.i.m@gmail.com'
 EMAIL_HOST_PASSWORD = 'pjqmmdgfnredlrtg'
 
+# -----------------------------------------------------
+# ✅ CONFIGURACIÓN DE ARCHIVOS MEDIA (Para Backups)
+# -----------------------------------------------------
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # WhiteNoise static files storage
 STORAGES = {

@@ -39,7 +39,7 @@
                 <a href="#" class="nav-link">
                   <i class="nav-icon bi bi-graph-down"></i>
                   <p>
-                    Analisis y Reportes
+                    Análisis y Reportes
                     <i class="nav-arrow bi bi-chevron-right"></i>
                   </p>
                 </a>
@@ -48,6 +48,15 @@
 
                     <!-- 1er item-->
                     <a href="{% url 'apy:estadisticas' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Estadísticas Generales</p>
+                    </a>
+                  </li>
+
+                  <li class="nav-item">
+
+                    <!-- 1er item-->
+                    <a href="{% url 'apy:informes_lista' %}" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>Informes</p>
                     </a>
@@ -62,7 +71,7 @@
                   <i class="nav-icon bi bi-car-front-fill"></i>
 
                   <p>
-                    Gestion de Vehiculo
+                    Gestión de Vehículos
                     <i class="nav-arrow bi bi-chevron-right"></i>
                   </p>
                 </a>
@@ -71,21 +80,21 @@
                   <li class="nav-item">
                     <a href="{% url 'apy:entrada_vehiculo_lista' %}" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
-                      <p>Entrada de vehiculo</p>
+                      <p>Entrada de Vehículo</p>
                     </a>
                   </li>
                   <!-- 2er item-->
                   <li class="nav-item">
                     <a href="{% url 'apy:salida_vehiculo_lista' %}" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
-                      <p>salida de vehiculo</p>
+                      <p>Salida de Vehículo</p>
                     </a>
                   </li>
                   <!-- 3er item-->
                   <li class="nav-item">
                     <a href="{% url 'apy:vehiculo_lista' %}" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
-                      <p>vehiculo</p>
+                      <p>Vehículos</p>
                     </a>
                   </li>
                   <!-- 4er item-->
@@ -104,7 +113,7 @@
                 <a href="#" class="nav-link">
                   <i class="nav-icon bi bi-wrench"></i>
                   <p>
-                    Mantenimiento y repuestos
+                    Mantenimiento y Repuestos
                     <i class="nav-arrow bi bi-chevron-right"></i>
                   </p>
                 </a>
@@ -113,14 +122,14 @@
                   <li class="nav-item">
                     <a href="{% url 'apy:mantenimiento_lista' %}" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
-                      <p>Gestion Mantenimento</p>
+                      <p>Gestión de Mantenimientos</p>
                     </a>
                   </li>
                   <!-- 2er item-->
                   <li class="nav-item">
                     <a href="{% url 'apy:repuesto_lista' %}" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
-                      <p>Gestion repuestos</p>
+                      <p>Gestión de Repuestos</p>
                     </a>
                   </li>
                   <!-- 3er item-->
@@ -141,7 +150,7 @@
                   <li class="nav-item">
                     <a href="{% url 'apy:insumo_lista' %}" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
-                      <p>Gestion Insumos</p>
+                      <p>Gestión de Insumos</p>
                     </a>
                   </li>
 
@@ -154,15 +163,12 @@
                   <i class="nav-icon bi bi-currency-dollar"></i>
 
                   <p>
-                    Administracion
+                    Administración
                     <i class="nav-arrow bi bi-chevron-right"></i>
                   </p>
                 </a>
                 <ul class="nav nav-treeview">
-                  <!-- 1er item-->
-                  <li class="nav-item">
-
-                  </li>
+       
                   <!-- 2er item-->
                   <li class="nav-item">
                     <a href="{% url 'apy:gasto_lista' %}" class="nav-link">
@@ -179,30 +185,37 @@
                   </li>
                   <!-- 4er item-->
                   <li class="nav-item">
+                    <a href="{% url 'apy:lista_servicios' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Detalle servicio</p>
+                    </a>
+                  </li>
+                  <!-- 5er item-->
+                  <li class="nav-item">
                     <a href="{% url 'apy:pagos_lista' %}" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>Pagos</p>
                     </a>
                   </li>
-                  <!-- 5er item-->
+                  <!-- 6er item-->
                   <li class="nav-item">
                     <a href="{% url 'apy:caja_lista' %}" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>Caja</p>
                     </a>
                   </li>
-                  <!-- 6er item-->
+                  <!-- 7er item-->
                   <li class="nav-item">
                     <a href="{% url 'apy:nomina_lista' %}" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
-                      <p>Nomina</p>
+                      <p>Nómina</p>
                     </a>
                   </li>
-                  <!-- 6er item-->
+                  <!-- 8er item-->
                   <li class="nav-item">
                     <a href="{% url 'apy:pago_servicios_lista' %}" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
-                      <p>Servicios Publicos</p>
+                      <p>Servicios Públicos</p>
                     </a>
                   </li>
 
@@ -215,7 +228,7 @@
                   <i class="nav-icon bi bi-people-fill"></i>
 
                   <p>
-                    Gestion de Clientes
+                    Gestión de Clientes
                     <i class="nav-arrow bi bi-chevron-right"></i>
                   </p>
                 </a>
@@ -272,7 +285,7 @@
                 <a href="#" class="nav-link">
                   <i class="nav-icon bi bi-gear-fill"></i>
                   <p>
-                    Configuracion
+                    Configuración
                     <i class="nav-arrow bi bi-chevron-right"></i>
                   </p>
                 </a>
@@ -296,6 +309,20 @@
                     <a href="{% url 'apy:permisos_usuarios' %}" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>Permisos</p>
+                    </a>
+                  </li>
+                  <!-- 4er item-->
+                   <li class="nav-item">
+                    <a href="{% url 'backup_module:configuracion_respaldo' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>respaldos</p>
+                    </a>
+                  </li>
+                  <!-- 5to item-->
+                  <li class="nav-item">
+                    <a href="{% url 'apy:ayuda' %}" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Ayuda</p>
                     </a>
                   </li>
               </li>

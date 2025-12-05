@@ -44,6 +44,8 @@
             <span class="badge bg-{{ user.is_superuser|yesno:'danger,success' }} mt-2 p-2">
                 {{ user.is_superuser|yesno:'Gerente (Admin),Empleado' }}
             </span>
+            
+            <button class="btn btn-primary mt-3" type="button" title="Nueva imagen">Subir nueva imagen</button> 
         </div>
     </div>
     
@@ -94,6 +96,13 @@
                         {{ user.last_name|default:"(No Registrado)" }}
                     </p>
                 </div>
+                
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary" title="Guardar Cambios">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
             </div>
             
             <h5 class="mb-3 mt-4 text-body">Información de Contacto</h5>
@@ -125,6 +134,47 @@
         </div>
     </div>
     
+    <div class="col-md-4">
+        <div class="p-3 py-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="text-right">Cambiar Contraseña</h4>
+            </div>
+            
+            <form method="POST" action="{% url 'apy:password_change' %}"> 
+                {% csrf_token %}
+                
+                <div class="col-md-12">
+                    <div class="form-floating password-field mb-4">
+                        {{ password_form.old_password }}
+                        <label for="{{ password_form.old_password.id_for_label }}">Contraseña Antigua</label>
+                        {% if password_form.old_password.errors %}<small class="text-danger">{{ password_form.old_password.errors }}</small>{% endif %}
+                    </div>
+                </div>
+                
+                <div class="col-md-12">
+                    <div class="form-floating password-field mb-4">
+                        {{ password_form.new_password1 }}
+                        <label for="{{ password_form.new_password1.id_for_label }}">Nueva Contraseña</label>
+                        {% if password_form.new_password1.errors %}<small class="text-danger">{{ password_form.new_password1.errors }}</small>{% endif %}
+                    </div>
+                </div>
+                
+                <div class="col-md-12">
+                    <div class="form-floating password-field mb-4">
+                        {{ password_form.new_password2 }}
+                        <label for="{{ password_form.new_password2.id_for_label }}">Confirmar Nueva Contraseña</label>
+                        {% if password_form.new_password2.errors %}<small class="text-danger">{{ password_form.new_password2.errors }}</small>{% endif %}
+                    </div>
+                </div>
+                
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary" title="Cambiar Contraseña">
+                        <i class="fas fa-lock"></i> Cambiar Contraseña
+                    </button>
+                </div>
+            </form>
+            </div>
+    </div>
 </div>
 
 <script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>

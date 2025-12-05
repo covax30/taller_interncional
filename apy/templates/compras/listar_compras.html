@@ -1,14 +1,16 @@
 {% extends "generic_listar.html"%}
 {% block titulo %}
+    <i class="fa-solid fa-receipt"></i>
     <h1 class="text-center">Listado de Compras</h1>
 {% endblock titulo %}
 
 {% block agregar %}
-    <a href="{% url 'apy:compra_crear' %}" class="btn btn-primary">Agregar Compra</a>
-{% endblock %}
+    <a href="{% url 'apy:compra_crear' %}" class="btn btn-primary" title="Agregar compra">Agregar Compra</a>
+{% endblock %} 
 
 {% block columnas %}
   <th>Id Compra</th>
+  <th>Id Factura</th>
   <th>Id Proveedor</th>
   <th>Fecha de Compra</th>
   <th>Hora de Compra</th>
@@ -20,16 +22,35 @@
   {% for c in object_list %}
     <tr>
         <td>{{ c.id_compra }}</td>
+        <td>{{ c.id_factura_compra }}</td>
         <td>{{ c.id_proveedor }}</td>
         <td>{{ c.fecha_compra }}</td>
         <td>{{ c.hora_compra }}</td>
 
         <td>
-            <a href="{% url 'apy:compra_editar' c.id_compra %}" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></a>
-            <a href="{% url 'apy:compra_eliminar' c.id_compra %}" class="btn btn-danger btn-xs"><i class="fas fa-trash-alt"></i></a>
+          <a href="{% url 'apy:compra_editar' c.id_compra %}" 
+              class="btn btn-info btn-xs" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="Editar compra">
+              <i class="fas fa-edit"></i>
+          </a>
+          <a href="{% url 'apy:compra_eliminar' c.id_compra %}" 
+              class="btn btn-danger btn-xs" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="Eliminar compra">
+              <i class="fas fa-trash"></i>
+          </a>
         </td>
     </tr>
   {% endfor %}
+
+<script>
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+});
+</script>
   
   <!-- Mensajes con SweetAlert -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

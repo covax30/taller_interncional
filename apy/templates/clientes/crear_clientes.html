@@ -1,30 +1,98 @@
 {% extends "form_generico.html" %}
 {% load widget_tweaks %}
-
 {% block form %}
     {% csrf_token %}
 
-    {% for field in form.visible_fields %}
     <div class="form-group mb-3">
-        <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
-        {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
-
-        {% if field.errors %}
+        <label for ="{{form.tipo.id_for_label}}">Tipo de Cliente:</label>
+        <div class= "input-group">
+            {{form.tipo|add_class:'form-control'|attr:'autocomplete:off'}}
+        </div>
+        {% if form.tipo.errors %} 
             <div class="invalid-feedback d-block">
-                {% for error in field.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
+                {% for error in form.tipo.errors%} 
+                <small> {{error}} </small> <br>
+                {%endfor%}    
             </div>
-        {% endif %}
+        {% endif%}             
     </div>
-    {% endfor %}
+
+    <div class="form-group mb-3">
+        <label for ="{{form.nombre.id_for_label}}">Nombre Cliente:</label>
+        <div class= "input-group">
+            {{form.nombre|add_class:'form-control'|attr:'autocomplete:off'|attr:'placeholder:Ingrese el nombre del cliente'}}
+        </div>
+        {% if form.nombre.errors %} 
+            <div class="invalid-feedback d-block">
+                {% for error in form.nombre.errors%} 
+                <small> {{error}} </small> <br>
+                {%endfor%}    
+            </div>
+        {% endif%}             
+    </div>
+    
+    <div class="form-group mb-3">
+        <label for ="{{form.identificacion.id_for_label}}">Documento:</label>
+        <div class= "input-group">
+            {{form.identificacion|add_class:'form-control'|attr:'autocomplete:off'|attr:'placeholder:Ingrese el documento del cliente'}}
+        </div>
+        {% if form.identificacion.errors %} 
+            <div class="invalid-feedback d-block">
+                {% for error in form.identificacion.errors%} 
+                <small> {{error}} </small> <br>
+                {%endfor%}    
+            </div>
+        {% endif%}             
+    </div>
+
+    <div class="form-group mb-3">
+        <label for ="{{form.telefono.id_for_label}}">Telefono:</label>
+        <div class= "input-group">
+            {{form.telefono|add_class:'form-control'|attr:'autocomplete:off'|attr:'placeholder:Ingrese el teléfono del cliente'}}
+        </div>
+        {% if form.telefono.errors %} 
+            <div class="invalid-feedback d-block">
+                {% for error in form.telefono.errors%} 
+                <small> {{error}} </small> <br>
+                {%endfor%}    
+            </div>
+        {% endif%}             
+    </div>
+
+    <div class="form-group mb-3">
+        <label for ="{{form.correo.id_for_label}}"> Correo:</label>
+        <div class= "input-group">
+            {{form.correo|add_class:'form-control'|attr:'autocomplete:off'|attr:'placeholder:Ingrese el correo del cliente'}}
+        </div>
+        {% if form.correo.errors %} 
+            <div class="invalid-feedback d-block">
+                {% for error in form.correo.errors%} 
+                <small> {{error}} </small> <br>
+                {%endfor%}    
+            </div>
+        {% endif%}             
+    </div>
+
+    <div class="form-group mb-3">
+        <label for ="{{form.direccion.id_for_label}}">Dirección:</label>
+        <div class= "input-group">
+            {{form.direccion|add_class:'form-control'|attr:'autocomplete:off'|attr:'placeholder:Ingrese la dirección del cliente'|attr:'rows:3'}}
+        </div>
+        {% if form.direccion.errors %} 
+            <div class="invalid-feedback d-block">
+                {% for error in form.direccion.errors%} 
+                <small> {{error}} </small> <br>
+                {%endfor%}    
+            </div>
+        {% endif%}             
+    </div>
 {% endblock %}
 
 {% block Cancelar %}
-                <button type="submit " class="btn btn-primary btn-flat"><i class="fas fa-save"></i>
-                    Agregar
-                </button>
-                <a href="{% url 'apy:cliente_lista' %}" class="btn btn-danger btn-flat float-right">
-                    <i class="fas fa-times"></i> Cancelar
-                </a>
+    <button type="submit" class="btn btn-primary btn-flat"><i class="fas fa-save"></i>
+        Agregar
+    </button>
+    <a href="{% url 'apy:cliente_lista' %}" class="btn btn-danger btn-flat float-right">
+        <i class="fas fa-times"></i> Cancelar
+    </a>
 {% endblock %}

@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse_lazy
+from django.template.loader import render_to_string
 from apy.forms import *
 from django.contrib import messages
 # Se elimina la importación de AccessMixin ya que no se usa localmente.
@@ -46,7 +47,7 @@ class HerramientaCreateView(PermisoRequeridoMixin, CreateView):
     permission_required = 'add'
     
     def form_valid(self, form):
-        messages.success(self.request, "herramienta creada correctamente")
+        messages.success(self.request, "Herramienta creada correctamente")
         return super().form_valid(form)
     
     def get_context_data(self, **kwargs):
@@ -66,6 +67,10 @@ class HerramientaUpdateView(PermisoRequeridoMixin, UpdateView):
     module_name = 'Herramientas'
     permission_required = 'change'
     
+    def form_valid(self, form):
+        messages.success(self.request, "Herramienta actualizada correctamente")
+        return super().form_valid(form)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Editar Herramienta'
@@ -82,9 +87,46 @@ class HerramientaDeleteView(PermisoRequeridoMixin, DeleteView):
     module_name = 'Herramientas'
     permission_required = 'delete'
     
+    def form_valid(self, form):
+        messages.success(self.request, "Herramienta eliminada correctamente")
+        return super().form_valid(form)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Eliminar Herramienta'
         context['entidad'] = 'Herramienta'
         context['listar_url'] = reverse_lazy('apy:herramienta_lista')
-        return context
+        return context  
+    
+class HerramientaCreateModalView(CreateView):
+    model = Herramienta
+    form_class = HerramientaForm
+    template_name = "herramienta/modal_herramienta.html"
+    success_url = reverse_lazy("apy:herramienta_lista")
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        try:
+            self.object = form.save()
+            return JsonResponse({
+                "success": True,
+                "id": self.object.id,
+                "text": str(self.object),
+                "message": "Herramienta registrada correctamente ✅"
+            })
+        except Exception as e:
+            return JsonResponse({
+                "success": False,
+                "message": f"Error al guardar: {str(e)}"
+            }, status=500)
+    
+    def form_invalid(self, form):
+        html = render_to_string(self.template_name, {"form": form}, request=self.request)
+        return JsonResponse({
+            "success": False,
+            "html": html,
+            "message": "Por favor, corrige los errores en el formulario ❌"
+        })

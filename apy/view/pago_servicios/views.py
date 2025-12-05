@@ -3,7 +3,8 @@ from apy.models import * # Asegúrate de que PagoServiciosPublicos, Module, y Pe
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
+from django.template.loader import render_to_string
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.urls import reverse_lazy
 from apy.forms import *
 from django.contrib import messages
@@ -101,3 +102,38 @@ class PagoServiciosDeleteView(PermisoRequeridoMixin, DeleteView):
         context['entidad'] = 'PagoServiciosPublicos'
         context['listar_url'] = reverse_lazy('apy:pago_servicios_lista')
         return context
+      
+class PagoServiciosCreateModalView(CreateView):
+    model = PagoServiciosPublicos
+    form_class = PagoServiciosForm
+    template_name = "Pago_Servicios/modal_pago_servicios.html"
+    success_url = reverse_lazy("apy:pago_servicios_lista")
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        try:
+            self.object = form.save()
+            return JsonResponse({
+                "success": True,
+                "id": self.object.id_servicio,
+                "text": f"{self.object.servicio} - {self.object.monto}",
+                "message": "Pago de servicio registrado correctamente"
+            })
+        except Exception as e:
+            import traceback
+            print("ERROR EN PagoServiciosCreateModalView:", traceback.format_exc())  # imprime la traza completa en consola
+            return JsonResponse({
+                "success": False,
+                "message": f"Error al guardar: {str(e)}"
+            }, status=500)
+        
+    def form_invalid(self, form):
+        html = render_to_string(self.template_name, {"form": form}, request=self.request)
+        return JsonResponse({
+            "success": False,
+            "html": html,
+            "message": "Por favor, corrige los errores en el formulario ❌"
+        })

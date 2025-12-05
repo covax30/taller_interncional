@@ -9,7 +9,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(('login.urls', 'login'), namespace='login')),  # ✅ con namespace
     path('apy/', include(('apy.urls', 'apy'), namespace='apy')),          # idem, por claridad
-    path('', include('django.contrib.auth.urls')),  
+    path('backups/', include('backup_module.urls')), # Ruta de acceso: /backups/
 ]
 
 if settings.DEBUG:

@@ -2,11 +2,12 @@
 {% load humanize %}
 
 {% block titulo %}
+        <i class="fa-solid fa-money-bill"></i>
         <h1 class="text-center">Lista de Gastos</h1>
 {% endblock titulo %}
 
 {% block agregar %}
-<a href="{{crear_url}}" class=" btn btn-primary btn btn-xs"><i class="fas fa-plus"></i>
+<a href="{{crear_url}}" class=" btn btn-primary btn btn-xs" title="Agregar gasto"><i class="fas fa-plus"></i>
           Agregar
 </a>
 {% endblock %}
@@ -14,7 +15,7 @@
 {% block columnas %}
 
         <th>Id del Monto</th>
-        <th>Descripcion</th>
+        <th>Descripción</th>
         <th>Tipo Gastos</th>
         <th>Id Pago Servicios</th>
         <th>Monto</th>
@@ -36,9 +37,20 @@
         <form method="post">
 
           <td>
-            <a href="{% url 'apy:gasto_editar' g.id %}" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></a>
-            <a href="{% url 'apy:gasto_eliminar' g.id %}" class="btn btn-danger btn-xs"><i
-                class="fas fa-trash-alt"></i></a>
+            <a href="{% url 'apy:gasto_editar' g.id %}" 
+              class="btn btn-info btn-xs" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="Editar gasto">
+              <i class="fas fa-edit"></i>
+            </a>
+            <a href="{% url 'apy:gasto_eliminar' g.id %}" 
+              class="btn btn-danger btn-xs" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="Eliminar gasto">
+              <i class="fas fa-trash-alt"></i>
+           </a>
           </td>
       </tr>
       {% endfor %}

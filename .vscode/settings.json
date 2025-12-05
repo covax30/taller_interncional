@@ -1,5 +1,8 @@
 {
     "liveServer.settings.port": 5501,
+    "cSpell.words": [
+        "Detalle"
+    ],
     "vscode-pets.petColor": "white",
     "vscode-pets.petSize": "medium",
     "vscode-pets.petType": "fox",
