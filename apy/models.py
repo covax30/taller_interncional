@@ -176,7 +176,28 @@ class Permission(models.Model):
     def __str__(self):
         return f"Permisos de {self.user.username} en {self.module.name}"
 
-
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    
+    telefono = models.CharField(
+        max_length=20, 
+        blank=True, 
+        null=True, 
+        verbose_name='Número de Teléfono'
+    )
+    
+    # Campo para la imagen de perfil
+    imagen = models.ImageField(
+        upload_to='perfiles/',          # Guarda las imágenes en media/perfiles/
+        default='perfiles/default.png', # Imagen por defecto (debes crearla)
+        null=True,                      # Permite null en la DB (aunque default hace que casi nunca sea null)
+        blank=True                      # Permite que el campo esté vacío en el formulario
+    )
+    
+    # ... otros campos del perfil ...
+    
+    def __str__(self):
+        return f'Perfil de {self.user.username}'
 
 
 class Cliente(models.Model):

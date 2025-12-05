@@ -2,6 +2,8 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views 
 from apy.view.usuario.contraseña.views import PerfilPasswordChangeView 
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -9,3 +11,9 @@ urlpatterns = [
     path('apy/', include(('apy.urls', 'apy'), namespace='apy')),          # idem, por claridad
     path('', include('django.contrib.auth.urls')),  
 ]
+
+if settings.DEBUG:
+    # Esto es crucial para que Django sirva tus archivos de media (fotos de perfil)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    # También puedes añadir static files (aunque staticfiles_dirs suele encargarse)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

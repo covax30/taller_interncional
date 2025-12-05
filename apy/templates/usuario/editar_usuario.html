@@ -1,0 +1,344 @@
+{% extends 'body.html' %}
+{% load static %}
+{% load static tz %} 
+{% load widget_tweaks %}
+
+{% block content %}
+<style>
+    /* Oculta el input de archivo de forma que sigue siendo funcional para JavaScript */
+    #id_profile_imagen {
+        width: 0.1px;
+        height: 0.1px;
+        opacity: 0;
+        overflow: hidden;
+        position: absolute;
+        z-index: -1;
+    }
+</style>
+
+{% with user.is_superuser as is_admin %}
+    {# ----------------------------------------------------- #}
+    {# LÓGICA DEL AVATAR (Mantiene la imagen subida, o usa el avatar genérico si solo tiene el default) #}
+    {# ----------------------------------------------------- #}
+    {% if user.profile.imagen.url and user.profile.imagen.url|length > 0 and 'default.png' not in user.profile.imagen.url %}
+        {# 1. Usa la foto subida por el usuario (si existe y no es el default) #}
+        {% with user.profile.imagen.url as user_avatar_url %}{% endwith %}
+    {% else %}
+        {# 2. Usa el avatar genérico de rol (Gerente/Empleado) #}
+        {% if is_admin %}
+            {% static 'img/gerente.png' as user_avatar_url %} 
+        {% else %}
+            {% static 'img/empleado.png' as user_avatar_url %}
+        {% endif %}
+    {% endif %}
+
+<div class="row">
+    
+    {# ----------------------------------------------------- #}
+    {# COLUMNA IZQUIERDA (col-md-4): Vista Estática del Perfil + Subida de Imagen #}
+    {# ----------------------------------------------------- #}
+    <div class="col-md-4 border-right d-flex align-items-start pt-5">
+        
+        {# Contenedor principal de la columna izquierda #}
+        <div class="d-flex flex-column align-items-center text-center p-3 py-3 w-100"> 
+            
+            {# AVATAR Y DATOS ESTÁTICOS #}
+            <img class="rounded-circle mt-5" width="200px" src="{{ user_avatar_url }}" alt="Foto de perfil">
+            
+            <span class="font-weight-bold mt-3 h4 text-primary">
+                {{ user.username }}
+            </span>
+            <span class="text-muted">
+                {{ user.email }}
+            </span>
+            <span class="badge bg-{{ user.is_superuser|yesno:'danger,success' }} mt-2 p-2 mb-4">
+                {{ user.is_superuser|yesno:'Gerente (Admin),Empleado' }}
+            </span>
+
+            <hr class="w-100 mb-4">
+
+            {# ------------------------------------------------ #}
+            {# 🖼️ SUBIDA DE IMAGEN (REPLANTEADO CON BOTÓN REAL) 🖼️ #}
+            {# ------------------------------------------------ #}
+            <h5 class="mt-2 mb-3 text-body">Imagen de Perfil</h5>
+            <div class="row mt-1 w-100"> 
+                <div class="col-md-12">
+
+                    {# 1. Fila del Botón y Archivo Seleccionado #}
+                    <div class="d-flex flex-column align-items-center mb-2">
+                        
+                        {# BOTÓN REAL para activar el input oculto (Usaremos JS para el click) #}
+                        <button type="button" id="btn-subir-imagen" class="btn btn-primary me-3 w-100">
+                            <i class="fas fa-upload"></i> Subir o Cambiar Imagen
+                        </button>
+                        
+                        {# Mensaje de opcionalidad #}
+                        <small class="form-text text-info mt-1 mb-2">
+                            *La imagen de perfil es opcional, no necesaria.
+                        </small>
+                        
+                        {# Mostramos el nombre del archivo seleccionado (debajo del mensaje) #}
+                        <small class="form-text text-muted mt-2" id="file-name-display">
+                            {% if user.profile.imagen and 'default.png' not in user.profile.imagen.url %}
+                                Archivo actual: {{ user.profile.imagen.name|truncatechars:30 }}
+                            {% else %}
+                                Ningún archivo seleccionado.
+                            {% endif %}
+                        </small>
+                    </div>
+
+                    {# 2. Información de la Imagen Actual y Opción Eliminar #}
+                    {% if user.profile.imagen and 'default.png' not in user.profile.imagen.url %}
+                    <div class="form-text mt-2" id="info-imagen-actual">
+                        <div class="d-flex align-items-center justify-content-center"> 
+                            
+                            <span class="me-3">Imagen actual: <a href="{{ user.profile.imagen.url }}" target="_blank">Ver</a></span>
+                            
+                            {# Checkbox Eliminar (usamos un botón visual para interactuar con el checkbox oculto) #}
+                            <div class="form-check form-check-inline">
+                                <button type="button" id="btn-eliminar-imagen" class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-trash-alt"></i> Eliminar
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {# Errores (Mostrar en la izquierda si los hay) #}
+                    {% if profile_form.imagen.errors %}<small class="text-danger">{{ profile_form.imagen.errors }}</small>{% endif %}
+                </div>
+            </div>
+            {# ------------------------------------------------ #}
+
+        </div>
+    </div>
+    
+    {# ----------------------------------------------------- #}
+    {# COLUMNA DERECHA (col-md-8): Formularios de Edición #}
+    {# ----------------------------------------------------- #}
+    <div class="col-md-8">
+        <div class="p-3 py-5">
+            
+            {# Título principal #}
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="text-right text-body">Ajustes de Perfil</h4>
+            </div>
+            
+            {# Información de la Cuenta #}
+            <h5 class="mt-2 mb-3 text-body">Información de la Cuenta</h5>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6"><h6>Cuenta Creada:</h6></div>
+                        <div class="col-md-6 text-end"><h6>{{ user.date_joined|date:"d/m/Y" }}</h6></div>
+                        
+                        <div class="col-md-6"><h6>Último inicio de sesión:</h6></div>
+                        <div class="col-md-6 text-end">
+                            <h6 class="">
+                                {{ user.last_login|default:"Nunca"|localtime|date:"d/m/Y H:i" }}
+                            </h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# FORMULARIO PRINCIPAL (Datos Personales y Perfil) - Importante: enctype para la imagen #}
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %} 
+                
+                {# Campos ocultos de Imagen (DEBEN ESTAR DENTRO DEL FORMULARIO) #}
+                <div class="d-none">
+                    {# El input file, usado por el botón de la izquierda. USAMOS SOLO EL ID Y EL CSS DE ARRIBA LO OCULTA #}
+                    {{ profile_form.imagen|attr:"id:id_profile_imagen" }}
+                    {# El checkbox de eliminar, usado por el botón "Eliminar" de la izquierda #}
+                    {{ profile_form.imagen_clear|attr:"id:id_imagen_clear" }} 
+                </div>
+
+                
+                {# Datos Personales #}
+                <h5 class="mt-4 mb-3 text-body">Datos Personales y Contacto</h5>
+                
+                <div class="row mt-3">
+                    {# Primer Nombre #}
+                    <div class="col-md-6">
+                        <div class="form-floating mb-4">
+                            {{ form.first_name|add_class:"form-control" }} 
+                            <label for="{{ form.first_name.id_for_label }}">Primer Nombre</label>
+                            {% if form.first_name.errors %}<small class="text-danger">{{ form.first_name.errors }}</small>{% endif %}
+                        </div>
+                    </div>
+                    
+                    {# Primer Apellido #}
+                    <div class="col-md-6">
+                        <div class="form-floating mb-4">
+                            {{ form.last_name|add_class:"form-control" }} 
+                            <label for="{{ form.last_name.id_for_label }}">Primer Apellido</label>
+                            {% if form.last_name.errors %}<small class="text-danger">{{ form.last_name.errors }}</small>{% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    {# Email #}
+                    <div class="col-md-6">
+                        <div class="form-floating mb-4">
+                            {{ form.email|add_class:"form-control" }} 
+                            <label for="{{ form.email.id_for_label }}">Email</label>
+                            {% if form.email.errors %}<small class="text-danger">{{ form.email.errors }}</small>{% endif %}
+                        </div>
+                    </div>
+                    
+                    {# Nombre de Usuario #}
+                    <div class="col-md-6">
+                        <div class="form-floating mb-4">
+                            {{ form.username|add_class:"form-control" }} 
+                            <label for="{{ form.username.id_for_label }}">Nombre de Usuario</label>
+                            {% if form.username.errors %}<small class="text-danger">{{ form.username.errors }}</small>{% endif %}
+                        </div>
+                    </div> 
+                </div>
+
+                <div class="row mt-3">
+                    {# Teléfono #}
+                    <div class="col-md-6">
+                        <div class="form-floating mb-4">
+                            {{ profile_form.telefono|add_class:"form-control" }} 
+                            <label for="{{ profile_form.telefono.id_for_label }}">Número de Teléfono</label>
+                            {% if profile_form.telefono.errors %}<small class="text-danger">{{ profile_form.telefono.errors }}</small>{% endif %}
+                        </div>
+                    </div> 
+                </div>
+                
+                <div class="mt-5 text-center">
+                    <a href="{% url 'apy:perfil_usuario' %}" class="btn btn-secondary me-2">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+
+            <hr class="mt-5 mb-4">
+            
+            {# ----------------------------------------------------- #}
+            {# SECCIÓN: CAMBIAR CONTRASEÑA (Formulario separado) #}
+            {# ----------------------------------------------------- #}
+            <h4 class="text-right text-body mt-4 mb-3">Cambiar Contraseña</h4>
+            
+            <form method="POST" action="{% url 'password_change' %}"> 
+                {% csrf_token %}
+                
+                <div class="row mt-3">
+                    {# Contraseña Antigua #}
+                    <div class="col-md-6">
+                        <div class="form-floating password-field mb-4">
+                            {{ password_form.old_password|add_class:"form-control" }}
+                            <label for="{{ password_form.old_password.id_for_label }}">Contraseña Antigua</label>
+                            {% if password_form.old_password.errors %}<small class="text-danger">{{ password_form.old_password.errors }}</small>{% endif %}
+                        </div>
+                    </div>
+                    
+                    {# Nueva Contraseña #}
+                    <div class="col-md-6">
+                        <div class="form-floating password-field mb-4">
+                            {{ password_form.new_password1|add_class:"form-control" }}
+                            <label for="{{ password_form.new_password1.id_for_label }}">Nueva Contraseña</label>
+                            {% if password_form.new_password1.errors %}<small class="text-danger">{{ password_form.new_password1.errors }}</small>{% endif %}
+                        </div>
+                    </div>
+                    
+                    {# Confirmar Nueva Contraseña #}
+                    <div class="col-md-6">
+                        <div class="form-floating password-field mb-4">
+                            {{ password_form.new_password2|add_class:"form-control" }}
+                            <label for="{{ password_form.new_password2.id_for_label }}">Confirmar Nueva Contraseña</label>
+                            {% if password_form.new_password2.errors %}<small class="text-danger">{{ password_form.new_password2.errors }}</small>{% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-lock"></i> Cambiar Contraseña
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInput = document.getElementById('id_profile_imagen');
+        const fileNameDisplay = document.getElementById('file-name-display');
+        const clearCheckbox = document.getElementById('id_imagen_clear');
+        
+        // Botones funcionales
+        const btnSubir = document.getElementById('btn-subir-imagen');
+        const btnEliminar = document.getElementById('btn-eliminar-imagen');
+        
+        // 1. Funcionalidad de Subir Imagen (Activa el input de archivo oculto)
+        if (btnSubir && fileInput) {
+            btnSubir.addEventListener('click', function() {
+                fileInput.click(); // Fuerza el clic en el input de archivo
+            });
+        }
+
+        // 2. Muestra el nombre del archivo seleccionado y gestiona el checkbox
+        if (fileInput && fileNameDisplay) {
+            fileInput.addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    fileNameDisplay.textContent = 'Archivo seleccionado: ' + e.target.files[0].name;
+                    // Si se selecciona un nuevo archivo, desmarca "Eliminar" para evitar conflicto
+                    if (clearCheckbox) {
+                        clearCheckbox.checked = false;
+                        if (btnEliminar) {
+                            btnEliminar.classList.remove('btn-danger');
+                            btnEliminar.classList.add('btn-outline-danger');
+                        }
+                    }
+                } else {
+                    // Si cancela la selección, se revierte al estado anterior (o "Ningún archivo...")
+                    const hasCurrentImage = "{{ user.profile.imagen.url|default:'' }}" && "{{ user.profile.imagen.url }}" !== "{% static 'default.png' %}";
+                    fileNameDisplay.textContent = hasCurrentImage ? 'Archivo actual: {{ user.profile.imagen.name|truncatechars:30 }}' : 'Ningún archivo seleccionado.';
+                }
+            });
+        }
+        
+        // 3. Funcionalidad del botón Eliminar (Interactúa con el checkbox oculto)
+        if (btnEliminar && clearCheckbox) {
+            btnEliminar.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Si ya está marcado (clic para desmarcar)
+                if (clearCheckbox.checked) {
+                    clearCheckbox.checked = false;
+                    btnEliminar.classList.remove('btn-danger');
+                    btnEliminar.classList.add('btn-outline-danger');
+                } 
+                // Si no está marcado (clic para marcar)
+                else {
+                    clearCheckbox.checked = true;
+                    // Limpia el input file para asegurar que solo se procese la eliminación
+                    if (fileInput) {
+                        fileInput.value = '';
+                    }
+                    fileNameDisplay.textContent = '¡Imagen marcada para **eliminación**!';
+                    btnEliminar.classList.remove('btn-outline-danger');
+                    btnEliminar.classList.add('btn-danger');
+                }
+            });
+            
+            // Si el formulario se recarga con un error y el checkbox ya estaba marcado, mantenemos el estilo del botón
+            if (clearCheckbox.checked) {
+                btnEliminar.classList.remove('btn-outline-danger');
+                btnEliminar.classList.add('btn-danger');
+            }
+        }
+    });
+</script>
+
+{% endwith %}
+{% endblock %}

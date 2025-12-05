@@ -10,6 +10,7 @@ from django.contrib.auth.hashers import make_password
 from django import forms  # Asegúrate de usar la importación estándar de forms
 from django.contrib.auth.models import User, Permission  # Importación de modelos de Django
 from django.core.exceptions import ValidationError
+from .models import Profile
 
 from apy.models import *
 
@@ -255,38 +256,48 @@ class RegistroUsuarioForm(forms.ModelForm):
             user.save()
         
         return user
-    
+
+# 1. Formulario para editar el modelo User (SIN TELEFONO)
 class PerfilUsuarioForm(forms.ModelForm):
-    # Campos adicionales del modelo User
-    first_name = forms.CharField(label='Nombre', required=False)
-    last_name = forms.CharField(label='Apellido', required=False)
-    
     class Meta:
         model = User
-        # Solo incluimos los campos que el usuario puede cambiar de su propio perfil
-        fields = ('username', 'email', 'first_name', 'last_name') 
-        
+        # Solo campos nativos de User
+        fields = ['first_name', 'last_name', 'email', 'username'] 
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
-        # Aplicar clases de Bootstrap y placeholders a todos los campos
+        placeholder_map = {
+            'first_name': 'Tu nombre',
+            'last_name': 'Tu apellido',
+            'username': 'Nombre de Usuario',
+            'email': 'ejemplo@dominio.com',
+        }
         for name, field in self.fields.items():
-            field.widget.attrs.update({'class': 'form-control'})
-            if name == 'first_name':
-                field.widget.attrs.update({'placeholder': 'Tu nombre'})
-            elif name == 'last_name':
-                field.widget.attrs.update({'placeholder': 'Tu apellido'})
-            elif name == 'username':
-                 field.widget.attrs.update({'placeholder': 'Nombre de Usuario'})
-            elif name == 'email':
-                 field.widget.attrs.update({'placeholder': 'ejemplo@dominio.com'})
-
+            field.widget.attrs.update({
+                'class': 'form-control',
+                'placeholder': placeholder_map.get(name, field.label) 
+            })
+            
+    # Lógica de limpieza para email...
     def clean_email(self):
         email = self.cleaned_data.get('email')
-        # Lógica para asegurar que el email sea único, excluyendo al usuario actual (self.instance)
         if User.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
             raise forms.ValidationError("Este correo electrónico ya está registrado.")
         return email
+
+# 2. Formulario para editar el modelo Profile (SOLO TELEFONO)
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['telefono']
+        labels = {'telefono': 'Número de Teléfono'}
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['telefono'].widget.attrs.update({
+            'class': 'form-control', 
+            'placeholder': 'Número de Teléfono (Ej: +57 300 000 0000)'
+        })
     
 class ClienteForm(ModelForm):
     def __init__(self, *args, **kwargs):
