@@ -1,9 +1,10 @@
-{% extends "generic_listar.html" %}
+{% extends "form_generico.html" %}
 {% load static %}
 
 {% block title %}Crear Servicio{% endblock %}
 
 {% block content %}
+{% csrf_token %}
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-0 text-gray-800">
@@ -28,13 +29,15 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            {{ form.id_vehiculo.label_tag }}
-                            {{ form.id_vehiculo }}
-                            {% if form.id_vehiculo.errors %}
-                                <div class="text-danger">
-                                    {{ form.id_vehiculo.errors }}
+                            <label for="{{ form.id_vehiculo.id_for_label }}">Vehículo:</label>
+                            <div class="input-group">
+                                {{ form.id_vehiculo }}
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_vehiculo">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
                                 </div>
-                            {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -54,16 +57,19 @@
                 <div id="repuestos-formset">
                     {% for form in repuesto_formset %}
                     <div class="repuesto-form row mb-3 border-bottom pb-3">
-                        {{ form.id }}
                         <div class="col-md-4">
                             <div class="mb-3">
-                                {{ form.id_repuesto.label_tag }}
-                                {{ form.id_repuesto }}
-                                {% if form.id_repuesto.errors %}
-                                    <div class="text-danger small">
-                                        {{ form.id_repuesto.errors }}
+                                <div class="form-group">
+                                <label for="{{ form.id_repuesto.id_for_label }}">Repuesto:</label>
+                                <div class="input-group">
+                                    {{ form.id_repuesto }}
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_repuesto">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
                                     </div>
-                                {% endif %}
+                                </div>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-2">
@@ -262,6 +268,108 @@
     </form>
 </div>
 
+<!-- Modal Vehiculo -->
+    <div class="modal fade" id="modal-id_vehiculo" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Vehículo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                        style="background-color: #dc3545; color: white; border: none; 
+                                border-radius: 50%; width: 35px; height: 35px;
+                                font-size: 1.5rem; line-height: 1; 
+                                display: flex; justify-content: center; align-items: center;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Modal Repuesto -->
+    <div class="modal fade" id="modal-id_repuesto" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Repuesto</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                        style="background-color: #dc3545; color: white; border: none; 
+                                border-radius: 50%; width: 35px; height: 35px;
+                                font-size: 1.5rem; line-height: 1; 
+                                display: flex; justify-content: center; align-items: center;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Script Vehiculo. -->
+    <script>
+        $("#modal-id_vehiculo").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:vehiculo_modal_crear' %}",
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+                }
+            });
+        });
+    </script>
+
+    <script>
+    $("#modal-id_repuesto").on("show.bs.modal", function(){
+        var modal = $(this);
+        $.ajax({
+            url: "{% url 'apy:repuesto_modal_crear' %}",
+            success: function(data){
+                modal.find(".modal-body").html(data.html || data);
+            }
+        });
+    });
+</script>
+
+<script>
+$(document).on('submit', '#form-repuesto', function(e){
+    e.preventDefault();
+
+    $.ajax({
+        type: $(this).attr('method'),
+        url: $(this).attr('action'),
+        data: $(this).serialize(),
+        success: function(data){
+            if(data.success){
+                // 1. Cerrar modal
+                $("#modal-id_repuesto").modal("hide");
+
+                // 2. Agregar el nuevo repuesto al select actual
+                let id = data.id;
+                let nombre = data.nombre;
+
+                // Buscar el SELECT que abrió el modal
+                let select = $("select[name$='id_repuesto']").last();
+
+                select.append(new Option(nombre, id));
+
+                // 3. Seleccionar automáticamente
+                select.val(id).trigger('change');
+            } else {
+                // Si hay errores de validación, los mostramos
+                $(".modal-body").html(data.html);
+            }
+        }
+    });
+});
+</script>
+
+    
+    
 <!-- ✅ JAVASCRIPT INLINE - FUNCIONA CON BOOTSTRAP 5 -->
 <script>
 // DEBUG: Verificar que el script se ejecuta
