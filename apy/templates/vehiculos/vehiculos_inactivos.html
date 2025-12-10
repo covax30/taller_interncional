@@ -1,11 +1,10 @@
 {% extends "generic_listar.html"%}
 {% block titulo %}
     <i class="fa-solid fa-truck"></i>
-    <h1 class="text-center">Lista de Vehículos</h1>
+    <h1 class="text-center">Lista de Vehículos Inactivos</h1>
 {% endblock %}
 {% block agregar %}
-    <a href="{% url 'apy:vehiculo_crear' %}" class="btn btn-primary" title="Agregar vehículo">Agregar Vehículo</a>
-    <a href="{% url 'apy:vehiculo_inactivos' %}" class="btn btn-secondary">Vehículos  Inactivos</a>
+    <a href="{% url 'apy:vehiculo_lista' %}" class="btn btn-primary" title="lista vehículo">Vehículos Activos</a>
 {% endblock %}
 
 {% block columnas %}
@@ -14,7 +13,7 @@
   <th>Placa</th>
   <th>Modelo</th>
   <th>Marca</th>
-  <th>Color</th> 
+  <th>Color</th>
 
   <th>Acciones</th>
 {% endblock %}
@@ -36,12 +35,12 @@
               title="Editar vehículo">
               <i class="fas fa-edit"></i>
             </a>
-            <a href="{% url 'apy:vehiculo_eliminar' v.id_vehiculo %}" 
-              class="btn btn-danger btn-xs" 
+            <a href="{% url 'apy:vehiculo_activar' v.id_vehiculo %}" 
+              class="btn btn-success btn-xs" 
               data-toggle="tooltip" 
               data-placement="top" 
-              title="Eliminar vehículo">
-              <i class="fas fa-trash-alt"></i>
+              title="Activar vehículo">
+              <i class="fas fa-power-off"></i>
            </a>
         </td>
     </tr>
