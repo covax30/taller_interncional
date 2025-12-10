@@ -56,7 +56,6 @@ INSTALLED_APPS = [
     'apy',
     'login',
     'widget_tweaks',
-    
     'backup_module',
 ]
 

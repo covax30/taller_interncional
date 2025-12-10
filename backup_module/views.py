@@ -1,6 +1,3 @@
-# views.py - ARCHIVO COMPLETO Y CORREGIDO
-
-# Importaciones necesarias (basado en tus imports)
 from django.shortcuts import render, redirect, get_object_or_404
 # Asume que aquí tienes tus modelos de BackupLog y ConfiguracionRespaldo
 from .models import BackupLog, ConfiguracionRespaldo 
@@ -20,7 +17,7 @@ from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 import uuid
 from django.utils import timezone
-
+from django.views.generic.edit import DeleteView # Asegúrate de que DeleteView esté importada
 # ------------------------------------------------------------------------------
 # Se usa try-except para importar las constantes de Windows solo si están disponibles
 try:
@@ -171,7 +168,7 @@ class RespaldoView(SuperuserRequiredMixin, View):
         context['espacio_ocupado'] = "1.2 GB" # (Valor estático de ejemplo)
 
         # 4. Logs del historial (Para llenar la tabla en la parte inferior)
-        context['historial_respaldos'] = logs[:10]
+        context['historial_respaldos'] = logs[:20]
         
         # URLs necesarias para los POSTs
         context['ejecutar_url'] = reverse_lazy('backup_module:backup_ejecutar')
@@ -191,6 +188,56 @@ class RespaldoView(SuperuserRequiredMixin, View):
         ultimo_backup = logs.filter(estado='Éxito').order_by('-fecha_fin').first()
         context['ultimo_backup_fecha'] = ultimo_backup.fecha_fin if ultimo_backup else None
         
+        return render(request, self.template_name, context)
+    # ⭐️ FUNCIÓN REQUERIDA: Limpia los logs atascados ⭐️
+    def _limpiar_logs_en_proceso(self):
+        """
+        Busca logs de restauración que hayan estado en 'En Proceso' por más de N minutos 
+        y los marca como 'Fallo' para que el usuario pueda reintentar.
+        """
+        # Define el tiempo de espera (15 minutos)
+        timeout_threshold = timezone.now() - timezone.timedelta(minutes=15)
+        
+        # 1. Busca logs atascados
+        logs_atascados = BackupLog.objects.filter(
+            estado='En Proceso', 
+            # Busca logs cuya fecha_inicio es anterior al umbral de tiempo límite
+            fecha_inicio__lt=timeout_threshold 
+        )
+        
+        # 2. Actualiza los logs
+        if logs_atascados.exists():
+            count = logs_atascados.count()
+            
+            # Usamos update() para eficiencia, marcando el log como Fallo.
+            logs_atascados.update(
+                estado='Fallo', 
+                fecha_fin=timezone.now(),
+                mensaje_error='El proceso de restauración excedió el tiempo límite (15 minutos) y fue revertido a Fallo por el sistema de limpieza automático.'
+            )
+            return count
+        return 0
+
+
+    def get(self, request, *args, **kwargs):
+        """Maneja la solicitud GET para mostrar la página."""
+        
+        # ⭐️ LLAMADA CRÍTICA: Ejecuta la limpieza antes de cargar la página
+        logs_limpiados = self._limpiar_logs_en_proceso()
+        if logs_limpiados > 0:
+            # Muestra un mensaje al administrador sobre los logs corregidos
+            messages.warning(request, f'⚠️ Atención: Se detectaron y limpiaron **{logs_limpiados}** logs atascados en "En Proceso". Fueron marcados como Fallo por timeout.')
+            
+        context = self.get_context_data()
+        
+        # ... (resto del código get)
+        logs = BackupLog.objects.all().order_by('-fecha_inicio')
+        context['logs'] = logs # Se usa logs para la tabla principal
+        
+        # Último backup exitoso (para el panel lateral)
+        ultimo_backup = logs.filter(estado='Éxito').order_by('-fecha_fin').first()
+        context['ultimo_backup_fecha'] = ultimo_backup.fecha_fin if ultimo_backup else None
+
         return render(request, self.template_name, context)
 
 # ------------------------------------------------------------------------------
@@ -389,3 +436,56 @@ class SubirRespaldoExternoView(SuperuserRequiredMixin, View):
             messages.error(request, f'❌ Error al procesar o guardar el archivo: {e}')
         
         return redirect(reverse_lazy('backup_module:configuracion_respaldo'))
+# ------------------------------------------------------------------------------
+# 🚨 7. VISTA API PARA EL ESTADO DE LOS LOGS 🚨
+# ------------------------------------------------------------------------------
+class LogsEstadoAPIView(View):
+    """
+    Retorna los datos de los logs recientes para ser consumidos por AJAX.
+    """
+    # Nota: No necesitamos limpiar los logs aquí, ya que la RespaldoView lo hace.
+    def get(self, request, *args, **kwargs):
+        # Obtener los logs más recientes (ej. los últimos 50, o logs "En Proceso")
+        logs_recientes = BackupLog.objects.all().order_by('-fecha_inicio')[:50]
+        
+        # Serializar los datos (convertir objetos de Django a JSON)
+        # Solo necesitamos los campos clave para la tabla
+        logs_data = []
+        for log in logs_recientes:
+            logs_data.append({
+                'pk': log.pk,
+                'fecha_inicio': timezone.localtime(log.fecha_inicio).strftime('%d/%m/%Y %H:%M'), # Formatear fecha
+                'fecha_fin': timezone.localtime(log.fecha_fin).strftime('%H:%M') if log.fecha_fin else 'N/A',
+                'tipo': log.get_tipo_display(),
+                'estado': log.estado,
+                'tamaño_mb': f"{log.tamaño_mb:.2f}" if log.tamaño_mb else 'N/A',
+                'usuario': log.usuario.username if log.usuario else 'Sistema',
+                'ruta_archivo': os.path.basename(log.ruta_archivo) if log.ruta_archivo else 'N/A',
+                'mensaje_error': log.mensaje_error,
+            })
+
+        return JsonResponse({'logs': logs_data})
+    
+class EliminarRespaldoView(DeleteView):
+    # Especifica el modelo a eliminar
+    model = BackupLog 
+    # Define a dónde redirigir después de una eliminación exitosa
+    success_url = reverse_lazy('backup_module:configuracion_respaldo') 
+    
+    # Este método se usa para manejar la solicitud POST de eliminación
+    def form_valid(self, form):
+        # Aquí puedes agregar lógica adicional antes de eliminar, como eliminar el archivo físico
+        try:
+            # Lógica para eliminar el archivo del sistema de archivos si existe
+            # if self.object.file_path and os.path.exists(self.object.file_path):
+            #     os.remove(self.object.file_path)
+            
+            # Llamar al método delete para eliminar el registro de la base de datos
+            response = super().form_valid(form)
+            messages.success(self.request, "El respaldo ha sido eliminado exitosamente.")
+            return response
+            
+        except Exception as e:
+            messages.error(self.request, f"Ocurrió un error al intentar eliminar el respaldo: {e}")
+            # Si hay un error, redirigir a la página principal
+            return redirect(self.success_url)

@@ -3,9 +3,9 @@
 {% load static tz %} 
 
 {% block content %}
+<div class="container rounded mt-5 mb-5 shadow-sm pl-4 pr- bg-body">
 <div class="row"> 
     <h3 class="text-primary mb-4">Gestión de Respaldos</h3>
-
     <h4 class="text-primary mb-3">Estadísticas Rápidas</h4>
     <div class="card mb-4 bg-light text-dark shadow-sm m-15">
         <div class="card-body">
@@ -150,8 +150,7 @@
                         <tbody>
                             {% for log in historial_respaldos %} 
                             <tr>
-                                <td>#{{ log.pk }}</td>
-                                <td>{{ log.fecha_inicio|date:"d/m/Y H:i" }}</td> 
+                                <td>{{ log.pk }}</td> <td>{{ log.fecha_inicio|date:"d/m/Y H:i" }}</td> 
                                 <td>{{ log.fecha_fin|default:"N/A"|date:"H:i" }}</td>
                                 <td>{{ log.tipo }}</td>
                                 <td>
@@ -172,16 +171,30 @@
                                 </td>
                                 <td>{{ log.usuario.username|default:"Sistema" }}</td> 
                                 <td>
-                                    {% if log.estado == 'Éxito' %}
-                                        <a href="{% url 'backup_module:backup_descargar' log.pk %}" class="btn btn-sm btn-info me-1" title="Descargar">
+                                    {% if log.estado == 'Éxito' or log.estado == 'Fallo' %}
+                                        <a href="{% url 'backup_module:backup_descargar' log.pk %}" class="btn btn-sm btn-info me-1" title="Descargar" {% if log.estado == 'Fallo' %}disabled{% endif %}>
                                             <i class="fas fa-download"></i>
                                         </a>
                                         
-                                        <form method="POST" action="{% url 'backup_module:backup_restaurar' log.pk %}" style="display:inline;" 
-                                            onsubmit="return confirm('⚠️ ADVERTENCIA CRÍTICA: ¿Estás ABSOLUTAMENTE SEGURO de que quieres restaurar el sistema a este punto ({{ log.fecha_inicio|date:"d/m/Y H:i" }})? Esto REEMPLAZARÁ TODOS los datos actuales. ¡Esta acción es irreversible!');">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-sm btn-danger" title="Restaurar Sistema">
+                                        {% if log.estado == 'Éxito' %}
+                                            <form method="POST" action="{% url 'backup_module:backup_restaurar' log.pk %}" style="display:inline;" 
+                                                onsubmit="return confirm('⚠️ ADVERTENCIA CRÍTICA: ¿Estás ABSOLUTAMENTE SEGURO de que quieres restaurar el sistema a este punto ({{ log.fecha_inicio|date:"d/m/Y H:i" }})? Esto REEMPLAZARÁ TODOS los datos actuales. ¡Esta acción es irreversible!');">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-danger me-1" title="Restaurar Sistema">
+                                                    <i class="fas fa-undo-alt"></i>
+                                                </button>
+                                            </form>
+                                        {% else %}
+                                            <button type="button" class="btn btn-sm btn-danger me-1" title="Restaurar no disponible" disabled>
                                                 <i class="fas fa-undo-alt"></i>
+                                            </button>
+                                        {% endif %}
+                                        
+                                        <form method="POST" action="{% url 'backup_module:backup_eliminar' log.pk %}" style="display:inline;" 
+                                            onsubmit="return confirm('¿Estás seguro de que quieres eliminar el respaldo #{{ log.pk }}? Esta acción es irreversible.');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-warning" title="Eliminar Respaldo">
+                                                <i class="fas fa-trash"></i>
                                             </button>
                                         </form>
                                     {% else %}
@@ -202,7 +215,9 @@
             </div>
         </div>
     </div>
-</div> <style>
+</div>
+</div>  
+<style>
 /* =======================================================
 SOLUCIÓN: SINCRONIZACIÓN DE DATATABLES CON TEMA OSCURO
 ======================================================= */
@@ -219,14 +234,29 @@ html[data-bs-theme="dark"] .dataTable {
 /* Sobrescribe el color del campo de búsqueda a blanco en tema oscuro */
 html[data-bs-theme="dark"] .dataTables_filter input {
     background-color: #343a40 !important; /* Fondo oscuro de AdminLTE */
-    color: #c2c7d0 !important;            /* Texto claro */
+    color: #c2c7d0 !important;              /* Texto claro */
     border-color: #454d55 !important;
 }
 </style>
 
 <script>
+    // ----------------------------------------------------------------------------------
+    // 🚨 PASO 1: DEFINIR URLs DE DJANGO PARA USO EN AJAX (VARIABLE GLOBAL) 🚨
+    // Esto asegura que las URLs de Descargar/Restaurar/Eliminar sean correctas incluso
+    // cuando la tabla se actualiza de forma asíncrona.
+    // ----------------------------------------------------------------------------------
+    const urlEndpoints = {
+        // Usamos '0' como marcador de posición para el PK, luego lo eliminamos para obtener la base.
+        descargar: "{% url 'backup_module:backup_descargar' 0 %}".replace('/0/', '/'),
+        restaurar: "{% url 'backup_module:backup_restaurar' 0 %}".replace('/0/', '/'),
+        eliminar: "{% url 'backup_module:backup_eliminar' 0 %}".replace('/0/', '/'),
+    };
+    
+    // Variable global para la instancia de DataTables
+    let logTable; 
+
     document.addEventListener('DOMContentLoaded', function() {
-        // Script para asegurar las clases de formularios de Bootstrap 5/4
+        // ... (Tu código de manejo de clases y alertas) ...
         var formFields = document.querySelectorAll('.form-floating input, .form-floating select, .form-control-file');
         formFields.forEach(function(field) {
             if (!field.classList.contains('form-control') && !field.classList.contains('form-select') && field.type !== 'checkbox') {
@@ -234,33 +264,30 @@ html[data-bs-theme="dark"] .dataTables_filter input {
             }
         });
         
-        // **Asegurar que los selectores y checkboxes tengan la clase correcta**
-        // Nota: Estas líneas son redundantes si el HTML usa 'form-select' y 'form-check-input' correctamente, 
-        // pero se mantienen para asegurar la compatibilidad.
         document.getElementById('ubicacion').classList.add('form-select');
         document.getElementById('frecuencia').classList.add('form-select');
         document.getElementById('incluirDB').classList.add('form-check-input');
         document.getElementById('incluirArchivos').classList.add('form-check-input');
 
-        // 🚨 INICIALIZACIÓN DE DATATABLE 🚨
-if (typeof $.fn.DataTable !== 'undefined') {
-    $('#backupTable').DataTable({
-        responsive: true,
-        order: [[ 0, "desc" ]], 
-        pageLength: 25, // 👈 CORRECCIÓN: Muestra 25 filas por defecto
-        lengthMenu: [
-            [10, 25, 50, -1],
-            [10, 25, 50, "Todo"]
-        ],
-        language: {
-url: "../../../static/lenguajes/espanol.json"        }
-    });
-    // ...
-}
+        // 🚨 INICIALIZACIÓN DE DATATABLE PRINCIPAL 🚨
+        if (typeof $.fn.DataTable !== 'undefined') {
+            logTable = $('#backupTable').DataTable({ // 👈 Usamos '#backupTable'
+                responsive: true,
+                order: [[ 0, "desc" ]], // 👈 CORRECCIÓN: Ordenar por ID (columna 0) descendente
+                pageLength: 50, 
+                lengthMenu: [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, "Todo"]
+                ],
+                language: {
+                    url: "{% static 'lenguajes/espanol.json' %}" // 👈 CORRECCIÓN: Usar static tag de Django
+                }
+            });
+        }
         
         // 🚨 CÓDIGO PARA CONVERTIR ALERTAS DE DJANGO A POPUPS 🚨
         const alertContainer = document.getElementById('django-alerts-root');
-    
+        
         if (alertContainer) {
             const alerts = alertContainer.querySelectorAll('.alert');
             
@@ -276,9 +303,111 @@ url: "../../../static/lenguajes/espanol.json"        }
                 }
             });
 
-            // Oculta las barras de alerta de Bootstrap
             alertContainer.style.display = 'none';
         }
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        // ----------------------------------------------------
+        // FUNCIÓN DE ACTUALIZACIÓN ASÍNCRONA (POLLING)
+        // ----------------------------------------------------
+        function actualizarEstadoLogs() {
+            if (!logTable) {
+                // Si la tabla no se inicializó aún, intenta de nuevo más tarde o sal.
+                console.warn("DataTables no inicializado. Cancelando polling.");
+                return;
+            }
+            
+            const apiUrl = "{% url 'backup_module:logs_estado_api' %}";
+            
+            // Obtenemos el token CSRF
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value; 
+            
+            // 🚨 Obtener la instancia de DataTables para asegurar que existe
+            const currentLogTable = $('#backupTable').DataTable({ retrieve: true }); 
+            
+            $.ajax({
+                url: apiUrl,
+                method: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.logs) {
+                        // 1. Limpiar la tabla de DataTables
+                        currentLogTable.clear();
+                        
+                        // 2. Insertar los nuevos datos
+                        response.logs.forEach(function(log) {
+                            
+                            // 💡 Función para generar el badge de estado
+                            function getStatusBadge(estado) {
+                                let className = 'badge bg-secondary';
+                                if (estado === 'Éxito') className = 'badge bg-success';
+                                else if (estado === 'Fallo') className = 'badge bg-danger';
+                                else if (estado === 'En Proceso') className = 'badge bg-warning text-dark';
+                                else if (estado === 'Éxito con advertencias') className = 'badge bg-info text-dark';
+                                return `<span class="${className}">${estado}</span>`;
+                            }
+
+                            // ----------------------------------------------------------------------
+                            // 3. Crear el HTML de las Acciones (Descargar, Restaurar, Eliminar)
+                            // ----------------------------------------------------------------------
+                            let accionesHtml = '';
+
+                            if (log.estado === 'Éxito' || log.estado === 'Fallo') {
+                                const disableDownload = log.estado === 'Fallo' ? 'disabled' : '';
+                                
+                                // 💡 CORRECCIÓN DESCARGA: Usa la URL base y concatena el PK
+                                const urlDescargar = urlEndpoints.descargar + log.pk + '/';
+                                accionesHtml += `<a href="${urlDescargar}" class="btn btn-sm btn-info me-1" title="Descargar" ${disableDownload}><i class="fas fa-download"></i></a>`;
+                                
+                                // Formulario de Restaurar (solo disponible si es Éxito)
+                                if (log.estado === 'Éxito') {
+                                    // 💡 CORRECCIÓN RESTAURAR: Usa la URL base y concatena el PK
+                                    const urlRestaurar = urlEndpoints.restaurar + log.pk + '/';
+                                    accionesHtml += `<form method="POST" action="${urlRestaurar}" style="display:inline;" onsubmit="return confirm('⚠️ ADVERTENCIA CRÍTICA: ¿Estás ABSOLUTAMENTE SEGURO de que quieres restaurar el sistema a este punto?');"><input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}"><button type="submit" class="btn btn-sm btn-warning me-1" title="Restaurar Sistema"><i class="fas fa-undo-alt"></i></button></form>`;
+                                } else {
+                                    // Botón Restaurar deshabilitado si no es Éxito
+                                    accionesHtml += `<button type="button" class="btn btn-sm btn-danger me-1" title="Restaurar no disponible" disabled><i class="fas fa-undo-alt"></i></button>`;
+                                }
+
+                                // 🛑 CORRECCIÓN ELIMINAR: Usa la URL base y concatena el PK
+                                const urlEliminar = urlEndpoints.eliminar + log.pk + '/';
+                                accionesHtml += `<form method="POST" action="${urlEliminar}" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que quieres eliminar el respaldo #${log.pk}? Esta acción es irreversible.');"><input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}"><button type="submit" class="btn btn-sm btn-danger" title="Eliminar Respaldo"><i class="fas fa-trash"></i></button></form>`;
+                                
+                            } else {
+                                // Estado "En Proceso" o desconocido
+                                accionesHtml = `<button type="button" class="btn btn-sm btn-secondary"><i class="fas fa-ban"></i></button>`;
+                            }
+                            
+                            const tamanio = log.tamaño_mb ? `${log.tamaño_mb} MB` : 'N/A';
+
+                            // 4. Agregar la fila a la tabla (8 columnas en total)
+                            currentLogTable.row.add([
+                                log.pk, // 0. ID
+                                log.fecha_inicio, // 1. Fecha y Hora Inicio
+                                log.fecha_fin, // 2. Fecha Fin
+                                log.tipo, // 3. Tipo
+                                getStatusBadge(log.estado), // 4. Estado con Badge
+                                tamanio, // 5. Tamaño
+                                log.usuario, // 6. Ejecutado por
+                                accionesHtml, // 7. Acciones (Botones)
+                            ]);
+                        });
+                        
+                        // 4. Redibujar la tabla manteniendo la paginación y el filtro
+                        currentLogTable.draw(false); 
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error al obtener estado de logs:", error);
+                }
+            });
+        }
+
+        // Ejecutar la actualización cada 5 segundos (5000 milisegundos)
+        setInterval(actualizarEstadoLogs, 5000); 
     });
 </script>
 
