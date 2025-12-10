@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.template.loader import render_to_string
 from django.contrib import messages
 from django.utils.decorators import method_decorator
@@ -23,6 +23,36 @@ class VehiculoListView(PermisoRequeridoMixin, ListView):
     # --- Configuración de Permisos ---
     module_name = 'Vehiculos' 
     permission_required = 'view'
+    
+    def get_queryset(self):
+        return Vehiculo.objects.filter(estado=True)
+    
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+    
+    def post(self, request, *args, **kwargs):
+        nombre = {'nombre' : 'Vehiculo'}
+        return JsonResponse(nombre)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Lista de Vehiculos'
+        context['crear_url'] = reverse_lazy('apy:vehiculo_crear')
+        context['entidad'] = 'Vehiculo'
+        return context
+    
+    #-- vista para ver vehiculos inactivos --   
+class VehiculoInactivoListView(PermisoRequeridoMixin, ListView):
+    model = Vehiculo
+    template_name = 'vehiculos/vehiculos_inactivos.html'
+
+    # --- Configuración de Permisos ---
+    module_name = 'Vehiculos' 
+    permission_required = 'view'
+    
+    def get_queryset(self):
+        return Vehiculo.objects.filter(estado=False)
     
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -50,6 +80,7 @@ class VehiculoCreateView(PermisoRequeridoMixin, CreateView):
     permission_required = 'add'
     
     def form_valid(self, form):
+        form.instance.estado = True 
         messages.success(self.request, "Vehiculo creado correctamente")
         response = super().form_valid(form)
         
@@ -100,6 +131,80 @@ class VehiculoDeleteView(PermisoRequeridoMixin, DeleteView):
     # --- Configuración de Permisos ---
     module_name = 'Vehiculos'
     permission_required = 'delete'
+    
+    def post(self, request, *args, **kwargs):
+        
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        
+        self.object.estado = False
+        self.object.save()
+        
+        messages.success(self.request,     f"Vehículo con placa {Vehiculo.placa} eliminado correctamente")
+        return HttpResponseRedirect(success_url)
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Vehiculo eliminado correctamente")
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Eliminar de Vehiculos'
+        context['entidad'] = 'Vehiculo'
+        context['listar_url'] = reverse_lazy('apy:vehiculo_lista')
+        return context
+    
+
+class VehiculoDeleteView(PermisoRequeridoMixin, DeleteView): 
+    model = Vehiculo
+    template_name = 'vehiculos/eliminar_vehiculos.html'
+    success_url = reverse_lazy('apy:vehiculo_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Vehiculos'
+    permission_required = 'delete'
+    
+    def post(self, request, *args, **kwargs):
+        
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        
+        self.object.estado = False
+        self.object.save()
+        
+        messages.success(self.request,     f"Vehículo con placa {Vehiculo.placa} eliminado correctamente")
+        return HttpResponseRedirect(success_url)
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Vehiculo eliminado correctamente")
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Eliminar de Vehiculos'
+        context['entidad'] = 'Vehiculo'
+        context['listar_url'] = reverse_lazy('apy:vehiculo_lista')
+        return context  
+    #--- vistas para activar vehiculos --      
+class VehiculoInactivoDeleteView(PermisoRequeridoMixin, DeleteView): 
+    model = Vehiculo
+    template_name = 'vehiculos/activar_vehiculo.html'
+    success_url = reverse_lazy('apy:vehiculo_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Vehiculos'
+    permission_required = 'delete'
+    
+    def post(self, request, *args, **kwargs):
+        
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        
+        self.object.estado = True
+        self.object.save()
+        
+        messages.success(self.request,     f"Vehículo con placa {Vehiculo.placa} activado correctamente")
+        return HttpResponseRedirect(success_url)
     
     def form_valid(self, form):
         messages.success(self.request, "Vehiculo eliminado correctamente")

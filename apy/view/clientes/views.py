@@ -12,7 +12,7 @@ from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import AccessMixin # Solo necesaria si defines mixins locales
 # Importaciones de modelos, formularios y Mixin corregido
-from apy.models import *
+from apy.models import * 
 from apy.forms import *
 from apy.decorators import PermisoRequeridoMixin, permiso_requerido_fbv # <-- Asumo que 'permiso_requerido_fbv' es tu decorador de función 
 
@@ -29,6 +29,34 @@ class ClienteListView(PermisoRequeridoMixin, ListView):
     
     def get_queryset(self):
         return Cliente.objects.filter(estado=True)
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+    
+    def post(self, request, *args, **kwargs):
+        nombre = {'nombre' : 'Cliente'}
+        return JsonResponse(nombre)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Lista de Clientes'
+        context['crear_url'] = reverse_lazy('apy:cliente_crear')
+        context['entidad'] = 'Cliente'
+        
+        return context
+    
+class ClienteInactivosListView(PermisoRequeridoMixin, ListView):
+    model = Cliente
+    template_name = 'clientes/modal_inactivos.html'
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Clientes' 
+    permission_required = 'view' 
+    # --------------------------------
+    
+    def get_queryset(self):
+        return Cliente.objects.filter(estado=False)
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -117,15 +145,13 @@ class ClienteDeleteView(PermisoRequeridoMixin, DeleteView):
         self.object = self.get_object()
         success_url = self.get_success_url()
         
-        # En lugar de eliminar, cambiar estado a inactivo
         self.object.estado = False
         self.object.save()
         
         messages.success(self.request, f"Cliente {self.object.nombre} desactivado ")
         return HttpResponseRedirect(success_url)
-   
     
-    # --- Configuración de Permisos ---
+     # --- Configuración de Permisos ---
     module_name = 'Clientes'
     permission_required = 'delete'
     
@@ -143,25 +169,42 @@ class ClienteDeleteView(PermisoRequeridoMixin, DeleteView):
         context['listar_url'] = reverse_lazy('apy:cliente_lista')
         return context
     
-class ClienteInactivosListView(View):
-    def get(self, request):
-        inactivos = Cliente.objects.filter(estado=False).values("id_cliente", "nombre")
-        return JsonResponse(list(inactivos), safe=False)
+ 
+class ClienteInactivoDeleteView(PermisoRequeridoMixin, DeleteView): 
+    model = Cliente
+    template_name = 'clientes/activar_clientes.html'
+    success_url = reverse_lazy('apy:cliente_lista')
     
+    def post(self, request, *args, **kwargs):
+        
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        
+        self.object.estado = True
+        self.object.save()
+        
+        messages.success(self.request, f"Cliente {self.object.nombre} activado ")
+        return HttpResponseRedirect(success_url)
     
-def activar_cliente(request):
-    if request.method == "POST":
-        id_cliente = request.POST.get("id_cliente")
-        cliente = Cliente.objects.filter(id_cliente=id_cliente).first()
+     # --- Configuración de Permisos ---
+    module_name = 'Clientes'
+    permission_required = 'delete'
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Cliente eliminado correctamente")
+        return super().form_valid(form)
+    
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Eliminar de Clientes'
+        context['entidad'] = 'Cliente'
+        context['listar_url'] = reverse_lazy('apy:cliente_lista')
+        return context    
+    
 
-        if cliente:
-            cliente.estado = True
-            cliente.save()
-            return JsonResponse({"success": True, "message": "Cliente activado correctamente"})
-
-        return JsonResponse({"success": False, "message": "Cliente no encontrado"})
-
-    return JsonResponse({"success": False, "message": "Método inválido"})
 # Vista para mostrar estadísticas
 def estadisticas_view(request):
     """Muestra estadísticas, requiere permiso 'view' de Clientes."""
@@ -191,11 +234,12 @@ class ClienteCreateModalView(CreateView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
+        form.instance.estado = True 
         try:
             self.object = form.save()
             return JsonResponse({
                 "success": True,
-                "id": self.object.id_cliente,
+                "id": self.object.id,
                 "text": str(self.object),
                 "message": "Cliente registrado correctamente ✅"
             })

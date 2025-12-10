@@ -6,7 +6,20 @@
     <form id="clienteForm" method="post" action="{% url 'apy:cliente_modal_crear' %}">
         {% csrf_token %}
    
+        <div class="form-group mb-3">
+        <label for ="{{form.tipo.id_for_label}}"> Tipo de Cliente:</label>
+        <div class= "input-group">
+            {{form.tipo|add_class:'form-control'|attr:'autocomplete:off'}}
+        </div>
 
+        {% if form.tipo.errors %} 
+            <div class="invalid-feedback d-block">
+                {% for error in form.tipo.errors%} 
+                <small> {{error}} </small> <br>
+                {%endfor%}    
+                </div>
+        {% endif%}             
+    </div>
     <div class="form-group mb-3">
         <label for ="{{form.nombre.id_for_label}}">Nombre Cliente:</label>
         <div class= "input-group">
@@ -23,14 +36,14 @@
     </div>
     
     <div class="form-group mb-3">
-        <label for ="{{form.documento.id_for_label}}">Documento:</label>
+        <label for ="{{form.identificacion.id_for_label}}">Documento:</label>
         <div class= "input-group">
-            {{form.documento|add_class:'form-control'|attr:'autocomplete:off'}}
+            {{form.identificacion|add_class:'form-control'|attr:'autocomplete:off'}}
         </div>
 
-        {% if form.documento.errors %} 
+        {% if form.identificacion.errors %} 
             <div class="invalid-feedback d-block">
-                {% for error in form.documento.errors%} 
+                {% for error in form.identificacion.errors%} 
                 <small> {{error}} </small> <br>
                 {%endfor%}    
                 </div>

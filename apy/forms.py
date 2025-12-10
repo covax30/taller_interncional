@@ -236,7 +236,8 @@ class DetalleInsumoForm(ModelForm):
             'precio_unitario': NumberInput(
                 attrs={
                     'placeholder': 'Ingrese el costo del insumo',
-                    'step': '0.01'
+                    'step': '0.01',
+                    'class': 'form-control',
                 }
             )
         }
@@ -560,7 +561,7 @@ class VehiculoForm(ModelForm):
         # Configura cómo se muestran los clientes en el select
         if 'id_cliente' in self.fields:
             self.fields['id_cliente'].label_from_instance = (
-                lambda obj: f"{obj.id} - {obj.nombre}"  # ← CAMBIADO de obj.id_cliente a obj.id
+                lambda obj: f"{obj.id} - {obj.nombre}"  
             )
             self.fields['id_cliente'].widget.attrs.update({
                 'class': 'form-control foreign-key-field',
@@ -1169,62 +1170,6 @@ class EmpleadoForm(ModelForm):
         }
         
         
-class Empleado_Mantenimiento_Form(ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['nombre'].widget.attrs['autofocus'] = True
-        
-    class Meta:
-        model = Empleado_Mantenimiento
-        fields = '__all__'
-        widgets = {
-            'nombre':TextInput(
-                attrs={
-                    'placeholder':'Ingrese el nombre del empleado',
-                }
-            ),
-            'telefono':NumberInput(
-                attrs={
-                    'placeholder':'Ingrese el telefono del empleado',
-                }
-            ),
-            'identificacion':NumberInput(
-                attrs={
-                    'placeholder':'Ingrese la identificacion del empleado',
-                }
-            ),
-            'Correo':TextInput(
-                attrs={
-                    'placeholder':'Ingrese el correo del empleado',
-                }
-            ),
-            'direccion':TextInput(
-                attrs={
-                    'placeholder':'Ingrese la direccion del empleado',
-                }
-            )
-            
-       }  
-        error_messages = {
-            'nombre': {
-                'required': 'El nombre del empleado es obligatorio',
-            },
-            'telefono': {
-                'required': 'El telefono del empleado es obligatorio',
-            },
-            'identificacion': {
-                'required': 'La identificacion del empleado es obligatoria',
-            },
-            'Correo': {
-                'required': 'El correo del empleado es obligatorio',
-                'invalid': 'El correo no tiene un formato válido',
-                'unique': 'Ya existe un administrador con ese correo',
-            },
-            'direccion': {
-                'required': 'La direccion del empleado es obligatoria',
-            },
-        }
-
 
  #------- formulario Gastos -------     
         

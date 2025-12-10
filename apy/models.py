@@ -100,7 +100,7 @@ class Marca(models.Model):
         return f"{self.nombre} "
 #------ ENTIDAD REPUESTOS --------3
 class Repuesto(models.Model):
-    id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE) 
+    id_marca = models.ForeignKey(Marca, on_delete=models.PROTECT) 
     nombre = models.CharField(max_length=100)
     CATEGORIA_OPCIONES = [
         ('automotriz', 'Automotriz'),
@@ -134,7 +134,7 @@ class Herramienta(models.Model):
     ]
     tipo = models.CharField(max_length=100, choices=TIPO_OPCIONES)
     material = models.CharField(max_length=100)
-    id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE)
+    id_marca = models.ForeignKey(Marca, on_delete=models.PROTECT)
     stock = models.IntegerField()
 
     def __str__(self):
@@ -143,7 +143,7 @@ class Herramienta(models.Model):
 #------ ENTIDAD INSUMOS --------
 class Insumos(models.Model):
 
-    id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE)
+    id_marca = models.ForeignKey(Marca, on_delete=models.PROTECT)
     costo = models.IntegerField(  # 🔹 ENTEROS, sin decimales
         error_messages={
             'invalid': 'Ingrese un número válido para el costo.',
@@ -178,8 +178,8 @@ class Module(models.Model):
         return self.name
 
 class Permission(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='custom_permissions', verbose_name="Usuario")
-    module = models.ForeignKey(Module, on_delete=models.CASCADE, verbose_name="Módulo")
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name='custom_permissions', verbose_name="Usuario")
+    module = models.ForeignKey(Module, on_delete=models.PROTECT, verbose_name="Módulo")
     
     # Campos booleanos para los permisos
     view = models.BooleanField(default=False, verbose_name="Ver")
@@ -220,21 +220,22 @@ class Cliente(models.Model):
 
 
 class Vehiculo(models.Model):
-    id_vehiculo = models.AutoField(primary_key=True)
-    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)  
+    id_vehiculo = models.AutoField(primary_key=True) 
+    id_cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)  
     placa = models.CharField(max_length=10, unique=True,validators=[placa_regex])
     modelo_vehiculo = models.CharField(max_length=4,validators=[modelo_regex])
     marca_vehiculo = models.CharField(max_length=100, validators=[marca_regex])
     color = models.CharField(max_length=100, validators=[color_regex])
+    estado = models.BooleanField(default=True, verbose_name="Activo")
 
     def __str__(self):
-        return f"{self.placa} - {self.marca_vehiculo} - {self.modelo_vehiculo}- {self.color} - {self.id_cliente.nombre}"
+        return f"{self.placa} -  {self.marca_vehiculo} - {self.modelo_vehiculo}- {self.color} - {self.id_cliente.id}"
     
 
 class EntradaVehiculo(models.Model):
     id_entrada = models.AutoField(primary_key=True)
-    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE) # LLAVE
-    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)  # LLAVE
+    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT) 
+    id_cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT) 
     fecha_ingreso = models.DateField()
     hora_ingreso = models.TimeField()
 
@@ -244,8 +245,8 @@ class EntradaVehiculo(models.Model):
 
 class SalidaVehiculo(models.Model):
     id_salida = models.AutoField(primary_key=True)
-    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE) # LLAVE
-    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)  # LLAVE
+    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT) 
+    id_cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)  
     diagnostico = models.CharField(max_length=100)
     fecha_salida = models.DateField()
     hora_salida = models.TimeField()
@@ -323,7 +324,7 @@ class Gastos(models.Model):
         ('costo variable', 'Costo variable'),
     ]
     tipo_gastos=models.CharField(max_length=100, choices=TIPO_GASTOS_OPCIONES)
-    id_pagos_servicios = models.ForeignKey(PagoServiciosPublicos, on_delete=models.CASCADE)
+    id_pagos_servicios = models.ForeignKey(PagoServiciosPublicos, on_delete=models.PROTECT)
     def __str__(self):
         return f"{self.tipo_gastos} - ${self.monto}"
      #class meta
@@ -343,31 +344,15 @@ class Empleado(models.Model):
     #class meta
         #verbose_name = 'Empleado'
         #verbose_name_plural = 'Empleado'
-        
-
-#-------- Empleado-------
-class Empleado_Mantenimiento(models.Model): 
-    id_empleado_mantenimiento = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=100)
-    telefono = models.CharField(max_length=15, validators=[validar_telefono])
-    identificacion = models.CharField(max_length=20, unique=True, validators=[validar_identificacion]) 
-    Correo= models.EmailField(max_length=254, unique=True, validators=[validar_email])
-    direccion = models.CharField(max_length=255)
-    def __str__(self):
-        return f"{self.nombre} ({self.identificacion})"
-    #class meta
-        #verbose_name = 'Empleado'
-        #verbose_name_plural = 'Empleado'
-
 
 
 #------ ENTIDAD GESTION DE MANTENIMIENTO --------2
 class Mantenimiento(models.Model):
     fallas = models.TextField()
     procesos = models.CharField(max_length=50)
-    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE)
-    id_empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE)
-    id_tipo_mantenimiento = models.ForeignKey(TipoMantenimiento, on_delete=models.CASCADE)
+    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT)
+    id_empleado = models.ForeignKey(Empleado, on_delete=models.PROTECT)
+    id_tipo_mantenimiento = models.ForeignKey(TipoMantenimiento, on_delete=models.PROTECT)
 
     def __str__(self):
         return f"{self.fallas} - {self.id_tipo_mantenimiento}"
@@ -385,10 +370,10 @@ class Informes(models.Model):
     )
     fecha = models.DateField()
     hora = models.TimeField()
-    id_repuesto = models.ForeignKey(Repuesto, on_delete=models.CASCADE)
-    id_empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE)
+    id_repuesto = models.ForeignKey(Repuesto, on_delete=models.PROTECT)
+    id_empleado = models.ForeignKey(Empleado, on_delete=models.PROTECT)
     tipo_informe = models.CharField(max_length=100)
-    id_mantenimiento = models.ForeignKey(Mantenimiento, on_delete=models.CASCADE)
+    id_mantenimiento = models.ForeignKey(Mantenimiento, on_delete=models.PROTECT)
     
     def __str__(self):
         return f"{self.id_informe} {self.tipo_informe}"
@@ -410,7 +395,7 @@ class Nomina(models.Model):
         } , validators=[validar_monto]
     )
     fecha_pago =  models.DateField() 
-    id_empleado =   models.ForeignKey(Empleado, on_delete=models.CASCADE)            
+    id_empleado =   models.ForeignKey(Empleado, on_delete=models.PROTECT)            
     def __str__(self):
         return f"{self.rol} - ${self.monto} - {self.fecha_pago}"
      #class meta
@@ -430,26 +415,22 @@ class Pagos(models.Model):
             'required': 'El monto del pago es obligatorio.'
         } , validators=[validar_monto]
     )
-    id_proveedor = models.ForeignKey(Proveedores, on_delete=models.CASCADE)
-    id_admin = models.ForeignKey(Administrador, on_delete=models.CASCADE)
-    id_herramienta = models.ForeignKey(Herramienta, on_delete=models.CASCADE)
-    id_insumos = models.ForeignKey(Insumos, on_delete=models.CASCADE)
-    id_repuesto = models.ForeignKey(Repuesto, on_delete=models.CASCADE)
-    id_nomina= models.ForeignKey(Nomina, on_delete=models.CASCADE, blank=True, null=True) 
+    id_proveedor = models.ForeignKey(Proveedores, on_delete=models.PROTECT)
+    id_admin = models.ForeignKey(Administrador, on_delete=models.PROTECT)
+    id_herramienta = models.ForeignKey(Herramienta, on_delete=models.PROTECT)
+    id_insumos = models.ForeignKey(Insumos, on_delete=models.PROTECT)
+    id_repuesto = models.ForeignKey(Repuesto, on_delete=models.PROTECT)
+    id_nomina= models.ForeignKey(Nomina, on_delete=models.PROTECT , blank=True, null=True) 
     
     def __str__(self):
         return f"{self.id_pago} {self.monto}"
 
 # ----- modulo detalle servicio  ---------
 
-def validar_monto(value):
-    if value <= 0:
-        raise ValidationError('El monto debe ser mayor a cero.')
-
 class DetalleServicio(models.Model):
-    id_vehiculo = models.ForeignKey('Vehiculo', on_delete=models.CASCADE)
+    id_vehiculo = models.ForeignKey('Vehiculo', on_delete=models.PROTECT)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    estado = models.CharField(max_length=20, default='pendiente')
+    estado = models.BooleanField(default=True)
     
     
     @property
@@ -497,8 +478,8 @@ class DetalleServicio(models.Model):
     def __str__(self):
         return f"Servicio {self.id} - Vehículo: {self.id_vehiculo.placa}"
 class DetalleRepuesto(models.Model):
-    detalle_servicio = models.ForeignKey(DetalleServicio, on_delete=models.CASCADE)
-    id_repuesto = models.ForeignKey('Repuesto', on_delete=models.CASCADE)
+    detalle_servicio = models.ForeignKey(DetalleServicio, on_delete=models.PROTECT)
+    id_repuesto = models.ForeignKey('Repuesto', on_delete=models.PROTECT)
     cantidad = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
     precio_unitario = models.PositiveIntegerField(validators=[validar_monto])
     
@@ -510,8 +491,8 @@ class DetalleRepuesto(models.Model):
         return f"Repuesto: {self.id_repuesto.nombre} - Cantidad: {self.cantidad}"
 
 class DetalleTipoMantenimiento(models.Model):
-    detalle_servicio = models.ForeignKey(DetalleServicio, on_delete=models.CASCADE)
-    id_tipo_mantenimiento = models.ForeignKey('TipoMantenimiento', on_delete=models.CASCADE)
+    detalle_servicio = models.ForeignKey(DetalleServicio, on_delete=models.PROTECT)
+    id_tipo_mantenimiento = models.ForeignKey('TipoMantenimiento', on_delete=models.PROTECT)
     cantidad = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
     precio_unitario = models.PositiveIntegerField(validators=[validar_monto])
     
@@ -523,8 +504,8 @@ class DetalleTipoMantenimiento(models.Model):
         return f"Mantenimiento: {self.id_tipo_mantenimiento.nombre}"
 
 class DetalleInsumos(models.Model):
-    detalle_servicio = models.ForeignKey(DetalleServicio, on_delete=models.CASCADE)
-    id_insumos = models.ForeignKey('Insumos', on_delete=models.CASCADE)
+    detalle_servicio = models.ForeignKey(DetalleServicio, on_delete=models.PROTECT)
+    id_insumos = models.ForeignKey('Insumos', on_delete=models.PROTECT)
     cantidad = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
     precio_unitario = models.PositiveIntegerField(validators=[validar_monto])
     
