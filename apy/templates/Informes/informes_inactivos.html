@@ -1,0 +1,57 @@
+{% extends "generic_listar.html" %}
+{% load humanize %}
+
+{% block titulo %}
+        <i class="fa-solid fa-file"></i>
+        <h1 class="text-center">Lista de Informes</h1>
+{% endblock titulo %}
+
+{% block agregar %}
+<a href="{{listar_url}}" class=" btn btn-primary btn btn-xs" title="listar informe inactivos"><i class="fas fa-plus"></i>
+            lista informes inactivos
+</a>
+{% endblock %}
+
+{% block columnas %}
+
+        <th>Id del Informe</th>
+        <th>Repuestos Usados</th>
+        <th>Costo Mano Obra</th>
+        <th>Fecha</th>
+        <th>Hora</th>
+        <th>Id Repuesto</th>
+        <th>Id Empleado</th>
+        <th>Tipo Informe</th>
+        <th>Id Mantenimiento</th>
+        <th>Acciones</th>
+
+{% endblock %}
+
+{% block iterar %}
+
+      {% for i in object_list %}
+      <tr>
+        <td>{{ i.id_informe }}</td>
+        <td>{{ i.repuestos_usados }}</td>
+        <td>{{ i.costo_mano_obra|intcomma }}</td>
+        <td>{{ i.fecha}}</td>
+        <td>{{ i.hora}}</td>
+        <td>{{ i.id_repuesto}}</td>
+        <td>{{ i.id_empleado}}</td>
+        <td>{{ i.tipo_informe}}</td>
+        <td>{{ i.id_mantenimiento}}</td>
+
+            <td>
+            <a href="{% url 'apy:informes_activar' i.id_informe %}" 
+              class="btn btn-danger btn-xs" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="activar informe">
+              <i class="fas fa-power-off"></i>
+            </a>
+            </td>
+      </tr>
+      {% endfor %}
+
+{% endblock %}
+

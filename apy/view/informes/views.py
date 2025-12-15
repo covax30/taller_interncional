@@ -47,6 +47,7 @@ class InformesCreateView(PermisoRequeridoMixin, CreateView):
     permission_required = 'add'
     
     def form_valid(self, form):
+        form.instance.estado = True 
         messages.success(self.request, "Informe creado correctamente")
         return super().form_valid(form)
     
@@ -56,6 +57,34 @@ class InformesCreateView(PermisoRequeridoMixin, CreateView):
         context ['entidad'] = 'Informes'
         context ['listar_url'] = reverse_lazy('apy:informes_lista')
         return context
+    
+#--- vista para listar informes inactivos ---
+class InformesInactivosListView(PermisoRequeridoMixin, ListView):       
+    model = Informes
+    template_name ='Informes/informes_inactivos.html'
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Informes' 
+    permission_required = 'view' 
+    
+    def get_queryset(self):
+        return Informes.objects.filter(estado=False)
+    
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        # Usa el Mixin importado de apy.decorators
+        return super().dispatch(request, *args, **kwargs)
+    
+    def post(self, request, *args, **kwargs):
+        nombre = {'nombre' : 'informes inactivos'}
+        return JsonResponse(nombre)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Lista de Informes Inactivos'
+        context['listar_url'] = reverse_lazy('apy:informes_lista')
+        context['entidad'] = 'Informes'
+        return context    
     
 class InformesUpdateView(PermisoRequeridoMixin, UpdateView): 
     model = Informes
@@ -92,13 +121,44 @@ class InformesDeleteView(PermisoRequeridoMixin, DeleteView):
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
     
-    def form_valid(self, form): 
-        messages.success(self.request, "Informe eliminado correctamente")
-        return super().form_valid(form)
+    def post(self, request, *args, **kwargs):
+        
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        
+        self.object.estado = False
+        self.object.save()
+        
+        messages.success(self.request,     f"Informe {Informes} desactivado correctamente")
+        return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Eliminar Informe'
         context['entidad'] = 'Informes'
         context['listar_url'] = reverse_lazy('apy:informes_lista')
+        return context
+    
+#- vista para activar  informe ---
+class InformesActivateView(PermisoRequeridoMixin, DeleteView): 
+    model = Informes
+    template_name = 'Informes/activar_informes.html'
+    success_url = reverse_lazy('apy:informes_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Informes'
+    permission_required = 'change'
+    
+    def form_valid(self, form):
+        self.object.estado = True
+        self.object.save()
+        messages.success(self.request, "informe activado correctamente")
+        return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Activar Informe'
+        context['entidad'] = 'Informes' 
+        context['listar_url'] = reverse_lazy('apy:informes_lista')
+        
         return context

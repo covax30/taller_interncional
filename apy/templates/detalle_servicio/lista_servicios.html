@@ -7,10 +7,15 @@
 <h1 class="text-center"><i class="fas fa-list-alt me-2"></i>Lista de Servicios</h1>
 {% endblock titulo %}
 
+
 {% block agregar %}
-<a href="{% url 'apy:crear_servicio' %}" class="btn btn-primary">
-    <i class="fas fa-plus me-1"></i>Agregar Servicio
-</a>
+    <a href="{% url 'apy:crear_servicio' %}" class="btn btn-primary" title="Agregar servicio">
+        <i class="fas fa-plus-circle"></i> Agregar Servicio
+    </a>
+    <a href="{% url 'apy:servicios_inactivos' %}" class="btn btn-secondary">
+        <i class="fas fa-trash-restore-alt"></i> Servicios Inactivos
+    </a>
+
 {% endblock %}
 
 {% block estadisticas %}

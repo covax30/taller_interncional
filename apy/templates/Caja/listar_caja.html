@@ -10,6 +10,8 @@
 <a href="{{crear_url}}" class=" btn btn-primary btn btn-xs" title="Agregar ingreso a caja"><i class="fas fa-plus"></i>
           Agregar
 </a>
+<a href="{% url 'apy:caja_inactivos' %}" class="btn btn-secondary">Registros de Caja Inactivos</a>
+
 {% endblock %}
 
 {% block columnas %}
@@ -19,8 +21,7 @@
         <th>Monto</th>
         <th>Fecha </th>
         <th>Hora</th>
-        <th>Id Administrador</th>
-        <th>Id Factura</th>
+
         <th>Acciones</th>
 
 {% endblock %}
@@ -34,8 +35,7 @@
         <td>{{ j.monto|intcomma }}</td>
         <td>{{ j.fecha}}</td>
         <td>{{ j.hora}}</td>
-       <td>{{ j.id_admin}}</td> 
-       <td>{{ j.id_Factura}}</td>
+
         
         <form method="post">
 
@@ -52,7 +52,7 @@
               data-toggle="tooltip" 
               data-placement="top" 
               title="Eliminar caja">
-              <i class="fas fa-trash-alt"></i>
+              <i class="fas fa-power-off"></i>
           </td>
       </tr>
       {% endfor %}

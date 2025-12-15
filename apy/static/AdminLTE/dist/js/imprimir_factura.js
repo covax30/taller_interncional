@@ -1,65 +1,40 @@
-function generarPDFFacturaDesdeDjango(factura) {
-    if (!window.jspdf || !window.jspdf.jsPDF) {
-        alert("Error: La librería jsPDF no está cargada");
-        return;
-    }
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".btn-pdf-factura").forEach(btn => {
+        btn.addEventListener("click", () => {
 
+            const factura = {
+                id: btn.dataset.id,
+                fecha: btn.dataset.fecha,
+                cliente: btn.dataset.cliente,
+                documento: btn.dataset.documento,
+                empleado: btn.dataset.empleado,
+                empresa: btn.dataset.empresa,
+                metodoPago: btn.dataset.metodoPago,
+                monto: btn.dataset.monto,
+            };
+
+            generarPDFFactura(factura);
+        });
+    });
+});
+
+function generarPDFFactura(factura) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
-    let yPos = 20;
+    // Título
+    doc.setFontSize(16);
+    doc.text(`Factura #${factura.id}`, 20, 20);
 
-    // Encabezado
-    doc.setFontSize(18);
-    doc.setTextColor(0, 0, 255);
-    doc.text("Factura de Servicios", 105, yPos, { align: 'center' });
+    // Contenido
+    doc.setFontSize(11);
+    doc.text(`Fecha: ${factura.fecha}`, 20, 30);
+    doc.text(`Empresa: ${factura.empresa}`, 20, 40);
+    doc.text(`Cliente: ${factura.cliente} (${factura.documento})`, 20, 50);
+    doc.text(`Empleado: ${factura.empleado}`, 20, 60);
+    doc.text(`Método de pago: ${factura.metodoPago}`, 20, 70);
+    doc.text(`Monto total: $${factura.monto}`, 20, 80);
 
-    yPos += 10;
-    doc.setDrawColor(0);
-    doc.setLineWidth(0.5);
-    doc.line(20, yPos, 190, yPos);
-
-    // Datos
-    yPos += 10;
-    doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0);
-    doc.text(`ID Factura: ${factura.id}`, 20, yPos);
-
-    yPos += 10;
-    doc.text(`Tipo de pago: ${factura.tipo_pago}`, 20, yPos);
-
-    yPos += 10;
-    doc.text(`ID Cliente: ${factura.id_cliente}`, 20, yPos);
-
-    yPos += 10;
-    doc.text(`ID Vehículo: ${factura.id_vehiculo}`, 20, yPos);
-
-    yPos += 10;
-    doc.text(`ID Tipo Mantenimiento: ${factura.id_tipo_mantenimiento}`, 20, yPos);
-
-    yPos += 10;
-    doc.text("Servicio prestado:", 20, yPos);
-    const servicioLines = doc.splitTextToSize(factura.servicio_prestado, 170);
-    yPos += 10;
-    doc.text(servicioLines, 20, yPos);
-    yPos += (servicioLines.length * 7);
-
-    yPos += 5;
-    doc.text(`Nombre empresa: ${factura.nombre_empresa}`, 20, yPos);
-
-    yPos += 10;
-    doc.text(`Dirección empresa: ${factura.direccion_empresa}`, 20, yPos);
-
-    yPos += 10;
-    doc.text(`ID Empleado: ${factura.id_empleado}`, 20, yPos);
-
-    yPos += 15;
-    doc.text(`Monto: ${factura.monto}`, 20, yPos);
-
-    // Guardar
+    // 👉 SOLO descarga el PDF
     doc.save(`Factura_${factura.id}.pdf`);
-
-    if (typeof mostrarMensaje === 'function') {
-        mostrarMensaje("Factura generada correctamente");
-    }
 }

@@ -9,6 +9,7 @@
 <a href="{{crear_url}}" class=" btn btn-primary btn btn-xs" title="Agregar proveedor"><i class="fas fa-plus"></i>
           Agregar
 </a>
+<a href="{% url 'apy:proveedor_inactivos' %}" class="btn btn-secondary">  <i class="fas fa-list"></i>  Proveedores Inactivos</a>
 {% endblock%}
 
 {% block columnas %}
@@ -42,8 +43,8 @@
               class="btn btn-danger btn-xs" 
               data-toggle="tooltip" 
               data-placement="top" 
-              title="Eliminar proveedor">
-              <i class="fas fa-trash-alt"></i>
+              title="Desactivar proveedor">
+              <i class="fas fa-power-off"></i>
            </a>
           </td>
       </tr>

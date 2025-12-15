@@ -38,6 +38,22 @@ class ListServicioView(ListView):
         context['servicios_activos'] = DetalleServicio.objects.filter(estado=True).count()
 
         return context
+    
+#---- vista para listar servicios inactivos -----
+class ServicioInactivosListView(ListView):
+    model = DetalleServicio
+    template_name = 'detalle_servicio/modal_inactivos.html'
+    context_object_name = 'servicios_inactivos'
+    
+    def get_queryset(self):
+        return DetalleServicio.objects.filter(estado=False) 
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['total_servicios'] = DetalleServicio.objects.count() 
+        context['servicios_activos'] = DetalleServicio.objects.filter(estado=True).count()
+
+        return context    
 
 class CreateServicioView(CreateView):
     model = DetalleServicio
@@ -90,6 +106,7 @@ class CreateServicioView(CreateView):
             print("Errores en mantenimiento_formset:", mantenimiento_formset.errors)
             print("Errores en insumo_formset:", insumo_formset.errors)
             
+            form.instance.estado = True 
             messages.error(self.request, 'Por favor corrige los errores en el formulario.')
             return self.render_to_response(self.get_context_data(form=form))
 
@@ -179,6 +196,20 @@ class DeleteServicioView(DeleteView):
         messages.success(self.request, f"Servicio {self.object.id} desactivado correctamente")
 
         return HttpResponseRedirect(self.get_success_url())
+    
+#---- vista para activar servicio -----
+class ServicioActivateView(DeleteView):
+    model = DetalleServicio
+    template_name = 'detalle_servicio/activar_servicio.html'
+    success_url = reverse_lazy('apy:lista_servicios')  # cambia por tu URL real
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.estado = True
+        self.object.save()
+        messages.success(self.request, f"Servicio {self.object.id} activado correctamente")
+
+        return HttpResponseRedirect(self.get_success_url())    
 
 class DetalleServicioView(DetailView):
     model = DetalleServicio

@@ -2,82 +2,78 @@
 {% load humanize %}
 
 {% block titulo %}
-        <i class="fa-solid fa-comments-dollar"></i>
-        <h1 class="text-center">Lista de Pagos</h1>
+    <i class="fa-solid fa-comments-dollar"></i>
+    <h1 class="text-center">Lista de Pagos</h1>
 {% endblock titulo %}
 
 {% block agregar %}
-<a href="{{crear_url}}" class=" btn btn-primary btn btn-xs" title="Agregar registro de pago"><i class="fas fa-plus"></i>
-          Agregar
+<a href="{{ crear_url }}" class="btn btn-primary btn-xs" title="Agregar registro de pago">
+    <i class="fas fa-plus"></i> Agregar
+</a>
+<a href="{% url 'apy:pagos_inactivos' %}" class="btn btn-secondary btn-xs" title="Ver pagos inactivos">
+    <i class="fas fa-list"></i> Ver Inactivos
 </a>
 {% endblock %}
 
 {% block columnas %}
-
-        <th>Id Pago</th>
-        <th>Tipo Pago</th>
-        <th>Fecha</th>
-        <th>Hora</th>
-        <th>Monto</th>
-        <th>Id Proveedor</th>
-        <th>Id Administrador</th>
-        <th>Id Herramientas</th>
-        <th>Id Insumos</th>
-        <th>Id Repuestos</th>
-        <th>Id Nómina</th>
-        <th>Acciones</th>
-
+    <th>ID Pago</th>
+    <th>Tipo Pago</th>
+    <th>Fecha</th>
+    <th>Hora</th>
+    <th>Monto</th>
+    <th>Proveedor</th>
+    <th>Administrador</th>
+    <th>Herramientas</th>
+    <th>Insumos</th>
+    <th>Repuestos</th>
+    <th>Nómina</th>
+    <th>Acciones</th>
 {% endblock %}
 
 {% block iterar %}
-
-      {% for p in object_list %}
-      <tr>
-        <td>{{ p.id_pago }}</td>
-        <td>{{ p.tipo_pago }}</td>
-        <td>{{ p.fecha }}</td>
-        <td>{{ p.hora }}</td>
-        <td>{{ p.monto|intcomma }}</td>
-        <td>{{ p.id_proveedor }}</td>
-        <td>{{ p.id_admin }}</td>
-        <td>{{ p.id_herramienta }}</td>
-        <td>{{ p.id_insumos }}</td>
-        <td>{{ p.id_repuestos }}</td>
-        <td>{{ p.id_nomina }}</td>
-        <form method="post">
-
-          <td>
+    {% for p in object_list %}
+    <tr>
+        <!-- Verifica que p.id_pago exista -->
+        <td>
+            {% if p.id_pago %}
+                {{ p.id_pago }}
+            {% else %}
+                <span class="text-muted">N/A</span>
+            {% endif %}
+        </td>
+        <td>{{ p.tipo_pago|default:"No especificado" }}</td>
+        <td>{{ p.fecha|date:"d/m/Y"|default:"No especificada" }}</td>
+        <td>{{ p.hora|default:"No especificada" }}</td>
+        <td>{{ p.monto|intcomma|default:"0" }}</td>
+        <td>{{ p.id_proveedor|default:"Sin proveedor" }}</td>
+        <td>{{ p.id_admin|default:"Sin admin" }}</td>
+        <td>{{ p.id_herramienta|default:"Sin herramienta" }}</td>
+        <td>{{ p.id_insumos|default:"Sin insumos" }}</td>
+        <td>{{ p.id_repuestos|default:"Sin repuestos" }}</td>
+        <td>{{ p.id_nomina|default:"Sin nómina" }}</td>
+        
+        <td>
+            <!-- Solo mostrar botones si existe id_pago -->
+            {% if p.id_pago %}
             <a href="{% url 'apy:pagos_editar' p.id_pago %}" 
-              class="btn btn-info btn-xs" 
-              data-toggle="tooltip" 
-              data-placement="top" 
-              title="Editar pago">
-              <i class="fas fa-edit"></i>
+               class="btn btn-info btn-xs" 
+               data-toggle="tooltip" 
+               data-placement="top" 
+               title="Editar pago">
+                <i class="fas fa-edit"></i>
             </a>
             <a href="{% url 'apy:pagos_eliminar' p.id_pago %}" 
-              class="btn btn-danger btn-xs" 
-              data-toggle="tooltip" 
-              data-placement="top" 
-              title="Eliminar pago">
-              <i class="fas fa-trash-alt"></i>
-           </a>
-          </td>
-      </tr>
-      {% endfor %}
-
-<!-- Mensajes con SweetAlert -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-  {% if messages %}
-    {% for message in messages %}
-      Swal.fire({
-        icon: '{% if "success" in message.tags %}success{% elif "error" in message.tags %}error{% else %}info{% endif %}',
-        title: '{{ message|escapejs }}',
-        timer: 2500,
-        showConfirmButton: false
-      });
+               class="btn btn-danger btn-xs" 
+               data-toggle="tooltip" 
+               data-placement="top" 
+               title="Eliminar pago"
+               onclick="return confirm('¿Está seguro de eliminar este pago?');">
+                <i class="fas fa-trash-alt"></i>
+            </a>
+            {% else %}
+            <span class="text-muted">No disponible</span>
+            {% endif %}
+        </td>
+    </tr>
     {% endfor %}
-  {% endif %}
-</script>
-
 {% endblock %}
