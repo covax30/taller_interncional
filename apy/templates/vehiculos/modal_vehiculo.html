@@ -1,4 +1,4 @@
-{% load widget_tweaks %}
+{% load widget_tweaks %} 
 {% block form %}
 
     <div id="msg-vehiculo"></div>  {# Aquí se mostrarán los mensajes #}
@@ -23,22 +23,69 @@
         {% endif %}
     </div>
 
-    <!-- Renderiza el resto de los campos, excepto id_cliente -->
-    {% for field in form.visible_fields %}
-        {% if field.name != 'id_cliente' %}
-            <div class="form-group mb-3">
-                <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
-                {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
-                {% if field.errors %}
-                    <div class="invalid-feedback d-block">
-                        {% for error in field.errors %}
-                            <small>{{ error }}</small><br>
-                        {% endfor %}
-                    </div>
-                {% endif %}
+     <!-- PLACA -->
+    <div class="form-group mb-3">
+        <label for="{{ form.placa.id_for_label }}">Placa:</label>
+        <div class="input-group">
+            {{ form.placa|add_class:'form-control'|attr:'autocomplete:off' }}
+        </div>
+
+        {% if form.placa.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.placa.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
             </div>
         {% endif %}
-    {% endfor %}
+    </div>
+
+     <!-- Modelo vehiculo -->
+    <div class="form-group mb-3">
+        <label for="{{ form.modelo_vehiculo.id_for_label }}">Modelo vehículo:</label>
+        <div class="input-group">
+            {{ form.modelo_vehiculo|add_class:'form-control'|attr:'autocomplete:off' }}
+        </div>
+
+        {% if form.modelo_vehiculo.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.modelo_vehiculo.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+     <!-- Marca vehículo -->
+    <div class="form-group mb-3">
+        <label for="{{ form.marca_vehiculo.id_for_label }}">Marca vehículo:</label>
+        <div class="input-group">
+            {{ form.marca_vehiculo|add_class:'form-control'|attr:'autocomplete:off' }}
+        </div>
+
+        {% if form.marca_vehiculo.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.marca_vehiculo.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+     <!-- color -->
+    <div class="form-group mb-3">
+        <label for="{{ form.color.id_for_label }}">Color:</label>
+        <div class="input-group">
+            {{ form.color|add_class:'form-control'|attr:'autocomplete:off' }}
+        </div>
+
+        {% if form.color.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.color.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
 </form>
 {% endblock %}
 

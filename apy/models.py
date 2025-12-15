@@ -205,16 +205,16 @@ class Cliente(models.Model):
         ('cliente particular', 'Cliente Particular'),
         ('empresa', 'Empresa'),
     ]
-    tipo = models.CharField(max_length=20, choices=TIPO_CLIENTE, blank=True, null=True)
-    nombre = models.CharField(max_length=255, verbose_name="Nombre/Razón Social", blank=True, null=True)
-    identificacion = models.CharField(max_length=50, unique=True, verbose_name="Documento/NIT", blank=True, null=True)
-    telefono = models.CharField(max_length=20, blank=True, null=True)
-    correo = models.EmailField(validators=[validar_email], blank=True, null=True)
-    direccion = models.TextField(verbose_name="Dirección", blank=True, null=True)
+    tipo = models.CharField(max_length=20, choices=TIPO_CLIENTE)
+    nombre = models.CharField(max_length=255, verbose_name="Nombre/Razón Social")
+    identificacion = models.CharField(max_length=50, unique=True, verbose_name="Documento/NIT")
+    telefono = models.CharField(max_length=20)
+    correo = models.EmailField(validators=[validar_email])
+    direccion = models.TextField(verbose_name="Dirección")
     estado = models.BooleanField(default=True, verbose_name="Activo")
 
     def __str__(self):
-        return f"{self.id} - {self.nombre}"
+        return f"{self.nombre} - {self.identificacion}"
     
 
 
@@ -526,7 +526,7 @@ class Empresa(models.Model):
 
     
     def __str__(self):
-        return self.nombre
+        return f"{self.nombre} - {self.nit} en {self.direccion} {self.telefono}"   
     
 #----- modulo de cliente base para factura----
 class ClienteFactura(models.Model):
@@ -553,10 +553,10 @@ class Factura(models.Model):
         ('transferencia', 'Transferencia'),
     ]
     metodo_pago = models.CharField(max_length=50, choices=opciones_pago, null=True, blank=True)  # Agregado
-
-    def __str__(self):
-        cliente_nombre = self.id_cliente.nombre if self.id_cliente else "Sin cliente"
-        return f"Factura {self.id} - {cliente_nombre}"
+    def save(self, *args, **kwargs):
+        if not self.id_empresa:
+            self.id_empresa = Empresa.objects.filter(estado=True).first()
+        super().save(*args, **kwargs)
 
     
 #--------------Modulo Compra (STEVEN)-----------------

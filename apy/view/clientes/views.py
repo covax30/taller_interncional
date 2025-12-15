@@ -169,11 +169,6 @@ class ClienteDeleteView(PermisoRequeridoMixin, DeleteView):
         context['listar_url'] = reverse_lazy('apy:cliente_lista')
         return context
     
-
-class ClienteInactivosListView(View):
-    def get(self, request):
-        inactivos = Cliente.objects.filter(estado=False).values("id", "nombre")
-        return JsonResponse(list(inactivos), safe=False)
  
 class ClienteInactivoDeleteView(PermisoRequeridoMixin, DeleteView): 
     model = Cliente
@@ -240,7 +235,6 @@ class ClienteCreateModalView(CreateView):
 
     def form_valid(self, form):
         form.instance.estado = True
-        form.instance.estado = True
         try:
             self.object = form.save()
             return JsonResponse({
@@ -256,7 +250,7 @@ class ClienteCreateModalView(CreateView):
             }, status=500)
     
     def form_invalid(self, form):
-        html = render_to_string("clientes/partials/form_cliente.html", {"form": form}, request=self.request)
+        html = render_to_string(self.template_name, {"form": form}, request=self.request)
         return JsonResponse({
             "success": False,
             "html": html,

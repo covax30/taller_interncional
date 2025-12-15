@@ -19,7 +19,7 @@ class FacturaForm(ModelForm):
         
     class Meta:
         model = Factura
-        fields = '__all__'
+        exclude = ['id_empresa']
         widgets = {
             'Fecha':DateInput(
                 attrs={
@@ -52,35 +52,23 @@ class FacturaForm(ModelForm):
 
 
         error_messages = {
-            'id_operacion': {
-                'required': 'El id de la operacion es obligatorio',
-            },
-            'tipo_pago': {
-                'required': 'El tipo de pago es obligatorio',
-            },
-            'id_cliente': {
-                'required': 'El id del cliente es obligatorio',
-            },
-            'id_vehiculo': {
-                'required': 'El id del vehiculo es obligatorio',
-            },
-            'id_tipo_mantenimiento': {
-                'required': 'El id de tipo de mantenimiento es obligatorio',
-            },
-            'servicio_prestado': {
-                'required': 'El servicio prestado es obligatorio',
-            },
-            'nombre_empresa': {
-                'required': 'El nombre de la empresa es obligatorio',
-            },
-            'direccion_empresa': {
-                'required': 'La direccion de la empresa es obligatoria',
+            'Fecha': {
+                'required': 'La fecha es obligatoria',
             },
             'id_empleado': {
                 'required': 'El id del empleado es obligatorio',
             },
-            'monto': {
-                'required': 'El monto es obligatorio',
+            'id_cliente': {
+                'required': 'El id del cliente es obligatorio',
+            },
+            'id_Detalles_servicios': {
+                'required': 'El id del detalle de servicios es obligatorio',
+            },
+            'id_tipo_mantenimiento': {
+                'required': 'El id de tipo de mantenimiento es obligatorio',
+            },
+            'metodo_pago': {
+                'required': 'El metodo de pago es obligatorio',
             }
         }
         

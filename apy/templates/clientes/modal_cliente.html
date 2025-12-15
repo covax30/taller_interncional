@@ -5,20 +5,6 @@
 
     <form id="clienteForm" method="post" action="{% url 'apy:cliente_modal_crear' %}">
         {% csrf_token %}
-
-        <div class="form-group mb-3">
-            <label for ="{{form.tipo.id_for_label}}">Tipo Cliente:</label>
-            <div class= "input-group">
-                {{form.tipo|add_class:'form-control'|attr:'autocomplete:off'}}
-            </div>
-
-            {% if form.tipo.errors %}
-            <div class="invalid-feedback d-block">
-                {% for error in form.tipo.errors%}
-                <small> {{error}} </small> <br>
-                {%endfor%}
-            </div>
-            {% endif%}
    
         <div class="form-group mb-3">
         <label for ="{{form.tipo.id_for_label}}"> Tipo de Cliente:</label>
@@ -55,14 +41,9 @@
             {{form.identificacion|add_class:'form-control'|attr:'autocomplete:off'}}
         </div>
 
-
-        {% if form.identificacion.errors %}
-            <div class="invalid-feedback d-block">
-                {% for error in form.identificacion.errors%}
-
         {% if form.identificacion.errors %} 
             <div class="invalid-feedback d-block">
-                {% for error in form.identificacion.errors%}
+                {% for error in form.identificacion.errors%} 
                 <small> {{error}} </small> <br>
                 {%endfor%}    
                 </div>
@@ -155,6 +136,7 @@ $(document).off('click', '#btnGuardarCliente').on('click', '#btnGuardarCliente',
                 }
 
                 // Cerrar el modal correctamente
+                $modal.modal('hide');
                 $modal.modal('hide');
                 $('body').removeClass('modal-open');
                 $('body').css('padding-right', '');

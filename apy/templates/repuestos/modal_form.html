@@ -57,6 +57,7 @@
 {% block extra_js %}
 <script>
 /* ✅ Evita duplicar eventos (clave del arreglo) */
+
 $(document).off('click', '#btnGuardarRepuesto').on('click', '#btnGuardarRepuesto', function(e) {
     e.preventDefault();
 
@@ -88,12 +89,17 @@ $(document).off('click', '#btnGuardarRepuesto').on('click', '#btnGuardarRepuesto
                 $msg.html('<div class="alert alert-success">' + data.message + '</div>');
 
                 // Actualizar select en la página principal
-                const $select = $('#id_id_repuesto');
-                if ($select.find('option[value="' + data.id + '"]').length === 0) {
-                    const option = new Option(data.text, data.id, true, true);
-                    $select.append(option).val(data.id).trigger('change');
+                const $select = $('#id_id_repuesto');   // <- usar el select correcto
+
+                if ($select.length) {
+                    if ($select.find('option[value="' + data.id + '"]').length === 0) {
+                        const option = new Option(data.text, data.id, true, true);
+                        $select.append(option).val(data.id).trigger('change');
+                    } else {
+                        $select.val(data.id).trigger('change');
+                    }
                 } else {
-                    $select.val(data.id).trigger('change');
+                    console.warn("No se encontró el select activo:", selectActivo);
                 }
 
                 // Cerrar el modal correctamente
