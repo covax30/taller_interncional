@@ -2,56 +2,66 @@
 {% load humanize %}
 
 {% block titulo %}
-        <i class="fa-solid fa-people-group"></i>
-        <h1 class="text-center">Lista de Nómina</h1>
+    <i class="fa-solid fa-people-group"></i>
+    <h1 class="text-center">Lista de Nómina</h1>
 {% endblock titulo %}
 
 {% block agregar %}
-<a href="{{crear_url}}" class=" btn btn-primary btn btn-xs" title="Agregar registro de nomina"><i class="fas fa-plus"></i>
-          Agregar
+<a href="{{ crear_url }}" class="btn btn-primary btn-xs" title="Agregar registro de nómina">
+    <i class="fas fa-plus"></i> Agregar
+</a>
+<a href="{% url 'apy:nomina_inactivos' %}" class="btn btn-secondary btn-xs" title="Ver nóminas inactivas">
+    <i class="fas fa-list"></i> Ver Inactivos
 </a>
 {% endblock %}
 
 {% block columnas %}
-
-        <th>Id de la nómina</th>
-        <th>Rol</th>
-        <th>Monto </th>
-        <th>Fecha de Pago </th>
-        <th>Id del Empleado  </th>
-        <th>Acciones</th>
-
+    <th>ID Nómina</th>
+    <th>Rol</th>
+    <th>Monto</th>
+    <th>Fecha de Pago</th>
+    <th>Empleado</th>
+    <th>Acciones</th>
 {% endblock %}
 
 {% block iterar %}
-
-      {% for n in object_list %}
-      <tr>
+    {% for n in object_list %}
+    <tr>
         <td>{{ n.id }}</td>
-        <td>{{ n.rol}}</td>
-        <td>{{ n.monto|intcomma }}</td>
-        <td>{{ n.fecha_pago}}</td>
-        <td>{{ n.id_empleado}}</td>
+        <td>{{ n.rol|default:"Sin rol especificado" }}</td>
+        <td>{{ n.monto|intcomma|default:"0" }}</td>
+        <td>
+            {% if n.fecha_pago %}
+                {{ n.fecha_pago|date:"d/m/Y" }}
+            {% else %}
+                <span class="text-muted">No especificada</span>
+            {% endif %}
+        </td>
+        <td>
+            {% if n.id_empleado %}
+                {{ n.id_empleado.nombre|default:n.id_empleado }}
+            {% else %}
+                <span class="text-muted">Sin empleado</span>
+            {% endif %}
+        </td>
         
-        <form method="post">
-
-          <td>
-                <a href="{% url 'apy:nomina_editar' n.id %}" 
-              class="btn btn-info btn-xs" 
-              data-toggle="tooltip" 
-              data-placement="top" 
-              title="Editar nomina">
-              <i class="fas fa-edit"></i>
+        <td>
+            <a href="{% url 'apy:nomina_editar' n.id %}" 
+               class="btn btn-info btn-xs" 
+               data-toggle="tooltip" 
+               data-placement="top" 
+               title="Editar nómina">
+                <i class="fas fa-edit"></i>
             </a>
             <a href="{% url 'apy:nomina_eliminar' n.id %}" 
-              class="btn btn-danger btn-xs" 
-              data-toggle="tooltip" 
-              data-placement="top" 
-              title="Eliminar nomina">
-              <i class="fas fa-trash-alt"></i>
-           </a>
-          </td>
-      </tr>
-      {% endfor %}
-
+               class="btn btn-danger btn-xs" 
+               data-toggle="tooltip" 
+               data-placement="top" 
+               title="Desactivar nómina"
+                >
+                <i class="fas fa-power-off"></i>
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
 {% endblock %}

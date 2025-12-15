@@ -9,6 +9,10 @@
 <a href="{{crear_url}}" class=" btn btn-primary btn btn-xs" title="Agregar pago de servicios"><i class="fas fa-plus"></i>
           Agregar
 </a>
+<a href="{% url 'apy:pago_servicios_inactivos' %}" class=" btn btn-primary btn btn-xs" title="lista pago de servicios inactivos"><i class="fas fa-list"></i>
+  
+          pago servicios inactivos
+</a>
 {% endblock %}
 
 {% block columnas %}
@@ -42,7 +46,7 @@
               data-toggle="tooltip" 
               data-placement="top" 
               title="Eliminar pago de servicios">
-              <i class="fas fa-trash-alt"></i>
+              <i class="fas fa-power-off"></i>
            </a>
           </td>
       </tr>

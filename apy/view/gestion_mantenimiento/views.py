@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.utils.decorators import method_decorator
 from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
@@ -22,7 +22,8 @@ class MantenimientoListView(PermisoRequeridoMixin, ListView):
     # --- Configuración de Permisos ---
     module_name = 'Mantenimientos' 
     permission_required = 'view'
-    
+    def get_queryset(self):
+        return Mantenimiento.objects.filter(estado=True)
     @method_decorator(csrf_exempt) 
     def dispatch(self, request, *args, **kwargs):
         # Usa el Mixin importado de apy.decorators
@@ -34,6 +35,27 @@ class MantenimientoListView(PermisoRequeridoMixin, ListView):
         context['crear_url'] = reverse_lazy('apy:mantenimiento_crear')
         context['entidad'] = 'Mantenimiento'
         return context
+    
+#--- vistas para listar inactivos ---
+class MantenimientoInactivosListView(PermisoRequeridoMixin, ListView):
+    model = Mantenimiento
+    template_name = 'gestion_mantenimiento/mantenimientos_inactivos.html'
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Mantenimientos' 
+    permission_required = 'view' 
+    # --------------------------------
+    
+    def get_queryset(self):
+        return Mantenimiento.objects.filter(estado=False)
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+    
+    def post(self, request, *args, **kwargs):
+        nombre = {'nombre' : 'Mantenimiento'}
+        return JsonResponse(nombre)    
 
 class MantenimientoCreateView(PermisoRequeridoMixin, CreateView): 
     model = Mantenimiento
@@ -46,6 +68,7 @@ class MantenimientoCreateView(PermisoRequeridoMixin, CreateView):
     permission_required = 'add'
     
     def form_valid(self, form):
+        form.instance.estado = True 
         messages.success(self.request, "Mantenimiento creado correctamente")
         return super().form_valid(form)
     
@@ -86,9 +109,17 @@ class MantenimientoDeleteView(PermisoRequeridoMixin, DeleteView):
     module_name = 'Mantenimientos'
     permission_required = 'delete'
     
-    def form_valid(self, form):
-        messages.success(self.request, "Mantenimiento eliminado correctamente")
-        return super().form_valid(form)
+    #--- Sobrescribir el método post para desactivar en lugar de eliminar ---
+    def post(self, request, *args, **kwargs):
+        
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        
+        self.object.estado = False
+        self.object.save()
+        
+        messages.success(self.request, f"mantenimiento {Mantenimiento} desactivado ")
+        return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -96,6 +127,36 @@ class MantenimientoDeleteView(PermisoRequeridoMixin, DeleteView):
         context['entidad'] = 'Mantenimiento'
         context['listar_url'] = reverse_lazy('apy:mantenimiento_lista')
         return context
+    
+    
+  #---vista para activar mantenimiento --
+class MantenimientoActivateView(PermisoRequeridoMixin, DeleteView):
+    model = Mantenimiento
+    template_name = 'gestion_mantenimiento/activar_mantenimiento.html'
+    success_url = reverse_lazy('apy:mantenimiento_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Mantenimientos'
+    permission_required = 'change'
+    
+    #--- Sobrescribir el método post para activar el mantenimiento ---
+    def post(self, request, *args, **kwargs):
+        
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        
+        self.object.estado = True
+        self.object.save()
+        
+        messages.success(self.request, f"Mantenimiento {Mantenimiento} activado ")
+        return HttpResponseRedirect(success_url)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Activar Mantenimiento'
+        context['entidad'] = 'Mantenimiento'
+        context['listar_url'] = reverse_lazy('apy:mantenimiento_lista')
+        return context  
     
 class MantenimientoCreateModalView(CreateView):
     model = Mantenimiento
@@ -108,6 +169,7 @@ class MantenimientoCreateModalView(CreateView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
+        form.instance.estado = True 
         try:
             self.object = form.save()
             return JsonResponse({

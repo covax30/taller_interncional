@@ -76,9 +76,9 @@ color_regex = RegexValidator(
 
 #------ ENTIDAD de TIPO mantenmimiento ---------1
 class TipoMantenimiento(models.Model):
-    
     nombre = models.CharField(max_length=50, unique=True)
     descripcion = models.TextField(blank=True, null=True)
+    estado = models.BooleanField(default=True)
 
     def __str__(self):
         return self.nombre
@@ -95,6 +95,7 @@ class Marca(models.Model):
     ]
     nombre = models.CharField(max_length=100)
     tipo = models.CharField(max_length=100, choices=tipo)
+    estado = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.nombre} "
@@ -116,6 +117,7 @@ class Repuesto(models.Model):
             'required': 'El precio del repuesto es obligatorio.'
         } , validators=[validar_monto]
     )
+    estado = models.BooleanField(default=True)
     
     def __str__(self):
         return f"{self.nombre} "   
@@ -136,6 +138,7 @@ class Herramienta(models.Model):
     material = models.CharField(max_length=100)
     id_marca = models.ForeignKey(Marca, on_delete=models.PROTECT)
     stock = models.IntegerField()
+    estado = models.BooleanField(default=True)
 
     def __str__(self):
         return self.nombre
@@ -159,7 +162,8 @@ class Insumos(models.Model):
     ]
 
     cantidad = models.CharField(max_length=20, choices=CANTIDAD_OPCIONES)
-
+    estado = models.BooleanField(default=True)
+    
     def __str__(self):
 
         return f"{self.id_marca} ({self.cantidad})"
@@ -292,6 +296,7 @@ class PagoServiciosPublicos(models.Model):
             'required': 'El monto de la nomina es obligatorio.'
         } , validators=[validar_monto]
     )
+    estado = models.BooleanField(default=True)
     
     def __str__(self):
         return f"{self.id_servicio} - {self.servicio} -{self.monto}"
@@ -302,6 +307,7 @@ class Proveedores(models.Model):
     nombre = models.CharField(max_length=100)
     telefono = models.CharField(max_length=20, validators=[validar_telefono])
     correo = models.EmailField(unique=True, validators=[validar_email])
+    estado = models.BooleanField(default=True)
     
     def __str__(self):
         return f"{self.id_proveedor} {self.correo}"
@@ -325,6 +331,8 @@ class Gastos(models.Model):
     ]
     tipo_gastos=models.CharField(max_length=100, choices=TIPO_GASTOS_OPCIONES)
     id_pagos_servicios = models.ForeignKey(PagoServiciosPublicos, on_delete=models.PROTECT)
+    estado = models.BooleanField(default=True)
+    
     def __str__(self):
         return f"{self.tipo_gastos} - ${self.monto}"
      #class meta
@@ -339,6 +347,7 @@ class Empleado(models.Model):
     identificacion = models.CharField(max_length=20, unique=True, validators=[validar_identificacion]) 
     Correo= models.EmailField(max_length=254, unique=True, validators=[validar_email])
     direccion = models.CharField(max_length=255)
+    estado = models.BooleanField(default=True)  
     def __str__(self):
         return f"{self.nombre} ({self.identificacion})"
     #class meta
@@ -353,6 +362,7 @@ class Mantenimiento(models.Model):
     id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT)
     id_empleado = models.ForeignKey(Empleado, on_delete=models.PROTECT)
     id_tipo_mantenimiento = models.ForeignKey(TipoMantenimiento, on_delete=models.PROTECT)
+    estado = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.fallas} - {self.id_tipo_mantenimiento}"
@@ -374,6 +384,7 @@ class Informes(models.Model):
     id_empleado = models.ForeignKey(Empleado, on_delete=models.PROTECT)
     tipo_informe = models.CharField(max_length=100)
     id_mantenimiento = models.ForeignKey(Mantenimiento, on_delete=models.PROTECT)
+    estado = models.BooleanField(default=True)
     
     def __str__(self):
         return f"{self.id_informe} {self.tipo_informe}"
@@ -395,7 +406,9 @@ class Nomina(models.Model):
         } , validators=[validar_monto]
     )
     fecha_pago =  models.DateField() 
-    id_empleado =   models.ForeignKey(Empleado, on_delete=models.PROTECT)            
+    id_empleado =   models.ForeignKey(Empleado, on_delete=models.PROTECT) 
+    estado = models.BooleanField(default=True)
+               
     def __str__(self):
         return f"{self.rol} - ${self.monto} - {self.fecha_pago}"
      #class meta
@@ -421,6 +434,7 @@ class Pagos(models.Model):
     id_insumos = models.ForeignKey(Insumos, on_delete=models.PROTECT)
     id_repuesto = models.ForeignKey(Repuesto, on_delete=models.PROTECT)
     id_nomina= models.ForeignKey(Nomina, on_delete=models.PROTECT , blank=True, null=True) 
+    estado = models.BooleanField(default=True)
     
     def __str__(self):
         return f"{self.id_pago} {self.monto}"
@@ -528,32 +542,20 @@ class Empresa(models.Model):
     def __str__(self):
         return self.nombre
     
-#----- modulo de cliente base para factura----
-class ClienteFactura(models.Model):
-    TIPO_CLIENTE= [
-        ('cliente particular', 'Cliente Particular'),
-        ('empresa', 'Empresa'),
-    ]
-    tipo = models.CharField(max_length=20, choices=TIPO_CLIENTE)   
-    nombre = models.CharField(max_length=255, verbose_name="Nombre/Razón Social")
-    identificacion = models.CharField(max_length=50,  unique=True, verbose_name="Documento/NIT") 
-    telefono = models.CharField(max_length=20)
-    email = models.EmailField(validators=[validar_email])
-    direccion = models.TextField(verbose_name="Dirección")
-    estado = models.BooleanField(default=True, verbose_name="Activo")
+
 #-----------Factura-----------------
 class Factura(models.Model):
-    id_empresa = models.ForeignKey(Empresa, on_delete=models.PROTECT, null=True, blank=True)  # Agregado null/blank
-    Fecha = models.DateField(null=True, blank=True)  # Agregado
-    id_Detalles_servicios = models.ForeignKey(DetalleServicio, on_delete=models.PROTECT, null=True, blank=True)  # Agregado
-    id_empleado = models.ForeignKey(Empleado, on_delete=models.PROTECT, null=True, blank=True)  # Agregado
-    id_cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT, null=True, blank=True)
+    id_empresa = models.ForeignKey(Empresa, on_delete=models.PROTECT)  
+    Fecha = models.DateField()  
+    id_Detalles_servicios = models.ForeignKey(DetalleServicio, on_delete=models.PROTECT)  
+    id_empleado = models.ForeignKey(Empleado, on_delete=models.PROTECT)  
+    id_cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
     opciones_pago = [
         ('efectivo', 'Efectivo'),
         ('transferencia', 'Transferencia'),
     ]
-    metodo_pago = models.CharField(max_length=50, choices=opciones_pago, null=True, blank=True)  # Agregado
-
+    metodo_pago = models.CharField(max_length=50, choices=opciones_pago)  
+    estado = models.BooleanField(default=True)
     def __str__(self):
         cliente_nombre = self.id_cliente.nombre if self.id_cliente else "Sin cliente"
         return f"Factura {self.id} - {cliente_nombre}"
@@ -566,6 +568,7 @@ class Compra(models.Model):
     id_proveedor = models.ForeignKey(Proveedores, on_delete=models.CASCADE)  # LLAVE
     fecha_compra = models.DateField()
     hora_compra = models.TimeField()
+    estado = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.id_factura_compra} - {self.proveedor} - {self.fecha_compra} {self.hora_compra}"
@@ -592,8 +595,7 @@ class Caja(models.Model):
     )
     fecha= models.DateField()
     hora=models.TimeField()
-    id_admin=models.ForeignKey(Administrador, on_delete=models.CASCADE) 
-    id_Factura= models.ForeignKey(Factura, on_delete=models.CASCADE, blank=True, null=True)
+    estado = models.BooleanField(default=True)
     def __str__(self):
         return f"{self.tipo_movimiento} - {self.monto} en {self.fecha} {self.hora}"   
     #class meta

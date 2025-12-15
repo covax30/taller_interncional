@@ -1,0 +1,51 @@
+{% extends "generic_listar.html" %}
+{% load humanize %}
+
+{% block titulo %}
+        <i class="fa-solid fa-cash-register"></i>
+        <h1 class="text-center">Lista Ingreso a Caja Inactivos</h1>
+{% endblock titulo %}
+
+{% block agregar %}
+<a href="{{listar_url}}" class=" btn btn-primary btn btn-xs" title="listar ingresos a caja"><i class="fas fa-list"></i>
+          listar Ingresos a Caja
+</a>
+{% endblock %}
+
+{% block columnas %}
+
+        <th>Id  </th>
+        <th>Tipo de Movimiento</th>
+        <th>Monto</th>
+        <th>Fecha </th>
+        <th>Hora</th>
+
+        <th>Acciones</th>
+
+{% endblock %}
+
+{% block iterar %}
+
+      {% for j in object_list %}
+      <tr>
+        <td>{{ j.id }}</td>
+        <td>{{ j.tipo_movimiento}}</td>
+        <td>{{ j.monto|intcomma }}</td>
+        <td>{{ j.fecha}}</td>
+        <td>{{ j.hora}}</td>
+
+        
+        <form method="post">
+
+          <td>
+            <a href="{% url 'apy:caja_activar' j.id %}" 
+              class="btn btn-danger btn-xs" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="Activar registro de caja">
+              <i class="fas fa-power-off"></i>
+          </td>
+      </tr>
+      {% endfor %}
+
+{% endblock %}

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from apy.models import * # Importa Proveedores, Module, Permission
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse_lazy
@@ -21,6 +21,8 @@ class ProveedorListView(PermisoRequeridoMixin, ListView):
     module_name = 'Proveedores' 
     permission_required = 'view' 
     # --------------------------------
+    def get_queryset(self):
+        return Proveedores.objects.filter(estado=True)
     
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -37,6 +39,24 @@ class ProveedorListView(PermisoRequeridoMixin, ListView):
         context['entidad'] = 'Proveedor'
         return context
     
+    #-- Vista para Proveedores Inactivos --
+class ProveedorInactivaListView(PermisoRequeridoMixin, ListView):
+    model = Proveedores
+    template_name = 'Proveedores/proveedores_inactivos.html'
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Proveedores' 
+    permission_required = 'view'
+    
+    def get_queryset(self):
+        return Proveedores.objects.filter(estado=False)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Lista de Proveedores Inactivos'
+        context['listar_url'] = reverse_lazy('apy:proveedor_lista')
+        return context
+    
 class ProveedorCreateView(PermisoRequeridoMixin, CreateView): 
     model = Proveedores
     form_class = ProveedorForm
@@ -46,8 +66,10 @@ class ProveedorCreateView(PermisoRequeridoMixin, CreateView):
     # --- Configuración de Permisos ---
     module_name = 'Proveedores'
     permission_required = 'add'
+        
     
     def form_valid(self, form):
+        form.instance.estado = True 
         messages.success(self.request, "Proveedor creado correctamente")
         return super().form_valid(form)
     
@@ -88,9 +110,16 @@ class ProveedorDeleteView(PermisoRequeridoMixin, DeleteView):
     module_name = 'Proveedores'
     permission_required = 'delete'
     
-    def form_valid(self, form):
-        messages.success(self.request, "Proveedor eliminado correctamente")
-        return super().form_valid(form)
+    def post(self, request, *args, **kwargs):
+        
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        
+        self.object.estado = False
+        self.object.save()
+        
+        messages.success(self.request,f"Proveedor {Proveedores} desactivado correctamente")
+        return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -98,6 +127,34 @@ class ProveedorDeleteView(PermisoRequeridoMixin, DeleteView):
         context['entidad'] = 'Proveedores'
         context['listar_url'] = reverse_lazy('apy:proveedor_lista')
         return context
+    
+#--- Vista para activar Proveedor ---
+class ProveedorActivateView(PermisoRequeridoMixin, DeleteView):
+    model = Proveedores
+    template_name = 'Proveedores/activar_proveedores.html'
+    success_url = reverse_lazy('apy:proveedor_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Proveedores'
+    permission_required = 'change'
+    
+    def post(self, request, *args, **kwargs):
+        
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        
+        self.object.estado = True
+        self.object.save()
+        
+        messages.success(self.request,f"Proveedor {Proveedores} activado correctamente")
+        return HttpResponseRedirect(success_url)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Activar Proveedor'
+        context['entidad'] = 'Proveedores'
+        context['listar_url'] = reverse_lazy('apy:proveedor_lista')
+        return context    
     
 class ProveedorCreateModalView(CreateView):
     model = Proveedores
@@ -110,6 +167,7 @@ class ProveedorCreateModalView(CreateView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
+        form.instance.estado = True 
         try:
             self.object = form.save()
             return JsonResponse({
