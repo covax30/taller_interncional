@@ -23,15 +23,15 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-md-6">
-                    <p><strong>Vehículo:</strong> {{ servicio.id_vehiculo.placa }}</p>
-                    <p><strong>Marca:</strong> {{ servicio.id_vehiculo.marca_vehiculo }}</p>
-                    <p><strong>Modelo:</strong> {{ servicio.id_vehiculo.modelo_vehiculo }}</p>
-                    <p><strong>Color:</strong> {{ servicio.id_vehiculo.color }}</p>
+                    <p><strong>Vehículo:</strong> {{ servicio.vehiculo.placa }}</p>
+                    <p><strong>Marca:</strong> {{ servicio.vehiculo.marca_vehiculo }}</p>
+                    <p><strong>Modelo:</strong> {{ servicio.vehiculo.modelo_vehiculo }}</p>
+                    <p><strong>Color:</strong> {{ servicio.vehiculo.color }}</p>
                 </div>
                 <div class="col-md-6">
-                    <p><strong>Cliente:</strong> {{ servicio.id_vehiculo.id_cliente.nombre }}</p>
-                    <p><strong>Documento:</strong> {{ servicio.id_vehiculo.id_cliente.documento }}</p>
-                    <p><strong>Telefono:</strong> {{ servicio.id_vehiculo.id_cliente.telefono }}</p>
+                    <p><strong>Cliente:</strong> {{ servicio.vehiculo.cliente.nombre }}</p>
+                    <p><strong>Documento:</strong> {{ servicio.vehiculo.cliente.documento }}</p>
+                    <p><strong>Telefono:</strong> {{ servicio.vehiculo.cliente.telefono }}</p>
                     
                     </p>
                 </div>
@@ -228,7 +228,6 @@
 
 {% block extra_js %}
 <script>
-    // Scripts 
     console.log('Página de detalle de servicio cargada correctamente');
 </script>
 {% endblock %}

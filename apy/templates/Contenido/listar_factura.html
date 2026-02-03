@@ -29,72 +29,24 @@
 {% block iterar %}
     {% for f in object_list %}
     <tr>
-        <!-- Campo correcto según tu modelo -->
         <td>{{ f.id }}</td>
-        
-        <!-- Fecha - con formato -->
-        <td>
-            {% if f.fecha %}
-                {{ f.fecha|date:"d/m/Y" }}
-            {% else %}
-                <span class="text-muted">No especificada</span>
-            {% endif %}
-        </td>
-        
-        <!-- Empresa -->
-        <td>
-            {% if f.id_empresa %}
-                {{ f.id_empresa.nombre }}
-            {% else %}
-                <span class="text-muted">Sin empresa</span>
-            {% endif %}
-        </td>
-        
-        <!-- Detalle Servicio -->
-        <td>
-            {% if f.id_Detalles_servicios %}
-                Detalle #{{ f.id_Detalles_servicios.id }}
-            {% else %}
-                <span class="text-muted">Sin detalle</span>
-            {% endif %}
-        </td>
-        
-        <!-- Empleado -->
-        <td>
-            {% if f.id_empleado %}
-                {{ f.id_empleado.nombre }}
-            {% else %}
-                <span class="text-muted">Sin empleado</span>
-            {% endif %}
-        </td>
-        
-        <!-- Cliente -->
-        <td>
-            {% if f.id_cliente %}
-                {{ f.id_cliente.nombre }} 
-                <small class="text-muted">({{ f.id_cliente.identificacion }})</small>
-            {% else %}
-                <span class="text-muted">Sin cliente</span>
-            {% endif %}
-        </td>
-        
-        <!-- Método de Pago -->
-        <td>
-            {% if f.metodo_pago %}
-                <span class="badge 
-                    {% if f.metodo_pago == 'efectivo' %}bg-success
-                    {% elif f.metodo_pago == 'transferencia' %}bg-primary
-                    {% elif f.metodo_pago == 'tarjeta' %}bg-info
-                    {% else %}bg-secondary{% endif %}">
-                    {{ f.get_metodo_pago_display|default:f.metodo_pago }}
-                </span>
-            {% else %}
-                <span class="text-muted">No especificado</span>
-            {% endif %}
-        </td>
+        <td>{{ f.fecha }}</td>
+        <td>{{ f.empresa.nombre }}</td>
+        <td>{{ f.detalle_servicio }}</td>
+        <td>{{ f.empleado.nombre }}</td>
+        <td>{{ f.cliente.nombre }}</td>
+        <td> {{f.subtotal|intcomma}}</td>
+        <td>{{ f.metodo_pago }}</td>
         
         <!-- Acciones -->
         <td>
+
+        <div class="btn-group" role="group">
+                <a href="{% url 'apy:factura_detalle' f.id %}" 
+                   class="btn btn-info btn-sm" 
+                   title="Ver detalles de la factura">
+                    <i class="fas fa-eye"></i>
+                </a>    
             <div class="btn-group" role="group">
                 <a href="{% url 'apy:factura_editar' f.id %}" 
                    class="btn btn-warning btn-sm" 
@@ -108,19 +60,11 @@
                     <i class="fas fa-trash-alt"></i>
                 </a>
             </div>
-            <button 
-    type="button"
-    class="btn btn-outline-secondary btn-sm btn-pdf-factura"
-    title="Generar PDF de la factura"
-    data-id="{{ f.id }}"
-    data-fecha="{{ f.fecha|date:'d/m/Y' }}"
-    data-cliente="{{ f.id_cliente.nombre|default:'' }}"
-    data-documento="{{ f.id_cliente.identificacion|default:'' }}"
-    data-empleado="{{ f.id_empleado.nombre|default:'' }}"
-    data-empresa="{{ f.id_empresa.nombre|default:'' }}"
-    data-metodo-pago="{{ f.get_metodo_pago_display|default:f.metodo_pago }}"
-    data-monto="{{ f.monto|default:'0' }}"
->
+            
+<button type="button" 
+        class="btn btn-outline-danger btn-sm btn-pdf-factura" 
+        data-id="{{ f.id }}" 
+        title="Generar PDF de la factura">
     <i class="fas fa-file-pdf"></i>
 </button>
 
@@ -134,9 +78,8 @@
 
 {% endblock %}
 {% block extra_js %}
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="{% static 'js/imprimir_factura.js' %}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+<script src="{% static 'AdminLTE/dist/js/imprimir_factura.js' %}"></script>
 
-</script>
 {% endblock %}

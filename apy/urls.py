@@ -1,5 +1,5 @@
 from django.urls import path
-from apy.view.empresa.views import EmpresaCreateModalView, EmpresaCreateView, EmpresaDeleteView, EmpresaInactivosListView, EmpresaListView, EmpresaUpdateView, activar_empresa
+from apy.view.empresa.views import *
 from apy.views import *
 from apy.view.Contenidos.views import *
 from apy.view.proveedor.view import *
@@ -8,6 +8,7 @@ from apy.view.Gastos.views import *
 from apy.view.Marca.views import *
 from apy.view.Nomina.views import *
 from apy.view.Caja.views import *
+from login import views
 from .views import *
 from apy.view.Contenidos.views import *
 from apy.view.gen_index.views import index
@@ -56,6 +57,8 @@ urlpatterns = [
     path('factura/eliminar/<int:pk>/', FacturaDeleteView.as_view(), name='factura_eliminar'),
     path("factura/inactivos/", FacturaInactivosListView.as_view(), name="factura_inactivos"),       
     path('factura/activar/<int:pk>/', FacturaActivarView.as_view(), name="factura_activar"),
+    path('factura/json/<int:pk>/', factura_detalle_json, name='factura_json'),
+    path('factura/detalle/<int:pk>/', DetalleFacturaView.as_view(), name='factura_detalle'),
     
     # ------Url modulo detalle servicio----------------
     path('servicios/', ListServicioView.as_view(), name='lista_servicios'),  
@@ -93,15 +96,9 @@ urlpatterns = [
     path('empresa/editar/<int:pk>/', EmpresaUpdateView.as_view(), name='empresa_editar'),
     path('empresa/eliminar/<int:pk>/', EmpresaDeleteView.as_view(), name='empresa_eliminar'),
     path("empresa/modal/crear/", EmpresaCreateModalView.as_view(), name="empresa_modal_crear"),
-    path("empresa/inactivos/", EmpresaInactivosListView.as_view(), name="empresa_inactivos"),
-    path("empresa/activar/", activar_empresa, name="empresa_activar"),
-
+    path("empresa/inactivos/", EmpresaInactivasListView.as_view(), name="empresa_inactivos"),
+    path("empresa/activar/<int:pk>/", EmpresaInactivaDeleteView.as_view(), name="empresa_activar"),
     
-    
-    
-
-
-
     path('compra/listar/', CompraListView.as_view(), name='compra_lista'),
     path('compra/agregar/', CompraCreateView.as_view(), name='compra_crear'),
     path('compra/editar/<int:pk>/', CompraUpdateView.as_view(), name='compra_editar'),

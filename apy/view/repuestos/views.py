@@ -84,7 +84,7 @@ class RepuestoCreateView(PermisoRequeridoMixin, CreateView):
     def form_valid(self, form):
         form.instance.estado = True 
         messages.success(self.request, "repuesto creado correctamente")
-        return super().form_valid(form) 
+        return super().form_valid(form)  
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -92,7 +92,6 @@ class RepuestoCreateView(PermisoRequeridoMixin, CreateView):
         context['entidad'] = 'Repuesto'
         context['listar_url'] = reverse_lazy('apy:repuesto_lista')
         return context
-    
     
 class RepuestoUpdateView(UpdateView):
     model = Repuesto

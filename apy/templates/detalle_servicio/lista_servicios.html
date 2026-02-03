@@ -68,10 +68,10 @@
     <tr>
         <td>{{ servicio.id }}</td>
         <td>
-            <strong>{{ servicio.id_vehiculo.placa }}</strong><br>
-            <small class="text-muted">{{ servicio.id_vehiculo.marca_vehiculo }} {{ servicio.id_vehiculo.modelo_vehiculo }}</small>
+            <strong>{{ servicio.vehiculo.placa }}</strong><br>
+            <small class="text-muted">{{ servicio.vehiculo.marca_vehiculo }} {{ servicio.vehiculo.modelo_vehiculo }}</small>
         </td>
-        <td>{{ servicio.id_vehiculo.id_cliente.nombre }}</td>
+        <td>{{ servicio.vehiculo.id_cliente.nombre }}</td>
         <td>{{ servicio.fecha_creacion|date:"d/m/Y H:i" }}</td>
         
         <td><strong>${{ servicio.subtotal|intcomma}}</strong></td>

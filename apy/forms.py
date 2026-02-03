@@ -92,7 +92,7 @@ class EmpresaForm(ModelForm):
                 attrs={
                     'class': 'form-control'
                     }),
-            'nit': NumberInput(
+            'nit': TextInput(
                 attrs={
                     'class': 'form-control', 'min': '1'
                     }),
@@ -245,15 +245,15 @@ class DetalleInsumoForm(ModelForm):
 class DetalleServicioForm(ModelForm):
     class Meta:
         model = DetalleServicio
-        fields = ['id_vehiculo']
+        fields = ['vehiculo']
         widgets = {
-            'id_vehiculo': Select(attrs={
+            'vehiculo': Select(attrs={
                 'class': 'form-control',
                 'placeholder': 'Seleccione un vehículo'
             }),
         }
         error_messages = {
-            'id_vehiculo': {
+            'vehiculo': {
                 'required': 'El vehículo es obligatorio.',
             },
         }
@@ -261,7 +261,7 @@ class DetalleServicioForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Configurar cómo se muestran los vehículos en el select
-        self.fields['id_vehiculo'].label_from_instance = (
+        self.fields['vehiculo'].label_from_instance = (
             lambda obj: f"{obj.placa} - {obj.marca_vehiculo} {obj.modelo_vehiculo} - {obj.color}"
         )
 
@@ -502,7 +502,7 @@ class ClienteForm(ModelForm):
                     'placeholder':'Ingrese el nombre del cliente',
                 }
             ),
-            'identificacion':NumberInput(
+            'identificacion':TextInput(
                 attrs={
                     'placeholder':'Ingrese el documento del cliente',
                 }
@@ -526,7 +526,7 @@ class ClienteForm(ModelForm):
             
         }
         error_messages = {
-            'documento': {
+            'identificacion': {
                 'required': 'El docmuento de identidad es obligatorio',
                 'unique': 'Ya existe un cliente con ese documento de identidad',
                 'invalid': 'Por favor ingrese solo números en el documento de identidad',
