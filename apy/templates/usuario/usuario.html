@@ -3,177 +3,118 @@
 {% load static tz %} 
 
 {% block content %}
-{% comment %}
-    Lógica para determinar la URL correcta de la imagen de perfil del usuario.
-    1. Si el usuario tiene una imagen subida y no es el default, usar esa URL (MEDIA_URL).
-    2. Si no, usar un avatar por defecto basado en si es administrador o no (STATIC_URL).
-{% endcomment %}
 {% with user.is_superuser as is_admin %}
     
-    {# ----------------------------------------------------- #}
     {# LÓGICA DE DEFINICIÓN DE user_avatar_url #}
-    {# ----------------------------------------------------- #}
-    {% if user.profile.imagen.url and user.profile.imagen.url|length > 0 and 'default.png' not in user.profile.imagen.url %}
-        {# 1. IMAGEN SUBIDA: Usar la URL dinámica #}
-        {% with user.profile.imagen.url as user_avatar_url %}{% endwith %}
+    {% if user.is_superuser %}
+        {% static 'img/gerente.png' as avatar_default %}
     {% else %}
-        {# 2. AVATAR POR DEFECTO: Usar el tag {% static ... as ... %} para asignación #}
-        {% if is_admin %}
-            {% static 'img/gerente.png' as user_avatar_url %}
-        {% else %}
-            {% static 'img/empleado.png' as user_avatar_url %}
-        {% endif %}
+        {% static 'img/empleado.png' as avatar_default %}
     {% endif %}
-    {# ----------------------------------------------------- #}
-
-<div class="row justify-content-center">
     
-    {# COLUMNA IZQUIERDA (col-md-4) #}
-    <div class="col-md-4 border-right d-flex align-items-center">
-        <div class="d-flex flex-column align-items-center text-center p-3 py-3 w-100">
-            
-            {# APLICACIÓN DE LA URL CORREGIDA #}
-            <img class="rounded-circle mt-7" width="200px" src="{{ user_avatar_url }}" alt="Foto de perfil">
-            
-            <span class="font-weight-bold mt-3 h4 text-primary">
-                {{ user.username }}
-            </span>
-            <span class="text-muted">
-                {{ user.email }}
-            </span>
-            <span class="badge bg-{{ user.is_superuser|yesno:'danger,success' }} mt-2 p-2">
-                {{ user.is_superuser|yesno:'Gerente (Admin),Empleado' }}
-            </span>
-            
-            <button class="btn btn-primary mt-3" type="button" title="Nueva imagen">Subir nueva imagen</button> 
+<div class="container rounded mt-5 mb-5 shadow-sm p-4 bg-body"> 
+    <div class="row justify-content-center">
+        
+        {# COLUMNA IZQUIERDA (col-md-4) - Vista Estática #}
+        <div class="col-md-4 border-right d-flex align-items-center pt-3"> 
+            <div class="d-flex flex-column align-items-center text-center p-3 py-3 w-100">
+                
+                {# CAMBIO 2: Reducción de margen superior de mt-5 a mt-3 #}
+                <img src="{% if user.profile.imagen %}{{ user.profile.imagen.url }}{% else %}{{ avatar_default }}{% endif %}" 
+                alt="Imagen de Perfil" 
+                class="rounded-circle mt-3" 
+                style="width: 250px; height: 250px; object-fit: cover;">
+                
+                <span class="font-weight-bold mt-3 h4 text-primary">
+                    {{ user.username }}
+                </span>
+                <span class="text-muted">
+                    {{ user.email }}
+                </span>
+                <span class="badge bg-{{ user.is_superuser|yesno:'danger,success' }} mt-2 p-2">
+                    {{ user.is_superuser|yesno:'Gerente (Admin),Empleado' }}
+                </span>
+            </div>
         </div>
-    </div>
-    
-    {# COLUMNA DERECHA (col-md-8) #}
-    <div class="col-md-8">
-        <div class="p-3 py-5">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="text-right text-body">Detalles del Perfil</h4>
-                
-                <a href="{% url 'apy:editar_usuario' %}" class="btn btn-warning">
-                    <i class="fas fa-edit"></i> Editar Información
-                </a>
-            </div>
-            
-            <div class="card shadow-sm mb-5">
-                <div class="card-header bg-dark text-white">
-                    Información de la Cuenta
+        
+        {# COLUMNA DERECHA (col-md-8) - Detalles del Perfil #}
+        <div class="col-md-8">
+            <div class="p-3 py-5">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="text-right text-body">Detalles del Perfil</h4>
+                    
+                    <a href="{% url 'apy:editar_usuario' %}" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Editar Información
+                    </a>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <h6 class="text-muted small">FECHA DE CREACIÓN</h6>
-                            <p class="mb-0 fs-5">{{ user.date_joined|date:"d/m/Y" }}</p>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <h6 class="text-muted small">ÚLTIMO ACCESO</h6>
-                            <p class="mb-0 fs-5">
-                                {{ user.last_login|default:"Nunca"|localtime|date:"d/m/Y H:i" }}
-                            </p>
+                
+                {# INFORMACIÓN DE LA CUENTA (Resto del código sin cambios) #}
+                <div class="card shadow-sm mb-5">
+                    <div class="card-header bg-dark text-white"> 
+                        Información de la Cuenta
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-muted small">FECHA DE CREACIÓN</h6>
+                                <p class="mb-0 fs-5">{{ user.date_joined|date:"d/m/Y" }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-muted small">ÚLTIMO ACCESO</h6>
+                                <p class="mb-0 fs-5">
+                                    {{ user.last_login|default:"Nunca"|localtime|date:"d/m/Y H:i" }}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <h5 class="mb-3 text-body">Datos Personales</h5>
-            
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label text-muted">Primer Nombre</label>
-                    <p class="form-control-static border p-2 rounded bg-light">
-                        {{ user.first_name|default:"(No Registrado)" }}
-                    </p>
+                
+                {# DATOS PERSONALES #}
+                <h5 class="mb-3 text-body">Datos Personales</h5>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Primer Nombre</label>
+                        <p class="form-control-static border p-2 rounded bg-light">
+                            {{ user.first_name|default:"(No Registrado)" }}
+                        </p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Primer Apellido</label>
+                        <p class="form-control-static border p-2 rounded bg-light">
+                            {{ user.last_name|default:"(No Registrado)" }}
+                        </p>
+                    </div>
+                </div> 
+                
+                {# INFORMACIÓN DE CONTACTO #}
+                <h5 class="mb-3 mt-4 text-body">Información de Contacto</h5>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Email</label>
+                        <p class="form-control-static border p-2 rounded bg-light">
+                            {{ user.email }}
+                        </p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Número de Teléfono</label>
+                        <p class="form-control-static border p-2 rounded bg-light">
+                        {{ user.profile.telefono|default:"(No Registrado)" }}</p> 
+                    </div>
                 </div>
                 
-                <div class="col-md-6 mb-3">
-                    <label class="form-label text-muted">Primer Apellido</label>
-                    <p class="form-control-static border p-2 rounded bg-light">
-                        {{ user.last_name|default:"(No Registrado)" }}
-                    </p>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Nombre de Usuario (Sistema)</label>
+                        <p class="form-control-static border p-2 rounded bg-light">
+                            {{ user.username }}
+                        </p>
+                    </div>
                 </div>
-                
-                <div class="text-center mt-4">
-                    <button type="submit" class="btn btn-primary" title="Guardar Cambios">
-                        <i class="fas fa-save"></i> Guardar Cambios
-                    </button>
-                </div>
-            </form>
-            </div>
-            
-            <h5 class="mb-3 mt-4 text-body">Información de Contacto</h5>
-            
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label text-muted">Email</label>
-                    <p class="form-control-static border p-2 rounded bg-light">
-                        {{ user.email }}
-                    </p>
-                </div>
-                
-                <div class="col-md-6 mb-3">
-                    <label class="form-label text-muted">Número de Teléfono</label>
-                    <p class="form-control-static border p-2 rounded bg-light">
-                    {{ telefono_valor }}</p>
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label text-muted">Nombre de Usuario (Sistema)</label>
-                    <p class="form-control-static border p-2 rounded bg-light">
-                        {{ user.username }}
-                    </p>
-                </div>
-            </div>
 
+            </div>
         </div>
-    </div>
-    
-    <div class="col-md-4">
-        <div class="p-3 py-5">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="text-right">Cambiar Contraseña</h4>
-            </div>
-            
-            <form method="POST" action="{% url 'apy:password_change' %}"> 
-                {% csrf_token %}
-                
-                <div class="col-md-12">
-                    <div class="form-floating password-field mb-4">
-                        {{ password_form.old_password }}
-                        <label for="{{ password_form.old_password.id_for_label }}">Contraseña Antigua</label>
-                        {% if password_form.old_password.errors %}<small class="text-danger">{{ password_form.old_password.errors }}</small>{% endif %}
-                    </div>
-                </div>
-                
-                <div class="col-md-12">
-                    <div class="form-floating password-field mb-4">
-                        {{ password_form.new_password1 }}
-                        <label for="{{ password_form.new_password1.id_for_label }}">Nueva Contraseña</label>
-                        {% if password_form.new_password1.errors %}<small class="text-danger">{{ password_form.new_password1.errors }}</small>{% endif %}
-                    </div>
-                </div>
-                
-                <div class="col-md-12">
-                    <div class="form-floating password-field mb-4">
-                        {{ password_form.new_password2 }}
-                        <label for="{{ password_form.new_password2.id_for_label }}">Confirmar Nueva Contraseña</label>
-                        {% if password_form.new_password2.errors %}<small class="text-danger">{{ password_form.new_password2.errors }}</small>{% endif %}
-                    </div>
-                </div>
-                
-                <div class="col-12">
-                    <button type="submit" class="btn btn-primary" title="Cambiar Contraseña">
-                        <i class="fas fa-lock"></i> Cambiar Contraseña
-                    </button>
-                </div>
-            </form>
-            </div>
     </div>
 </div>
 

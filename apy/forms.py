@@ -488,18 +488,27 @@ class PerfilUsuarioForm(forms.ModelForm):
             raise forms.ValidationError("Este correo electrónico ya está registrado.")
         return email
 
-# 2. Formulario para editar el modelo Profile (SOLO TELEFONO)
+# 2. Formulario para editar el modelo Profile (CON TELEFONO E IMAGEN)
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ['telefono']
-        labels = {'telefono': 'Número de Teléfono'}
+        # Incluimos 'telefono' e 'imagen'
+        fields = ['telefono', 'imagen'] 
+        labels = {
+            'telefono': 'Número de Teléfono',
+            'imagen': 'Imagen de Perfil', # Etiqueta para el campo de imagen
+        }
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Estilos para el campo de teléfono
         self.fields['telefono'].widget.attrs.update({
             'class': 'form-control', 
             'placeholder': 'Número de Teléfono (Ej: +57 300 000 0000)'
+        })
+        # Estilos para el campo de archivo (opcional, FileInput ya es el default)
+        self.fields['imagen'].widget.attrs.update({
+            'class': 'form-control-file' 
         })
     
 class ClienteForm(ModelForm):

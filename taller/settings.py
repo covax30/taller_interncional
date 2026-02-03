@@ -137,12 +137,13 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+# La línea USE_TZ = True ya está arriba, la dejamos
+# USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
+# -----------------------------------------------------
+## 📁 Configuración de Archivos Estáticos (STATIC)
+# -----------------------------------------------------
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
@@ -151,6 +152,16 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# -----------------------------------------------------
+## 🖼️ Configuración de Archivos de Usuario (MEDIA)
+# -----------------------------------------------------
+# La URL que usaremos para acceder a los archivos subidos (ej: la foto de perfil)
+MEDIA_URL = '/media/'
+# La ruta física donde Django guarda los archivos subidos (dentro del proyecto)
+MEDIA_ROOT = BASE_DIR / 'media'
+# -----------------------------------------------------
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -161,9 +172,8 @@ LOGIN_REDIRECT_URL = 'apy:estadisticas'
 LOGOUT_REDIRECT_URL = ''
 
 # -----------------------------------------------------
-# ✅ CONFIGURACIÓN DE CORREO CORREGIDA Y FINAL
+# ✅ CONFIGURACIÓN DE CORREO
 # -----------------------------------------------------
-# Asegúrate de que esta línea esté presente:
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' 
 # Si usas Gmail (lo más común):
 EMAIL_HOST = 'smtp.gmail.com'
@@ -173,12 +183,8 @@ EMAIL_HOST_USER = 'soportecnico.t.i.m@gmail.com'
 EMAIL_HOST_PASSWORD = 'pjqmmdgfnredlrtg'
 
 # -----------------------------------------------------
-# ✅ CONFIGURACIÓN DE ARCHIVOS MEDIA (Para Backups)
+# 📦 WhiteNoise y Almacenamiento
 # -----------------------------------------------------
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
-# WhiteNoise static files storage
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
@@ -189,5 +195,4 @@ STORAGES = {
     },
 }
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# La duplicación de MEDIA_URL y MEDIA_ROOT ha sido eliminada de aquí
