@@ -21,7 +21,7 @@ class FacturaForm(ModelForm):
         model = Factura
         exclude = ['id_empresa']
         widgets = {
-            'Fecha':DateInput(
+            'fecha':DateInput(
                 attrs={
                     'type': 'date',
                     'placeholder':'Ingrese la fecha',
@@ -136,7 +136,7 @@ class RepuestoscantidadForm(ModelForm):
         widgets = {
             'id_repuesto': Select(attrs={'class': 'form-control'}),
             'cantidad': NumberInput(attrs={'class': 'form-control', 'min': '1'}),
-            'precio_unitario': NumberInput(attrs={'class': 'form-control', 'placeholder': '0.00', 'step': '0.01'}),
+            'precio_unitario': NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese el precio unitario', 'step': '0.01'}),
         }
         
         error_messages = {
@@ -223,7 +223,7 @@ class DetalleInsumoForm(ModelForm):
             ),
             'precio_unitario': NumberInput(
                 attrs={
-                    'placeholder': 'Ingrese el costo del insumo',
+                    'placeholder': 'Ingrese el precio unitario',
                     'step': '0.01',
                     'class': 'form-control',
                 }

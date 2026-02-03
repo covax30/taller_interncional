@@ -93,26 +93,6 @@ class RepuestoCreateView(PermisoRequeridoMixin, CreateView):
         context['listar_url'] = reverse_lazy('apy:repuesto_lista')
         return context
     
-    def form_valid(self, form):
-        self.object = form.save()
-
-        if self.request.headers.get("x-requested-with") == "XMLHttpRequest":
-            return JsonResponse({
-                "success": True,
-                "id": self.object.id,
-                "nombre": str(self.object.nombre)
-            })
-
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        if self.request.headers.get("x-requested-with") == "XMLHttpRequest":
-            return JsonResponse({
-                "success": False,
-                "errors": form.errors
-            }, status=400)
-        return super().form_invalid(form)
-
     
 class RepuestoUpdateView(UpdateView):
     model = Repuesto

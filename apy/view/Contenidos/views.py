@@ -79,6 +79,7 @@ class FacturaCreateView(PermisoRequeridoMixin, CreateView):
     
     def form_valid(self, form):
         form.instance.estado = True 
+        form.instance.id_empresa_id = 1 
         messages.success(self.request, "Factura creada correctamente")
         return super().form_valid(form)
     
@@ -127,7 +128,7 @@ class FacturaDeleteView(PermisoRequeridoMixin, DeleteView):
         self.object.estado = False
         self.object.save()
         
-        messages.success(self.request, f"Cliente {self.object.nombre} desactivado ")
+        messages.success(self.request, f"Cliente {self.object.id} desactivado ")
         return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):
@@ -155,7 +156,7 @@ class FacturaActivarView(PermisoRequeridoMixin, DeleteView):
         self.object.estado = True
         self.object.save()
         
-        messages.success(self.request, f"Factura {self.object.nombre} activado ")
+        messages.success(self.request, f"Factura {self.object.id} activado ")
         return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):

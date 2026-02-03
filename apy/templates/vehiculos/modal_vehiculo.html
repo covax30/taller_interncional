@@ -12,7 +12,10 @@
         <div class="input-group">
             {{ form.id_cliente|add_class:'form-control'|attr:'autocomplete:off' }}
             <div class="input-group-append">
-            </div>
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_cliente" title="Agregar nuevo cliente">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div> 
         </div>
         {% if form.id_cliente.errors %}
             <div class="invalid-feedback d-block">

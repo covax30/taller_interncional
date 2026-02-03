@@ -29,7 +29,7 @@
                 {% endfor %}
             </div>
         {% endif %}
-    </div>
+    </div> 
 
     <!-- Hora -->
     <div class="form-group mb-3">
@@ -84,6 +84,7 @@
 {% endblock %}
 
 {% block modals %}
+    {% include "apy/vehiculos/modal_vehiculo.html" %}
     {% include "apy/clientes/modal_cliente.html" %} 
 {% endblock %}
 

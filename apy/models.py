@@ -546,7 +546,7 @@ class Empresa(models.Model):
 #-----------Factura-----------------
 class Factura(models.Model):
     id_empresa = models.ForeignKey(Empresa, on_delete=models.PROTECT)  
-    Fecha = models.DateField()  
+    fecha = models.DateField()  
     id_Detalles_servicios = models.ForeignKey(DetalleServicio, on_delete=models.PROTECT)  
     id_empleado = models.ForeignKey(Empleado, on_delete=models.PROTECT)  
     id_cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
