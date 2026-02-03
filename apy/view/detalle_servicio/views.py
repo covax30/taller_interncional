@@ -221,8 +221,8 @@ class DetalleServicioView(DetailView):
             'detallerepuesto_set__id_repuesto',
             'detalletipomantenimiento_set__id_tipo_mantenimiento', 
             'detalleinsumos_set__id_insumos__id_marca',
-            'id_vehiculo__id_cliente'
-        ).select_related('id_vehiculo')
+            'vehiculo__id_cliente'
+        ).select_related('vehiculo')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

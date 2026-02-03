@@ -1,0 +1,40 @@
+{% extends "generic_listar.html" %}
+{% load humanize %}
+{% block titulo %}
+        <h1 class="text-center">Lista de empresas inactivas</h1>
+{% endblock titulo %}
+
+{% block agregar %}
+        <a href="{% url 'apy:empresa_lista' %}" class="btn btn-primary">Volver a lista de empresas</a>
+       
+{% endblock %}
+
+{% block columnas %}
+  <th>Id empresa</th>
+  <th>Nombre</th>
+  <th>NIT</th>
+  <th>Direccion</th>
+  <th>Telefono</th>
+
+  <th>Acciones</th>
+{% endblock %}
+
+{% block iterar %}
+  {% for emp in object_list %}
+    <tr>
+        <td>{{ emp.id }}</td>
+        <td>{{ emp.nombre }}</td>
+        <td>{{ emp.nit }}</td>
+        <td>{{ emp.direccion }}</td>
+        <td>{{ emp.telefono }}</td>
+
+        <td>
+            <a href="{% url 'apy:empresa_activar' emp.id %}" class="btn btn-success btn-xs">
+                <i class="fas fa-power-off"></i>
+            </a>
+        </td>
+    </tr>
+  {% endfor %}
+  
+  
+{% endblock %} 

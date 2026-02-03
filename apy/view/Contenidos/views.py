@@ -7,10 +7,14 @@ from django.urls import reverse_lazy
 from apy.forms import *
 from django.contrib import messages
 # Importar modelos necesarios
-from apy.models import Factura 
+from apy.models import Factura, DetalleRepuesto, DetalleTipoMantenimiento, DetalleInsumos 
 # Importar el Mixin Corregido (que lanza 403)
 from apy.decorators import PermisoRequeridoMixin 
 
+
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.views.generic import DetailView
 
 # --------------Vistas de Facturas---------------
 class FacturaListView(PermisoRequeridoMixin, ListView):
@@ -126,8 +130,8 @@ class FacturaDeleteView(PermisoRequeridoMixin, DeleteView):
         
         self.object.estado = False
         self.object.save()
-        
-        messages.success(self.request, f"Cliente {self.object.nombre} desactivado ")
+
+        messages.success(self.request, f"Factura {Factura} desactivada ")
         return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):
@@ -155,7 +159,7 @@ class FacturaActivarView(PermisoRequeridoMixin, DeleteView):
         self.object.estado = True
         self.object.save()
         
-        messages.success(self.request, f"Factura {self.object.nombre} activado ")
+        messages.success(self.request, f"Factura {Factura} activado ")
         return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):
@@ -164,3 +168,100 @@ class FacturaActivarView(PermisoRequeridoMixin, DeleteView):
         context['entidad'] = 'Facturas'
         context['listar_url'] = reverse_lazy('apy:factura_inactivos')
         return context    
+    
+def factura_detalle_json(request, pk):
+    # Traemos la factura por su ID (pk)
+    factura = get_object_or_404(Factura, pk=pk)
+    
+    # Obtenemos el servicio relacionado
+    # NOTA: Asegúrate que el campo en 'Factura' se llame 'detalles_servicios'
+    servicio = factura.detalle_servicio
+    
+    # 1. Repuestos (usando el related_name por defecto '_set')
+    repuestos = [
+        {
+            'descripcion': f"REPUESTO: {r.id_repuesto.nombre}",
+            'cantidad': r.cantidad,
+            'precio': float(r.precio_unitario),
+            'subtotal': float(r.subtotal)
+        } for r in servicio.detallerepuesto_set.all().select_related('id_repuesto')
+    ]
+    
+    # 2. Mantenimientos
+    mantenimientos = [
+        {
+            'descripcion': f"MANTENIMIENTO: {m.id_tipo_mantenimiento.nombre}",
+            'cantidad': m.cantidad,
+            'precio': float(m.precio_unitario),
+            'subtotal': float(m.subtotal)
+        } for m in servicio.detalletipomantenimiento_set.all().select_related('id_tipo_mantenimiento')
+    ]
+
+    # 3. Insumos
+    insumos = [
+        {
+            'descripcion': f"INSUMO: {i.id_insumos}",
+            'cantidad': i.cantidad,
+            'precio': float(i.precio_unitario),
+            'subtotal': float(i.subtotal)
+        } for i in servicio.detalleinsumos_set.all().select_related('id_insumos')
+    ]
+
+    # Unimos todos los items para la tabla del PDF
+    todos_los_items = repuestos + mantenimientos + insumos
+
+    # Estructura final del JSON
+    data = {
+        'factura_nro': factura.id,
+        'fecha': factura.fecha.strftime('%d/%m/%Y'),
+        'empresa': {
+            'nombre': factura.empresa.nombre,
+            'nit': factura.empresa.nit,
+            'direccion': factura.empresa.direccion,
+            'telefono': factura.empresa.telefono,
+        },
+        'cliente': {
+            'nombre': factura.cliente.nombre,
+            'documento': factura.cliente.identificacion,
+        },
+        'vehiculo': {
+            'placa': servicio.vehiculo.placa,
+            'info': f"{servicio.vehiculo.marca_vehiculo} {servicio.vehiculo.modelo_vehiculo}",
+        },
+        'items': todos_los_items,
+        'subtotal_factura': float(factura.subtotal),
+    }
+    
+    return JsonResponse(data)
+
+class DetalleFacturaView(DetailView):
+    model = Factura
+    template_name = 'Contenido/detalle_factura.html'
+    context_object_name = 'factura'
+
+    def get_queryset(self):
+        return Factura.objects.select_related(
+            'empresa', 
+            'cliente', 
+            'empleado', 
+            'detalle_servicio__vehiculo' # Accedemos al vehículo a través del servicio
+        ).prefetch_related(
+            'detalle_servicio__detallerepuesto_set__id_repuesto',
+            'detalle_servicio__detalleinsumos_set__id_insumos',
+            'detalle_servicio__detalletipomantenimiento_set__id_tipo_mantenimiento'
+        )
+ 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        factura = self.get_object()
+        servicio = factura.detalle_servicio
+
+        context.update({
+            'servicio': servicio,
+            'repuestos': servicio.detallerepuesto_set.all(),
+            'mantenimientos': servicio.detalletipomantenimiento_set.all(),
+            'insumos': servicio.detalleinsumos_set.all(),
+            'subtotal_factura': servicio.subtotal,
+        })
+
+        return context

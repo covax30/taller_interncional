@@ -26,14 +26,8 @@ def validar_telefono(value):
     
 def validar_identificacion(value):
     s = str(value).strip()
-
-    # Verifica solo números (sin letras ni símbolos)
-    if not re.fullmatch(r'^\d+$', s):
-        raise ValidationError('La identificación debe contener únicamente números')
-
-    # Verifica la longitud
-    if not (8 <= len(s) <= 11):
-        raise ValidationError('La identificación debe tener entre 8 y 11 dígitos')
+    if not re.fullmatch(r'^\d{7,10}(-\d{1})?$', s):
+        raise ValidationError('Ingrese solo números (Cédula) o el formato 123456789-0 (NIT).')
     
 def validar_edad(value):
     if value < 16 or value > 90:
@@ -70,6 +64,11 @@ color_regex = RegexValidator(
         regex=r'^[A-Za-z\s]+$',
         message="El color solo debe contener letras."
     )
+
+nit_validator = RegexValidator(
+    regex=r'^(\d{1,3}(\.?\d{3}){2})\-\d$',
+    message="El NIT debe tener el formato: 123456789-0 o 12.345.678-0"
+)
 
 
 #------ MODULOS ERICK ---------
@@ -211,7 +210,14 @@ class Cliente(models.Model):
     ]
     tipo = models.CharField(max_length=20, choices=TIPO_CLIENTE, blank=True, null=True)
     nombre = models.CharField(max_length=255, verbose_name="Nombre/Razón Social", blank=True, null=True)
-    identificacion = models.CharField(max_length=50, unique=True, verbose_name="Documento/NIT", blank=True, null=True)
+    identificacion = models.CharField(
+        max_length=50, 
+        unique=True, 
+        verbose_name="Documento/NIT", 
+        validators=[validar_identificacion], 
+        blank=False, 
+        null=False 
+    )
     telefono = models.CharField(max_length=20, blank=True, null=True)
     correo = models.EmailField(validators=[validar_email], blank=True, null=True)
     direccion = models.TextField(verbose_name="Dirección", blank=True, null=True)
@@ -440,60 +446,56 @@ class Pagos(models.Model):
         return f"{self.id_pago} {self.monto}"
 
 # ----- modulo detalle servicio  ---------
-
 class DetalleServicio(models.Model):
-    id_vehiculo = models.ForeignKey('Vehiculo', on_delete=models.PROTECT)
+    vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT,related_name="servicios")
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     estado = models.BooleanField(default=True)
-    
-    
+
+    #class Meta:
+        #verbose_name = "Detalle de Servicio"
+        #verbose_name_plural = "Detalles de Servicio"
+
+    # ---------- TOTALES ----------
     @property
     def total_repuestos(self):
-        """Calcula el total de TODOS los repuestos del servicio"""
-        try:
-            return sum(detalle_repuesto.subtotal for detalle_repuesto in self.detallerepuesto_set.all())
-        except (AttributeError, TypeError):
-            return 0
-    
+        return sum(
+            d.subtotal for d in self.detallerepuesto_set.all()
+        )
+
     @property
     def total_mantenimientos(self):
-        """Calcula el total de TODOS los mantenimientos del servicio"""
-        try:
-            return sum(detalle_tipo.subtotal for detalle_tipo in self.detalletipomantenimiento_set.all())
-        except (AttributeError, TypeError):
-            return 0
-    
+        return sum(
+            d.subtotal for d in self.detalletipomantenimiento_set.all()
+        )
+
     @property
     def total_insumos(self):
-        """Calcula el total de TODOS los insumos del servicio"""
-        try:
-            return sum(detalle_insumo.subtotal for detalle_insumo in self.detalleinsumos_set.all())
-        except (AttributeError, TypeError):
-            return 0
-    
-    
+        return sum(
+            d.subtotal for d in self.detalleinsumos_set.all()
+        )
+
     @property
     def subtotal(self):
-        total = 0
-        for detalle_repuesto in self.detallerepuesto_set.all():
-            total += detalle_repuesto.subtotal
-        for detalle_tipo in self.detalletipomantenimiento_set.all():
-            total += detalle_tipo.subtotal
-        for detalle_insumo in self.detalleinsumos_set.all():
-            total += detalle_insumo.subtotal
-        return total
+        return (
+            self.total_repuestos +
+            self.total_mantenimientos +
+            self.total_insumos
+        )
 
     @property
     def total_items(self):
-        return (self.detallerepuesto_set.count() + 
-                self.detalletipomantenimiento_set.count() + 
-                self.detalleinsumos_set.count())
+        return (
+            self.detallerepuesto_set.count() +
+            self.detalletipomantenimiento_set.count() +
+            self.detalleinsumos_set.count()
+        )
 
     def __str__(self):
-        return f"Servicio {self.id} - Vehículo: {self.id_vehiculo.placa}"
+        return f"Servicio #{self.id} - {self.vehiculo.placa}"
+
 class DetalleRepuesto(models.Model):
     detalle_servicio = models.ForeignKey(DetalleServicio, on_delete=models.PROTECT)
-    id_repuesto = models.ForeignKey('Repuesto', on_delete=models.PROTECT)
+    id_repuesto = models.ForeignKey(Repuesto, on_delete=models.PROTECT)
     cantidad = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
     precio_unitario = models.PositiveIntegerField(validators=[validar_monto])
     
@@ -506,7 +508,7 @@ class DetalleRepuesto(models.Model):
 
 class DetalleTipoMantenimiento(models.Model):
     detalle_servicio = models.ForeignKey(DetalleServicio, on_delete=models.PROTECT)
-    id_tipo_mantenimiento = models.ForeignKey('TipoMantenimiento', on_delete=models.PROTECT)
+    id_tipo_mantenimiento = models.ForeignKey(TipoMantenimiento, on_delete=models.PROTECT)
     cantidad = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
     precio_unitario = models.PositiveIntegerField(validators=[validar_monto])
     
@@ -519,7 +521,7 @@ class DetalleTipoMantenimiento(models.Model):
 
 class DetalleInsumos(models.Model):
     detalle_servicio = models.ForeignKey(DetalleServicio, on_delete=models.PROTECT)
-    id_insumos = models.ForeignKey('Insumos', on_delete=models.PROTECT)
+    id_insumos = models.ForeignKey(Insumos, on_delete=models.PROTECT)
     cantidad = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
     precio_unitario = models.PositiveIntegerField(validators=[validar_monto])
     
@@ -533,7 +535,7 @@ class DetalleInsumos(models.Model):
  #-----Empresa----------------------
 class Empresa(models.Model):
     nombre = models.CharField(max_length=255,default= "Taller Mecanica Diesel Internacional Arturo Patiño"  )
-    nit = models.CharField(max_length=50,default="74.187366-2")
+    nit = models.CharField(max_length=50,default="74.187366-2",validators=[nit_validator])
     direccion =  models.CharField(default="calle 9 #32-37 Barrio La Isla", max_length=200)
     telefono = models.CharField(default="3118112714 - 3133342841", max_length=50)
     estado = models.BooleanField(default=True) 
@@ -545,20 +547,35 @@ class Empresa(models.Model):
 
 #-----------Factura-----------------
 class Factura(models.Model):
-    id_empresa = models.ForeignKey(Empresa, on_delete=models.PROTECT)  
-    Fecha = models.DateField()  
-    id_Detalles_servicios = models.ForeignKey(DetalleServicio, on_delete=models.PROTECT)  
-    id_empleado = models.ForeignKey(Empleado, on_delete=models.PROTECT)  
-    id_cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
-    opciones_pago = [
+
+    METODO_PAGO = [
         ('efectivo', 'Efectivo'),
         ('transferencia', 'Transferencia'),
     ]
-    metodo_pago = models.CharField(max_length=50, choices=opciones_pago)  
+
+    empresa = models.ForeignKey( Empresa, on_delete=models.PROTECT)
+    cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
+    empleado = models.ForeignKey(Empleado,on_delete=models.PROTECT)
+    detalle_servicio = models.OneToOneField(DetalleServicio,on_delete=models.PROTECT,related_name="factura")
+    fecha = models.DateField(auto_now_add=True)
+    metodo_pago = models.CharField(max_length=50, choices=METODO_PAGO  )
     estado = models.BooleanField(default=True)
+
+    #class Meta:
+        #verbose_name = "Factura"
+        #verbose_name_plural = "Facturas"
+
+    # ---------- TOTALES ----------
+    @property
+    def subtotal(self):
+        if not self.detalle_servicio:
+            return 0
+        return self.detalle_servicio.subtotal
+
+
     def __str__(self):
-        cliente_nombre = self.id_cliente.nombre if self.id_cliente else "Sin cliente"
-        return f"Factura {self.id} - {cliente_nombre}"
+        return f"Factura #{self.id} - {self.cliente.nombre}"
+
 
     
 #--------------Modulo Compra (STEVEN)-----------------

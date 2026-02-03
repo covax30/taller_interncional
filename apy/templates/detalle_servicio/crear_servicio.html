@@ -1,4 +1,4 @@
-{% extends "generic_listar.html" %}
+{% extends "form_generico.html" %}
 {% load static %}
 
 {% block title %}Crear Servicio{% endblock %}
@@ -28,11 +28,11 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            {{ form.id_vehiculo.label_tag }}
-                            {{ form.id_vehiculo }}
-                            {% if form.id_vehiculo.errors %}
+                            {{ form.vehiculo.label_tag }}
+                            {{ form.vehiculo }}
+                            {% if form.vehiculo.errors %}
                                 <div class="text-danger">
-                                    {{ form.id_vehiculo.errors }}
+                                    {{ form.vehiculo.errors }}
                                 </div>
                             {% endif %}
                         </div>
