@@ -21,4 +21,10 @@ urlpatterns = [
 
     # 🚨 5. NUEVA URL: Subir y Restaurar Respaldo Externo (POST) 🚨
     path('subir/', views.SubirRespaldoExternoView.as_view(), name='subir_respaldo'), # Cambiado
+    
+    path('logs/estado/', views.LogsEstadoAPIView.as_view(), name='logs_estado_api'),
+    
+    path('eliminar/<int:pk>/', views.EliminarRespaldoView.as_view(), name='backup_eliminar'),
+    
+    path('logs/subir_drive/<int:pk>/', SubirRespaldoGoogleDriveView.as_view(), name='backup_subir_drive'),
 ]

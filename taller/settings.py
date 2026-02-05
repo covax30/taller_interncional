@@ -56,7 +56,6 @@ INSTALLED_APPS = [
     'apy',
     'login',
     'widget_tweaks',
-    
     'backup_module',
 ]
 
@@ -102,9 +101,24 @@ DATABASES = {
         'PASSWORD': os.getenv('DB_PASSWORD', 'mypassword'),
         'HOST': os.getenv('DB_HOST', 'localhost'),
         'PORT': os.getenv('DB_PORT', '3307'),
+    },
+    
+    'log_db': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'bckp_logs', 
+        # 🚨 CORRECCIÓN: Usar variables de entorno (DB_USER, DB_PASSWORD)
+        'USER': os.getenv('DB_USER', 'myuser'), 
+        'PASSWORD': os.getenv('DB_PASSWORD', 'mypassword'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        # 🚨 CORRECCIÓN: Usar el mismo puerto que la base de datos 'default'
+        'PORT': os.getenv('DB_PORT', '3307'), 
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        }
     }
 }
 
+DATABASE_ROUTERS = ['backup_module.routers.LogRouter']
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 

@@ -218,8 +218,6 @@ class Profile(models.Model):
     
     def __str__(self):
         return f'Perfil de {self.user.username}'
-
-
 class Cliente(models.Model):
 
     TIPO_CLIENTE = [

@@ -37,7 +37,8 @@ class Migration(migrations.Migration):
                 ('estado', models.CharField(choices=[('Éxito', 'Éxito'), ('Fallo', 'Fallo'), ('En Proceso', 'En Proceso')], default='En Proceso', max_length=10)),
                 ('tamaño_mb', models.FloatField(blank=True, null=True, verbose_name='Tamaño (MB)')),
                 ('ruta_archivo', models.CharField(blank=True, max_length=255, null=True, verbose_name='Ruta')),
-                ('usuario', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL, verbose_name='Ejecutado por')),
+                ('mensaje_error', models.TextField(blank=True, null=True, verbose_name='Mensaje de Error/Advertencia')),
+                ('usuario', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL, verbose_name='Ejecutado por')),
             ],
             options={
                 'verbose_name': 'Registro de Respaldo',

@@ -13,3 +13,5 @@ __pycache__/
 .idea
 .env
 db_backups/
+credentials.json
+token.json

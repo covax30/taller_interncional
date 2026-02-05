@@ -165,18 +165,12 @@ class Command(BaseCommand):
         # ----------------------------------------------------
         finally:
             if log:
-                # ⭐️ CORRECCIÓN: Asignamos directamente el estado_final.
-                # Si ocurrió un error en try/except, estado_final será 'Fallo'.
-                # Si tuvo éxito, estado_final será 'Éxito'.
+                # ⭐️ CORRECCIÓN CRÍTICA: Asigna el estado_final real.
+                # Asegúrate de que NO tengas la línea: if estado_final == 'Fallo': log.estado = 'Éxito'
                 log.estado = estado_final 
                     
                 log.fecha_fin = timezone.now()
-                # ⭐️ CLAVE: Guardamos el mensaje de error/advertencia (asumo que tienes este campo 'mensaje_error' en tu modelo)
-                if 'error_msg' in locals() and error_msg:
-                    log.mensaje_error = error_msg 
-                else:
-                    log.mensaje_error = "" # Opcional: limpiar si tuvo éxito
-                    
+                log.mensaje_error = error_msg 
                 log.save()
                 
-            self.stdout.write(self.style.NOTICE("Proceso de restauración finalizado y estado del log actualizado."))
+            self.stdout.write(self.style.NOTICE("Proceso de restauración finalizado..."))
