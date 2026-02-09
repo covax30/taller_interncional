@@ -10,6 +10,7 @@
 <a href="{{crear_url}}" class=" btn btn-primary btn btn-xs" title="Agregar repuesto"><i class="fas fa-plus"></i>
           Agregar
 </a>
+<a href="{% url 'apy:repuestos_inactivos' %}" class="btn btn-secondary">  <i class="fas fa-list"></i>  Lista de Repuestos Inactivos </a>
 {% endblock %}
 
 {% block columnas %}
@@ -22,7 +23,7 @@
         <th>Ubicación</th>
         <th>Precio</th>
         <th>Acciones</th>
-
+ 
 {% endblock %}
 
 {% block iterar %}
@@ -52,7 +53,7 @@
               data-toggle="tooltip" 
               data-placement="top" 
               title="Eliminar repuesto">
-              <i class="fas fa-trash-alt"></i>
+              <i class="fas fa-power-off"></i>
            </a>
           </td>
       </tr>

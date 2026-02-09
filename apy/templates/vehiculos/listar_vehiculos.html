@@ -5,6 +5,7 @@
 {% endblock %}
 {% block agregar %}
     <a href="{% url 'apy:vehiculo_crear' %}" class="btn btn-primary" title="Agregar vehículo">Agregar Vehículo</a>
+    <a href="{% url 'apy:vehiculo_inactivos' %}" class="btn btn-secondary">Vehículos  Inactivos</a>
 {% endblock %}
 
 {% block columnas %}
@@ -13,7 +14,7 @@
   <th>Placa</th>
   <th>Modelo</th>
   <th>Marca</th>
-  <th>Color</th>
+  <th>Color</th> 
 
   <th>Acciones</th>
 {% endblock %}
@@ -25,7 +26,7 @@
         <td>{{ v.id_cliente }}</td>
         <td>{{ v.placa }}</td>
         <td>{{ v.modelo_vehiculo }}</td>
-        <td>{{ v.id_marca }}</td>
+        <td>{{ v.marca_vehiculo }}</td>
         <td>{{ v.color }}</td>
         <td>
           <a href="{% url 'apy:vehiculo_editar' v.id_vehiculo %}" 
@@ -40,24 +41,10 @@
               data-toggle="tooltip" 
               data-placement="top" 
               title="Eliminar vehículo">
-              <i class="fas fa-trash-alt"></i>
+              <i class="fas fa-power-off"></i>
            </a>
         </td>
     </tr>
   {% endfor %}
-  
-  <!-- Mensajes con SweetAlert -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-  {% if messages %}
-    {% for message in messages %}
-      Swal.fire({
-        icon: '{% if "success" in message.tags %}success{% elif "error" in message.tags %}error{% else %}info{% endif %}',
-        title: '{{ message|escapejs }}',
-        timer: 2500,
-        showConfirmButton: false
-      });
-    {% endfor %}
-  {% endif %}
-</script>
+
 {% endblock %}

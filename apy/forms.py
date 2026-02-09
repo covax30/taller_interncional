@@ -22,7 +22,7 @@ class FacturaForm(ModelForm):
         model = Factura
         fields = '__all__'
         widgets = {
-            'Fecha':DateInput(
+            'fecha':DateInput(
                 attrs={
                     'type': 'date',
                     'placeholder':'Ingrese la fecha',
@@ -105,7 +105,7 @@ class EmpresaForm(ModelForm):
                 attrs={
                     'class': 'form-control'
                     }),
-            'nit': NumberInput(
+            'nit': TextInput(
                 attrs={
                     'class': 'form-control', 'min': '1'
                     }),
@@ -237,7 +237,8 @@ class DetalleInsumoForm(ModelForm):
             'precio_unitario': NumberInput(
                 attrs={
                     'placeholder': 'Ingrese el costo del insumo',
-                    'step': '0.01'
+                    'step': '0.01',
+                    'class': 'form-control',
                 }
             )
         }
@@ -257,15 +258,15 @@ class DetalleInsumoForm(ModelForm):
 class DetalleServicioForm(ModelForm):
     class Meta:
         model = DetalleServicio
-        fields = ['id_vehiculo']
+        fields = ['vehiculo']
         widgets = {
-            'id_vehiculo': Select(attrs={
+            'vehiculo': Select(attrs={
                 'class': 'form-control',
                 'placeholder': 'Seleccione un vehículo'
             }),
         }
         error_messages = {
-            'id_vehiculo': {
+            'vehiculo': {
                 'required': 'El vehículo es obligatorio.',
             },
         }
@@ -273,7 +274,7 @@ class DetalleServicioForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Configurar cómo se muestran los vehículos en el select
-        self.fields['id_vehiculo'].label_from_instance = (
+        self.fields['vehiculo'].label_from_instance = (
             lambda obj: f"{obj.placa} - {obj.marca_vehiculo} {obj.modelo_vehiculo} - {obj.color}"
         )
 
@@ -533,7 +534,7 @@ class ClienteForm(ModelForm):
                     'placeholder':'Ingrese el nombre del cliente',
                 }
             ),
-            'identificacion':NumberInput(
+            'identificacion':TextInput(
                 attrs={
                     'placeholder':'Ingrese el documento del cliente',
                 }
@@ -557,7 +558,7 @@ class ClienteForm(ModelForm):
             
         }
         error_messages = {
-            'documento': {
+            'identificacion': {
                 'required': 'El docmuento de identidad es obligatorio',
                 'unique': 'Ya existe un cliente con ese documento de identidad',
                 'invalid': 'Por favor ingrese solo números en el documento de identidad',
@@ -580,7 +581,7 @@ class VehiculoForm(ModelForm):
         # Configura cómo se muestran los clientes en el select
         if 'id_cliente' in self.fields:
             self.fields['id_cliente'].label_from_instance = (
-                lambda obj: f"{obj.id} - {obj.nombre}"  # ← CAMBIADO de obj.id_cliente a obj.id
+                lambda obj: f"{obj.id} - {obj.nombre}"  
             )
             self.fields['id_cliente'].widget.attrs.update({
                 'class': 'form-control foreign-key-field',
@@ -1189,62 +1190,6 @@ class EmpleadoForm(ModelForm):
         }
         
         
-class Empleado_Mantenimiento_Form(ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['nombre'].widget.attrs['autofocus'] = True
-        
-    class Meta:
-        model = Empleado_Mantenimiento
-        fields = '__all__'
-        widgets = {
-            'nombre':TextInput(
-                attrs={
-                    'placeholder':'Ingrese el nombre del empleado',
-                }
-            ),
-            'telefono':NumberInput(
-                attrs={
-                    'placeholder':'Ingrese el telefono del empleado',
-                }
-            ),
-            'identificacion':NumberInput(
-                attrs={
-                    'placeholder':'Ingrese la identificacion del empleado',
-                }
-            ),
-            'Correo':TextInput(
-                attrs={
-                    'placeholder':'Ingrese el correo del empleado',
-                }
-            ),
-            'direccion':TextInput(
-                attrs={
-                    'placeholder':'Ingrese la direccion del empleado',
-                }
-            )
-            
-       }  
-        error_messages = {
-            'nombre': {
-                'required': 'El nombre del empleado es obligatorio',
-            },
-            'telefono': {
-                'required': 'El telefono del empleado es obligatorio',
-            },
-            'identificacion': {
-                'required': 'La identificacion del empleado es obligatoria',
-            },
-            'Correo': {
-                'required': 'El correo del empleado es obligatorio',
-                'invalid': 'El correo no tiene un formato válido',
-                'unique': 'Ya existe un administrador con ese correo',
-            },
-            'direccion': {
-                'required': 'La direccion del empleado es obligatoria',
-            },
-        }
-
 
  #------- formulario Gastos -------     
         

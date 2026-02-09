@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from apy.models import * # Asegúrate de que Marca, Module, y Permission sean importados
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse_lazy
@@ -24,6 +24,10 @@ class MarcaListView(PermisoRequeridoMixin, ListView):
     module_name = 'Marca' 
     permission_required = 'view'
     
+    def get_queryset(self):
+        return Marca.objects.filter(estado=True)
+    
+    
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         # Usa el Mixin importado de apy.decorators
@@ -40,6 +44,23 @@ class MarcaListView(PermisoRequeridoMixin, ListView):
         context['entidad'] = 'Marcas'
         return context
     
+    #-- vista para listar marcas inactivos ---
+class MarcaInactivosListView(PermisoRequeridoMixin, ListView): 
+    model = Marca
+    template_name ='Marca/marcas_inactivas.html'
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Marca' 
+    permission_required = 'view' 
+    
+    def get_queryset(self):
+        return Marca.objects.filter(estado=False)
+    
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        # Usa el Mixin importado de apy.decorators
+        return super().dispatch(request, *args, **kwargs)
+    
 class MarcaCreateView(PermisoRequeridoMixin, CreateView): 
     model = Marca
     form_class = MarcaForm
@@ -55,6 +76,7 @@ class MarcaCreateView(PermisoRequeridoMixin, CreateView):
     permission_required = 'add'
     
     def form_valid(self, form):
+        form.instance.estado = True
         messages.success(self.request, "Marca creada correctamente")
         return super().form_valid(form)
     
@@ -95,15 +117,52 @@ class MarcaDeleteView(PermisoRequeridoMixin, DeleteView):
     module_name = 'Marca'
     permission_required = 'delete'
     
-    def form_valid(self, form):
-        messages.success(self.request, "Marca eliminada correctamente")
-        return super().form_valid(form)
+    def post(self, request, *args, **kwargs):
+        
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        
+        self.object.estado = False
+        self.object.save()
+        
+        messages.success(self.request,     f"Pago de servicios Publicos {PagoServiciosPublicos} desactivado correctamente")
+        return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Eliminar Marca'
         context['entidad'] = 'Marcas' 
         context['listar_url'] = reverse_lazy('apy:marca_lista')
+        
+        return context
+    
+#- vista para activar  marca ---
+class MarcaActivateView(PermisoRequeridoMixin, DeleteView): 
+    model = Marca
+    template_name = 'Marca/activar_marcas.html'
+    success_url = reverse_lazy('apy:marca_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Marca'
+    permission_required = 'change'
+    
+    def post(self, request, *args, **kwargs):
+        
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        
+        self.object.estado = True
+        self.object.save()
+        
+        messages.success(self.request,f"Marca {self.object} activada correctamente")
+        return HttpResponseRedirect(success_url)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Activar Marca'
+        context['entidad'] = 'Marcas' 
+        context['listar_url'] = reverse_lazy('apy:marca_lista')
+        
         return context
 
 class MarcaCreateModalView(CreateView):
@@ -117,6 +176,7 @@ class MarcaCreateModalView(CreateView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
+        form.instance.estado = True 
         try:
             self.object = form.save()
             return JsonResponse({

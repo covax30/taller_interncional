@@ -1,0 +1,67 @@
+{% extends "generic_listar.html" %}
+{% load humanize %}
+
+{% block titulo %}
+        <i class="fa-solid fa-hammer"></i>
+        <h1 class="text-center">Listar Repuestos</h1>
+{% endblock titulo %}
+
+{% block agregar %}
+<a href="{% url 'apy:repuesto_lista' %}" class="btn btn-primary">  <i class="fas fa-list"></i>  lista de Repuestos </a>
+{% endblock %}
+
+{% block columnas %}
+
+        <th>Id Marca</th>
+        <th>Nombre</th>
+        <th>Categoría</th>
+        <th>Fabricante</th>
+        <th>Stock</th>
+        <th>Ubicación</th>
+        <th>Precio</th>
+        <th>Acciones</th>
+
+{% endblock %}
+
+{% block iterar %}
+
+      {% for r in object_list %}
+      <tr>
+        <td>{{r.id_marca}}</td>
+        <td>{{r.nombre}}</td>
+        <td>{{r.categoria}}</td>
+        <td>{{r.fabricante}}</td>
+        <td>{{r.stock}}</td>
+        <td>{{r.ubicacion}}</td>
+        <td>{{r.precio|intcomma }}</td>
+
+        <form method="post">
+
+          <td>
+            <a href="{% url 'apy:repuesto_activar' r.id %}" 
+              class="btn btn-success btn-xs" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="activar repuesto">
+              <i class="fas fa-power-off"></i>
+           </a>
+          </td>
+      </tr>
+      {% endfor %}
+
+<!-- Mensajes con SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  {% if messages %}
+    {% for message in messages %}
+      Swal.fire({
+        icon: '{% if "success" in message.tags %}success{% elif "error" in message.tags %}error{% else %}info{% endif %}',
+        title: '{{ message|escapejs }}',
+        timer: 2500,
+        showConfirmButton: false
+      });
+    {% endfor %}
+  {% endif %}
+</script>
+
+{% endblock %}

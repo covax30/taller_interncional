@@ -176,18 +176,7 @@
     </div>
     </div>
 
-    <!-- Script Empleado Mantenimiento. -->
-    <script>
-        $("#modal-id_empleado_mantenimiento").on("show.bs.modal", function(){
-            var modal = $(this);
-            $.ajax({
-                url: "{% url 'apy:empleado_modal_crear_mantenimiento' %}",
-                success: function(data){
-                    modal.find(".modal-body").html(data.html || data);
-                }
-            });
-        });
-    </script>
+  
 
     <!-- Script Sub-Modal Cliente. -->
     <script>

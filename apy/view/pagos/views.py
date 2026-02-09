@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from apy.models import *
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse_lazy
@@ -20,6 +20,9 @@ class PagosListView(PermisoRequeridoMixin, ListView):
     module_name = 'Pagos' 
     permission_required = 'view' 
     
+    def get_queryset(self):
+        return Pagos.objects.filter(estado=True)
+    
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
@@ -35,6 +38,26 @@ class PagosListView(PermisoRequeridoMixin, ListView):
         context['entidad'] = 'Pagos'
         return context
     
+#---- vista para listar pagos inactivos -----
+class PagosInactivosListView(PermisoRequeridoMixin, ListView): 
+    model = Pagos
+    template_name = 'Pagos/pago_inactivos.html'
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Pagos' 
+    permission_required = 'view' 
+    # --------------------------------
+    
+    def get_queryset(self):
+        return Pagos.objects.filter(estado=False) 
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['total_pagos'] = Pagos.objects.count() 
+        context['pagos_activos'] = Pagos.objects.filter(estado=True).count()
+
+        return context    
+    
 class PagosCreateView(PermisoRequeridoMixin, CreateView): 
     model = Pagos
     form_class = PagosForm
@@ -46,6 +69,7 @@ class PagosCreateView(PermisoRequeridoMixin, CreateView):
     permission_required = 'add'
     
     def form_valid(self, form):
+        form.instance.estado = True 
         messages.success(self.request, "Pago creado correctamente")
         return super().form_valid(form)
     
@@ -86,9 +110,16 @@ class PagosDeleteView(PermisoRequeridoMixin, DeleteView):
     module_name = 'Pagos'
     permission_required = 'delete'
     
-    def form_valid(self, form):
-        messages.success(self.request, "Pago eliminado correctamente")
-        return super().form_valid(form)
+    def post(self, request, *args, **kwargs):
+        
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        
+        self.object.estado = False
+        self.object.save()
+        
+        messages.success(self.request, f"Cliente {self.object.nombre} desactivado ")
+        return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -96,3 +127,21 @@ class PagosDeleteView(PermisoRequeridoMixin, DeleteView):
         context['entidad'] = 'Pagos'
         context['listar_url'] = reverse_lazy('apy:pagos_lista')
         return context
+    
+    #---- vista para activar pagos -----
+class PagosActivateView(PermisoRequeridoMixin, DeleteView):
+    model = Pagos
+    template_name = 'Pagos/activar_gastos.html'
+    success_url = reverse_lazy('apy:pagos_lista')  # cambia por tu URL real
+
+    # --- Configuración de Permisos ---
+    module_name = 'Pagos'
+    permission_required = 'change'
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.estado = True
+        self.object.save()
+        messages.success(self.request, f"Pago {self.object.id} activado correctamente")
+
+        return HttpResponseRedirect(self.get_success_url())

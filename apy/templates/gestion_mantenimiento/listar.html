@@ -10,6 +10,9 @@
 <a href="{{crear_url}}" class=" btn btn-primary btn btn-xs" title="Agregar mantenimiento"><i class="fas fa-plus"></i>
           Agregar
 </a>
+<a href="{% url 'apy:mantenimiento_inactivos' %}" class="btn btn-secondary">  <i class="fas fa-list"></i>  lista de mantenimientos Inactivos </a>
+
+
 {% endblock %}
 
 {% block columnas %}
@@ -48,7 +51,7 @@
               data-toggle="tooltip" 
               data-placement="top" 
               title="Eliminar mantenimiento">
-              <i class="fas fa-trash-alt"></i>
+              <i class="fas fa-power-off"></i>
            </a>
           </td>
       </tr>
