@@ -162,7 +162,6 @@ class RespaldoView(SuperuserRequiredMixin, View):
             
         return super().dispatch(request, *args, **kwargs)
 
-
     def _limpiar_logs_en_proceso(self):
         """
         Busca logs de restauración que hayan estado en 'En Proceso' por más de 15 minutos 
@@ -188,8 +187,7 @@ class RespaldoView(SuperuserRequiredMixin, View):
             return count
         return 0
 
-    
-    # ✅ MÉTODO GET UNIFICADO Y CORREGIDO (Contiene todas las variables de contexto)
+    # ✅ MÉTODO GET UNIFICADO Y CORREGIDO PARA CUALQUIER PC
     def get(self, request):
         
         # 1. Obtener la configuración actual (o crear una por defecto si no existe)
@@ -201,7 +199,7 @@ class RespaldoView(SuperuserRequiredMixin, View):
         ultimo_log = logs.filter(estado='Éxito').order_by('-fecha_inicio').first()
         
         # ----------------------------------------------------
-        # ✅ LÓGICA DE ESPACIO OCUPADO (Robusta, que produce 11.5)
+        # ✅ LÓGICA DE RUTAS UNIVERSALES (Solución para tus compañeros)
         # ----------------------------------------------------
         total_bytes = 0
         espacio_ocupado_str = "0 B"
@@ -209,11 +207,16 @@ class RespaldoView(SuperuserRequiredMixin, View):
         espacio_ocupado_gb = 0.0
         
         try:
-            backup_root = settings.BACKUP_ROOT
+            # En lugar de usar una ruta fija de tu PC, usamos la carpeta del proyecto
+            # Esto funcionará en cualquier disco (C:, D:, etc.)
+            backup_root = os.path.join(settings.BASE_DIR, 'db_backups')
             
-            # ADICIÓN DE ROBUSTEZ: Verifica que la ruta exista y sea un directorio
+            # Si la carpeta no existe en la PC del compañero, la creamos
+            if not os.path.exists(backup_root):
+                os.makedirs(backup_root)
+
+            # Verificar que sea un directorio antes de listar
             if os.path.isdir(backup_root):
-                
                 for item in os.listdir(backup_root):
                     full_path = os.path.join(backup_root, item)
                     if os.path.isfile(full_path):
@@ -224,11 +227,12 @@ class RespaldoView(SuperuserRequiredMixin, View):
                     espacio_ocupado_mb = total_bytes / (1024 * 1024)
                     espacio_ocupado_gb = total_bytes / (1024 * 1024 * 1024)
                 
-                # Usar la función auxiliar para formatear (esto genera la unidad, ej. "11.5 MB")
+                # Formatear a string legible (ej. "11.5 MB")
                 espacio_ocupado_str = humanize_bytes(total_bytes)
             
-        except Exception:
-            pass 
+        except Exception as e:
+            # Logueamos el error de forma silenciosa para no romper la vista
+            print(f"Error al calcular espacio en disco: {e}")
         # ----------------------------------------------------
         
         context = {
@@ -240,16 +244,16 @@ class RespaldoView(SuperuserRequiredMixin, View):
             'cantidad_programados': ConfiguracionRespaldo.objects.exclude(frecuencia='inactivo').count(),
             'ultimo_backup_fecha': ultimo_log.fecha_fin if ultimo_log else 'N/A',
             
-            # ✅ Variables que FALTABAN (Restauradas)
+            # Variables de configuración
             'frecuencia_actual': configuracion.frecuencia if configuracion else 'inactivo', 
             'hora_actual': configuracion.hora_ejecucion if configuracion else '03:00',
             
             # Logs (para la tabla principal y el historial)
             'log_list': logs, 
             'logs': logs, 
-            'historial_respaldos': logs[:20], # La variable que usa su template para el bucle
+            'historial_respaldos': logs[:20], 
             
-            # Valores de espacio ocupado
+            # Valores de espacio ocupado corregidos dinámicamente
             'espacio_ocupado': espacio_ocupado_str, 
             'espacio_ocupado_bytes': total_bytes,
             'espacio_ocupado_mb': espacio_ocupado_mb,
@@ -409,43 +413,40 @@ class SubirRespaldoExternoView(SuperuserRequiredMixin, View):
         archivo_respaldo = request.FILES.get('archivo_restauracion')
         
         if not archivo_respaldo:
-            messages.error(request, '❌ Debe seleccionar un archivo SQL o GZ para subir.')
+            messages.error(request, '❌ Debe seleccionar un archivo SQL para subir.')
             return redirect(reverse_lazy('backup_module:configuracion_respaldo'))
 
-        # Validar tipo de archivo
-        if not archivo_respaldo.name.lower().endswith(('.sql', '.gz', '.zip')):
-            messages.error(request, '❌ Formato de archivo no válido. Solo se permiten .sql, .gz o .zip.')
-            return redirect(reverse_lazy('backup_module:configuracion_respaldo'))
-        
         try:
-            # 1. Preparar y guardar el archivo subido en el directorio de backups
-            fs = FileSystemStorage(location=settings.BACKUP_ROOT)
+            # CORRECCIÓN: Usar ruta dinámica para la subida externa
+            backup_root = os.path.join(settings.BASE_DIR, 'db_backups')
+            if not os.path.exists(backup_root):
+                os.makedirs(backup_root)
+
+            fs = FileSystemStorage(location=backup_root)
             nombre_base = os.path.splitext(archivo_respaldo.name)[0]
             extension = os.path.splitext(archivo_respaldo.name)[1]
             nombre_final = f"EXTERNAL_{nombre_base}_{uuid.uuid4().hex[:6]}{extension}"
             
             filename = fs.save(nombre_final, archivo_respaldo)
-            ruta_completa_sql = os.path.join(settings.BACKUP_ROOT, filename)
+            ruta_completa_sql = os.path.join(backup_root, filename)
             
-            # Calcular el tamaño
             tamaño_bytes = os.path.getsize(ruta_completa_sql)
             tamaño_mb = tamaño_bytes / (1024 * 1024)
             
-            # 2. Crear el log en la BD (marcado como Éxito porque el archivo está listo)
             nuevo_log = BackupLog.objects.create(
                 fecha_inicio=timezone.now(),
                 fecha_fin=timezone.now(),
-                tipo='Externo', # Tipo: Externo
-                estado='Éxito', # Estado: Listo para restaurar
+                tipo='Externo',
+                estado='Éxito',
                 ruta_archivo=ruta_completa_sql,
                 usuario=request.user,
                 tamaño_mb=tamaño_mb,
             )
             
-            messages.success(request, f'✅ Archivo **{archivo_respaldo.name}** subido correctamente. Ya está disponible en el Historial (Log #{nuevo_log.pk}) para su restauración.')
+            messages.success(request, f'✅ Archivo **{archivo_respaldo.name}** subido correctamente.')
             
         except Exception as e:
-            messages.error(request, f'❌ Error al procesar o guardar el archivo: {e}')
+            messages.error(request, f'❌ Error al procesar el archivo: {e}')
         
         return redirect(reverse_lazy('backup_module:configuracion_respaldo'))
 # ------------------------------------------------------------------------------
