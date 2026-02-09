@@ -146,7 +146,7 @@ class Herramienta(models.Model):
 class Insumos(models.Model):
 
     id_marca = models.ForeignKey(Marca, on_delete=models.PROTECT)
-    costo = models.IntegerField(  # 🔹 ENTEROS, sin decimales
+    costo = models.IntegerField(  
         error_messages={
             'invalid': 'Ingrese un número válido para el costo.',
             'required': 'El costo del insumo es obligatorio.'

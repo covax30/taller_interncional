@@ -7,10 +7,10 @@
 {% endblock titulo %}
 
 {% block agregar %}
-<a href="{{ crear_url }}" class="btn btn-primary btn-xs">
+<a href="{{ crear_url }}" class="btn btn-outline-primary btn-xs">
     <i class="fas fa-plus"></i> Agregar
 </a>
-<a href="{% url 'apy:factura_inactivos' %}" class="btn btn-secondary btn-xs">
+<a href="{% url 'apy:factura_inactivos' %}" class="btn btn-outline-secondary btn-xs">
     <i class="fas fa-list"></i> Lista de Facturas Inactivas
 </a>
 {% endblock %}
@@ -22,6 +22,7 @@
     <th>Detalle Servicio</th>
     <th>Empleado</th>
     <th>Cliente</th>
+    <th>Subtotal</th>
     <th>Método de Pago</th>
     <th>Acciones</th>
 {% endblock %}
@@ -43,18 +44,18 @@
 
         <div class="btn-group" role="group">
                 <a href="{% url 'apy:factura_detalle' f.id %}" 
-                   class="btn btn-info btn-sm" 
+                   class="btn btn-outline-info btn-sm" 
                    title="Ver detalles de la factura">
                     <i class="fas fa-eye"></i>
                 </a>    
             <div class="btn-group" role="group">
                 <a href="{% url 'apy:factura_editar' f.id %}" 
-                   class="btn btn-warning btn-sm" 
+                   class="btn btn-outline-warning btn-sm" 
                    title="Editar factura">
                     <i class="fas fa-edit"></i>
                 </a>
                 <a href="{% url 'apy:factura_eliminar' f.id %}" 
-                   class="btn btn-danger btn-sm" 
+                   class="btn btn-outline-danger btn-sm" 
                    title="Eliminar factura"
                    onclick="return confirm('¿Está seguro de eliminar esta factura?');">
                     <i class="fas fa-trash-alt"></i>
@@ -62,7 +63,7 @@
             </div>
             
 <button type="button" 
-        class="btn btn-outline-danger btn-sm btn-pdf-factura" 
+        class="btn btn-outline-secondary btn-sm btn-pdf-factura" 
         data-id="{{ f.id }}" 
         title="Generar PDF de la factura">
     <i class="fas fa-file-pdf"></i>

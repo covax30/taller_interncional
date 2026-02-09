@@ -11,7 +11,6 @@
     <i class="fas fa-list"></i> Lista de Facturas Activas
 </a>
 {% endblock %}
-
 {% block columnas %}
     <th>ID</th>
     <th>Fecha</th>
@@ -19,6 +18,7 @@
     <th>Detalle Servicio</th>
     <th>Empleado</th>
     <th>Cliente</th>
+    <th>Subtotal</th>
     <th>Método de Pago</th>
     <th>Acciones</th>
 {% endblock %}
@@ -27,67 +27,13 @@
     {% for f in object_list %}
     <tr>
         <td>{{ f.id }}</td>
-        
-        <!-- Fecha -->
-        <td>
-            {% if f.Fecha %}
-                {{ f.Fecha|date:"d/m/Y" }}
-            {% else %}
-                <span class="text-muted">No especificada</span>
-            {% endif %}
-        </td>
-        
-        <!-- Empresa -->
-        <td>
-            {% if f.id_empresa %}
-                {{ f.id_empresa.nombre }}
-            {% else %}
-                <span class="text-muted">Sin empresa</span>
-            {% endif %}
-        </td>
-        
-        <!-- Detalle Servicio -->
-        <td>
-            {% if f.id_Detalles_servicios %}
-                Detalle #{{ f.id_Detalles_servicios.id }}
-            {% else %}
-                <span class="text-muted">Sin detalle</span>
-            {% endif %}
-        </td>
-        
-        <!-- Empleado -->
-        <td>
-            {% if f.id_empleado %}
-                {{ f.id_empleado.nombre }}
-            {% else %}
-                <span class="text-muted">Sin empleado</span>
-            {% endif %}
-        </td>
-        
-        <!-- Cliente -->
-        <td>
-            {% if f.id_cliente %}
-                {{ f.id_cliente.nombre }} 
-                <small class="text-muted">({{ f.id_cliente.identificacion }})</small>
-            {% else %}
-                <span class="text-muted">Sin cliente</span>
-            {% endif %}
-        </td>
-        
-        <!-- Método de Pago -->
-        <td>
-            {% if f.metodo_pago %}
-                <span class="badge 
-                    {% if f.metodo_pago == 'efectivo' %}bg-success
-                    {% elif f.metodo_pago == 'transferencia' %}bg-primary
-                    {% elif f.metodo_pago == 'tarjeta' %}bg-info
-                    {% else %}bg-secondary{% endif %}">
-                    {{ f.get_metodo_pago_display|default:f.metodo_pago }}
-                </span>
-            {% else %}
-                <span class="text-muted">No especificado</span>
-            {% endif %}
-        </td>
+        <td>{{ f.fecha }}</td>
+        <td>{{ f.empresa.nombre }}</td>
+        <td>{{ f.detalle_servicio }}</td>
+        <td>{{ f.empleado.nombre }}</td>
+        <td>{{ f.cliente.nombre }}</td>
+        <td> {{f.subtotal|intcomma}}</td>
+        <td>{{ f.metodo_pago }}</td>
         
         <!-- Acciones -->
         <td>

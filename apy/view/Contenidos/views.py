@@ -180,7 +180,8 @@ def factura_detalle_json(request, pk):
     # 1. Repuestos (usando el related_name por defecto '_set')
     repuestos = [
         {
-            'descripcion': f"REPUESTO: {r.id_repuesto.nombre}",
+            'categoria': f"REPUESTO",
+            'descripcion': f" {r.id_repuesto.nombre}",
             'cantidad': r.cantidad,
             'precio': float(r.precio_unitario),
             'subtotal': float(r.subtotal)
@@ -190,7 +191,8 @@ def factura_detalle_json(request, pk):
     # 2. Mantenimientos
     mantenimientos = [
         {
-            'descripcion': f"MANTENIMIENTO: {m.id_tipo_mantenimiento.nombre}",
+            'categoria': f"MANTENIMIENTO ",
+            'descripcion': f" {m.id_tipo_mantenimiento.nombre}",
             'cantidad': m.cantidad,
             'precio': float(m.precio_unitario),
             'subtotal': float(m.subtotal)
@@ -200,7 +202,8 @@ def factura_detalle_json(request, pk):
     # 3. Insumos
     insumos = [
         {
-            'descripcion': f"INSUMO: {i.id_insumos}",
+            'categoria': f"INSUMO",
+            'descripcion': f" {i.id_insumos.id_marca.nombre}",
             'cantidad': i.cantidad,
             'precio': float(i.precio_unitario),
             'subtotal': float(i.subtotal)
@@ -223,10 +226,14 @@ def factura_detalle_json(request, pk):
         'cliente': {
             'nombre': factura.cliente.nombre,
             'documento': factura.cliente.identificacion,
+            'telefono': factura.cliente.telefono,
+            'direccion': factura.cliente.direccion,
+            
         },
         'vehiculo': {
             'placa': servicio.vehiculo.placa,
-            'info': f"{servicio.vehiculo.marca_vehiculo} {servicio.vehiculo.modelo_vehiculo}",
+            'info': f"{servicio.vehiculo.marca_vehiculo} {servicio.vehiculo.modelo_vehiculo} ",
+            
         },
         'items': todos_los_items,
         'subtotal_factura': float(factura.subtotal),
@@ -240,17 +247,19 @@ class DetalleFacturaView(DetailView):
     context_object_name = 'factura'
 
     def get_queryset(self):
+        # 1. select_related: Solo para lo que Django te permite (relaciones directas)
         return Factura.objects.select_related(
             'empresa', 
             'cliente', 
             'empleado', 
-            'detalle_servicio__vehiculo' # Accedemos al vehículo a través del servicio
+            'detalle_servicio'
         ).prefetch_related(
-            'detalle_servicio__detallerepuesto_set__id_repuesto',
-            'detalle_servicio__detalleinsumos_set__id_insumos',
-            'detalle_servicio__detalletipomantenimiento_set__id_tipo_mantenimiento'
+            # 2. prefetch_related: Para los detalles que quieres SEPARAR
+            'detalle_servicio__vehiculo',
+            'detalle_servicio__detallerepuesto_set',
+            'detalle_servicio__detalleinsumos_set',
+            'detalle_servicio__detalletipomantenimiento_set'
         )
- 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         factura = self.get_object()
