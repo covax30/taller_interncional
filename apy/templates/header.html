@@ -207,46 +207,47 @@
 
             <!--begin::User Menu Dropdown-->
             {% if user.is_authenticated %}
-              <li class="nav-item dropdown user-menu">
-                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                  <img src="{% static 'AdminLTE/dist/assets/img/user2-160x160.jpg' %}"
-                    class="user-image rounded-circle shadow"
-                    alt="User Image"
-                  />
-                  <span class="d-none d-md-inline">{{ user.username }}</span>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-                  <li class="user-header text-bg-primary">
-                    <img src="{% static 'AdminLTE/dist/assets/img/user2-160x160.jpg' %}"
-                      class="rounded-circle shadow"
-                      alt="User Image"
-                    />
-                    <p>
-                      {{ user.get_full_name|default:user.username }}
-                       <small>Miembro desde {{ user.date_joined|date:"j \d\e M. \d\e Y" }}</small>
-                    </p>
-                  </li>
-                  <li class="user-body">
-                    <div class="row">
-                      <div class="col-4 text-center">
-                        <a href="#">Followers</a>
-                      </div>
-                      <div class="col-4 text-center">
-                        <a href="#">Sales</a>
-                      </div>
-                      <div class="col-4 text-center">
-                        <a href="#">Friends</a>
-                      </div>
-                    </div>
-                    </li>
-                  <li class="user-footer">
-                    <a href="#" class="btn btn-default btn-flat">Perfil</a>
-                    <form action="{% url 'login:logout' %}" method="post" style="display: inline;">
-                      {% csrf_token %}
-                    </form>
-                  </li>
-                  </ul>
-              </li>
+            <li class="nav-item dropdown user-menu">
+              <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                {# Lógica para la miniatura en la barra superior #}
+                {% if user.profile.imagen and 'default.png' not in user.profile.imagen.url %}
+                  <img src="{{ user.profile.imagen.url }}" class="user-image rounded-circle shadow" alt="User Image" style="object-fit: cover;" />
+                {% else %}
+                  {% if user.is_superuser %}
+                    <img src="{% static 'img/gerente.png' %}" class="user-image rounded-circle shadow" alt="Gerente" />
+                  {% else %}
+                    <img src="{% static 'img/empleado.png' %}" class="user-image rounded-circle shadow" alt="Empleado" />
+                  {% endif %}
+                {% endif %}
+                <span class="d-none d-md-inline">{{ user.username }}</span>
+              </a>
+              
+              <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
+                <li class="user-header text-bg-primary">
+                  {# Lógica para la imagen grande en el desplegable #}
+                  {% if user.profile.imagen and 'default.png' not in user.profile.imagen.url %}
+                    <img src="{{ user.profile.imagen.url }}" class="rounded-circle shadow" alt="User Image" style="width: 90px; height: 90px; object-fit: cover;" />
+                  {% else %}
+                    {% if user.is_superuser %}
+                      <img src="{% static 'img/gerente.png' %}" class="rounded-circle shadow" alt="Gerente" />
+                    {% else %}
+                      <img src="{% static 'img/empleado.png' %}" class="rounded-circle shadow" alt="Empleado" />
+                    {% endif %}
+                  {% endif %}
+                  <p>
+                    {{ user.get_full_name|default:user.username }}
+                    <small>Miembro desde {{ user.date_joined|date:"j \d\e M. \d\e Y" }}</small>
+                  </p>
+                </li>
+                
+                <li class="user-footer">
+                  <a href="{% url 'apy:perfil_usuario' %}" class="btn btn-default btn-flat">Perfil</a>
+                  <form action="{% url 'login:logout' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                  </form>
+                </li>
+              </ul>
+            </li>
             {% endif %}
             <!--end::User Menu Dropdown-->
             <a class="nav-link" href="{% url 'login:login'%}">

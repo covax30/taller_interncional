@@ -33,10 +33,22 @@ def permisos_usuarios(request):
         
         try:
             user_to_edit = User.objects.get(id=user_id_to_save)
+            
+            # SEGURIDAD: Si es superusuario, no permitimos guardar cambios
+            if user_to_edit.is_superuser:
+                messages.error(request, "Acción denegada: No se pueden alterar los permisos de un Administrador.")
+                return redirect(f"{reverse('apy:permisos_usuarios')}?user_id={user_to_edit.id}")
+            
         except User.DoesNotExist:
             messages.error(request, "Error: el usuario no existe.")
             return redirect('apy:permisos_usuarios')
 
+        # --- PROTECCIÓN PARA EL ADMIN ---
+        if user_to_edit.is_superuser:
+            messages.warning(request, "Los permisos del Administrador (Superusuario) son totales y no pueden ser modificados por seguridad.")
+            return redirect(f"{reverse('apy:permisos_usuarios')}?user_id={user_to_edit.id}")
+        # --------------------------------
+        
         try:
             with transaction.atomic():
                 # Borramos permisos previos del usuario
