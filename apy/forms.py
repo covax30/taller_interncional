@@ -20,7 +20,7 @@ class FacturaForm(ModelForm):
         
     class Meta:
         model = Factura
-        fields = '__all__'
+        exclude = ['id_empresa']
         widgets = {
             'fecha':DateInput(
                 attrs={
@@ -29,17 +29,17 @@ class FacturaForm(ModelForm):
                 }
             ),
             
-            'id_empleado': Select(
+            'empleado': Select(
                 attrs={
                     'class': 'form-control',
                 }
             ),
-            'id_cliente': Select(
+            'cliente': Select(
                 attrs={
                     'class': 'form-control',
                 }
             ),
-            'id_Detalles_servicios': Select(
+            'detalle_servicio': Select(
                 attrs={
                     'class': 'form-control',
                 }
@@ -53,35 +53,20 @@ class FacturaForm(ModelForm):
 
 
         error_messages = {
-            'id_operacion': {
-                'required': 'El id de la operacion es obligatorio',
+            'fecha': {
+                'required': 'La fecha es obligatoria',
             },
-            'tipo_pago': {
-                'required': 'El tipo de pago es obligatorio',
+            'empleado': {
+                'required': 'El empleado es obligatorio',
             },
-            'id_cliente': {
-                'required': 'El id del cliente es obligatorio',
+            'cliente': {
+                'required': 'El  cliente es obligatorio',
             },
-            'id_vehiculo': {
-                'required': 'El id del vehiculo es obligatorio',
+            'detalle_servicio': {
+                'required': 'El detalle de servicios es obligatorio',
             },
-            'id_tipo_mantenimiento': {
-                'required': 'El id de tipo de mantenimiento es obligatorio',
-            },
-            'servicio_prestado': {
-                'required': 'El servicio prestado es obligatorio',
-            },
-            'nombre_empresa': {
-                'required': 'El nombre de la empresa es obligatorio',
-            },
-            'direccion_empresa': {
-                'required': 'La direccion de la empresa es obligatoria',
-            },
-            'id_empleado': {
-                'required': 'El id del empleado es obligatorio',
-            },
-            'monto': {
-                'required': 'El monto es obligatorio',
+            'metodo_pago': {
+                'required': 'El metodo de pago es obligatorio',
             }
         }
         
@@ -149,7 +134,7 @@ class RepuestoscantidadForm(ModelForm):
         widgets = {
             'id_repuesto': Select(attrs={'class': 'form-control'}),
             'cantidad': NumberInput(attrs={'class': 'form-control', 'min': '1'}),
-            'precio_unitario': NumberInput(attrs={'class': 'form-control', 'placeholder': '0.00', 'step': '0.01'}),
+            'precio_unitario': NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese el precio unitario', 'step': '0.01'}),
         }
         
         error_messages = {
@@ -236,7 +221,7 @@ class DetalleInsumoForm(ModelForm):
             ),
             'precio_unitario': NumberInput(
                 attrs={
-                    'placeholder': 'Ingrese el costo del insumo',
+                    'placeholder': 'Ingrese el precio unitario',
                     'step': '0.01',
                     'class': 'form-control',
                 }
@@ -258,15 +243,15 @@ class DetalleInsumoForm(ModelForm):
 class DetalleServicioForm(ModelForm):
     class Meta:
         model = DetalleServicio
-        fields = ['vehiculo']
+        fields = ['id_vehiculo']
         widgets = {
-            'vehiculo': Select(attrs={
+            'id_vehiculo': Select(attrs={
                 'class': 'form-control',
                 'placeholder': 'Seleccione un vehículo'
             }),
         }
         error_messages = {
-            'vehiculo': {
+            'id_vehiculo': {
                 'required': 'El vehículo es obligatorio.',
             },
         }
@@ -274,7 +259,7 @@ class DetalleServicioForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Configurar cómo se muestran los vehículos en el select
-        self.fields['vehiculo'].label_from_instance = (
+        self.fields['id_vehiculo'].label_from_instance = (
             lambda obj: f"{obj.placa} - {obj.marca_vehiculo} {obj.modelo_vehiculo} - {obj.color}"
         )
 

@@ -234,7 +234,7 @@ class ClienteCreateModalView(CreateView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        form.instance.estado = True 
+        form.instance.estado = True
         try:
             self.object = form.save()
             return JsonResponse({

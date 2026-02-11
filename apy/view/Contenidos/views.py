@@ -83,6 +83,7 @@ class FacturaCreateView(PermisoRequeridoMixin, CreateView):
     
     def form_valid(self, form):
         form.instance.estado = True 
+        form.instance.id_empresa_id = 1 
         messages.success(self.request, "Factura creada correctamente")
         return super().form_valid(form)
     

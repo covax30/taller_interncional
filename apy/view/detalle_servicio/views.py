@@ -4,6 +4,9 @@ from django.shortcuts import redirect, get_object_or_404
 from django.db import transaction
 from django.contrib import messages
 from django.http import HttpResponseRedirect, JsonResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
+from django.template.loader import render_to_string
 
 
 from apy.models import (
@@ -80,6 +83,7 @@ class CreateServicioView(CreateView):
 
     @transaction.atomic
     def form_valid(self, form):
+        form.instance.estado = True
         context = self.get_context_data()
         repuesto_formset = context['repuesto_formset']
         mantenimiento_formset = context['mantenimiento_formset']
@@ -159,6 +163,8 @@ class UpdateServicioView(UpdateView):
 
     @transaction.atomic
     def form_valid(self, form):
+        form.instance.estado = True
+
         context = self.get_context_data()
         repuesto_formset = context['repuesto_formset']
         mantenimiento_formset = context['mantenimiento_formset']
@@ -183,6 +189,11 @@ class UpdateServicioView(UpdateView):
         else:
             messages.error(self.request, 'Corrige los errores antes de guardar.')
             return self.render_to_response(self.get_context_data(form=form))
+        
+    def form_invalid(self, form):
+        print("ERRORES FORM:", form.errors)
+        return super().form_invalid(form)
+
 
 class DeleteServicioView(DeleteView):
     model = DetalleServicio
@@ -221,8 +232,8 @@ class DetalleServicioView(DetailView):
             'detallerepuesto_set__id_repuesto',
             'detalletipomantenimiento_set__id_tipo_mantenimiento', 
             'detalleinsumos_set__id_insumos__id_marca',
-            'vehiculo__id_cliente'
-        ).select_related('vehiculo')
+            'id_vehiculo__id_cliente'
+        ).select_related('id_vehiculo')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -236,3 +247,37 @@ class DetalleServicioView(DetailView):
         })
         
         return context
+    
+class DetalleCreateModalView(CreateView):
+    model = DetalleServicio
+    form_class = DetalleServicioForm
+    template_name = 'detalle_servicio/modal_detalle.html'
+    success_url = reverse_lazy("apy:lista_servicios")
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.instance.estado = True 
+        try:
+            self.object = form.save()
+            return JsonResponse({
+                "success": True,
+                "id": self.object.id,
+                "text": str(self.object),
+                "message": "Servicio registrado correctamente ✅"
+            })
+        except Exception as e:
+            return JsonResponse({
+                "success": False,
+                "message": f"Error al guardar: {str(e)}"
+            }, status=500)
+    
+    def form_invalid(self, form):
+        html = render_to_string(self.template_name, {"form": form}, request=self.request)
+        return JsonResponse({
+            "success": False,
+            "html": html,
+            "message": "Por favor, corrige los errores en el formulario ❌"
+        })
