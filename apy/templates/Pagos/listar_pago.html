@@ -22,7 +22,6 @@
     <th>Hora</th>
     <th>Monto</th>
     <th>Proveedor</th>
-    <th>Administrador</th>
     <th>Herramientas</th>
     <th>Insumos</th>
     <th>Repuestos</th>
@@ -46,7 +45,6 @@
         <td>{{ p.hora|default:"No especificada" }}</td>
         <td>{{ p.monto|intcomma|default:"0" }}</td>
         <td>{{ p.id_proveedor|default:"Sin proveedor" }}</td>
-        <td>{{ p.id_admin|default:"Sin admin" }}</td>
         <td>{{ p.id_herramienta|default:"Sin herramienta" }}</td>
         <td>{{ p.id_insumos|default:"Sin insumos" }}</td>
         <td>{{ p.id_repuestos|default:"Sin repuestos" }}</td>

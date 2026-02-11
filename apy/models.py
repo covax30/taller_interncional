@@ -243,7 +243,7 @@ class Cliente(models.Model):
     estado = models.BooleanField(default=True, verbose_name="Activo")
 
     def __str__(self):
-        return f"{self.id} - {self.nombre}"
+        return f"{self.nombre} - {self.identificacion}"
     
 
 
@@ -286,19 +286,6 @@ class SalidaVehiculo(models.Model):
 
  
 #-------------MODULOS DE karol-----------
-#-------------Modulo Administrador-----------
-class Administrador(models.Model):
-    id_admin = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=100)
-    apellidos = models.CharField(max_length=100)
-    identificacion = models.IntegerField( unique=True, validators=[validar_identificacion])
-    edad = models.PositiveIntegerField(validators=[validar_edad])
-    correo = models.EmailField(unique=True, validators=[validar_email])
-    telefono = models.IntegerField( validators=[validar_telefono])
-    fecha_ingreso = models.DateField()
-    
-    def __str__(self):
-        return f"{self.nombre} {self.apellidos}"
 
 
 #--------------Modulo Pago Servicio Publicos-----------
@@ -454,7 +441,6 @@ class Pagos(models.Model):
         } , validators=[validar_monto]
     )
     id_proveedor = models.ForeignKey(Proveedores, on_delete=models.PROTECT)
-    id_admin = models.ForeignKey(Administrador, on_delete=models.PROTECT)
     id_herramienta = models.ForeignKey(Herramienta, on_delete=models.PROTECT)
     id_insumos = models.ForeignKey(Insumos, on_delete=models.PROTECT)
     id_repuesto = models.ForeignKey(Repuesto, on_delete=models.PROTECT)
@@ -466,7 +452,7 @@ class Pagos(models.Model):
 
 # ----- modulo detalle servicio  ---------
 class DetalleServicio(models.Model):
-    vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT,related_name="servicios")
+    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT,related_name="servicios")
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     estado = models.BooleanField(default=True)
 
@@ -510,7 +496,7 @@ class DetalleServicio(models.Model):
         )
 
     def __str__(self):
-        return f"Servicio #{self.id} - {self.vehiculo.placa}"
+        return f"Servicio #{self.id} - {self.id_vehiculo.placa}"
 
 class DetalleRepuesto(models.Model):
     detalle_servicio = models.ForeignKey(DetalleServicio, on_delete=models.PROTECT)
@@ -520,7 +506,7 @@ class DetalleRepuesto(models.Model):
     
     @property
     def subtotal(self):
-        return self.cantidad * self.precio_unitario
+        return self.cantidad 
     
     def __str__(self):
         return f"Repuesto: {self.id_repuesto.nombre} - Cantidad: {self.cantidad}"
@@ -561,7 +547,7 @@ class Empresa(models.Model):
 
     
     def __str__(self):
-        return self.nombre
+        return f"{self.nombre} - {self.nit} en {self.direccion} {self.telefono}"   
     
 
 #-----------Factura-----------------

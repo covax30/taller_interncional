@@ -9,6 +9,10 @@ from apy.forms import *
 from django.contrib import messages
 # Se elimina la importación de AccessMixin ya que no se usa localmente.
 from apy.decorators import PermisoRequeridoMixin
+from openpyxl import Workbook
+from django.http import HttpResponse
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+
 
 # --------------Vistas de informes---------------
 
@@ -162,3 +166,80 @@ class InformesActivateView(PermisoRequeridoMixin, DeleteView):
         context['listar_url'] = reverse_lazy('apy:informes_lista')
         
         return context
+    
+def informe_excel(request, id):
+    informe = Informes.objects.get(id_informe=id)
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Informe"
+
+    # ===== ESTILOS =====
+    titulo_font = Font(size=14, bold=True)
+    header_font = Font(bold=True, color="FFFFFF")
+    header_fill = PatternFill("solid", fgColor="2C3E50")
+    center = Alignment(horizontal="center", vertical="center")
+
+    border = Border(
+        left=Side(style="thin"),
+        right=Side(style="thin"),
+        top=Side(style="thin"),
+        bottom=Side(style="thin")
+    )
+
+    # ===== TÍTULO =====
+    ws.merge_cells("A1:B1")
+    ws["A1"] = "INFORME DE MANTENIMIENTO"
+    ws["A1"].font = titulo_font
+    ws["A1"].alignment = center
+
+    # ===== ENCABEZADOS =====
+    headers = ["Campo", "Detalle"]
+    ws.append(headers)
+
+    for col in range(1, 3):
+        cell = ws.cell(row=2, column=col)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = center
+        cell.border = border
+
+    # ===== DATOS =====
+    data = [
+        ("ID Informe", informe.id_informe),
+        ("Repuestos Usados", informe.repuestos_usados),
+        ("Costo Mano de Obra", informe.costo_mano_obra),
+        ("Fecha", informe.fecha),
+        ("Hora", informe.hora),
+        ("Repuesto", str(informe.id_repuesto)),
+        ("Empleado", str(informe.id_empleado)),
+        ("Tipo Informe", informe.tipo_informe),
+        ("Mantenimiento", str(informe.id_mantenimiento)),
+    ]
+
+    row = 3
+    for campo, valor in data:
+        ws.cell(row=row, column=1, value=campo)
+        ws.cell(row=row, column=2, value=valor)
+
+        for col in range(1, 3):
+            ws.cell(row=row, column=col).border = border
+            ws.cell(row=row, column=col).alignment = Alignment(vertical="center")
+
+        row += 1
+
+    # ===== FORMATO MONEDA =====
+    ws["B5"].number_format = '"$"#,##0.00'
+
+    # ===== AJUSTAR COLUMNAS =====
+    ws.column_dimensions["A"].width = 25
+    ws.column_dimensions["B"].width = 40
+
+    # ===== RESPONSE =====
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response["Content-Disposition"] = f'attachment; filename=Informe_{id}.xlsx'
+
+    wb.save(response)
+    return response

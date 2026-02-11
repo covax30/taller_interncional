@@ -69,6 +69,7 @@ urlpatterns = [
     path('servicios/detalle/<int:pk>/', DetalleServicioView.as_view(), name='detalle_servicio'),
     path('servicios/inactivos/', ServicioInactivosListView.as_view(), name='servicios_inactivos'),  
     path('servicios/activar/<int:pk>/', ServicioActivateView.as_view(), name='servicio_activar'),
+    path('servicios/modal/crear/', DetalleCreateModalView.as_view(), name='servicio_modal_crear'),
     
     # -------------URL modulo proveedor---------------
     path('Proveedor/listar/', ProveedorListView.as_view(), name='proveedor_lista'),
@@ -146,6 +147,8 @@ urlpatterns = [
     path('informes/eliminar/<int:pk>/', InformesDeleteView.as_view() , name='informes_eliminar'),
     path("informes/inactivos/", InformesInactivosListView.as_view(), name="informes_inactivos"),
     path('informes/activar/<int:pk>/', InformesActivateView.as_view(), name="informes_activar"),
+    path('informes/excel/<int:id>/', informe_excel, name='informes_excel'),
+
     
     #--------URL modulo pago de sercicios publicos----------------
     path('PagoServicios/listar/', PagoServiciosListView.as_view() , name='pago_servicios_lista'),

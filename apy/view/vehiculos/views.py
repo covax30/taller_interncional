@@ -95,12 +95,6 @@ class VehiculoCreateView(PermisoRequeridoMixin, CreateView):
         
         return response
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['titulo'] = 'Crear de Vehiculos'
-        context['entidad'] = 'Vehiculo'
-        context['listar_url'] = reverse_lazy('apy:vehiculo_lista')
-        return context
 
 class VehiculoUpdateView(PermisoRequeridoMixin, UpdateView): 
     model = Vehiculo
@@ -260,6 +254,7 @@ class VehiculoCreateModalView(CreateView):
 
     def form_valid(self, form):
         """Manejar formulario válido"""
+        form.instance.estado = True 
         try:
             self.object = form.save()
 
