@@ -51,9 +51,6 @@
         <div class="input-group">
             {{ form.detalle_servicio }}
             <div class="input-group-append">
-                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-detalle_servicio">
-                    <i class="fas fa-plus"></i>
-                </button>
             </div>
         </div>
     </div>
@@ -162,18 +159,7 @@
         });
     </script>
 
-    <!-- Script detalle repuesto. -->
-    <script>
-        $("#modal-detalle_servicio").on("show.bs.modal", function(){
-            var modal = $(this);
-            $.ajax({
-                url: "{% url 'apy:servicio_modal_crear' %}",
-                success: function(data){
-                    modal.find(".modal-body").html(data.html || data);
-                }
-            });
-        });
-    </script>
+    
 
 {% endblock %}
 
