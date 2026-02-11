@@ -20,7 +20,7 @@ class FacturaForm(ModelForm):
         
     class Meta:
         model = Factura
-        exclude = ['id_empresa']
+        fields = '__all__'
         widgets = {
             'fecha':DateInput(
                 attrs={
@@ -799,89 +799,6 @@ class CompraForm(ModelForm):
             },
         }
      
-       
-# -----------Formulario modelo administrador------------------
-class AdministradorForm(ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['nombre'].widget.attrs['autofocus'] = True
-        
-    class Meta:
-        model = Administrador
-        fields = '__all__'
-        widgets = {
-            'nombre':TextInput(
-                attrs={
-                    'placeholder':'Ingrese el nombre del administrador',
-                }
-            ),
-            'apellidos':TextInput(
-                attrs={
-                    'placeholder':'Ingrese los apellidos del administrador',
-                }
-            ),
-            'identificacion':NumberInput(
-                attrs={
-                    'placeholder':'Ingrese la identificacion del administrador',
-                    'pattern': '[0-9]+',
-                    'title': 'Solo se permiten números',
-                    'maxlength': '20'
-                }
-            ),
-            'edad':NumberInput(
-                attrs={
-                    'placeholder':'Ingrese la edad del administrador',
-                    'min': 1,
-                    'max': 100
-                }
-            ),
-            'correo':EmailInput(
-                attrs={
-                    'placeholder':'Ingrese el correo del administrador',
-                }
-            ),
-            'telefono':NumberInput(
-                attrs={
-                    'placeholder':'Ingrese el telefono del administrador',
-                    'type': 'tel'
-                }
-            ),
-            'fecha_ingreso':DateInput(
-                attrs={
-                    'placeholder':'Ingrese la fecha de ingreso del administrador',
-                    'type': 'date'
-                }
-            )
-        }
-        error_messages = {
-            'nombre': {
-                'required': 'El nombre es obligatorio',
-            },
-            'apellidos': {
-                'required': 'El apellido es obligatorio',
-            },
-            'identificacion': {
-                'required': 'La identificación es obligatoria',
-                'unique': 'Ya existe un administrador con esa identificación',
-                'invalid': 'Por favor ingrese solo números en la identificación',
-            },
-            'edad': {
-                'required': 'La edad es obligatoria',
-                'invalid': 'Por favor ingrese solo números en la edad',
-            },
-            'correo': {
-                'required': 'El correo es obligatorio',
-                'invalid': 'El correo no tiene un formato válido',
-                'unique': 'Ya existe un administrador con ese correo',
-            },
-            'telefono': {
-                'required': 'El teléfono es obligatorio',
-                'invalid': 'Por favor ingrese solo números en el telefono',
-            },
-            'fecha_ingreso': {
-                'required': 'La fecha de ingreso es obligatoria',
-            },
-        }
         
 
     

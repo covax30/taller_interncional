@@ -83,7 +83,6 @@ class FacturaCreateView(PermisoRequeridoMixin, CreateView):
     
     def form_valid(self, form):
         form.instance.estado = True 
-        form.instance.id_empresa_id = 1 
         messages.success(self.request, "Factura creada correctamente")
         return super().form_valid(form)
     
@@ -232,8 +231,8 @@ def factura_detalle_json(request, pk):
             
         },
         'vehiculo': {
-            'placa': servicio.vehiculo.placa,
-            'info': f"{servicio.vehiculo.marca_vehiculo} {servicio.vehiculo.modelo_vehiculo} ",
+            'placa': servicio.id_vehiculo.placa,
+            'info': f"{servicio.id_vehiculo.marca_vehiculo} {servicio.id_vehiculo.modelo_vehiculo} ",
             
         },
         'items': todos_los_items,
@@ -256,7 +255,7 @@ class DetalleFacturaView(DetailView):
             'detalle_servicio'
         ).prefetch_related(
             # 2. prefetch_related: Para los detalles que quieres SEPARAR
-            'detalle_servicio__vehiculo',
+            'detalle_servicio__id_vehiculo',
             'detalle_servicio__detallerepuesto_set',
             'detalle_servicio__detalleinsumos_set',
             'detalle_servicio__detalletipomantenimiento_set'

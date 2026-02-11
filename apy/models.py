@@ -286,19 +286,6 @@ class SalidaVehiculo(models.Model):
 
  
 #-------------MODULOS DE karol-----------
-#-------------Modulo Administrador-----------
-class Administrador(models.Model):
-    id_admin = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=100)
-    apellidos = models.CharField(max_length=100)
-    identificacion = models.IntegerField( unique=True, validators=[validar_identificacion])
-    edad = models.PositiveIntegerField(validators=[validar_edad])
-    correo = models.EmailField(unique=True, validators=[validar_email])
-    telefono = models.IntegerField( validators=[validar_telefono])
-    fecha_ingreso = models.DateField()
-    
-    def __str__(self):
-        return f"{self.nombre} {self.apellidos}"
 
 
 #--------------Modulo Pago Servicio Publicos-----------
@@ -454,7 +441,6 @@ class Pagos(models.Model):
         } , validators=[validar_monto]
     )
     id_proveedor = models.ForeignKey(Proveedores, on_delete=models.PROTECT)
-    id_admin = models.ForeignKey(Administrador, on_delete=models.PROTECT)
     id_herramienta = models.ForeignKey(Herramienta, on_delete=models.PROTECT)
     id_insumos = models.ForeignKey(Insumos, on_delete=models.PROTECT)
     id_repuesto = models.ForeignKey(Repuesto, on_delete=models.PROTECT)
@@ -576,7 +562,7 @@ class Factura(models.Model):
     cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
     empleado = models.ForeignKey(Empleado,on_delete=models.PROTECT)
     detalle_servicio = models.OneToOneField(DetalleServicio,on_delete=models.PROTECT,related_name="factura")
-    fecha = models.DateField()
+    fecha = models.DateField(auto_now_add=True)
     metodo_pago = models.CharField(max_length=50, choices=METODO_PAGO  )
     estado = models.BooleanField(default=True)
 

@@ -4,28 +4,28 @@
 {% block form %}
     {% csrf_token %}
 
-    <!-- Fecha -->
+    <!-- Empresa -->
     <div class="form-group mb-3">
-        <label for="{{ form.fecha.id_for_label }}">Fecha:</label>
+        <label for="{{ form.empresa.id_for_label }}">Empresa:</label>
         <div class="input-group">
-            {{ form.fecha|add_class:'form-control'|attr:'autocomplete:off' }}
+            {{ form.empresa|add_class:'form-control'|attr:'autocomplete:off' }}
         </div>
-        {% if form.fecha.errors %}
+        {% if form.empresa.errors %}
             <div class="invalid-feedback d-block">
-                {% for error in form.fecha.errors %}
+                {% for error in form.empresa.errors %}
                     <small>{{ error }}</small><br>
                 {% endfor %}
             </div>
         {% endif %}
     </div>
 
-    <!-- id detalles servcios -->
+    <!-- id_cliente con modal -->
     <div class="form-group mb-3">
-        <label for="{{ form.detalle_servicio.id_for_label }}">Detalles de servicios:</label>
+        <label for="{{ form.cliente.id_for_label }}">Cliente:</label>
         <div class="input-group">
-            {{ form.detalle_servicio }}
+            {{ form.cliente }}
             <div class="input-group-append">
-                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-detalle_servicio">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-cliente">
                     <i class="fas fa-plus"></i>
                 </button>
             </div>
@@ -45,13 +45,13 @@
         </div>
     </div>
 
-    <!-- id_cliente con modal -->
+    <!-- id detalles servcios -->
     <div class="form-group mb-3">
-        <label for="{{ form.cliente.id_for_label }}">Cliente:</label>
+        <label for="{{ form.detalle_servicio.id_for_label }}">Detalles de servicios:</label>
         <div class="input-group">
-            {{ form.cliente }}
+            {{ form.detalle_servicio }}
             <div class="input-group-append">
-                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-cliente">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-detalle_servicio">
                     <i class="fas fa-plus"></i>
                 </button>
             </div>
@@ -136,12 +136,12 @@
         </div>
     </div>
 
-    <!-- Script detalle repuesto. -->
+    <!-- Script cliente -->
     <script>
-        $("#modal-detalle_servicio").on("show.bs.modal", function(){
+        $("#modal-cliente").on("show.bs.modal", function(){
             var modal = $(this);
             $.ajax({
-                url: "{% url 'apy:servicio_modal_crear' %}",
+                url: "{% url 'apy:cliente_modal_crear' %}",
                 success: function(data){
                     modal.find(".modal-body").html(data.html || data);
                 }
@@ -162,12 +162,12 @@
         });
     </script>
 
-    <!-- Script cliente -->
+    <!-- Script detalle repuesto. -->
     <script>
-        $("#modal-cliente").on("show.bs.modal", function(){
+        $("#modal-detalle_servicio").on("show.bs.modal", function(){
             var modal = $(this);
             $.ajax({
-                url: "{% url 'apy:cliente_modal_crear' %}",
+                url: "{% url 'apy:servicio_modal_crear' %}",
                 success: function(data){
                     modal.find(".modal-body").html(data.html || data);
                 }
