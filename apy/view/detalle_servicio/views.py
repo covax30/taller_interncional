@@ -163,6 +163,8 @@ class UpdateServicioView(UpdateView):
 
     @transaction.atomic
     def form_valid(self, form):
+        form.instance.estado = True
+
         context = self.get_context_data()
         repuesto_formset = context['repuesto_formset']
         mantenimiento_formset = context['mantenimiento_formset']
@@ -187,6 +189,11 @@ class UpdateServicioView(UpdateView):
         else:
             messages.error(self.request, 'Corrige los errores antes de guardar.')
             return self.render_to_response(self.get_context_data(form=form))
+        
+    def form_invalid(self, form):
+        print("ERRORES FORM:", form.errors)
+        return super().form_invalid(form)
+
 
 class DeleteServicioView(DeleteView):
     model = DetalleServicio
@@ -225,8 +232,8 @@ class DetalleServicioView(DetailView):
             'detallerepuesto_set__id_repuesto',
             'detalletipomantenimiento_set__id_tipo_mantenimiento', 
             'detalleinsumos_set__id_insumos__id_marca',
-            'vehiculo__id_cliente'
-        ).select_related('vehiculo')
+            'id_vehiculo__id_cliente'
+        ).select_related('id_vehiculo')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

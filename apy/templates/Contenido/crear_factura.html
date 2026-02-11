@@ -21,11 +21,11 @@
 
     <!-- id detalles servcios -->
     <div class="form-group mb-3">
-        <label for="{{ form.id_Detalles_servicios.id_for_label }}">Detalles de servicios:</label>
+        <label for="{{ form.detalle_servicio.id_for_label }}">Detalles de servicios:</label>
         <div class="input-group">
-            {{ form.id_Detalles_servicios }}
+            {{ form.detalle_servicio }}
             <div class="input-group-append">
-                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_Detalles_servicios">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-detalle_servicio">
                     <i class="fas fa-plus"></i>
                 </button>
             </div>
@@ -34,11 +34,11 @@
 
     <!-- id_empleado -->
     <div class="form-group mb-3">
-        <label for="{{ form.id_empleado.id_for_label }}">Empleado:</label>
+        <label for="{{ form.empleado.id_for_label }}">Empleado:</label>
         <div class="input-group">
-            {{ form.id_empleado }}
+            {{ form.empleado }}
             <div class="input-group-append">
-                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_empleado">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-empleado">
                     <i class="fas fa-plus"></i>
                 </button>
             </div>
@@ -47,11 +47,11 @@
 
     <!-- id_cliente con modal -->
     <div class="form-group mb-3">
-        <label for="{{ form.id_cliente.id_for_label }}">Cliente:</label>
+        <label for="{{ form.cliente.id_for_label }}">Cliente:</label>
         <div class="input-group">
-            {{ form.id_cliente }}
+            {{ form.cliente }}
             <div class="input-group-append">
-                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_cliente">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-cliente">
                     <i class="fas fa-plus"></i>
                 </button>
             </div>
@@ -74,7 +74,7 @@
     </div>
 
     <!-- Modal detalle servicio  -->
-    <div class="modal fade" id="modal-id_Detalles_servicios" tabindex="-1" role="dialog">
+    <div class="modal fade" id="modal-detalle_servicio" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
             <div class="modal-header d-flex justify-content-between align-items-center">
@@ -95,7 +95,7 @@
     </div>
 
     <!-- Modal empleado -->
-    <div class="modal fade" id="modal-id_empleado" tabindex="-1" role="dialog">
+    <div class="modal fade" id="modal-empleado" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
             <div class="modal-header d-flex justify-content-between align-items-center">
@@ -116,7 +116,7 @@
     </div>
 
     <!-- Modal cliente -->
-    <div class="modal fade" id="modal-id_cliente" tabindex="-1" role="dialog">
+    <div class="modal fade" id="modal-cliente" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
             <div class="modal-header d-flex justify-content-between align-items-center">
@@ -138,7 +138,7 @@
 
     <!-- Script detalle repuesto. -->
     <script>
-        $("#modal-id_Detalles_servicios").on("show.bs.modal", function(){
+        $("#modal-detalle_servicio").on("show.bs.modal", function(){
             var modal = $(this);
             $.ajax({
                 url: "{% url 'apy:servicio_modal_crear' %}",
@@ -151,7 +151,7 @@
 
     <!-- Script empleado. -->
     <script>
-        $("#modal-id_empleado").on("show.bs.modal", function(){
+        $("#modal-empleado").on("show.bs.modal", function(){
             var modal = $(this);
             $.ajax({
                 url: "{% url 'apy:empleado_modal_crear' %}",
@@ -164,7 +164,7 @@
 
     <!-- Script cliente -->
     <script>
-        $("#modal-id_cliente").on("show.bs.modal", function(){
+        $("#modal-cliente").on("show.bs.modal", function(){
             var modal = $(this);
             $.ajax({
                 url: "{% url 'apy:cliente_modal_crear' %}",

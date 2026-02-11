@@ -35,7 +35,10 @@
                             <div class="input-group">
                                 {{ form.id_vehiculo }}
                                 <div class="input-group-append">
-                                    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_vehiculo">
+                                    <button type="button" 
+                                    class="btn btn-secondary" 
+                                    data-toggle="modal" 
+                                    data-target="#modal-id_vehiculo">
                                         <i class="fas fa-plus"></i>
                                     </button>
                                 </div>
@@ -59,25 +62,33 @@
                 <div id="repuestos-formset">
                     {% for form in repuesto_formset %}
                     <div class="repuesto-form row mb-3 border-bottom pb-3">
+                        {{ form.id }}
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <div class="form-group">
-                                <label for="{{ form.id_repuesto.id_for_label }}">Repuesto:</label>
-                                <div class="input-group">
-                                    {{ form.id_repuesto }}
-                                    <div class="input-group-append">
-                                        <button 
-                                            type="button" 
-                                            class="btn btn-secondary btn-add-repuesto"
-                                            data-toggle="modal" 
-                                            data-target="#modal-id_repuesto"
-                                            data-select="#{{ form.id_repuesto.id_for_label }}"
-                                        >
-                                            <i class="fas fa-plus"></i>
-                                        </button>
+                                    <label for="{{ form.id_repuesto.id_for_label }}">Repuesto:</label>
+                                    <div class="input-group">
+                                        {{ form.id_repuesto|add_class:'form-control' }}
+                                        <div class="input-group-append">
+                                            <button 
+                                                type="button" 
+                                                class="btn btn-secondary btn-add-repuesto"
+                                                data-toggle="modal" 
+                                                data-target="#modal-id_repuesto"
+                                                data-select="#{{ form.id_repuesto.id_for_label }}"
+                                            >
+                                                <i class="fas fa-plus"></i>
+                                            </button>
 
+                                        </div>
                                     </div>
-                                </div>
+                                    {% if form.id_repuesto.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.id_repuesto.errors %}
+                                                <small>{{ error }}</small><br>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -139,16 +150,17 @@
                 <div id="mantenimientos-formset">
                     {% for form in mantenimiento_formset %}
                     <div class="mantenimiento-form row mb-3 border-bottom pb-3">
+                        {{ form.id }}
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <div class="form-group">
                                 <label for="{{ form.id_tipo_mantenimiento.id_for_label }}">Id tipo mantenimiento:</label>
                                 <div class="input-group">
-                                    {{ form.id_tipo_mantenimiento }}
+                                    {{ form.id_tipo_mantenimiento|add_class:'form-control' }}
                                     <div class="input-group-append">
                                         <button 
                                             type="button" 
-                                            class="btn btn-secondary btn-add-tipo_mantenimiento"
+                                            class="btn btn-secondary btn-add-mantenimiento"
                                             data-toggle="modal" 
                                             data-target="#modal-id_tipo_mantenimiento"
                                             data-select="#{{ form.id_tipo_mantenimiento.id_for_label }}"
@@ -158,6 +170,13 @@
 
                                     </div>
                                 </div>
+                                {% if form.id_tipo_mantenimiento.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.id_tipo_mantenimiento.errors %}
+                                            <small>{{ error }}</small><br>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -186,7 +205,7 @@
                         <div class="col-md-2">
                             <div class="mb-3">
                                 <label class="form-label">Subtotal</label>
-                                <input type="text" class="form-control subtotal-mantenimiento" readonly value="$0.00">
+                                <input type="text" class="form-control subtotal-mantenimiento" readonly value="$0">
                             </div>
                         </div>
                         <div class="col-md-1">
@@ -219,16 +238,17 @@
                 <div id="insumos-formset">
                     {% for form in insumo_formset %}
                     <div class="insumo-form row mb-3 border-bottom pb-3">
+                        {{ form.id }}
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <div class="form-group">
                                 <label for="{{ form.id_insumos.id_for_label }}">Insumo:</label>
                                 <div class="input-group">
-                                    {{ form.id_insumos }}
+                                    {{ form.id_insumos|add_class:'form-control' }}
                                     <div class="input-group-append">
                                         <button 
                                             type="button" 
-                                            class="btn btn-secondary btn-add-insumos"
+                                            class="btn btn-secondary btn-add-insumo"
                                             data-toggle="modal" 
                                             data-target="#modal-id_insumos"
                                             data-select="#{{ form.id_insumos.id_for_label }}"
@@ -265,7 +285,7 @@
                         <div class="col-md-2">
                             <div class="mb-3">
                                 <label class="form-label">Subtotal</label>
-                                <input type="text" class="form-control subtotal-insumo" readonly value="$0.00">
+                                <input type="text" class="form-control subtotal-insumo" readonly value="$0">
                             </div>
                         </div>
                         <div class="col-md-1">
@@ -523,54 +543,117 @@ document.getElementById('add-mantenimiento')?.addEventListener('click', function
 });
 </script>
 
-
 <script>
-let $selectActivo = null;
+// Declaramos la variable UNA SOLA VEZ
+if (typeof $selectActivo === 'undefined') {
+    var $selectActivo = null; 
+}
 
-$(document).on('click', '.btn-add-repuesto', function () {
-    $selectActivo = $(this)
-        .closest('.input-group')
-        .find('select');
+// Manejo para Repuestos
+$(document).on('click', '.btn-add-repuesto', function() {
+    const selector = $(this).data('select');
+    $selectActivo = $(selector); 
+    console.log("Modo Repuesto - Select objetivo:", selector);
 });
-</script>
 
-<script>
-$(document).on('submit', '#form-repuesto', function(e){
-    e.preventDefault();
+// Manejo para tipo mantenimiento
+$(document).on('click', '.btn-add-mantenimiento', function() {
+    const selector = $(this).data('select');
+    $selectActivo = $(selector); 
+    console.log("Modo Mantenimiento - Select objetivo:", selector);
+});
 
-    $.ajax({
-        type: this.method,
-        url: this.action,
-        data: $(this).serialize(),
-        success: function(data){
-            if (data.success) {
+// Manejo para Insumos
+$(document).on('click', '.btn-add-insumo', function() {
+    const selector = $(this).data('select');
+    $selectActivo = $(selector); 
+    console.log("Modo Insumo - Select objetivo:", selector);
+});
+</script>  
 
-                if ($selectActivo && $selectActivo.length) {
-
-                    // Evitar duplicados
-                    if ($selectActivo.find(`option[value="${data.id}"]`).length === 0) {
-                        const option = new Option(data.text, data.id, true, true);
-                        $selectActivo.append(option);
-                    }
-
-                    $selectActivo.val(data.id).trigger('change');
-                }
-
-                const modalElement = document.getElementById('modal-id_repuesto');
-                const modalInstance = bootstrap.Modal.getInstance(modalElement);
-                modalInstance.hide();
-
-
-            } else {
-                $('#modal-id_repuesto .modal-body').html(data.html);
-            }
+<script> 
+$(document).ready(function() {
+    // Función para calcular subtotales al cargar
+    function calcularTotalesAlInicio() {
+        
+        // --- SECCIÓN DE REPUESTOS ---
+        $('.repuesto-form').each(function() {
+            let cant = $(this).find('.cantidad-repuestos').val() || 0;
+            let precio = $(this).find('.precio-repuestos').val() || 0;
+            let subtotal = parseFloat(cant) * parseFloat(precio);
+            $(this).find('.subtotal-repuesto').val('$' + subtotal.toFixed(2));
+        });
+        
+        // --- SECCIÓN DE MANTENIMIENTOS (Basada en la anterior) ---
+        $('.mantenimiento-form').each(function() {
+            let cant = $(this).find('.cantidad-mantenimientos').val() || 0;
+            let precio = $(this).find('.precio-mantenimientos').val() || 0;
+            let subtotal = parseFloat(cant) * parseFloat(precio);
+            $(this).find('.subtotal-mantenimiento').val('$' + subtotal.toFixed(2));
+        });
+        
+        // --- SECCIÓN DE INSUMOS ---
+        $('.insumo-form').each(function() {
+            let cant = $(this).find('.cantidad-insumo').val() || 0;
+            let precio = $(this).find('.precio-insumo').val() || 0;
+            let subtotal = parseFloat(cant) * parseFloat(precio);
+            $(this).find('.subtotal-insumo').val('$' + subtotal.toFixed(2));
+        });
+        
+        
+        // --- LLAMADA A LOS TOTALES GENERALES ---
+        // Suma todos los subtotales de repuestos
+        if (typeof actualizarGranTotalRepuestos === "function") {
+            actualizarGranTotalRepuestos(); 
         }
-    });
+
+        // Suma todos los subtotales de mantenimientos
+        if (typeof actualizarGranTotalMantenimientos === "function") {
+            actualizarGranTotalMantenimientos();
+        }
+
+        // Suma todos los subtotales de insumos
+        if (typeof actualizarGranTotalInsumos === "function") {
+            actualizarGranTotalInsumos();
+        }
+    }
+
+    // Ejecutar al iniciar
+    calcularTotalesAlInicio();
 });
+
+// Esta función debe existir para que el Gran Total de mantenimientos se pinte
+function actualizarGranTotalMantenimientos() {
+    let total = 0;
+    $('.subtotal-mantenimiento').each(function() {
+        // Limpiamos el "$" y convertimos a número para sumar
+        let valor = parseFloat($(this).val().replace('$', '')) || 0;
+        total += valor;
+    });
+    // Pintamos el resultado en el span correspondiente
+    $('#total-mantenimientos').text('$' + total.toFixed(2));
+}
+function actualizarGranTotalRepuestos() {
+    let total = 0;
+    $('.subtotal-repuesto').each(function() {
+        // Limpiamos el "$" y convertimos a número para sumar
+        let valor = parseFloat($(this).val().replace('$', '')) || 0;
+        total += valor;
+    });
+    // Pintamos el resultado en el span correspondiente
+    $('#total-repuestos').text('$' + total.toFixed(2));
+}
+function actualizarGranTotalInsumos() {
+    let total = 0;
+    $('.subtotal-insumo').each(function() {
+        // Limpiamos el "$" y convertimos a número para sumar
+        let valor = parseFloat($(this).val().replace('$', '')) || 0;
+        total += valor;
+    });
+    // Pintamos el resultado en el span correspondiente
+    $('#total-insumos').text('$' + total.toFixed(2));
+}
 </script>
-
-
-    
     
 <!-- ✅ JAVASCRIPT INLINE - FUNCIONA CON BOOTSTRAP 5 -->
 <script>
@@ -594,7 +677,7 @@ const repuestoTemplate = `
                 <option value="">Seleccione un repuesto</option>
                 {% for repuesto in repuestos %}
                     <option value="{{ repuesto.pk }}" data-precio="{{ repuesto.precio|default:0 }}">
-                        {{ repuesto.nombre }} - ${{ repuesto.precio|default:0 }}
+                        {{ repuesto.nombre }}
                     </option>
                 {% endfor %}
             </select>
@@ -637,7 +720,7 @@ const mantenimientoTemplate = `
                 <option value="">Seleccione un tipo</option>
                 {% for tipo in tipos_mantenimiento %}
                     <option value="{{ tipo.pk }}" data-precio="{{ tipo.precio|default:0 }}">
-                        {{ tipo.nombre }} - ${{ tipo.precio|default:0 }}
+                        {{ tipo.nombre }} 
                     </option>
                 {% endfor %}
             </select>
@@ -680,7 +763,7 @@ const insumoTemplate = `
                 <option value="">Seleccione un insumo</option>
                 {% for insumo in insumos %}
                     <option value="{{ insumo.pk }}" data-precio="{{ insumo.costo|default:0 }}">
-                        {{ insumo.id_marca.nombre }} - ${{ insumo.costo|default:0 }} 
+                        {{ insumo.id_marca.nombre }} 
                     </option>
                 {% endfor %}
             </select>

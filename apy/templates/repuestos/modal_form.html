@@ -83,40 +83,62 @@ $(document).off('click', '#btnGuardarRepuesto').on('click', '#btnGuardarRepuesto
         contentType: false,
         headers: { 'X-Requested-With': 'XMLHttpRequest' },
         success: function(data) {
-            if (data.success) {
-                // Mensaje de éxito
-                const $msg = $modal.find('#msg-repuesto');
-                $msg.html('<div class="alert alert-success">' + data.message + '</div>');
+        if (data.success) {
+            // 1. Mensaje de éxito
+            const $msg = $modal.find('#msg-repuesto');
+            $msg.html('<div class="alert alert-success">' + data.message + '</div>');
 
-                // Actualizar select en la página principal
-                const $select = $('#id_id_repuesto');   // <- usar el select correcto
+            const nuevoId = data.id;
+            const nuevoTexto = data.text;
 
-                if ($select.length) {
-                    if ($select.find('option[value="' + data.id + '"]').length === 0) {
-                        const option = new Option(data.text, data.id, true, true);
-                        $select.append(option).val(data.id).trigger('change');
-                    } else {
-                        $select.val(data.id).trigger('change');
+            // 2. Lógica para Detalle Servicio (Formsets dinámicos)
+            const $botonActivador = $('[data-target="#modal-id_repuesto"]:visible');
+            const selectorSelect = $botonActivador.data('select');
+
+            if (selectorSelect && $(selectorSelect).length) {
+                const $elSelectActivo = $(selectorSelect);
+                if ($elSelectActivo.find('option[value="' + nuevoId + '"]').length === 0) {
+                    $elSelectActivo.append(new Option(nuevoTexto, nuevoId, true, true));
+                }
+                $elSelectActivo.val(nuevoId).trigger('change');
+                console.log("Actualizado por data-select:", selectorSelect);
+            } 
+            else {
+                // 3. Lógica para OTROS MÓDULOS (Si no hay data-select)
+                // Buscamos posibles IDs de select de repuesto
+                const posiblesSelectors = ['#id_repuesto', '#id_id_repuesto'];
+                let asignado = false;
+
+                posiblesSelectors.forEach(function(sel) {
+                    const $s = $(sel);
+                    if ($s.length && !asignado) {
+                        if ($s.find('option[value="' + nuevoId + '"]').length === 0) {
+                            $s.append(new Option(nuevoTexto, nuevoId, true, true));
+                        }
+                        $s.val(nuevoId).trigger('change');
+                        asignado = true;
+                        console.log("Actualizado por ID fijo:", sel);
                     }
-                } else {
-                    console.warn("No se encontró el select activo:", selectActivo);
-                }
-
-                // Cerrar el modal correctamente
-                $modal.modal('hide');
-                $modal.modal('hide');
-                $('body').removeClass('modal-open');
-                $('body').css('padding-right', '');
-                $('.modal-backdrop').remove();
-                $modal.removeClass('show');
-                $modal.css('display', 'none');
-            } else {
-                if (data.html) {
-                    $modal.find('.modal-body').html(data.html);
-                } else {
-                    $modal.find('#msg-repuesto').html('<div class="alert alert-danger">' + data.message + '</div>');
-                }
+                });
             }
+
+            // 4. CIERRE FORZADO DEL MODAL
+            $modal.modal('hide');
+            $('.modal-backdrop').remove(); 
+            $modal.css('display', 'none').removeClass('show');
+            $('body').removeClass('modal-open').css({
+                'overflow': 'auto',
+                'padding-right': '0'
+            });
+
+        } else {
+            if (data.html) {
+                $modal.find('.modal-body').html(data.html);
+            } else {
+                $modal.find('#msg-repuesto').html('<div class="alert alert-danger">' + data.message + '</div>');
+            }
+        }
+
         },
         error: function(xhr, status, err) {
             const $msg = $modal.find('#msg-repuesto');

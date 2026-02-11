@@ -2,23 +2,132 @@
 {%block form%}
     <div id="msg-detalle"></div>  {# Aquí se mostrarán los mensajes #}
 
-    <form id="detalleForm" method="post" action="{% url 'apy:detallerepuesto_modal_crear' %}">
+    <form id="detalleForm" method="post" action="{% url 'apy:servicio_modal_crear' %}">
         {% csrf_token %}
-    {% for field in form.visible_fields %}
-    <div class="form-group mb-3">
-        <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
-        {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
 
+        <div class="form-group">
+            <label for="{{ form.id_vehiculo.id_for_label }}">Vehículo:</label>
+                <div class="input-group">
+                    {{ form.id_vehiculo }}
+                    <div class="input-group-append">
+                        <button type="button" 
+                                class="btn btn-secondary" 
+                                data-toggle="modal" 
+                                data-target="#modal-id_vehiculo">
+                                    <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    {% if form.id_vehiculo.errors %}
+                        <div class="invalid-feedback d-block">
+                {% for error in form.id_vehiculo.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+                </div>
+        </div>
         {% if field.errors %}
             <div class="invalid-feedback d-block">
                 {% for error in field.errors %}
                     <small>{{ error }}</small><br>
                 {% endfor %}
             </div>
-        {% endif %}
+        {% endif %} 
     </div>
 
-    {% endfor %}
+    <div class="card mt-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>Repuestos</strong>
+        <button type="button" class="btn btn-sm btn-outline-primary" id="add-repuesto">
+            + Agregar Repuesto
+        </button>
+    </div>
+
+    <div class="card-body">
+        {{ repuesto_formset.management_form }}
+
+        <div id="repuestos-formset">
+                    {% for form in repuesto_formset %}
+                    <div class="repuesto-form row mb-3 border-bottom pb-3">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <div class="form-group">
+                                    <label for="{{ form.id_repuesto.id_for_label }}">Repuesto:</label>
+                                    <div class="input-group">
+                                        {{ form.id_repuesto|add_class:'form-control' }}
+                                        <div class="input-group-append">
+                                            <button 
+                                                type="button" 
+                                                class="btn btn-secondary btn-add-repuesto"
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#modal-id_repuesto"
+                                                data-select="#{{ form.id_repuesto.id_for_label }}"
+                                            >
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+
+                                        </div>
+                                    </div>
+                                    {% if form.id_repuesto.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.id_repuesto.errors %}
+                                                <small>{{ error }}</small><br>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="mb-3">
+                                {{ form.cantidad.label_tag }}
+                                {{ form.cantidad|add_class:"form-control cantidad-repuestos" }}
+                                {% if form.cantidad.errors %}
+                                    <div class="text-danger small">
+                                        {{ form.cantidad.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                {{ form.precio_unitario.label_tag }}
+                                {{ form.precio_unitario|add_class:"form-control precio-repuestos"}}
+                                {% if form.precio_unitario.errors %}
+                                    <div class="text-danger small">
+                                        {{ form.precio_unitario.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="mb-3">
+                                <label class="form-label">Subtotal</label>
+                                <input type="text" class="form-control subtotal-repuesto" readonly value="$0">
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="mb-3">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="button" class="btn btn-danger btn-sm remove-form" {% if forloop.first and repuesto_formset.total_form_count == 1 %}disabled{% endif %}>
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+        <div class="text-end mt-3">
+            <strong>Total Repuestos:
+                <span id="total-repuestos">$0.00</span>
+            </strong>
+        </div>
+    </div>
+</div>
+
+
+
     </form>
 {% endblock %}
 
@@ -29,6 +138,27 @@
 {% endblock %}
 
 {% block extra_js %}
+<script>
+    $(document).on('click', '#add-repuesto', function () {
+    const formset = $('#repuestos-formset');
+    const totalForms = $('#id_repuestos-TOTAL_FORMS');
+    const index = parseInt(totalForms.val());
+
+    const newForm = formset.find('.repuesto-form:first').clone(true);
+
+    newForm.find('input, select').each(function () {
+        const name = $(this).attr('name').replace('-0-', `-${index}-`);
+        const id = 'id_' + name;
+        $(this).attr({ name, id }).val('');
+    });
+
+    newForm.find('.subtotal-repuesto').val('$0');
+
+    formset.append(newForm);
+    totalForms.val(index + 1);
+});
+
+</script> 
 <script>
 /* ✅ Evita duplicar eventos y asegura consistencia */
 $(document).off('click', '#btnGuardarDetalle').on('click', '#btnGuardarDetalle', function(e) {
@@ -101,6 +231,45 @@ $('#modal-id_detalle').on('hidden.bs.modal', function() {
     if ($form) $form.reset();
     $(this).find('#msg-detalle').html('');
 });
+
+</script>
+<script>
+$(document).on('click', '#add-repuesto', function () {
+    const formset = $('#repuestos-formset');
+    const totalForms = $('#id_repuestos-TOTAL_FORMS');
+    const index = parseInt(totalForms.val());
+
+    const newForm = formset.find('.repuesto-form:first').clone(true);
+
+    newForm.find('input, select').each(function () {
+        const name = $(this).attr('name').replace('-0-', `-${index}-`);
+        const id = 'id_' + name;
+        $(this).attr({ name, id }).val('');
+    });
+
+    newForm.find('.subtotal-repuesto').val('$0');
+
+    formset.append(newForm);
+    totalForms.val(index + 1);
+});
+</script>
+
+<script>
+$(document).on('input', '.cantidad-repuestos, .precio-repuestos', function () {
+    let total = 0;
+
+    $('.repuesto-form').each(function () {
+        const cantidad = parseFloat($(this).find('.cantidad-repuestos').val()) || 0;
+        const precio = parseFloat($(this).find('.precio-repuestos').val()) || 0;
+        const subtotal = cantidad * precio;
+
+        $(this).find('.subtotal-repuesto').val(`$${subtotal.toFixed(2)}`);
+        total += subtotal;
+    });
+
+    $('#total-repuestos').text(`$${total.toFixed(2)}`);
+});
+
 </script>
 
 {% endblock %}

@@ -447,7 +447,7 @@ class Pagos(models.Model):
 
 # ----- modulo detalle servicio  ---------
 class DetalleServicio(models.Model):
-    vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT,related_name="servicios")
+    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT,related_name="servicios")
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     estado = models.BooleanField(default=True)
 
@@ -491,7 +491,7 @@ class DetalleServicio(models.Model):
         )
 
     def __str__(self):
-        return f"Servicio #{self.id} - {self.vehiculo.placa}"
+        return f"Servicio #{self.id} - {self.id_vehiculo.placa}"
 
 class DetalleRepuesto(models.Model):
     detalle_servicio = models.ForeignKey(DetalleServicio, on_delete=models.PROTECT)
@@ -501,7 +501,7 @@ class DetalleRepuesto(models.Model):
     
     @property
     def subtotal(self):
-        return self.cantidad * self.precio_unitario
+        return self.cantidad 
     
     def __str__(self):
         return f"Repuesto: {self.id_repuesto.nombre} - Cantidad: {self.cantidad}"
@@ -557,7 +557,7 @@ class Factura(models.Model):
     cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
     empleado = models.ForeignKey(Empleado,on_delete=models.PROTECT)
     detalle_servicio = models.OneToOneField(DetalleServicio,on_delete=models.PROTECT,related_name="factura")
-    fecha = models.DateField(auto_now_add=True)
+    fecha = models.DateField()
     metodo_pago = models.CharField(max_length=50, choices=METODO_PAGO  )
     estado = models.BooleanField(default=True)
 
