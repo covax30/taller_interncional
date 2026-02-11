@@ -35,7 +35,8 @@ class EmpleadoListView(PermisoRequeridoMixin, ListView):
     # --- Configuración de Permisos ---
     module_name = 'Empleados' 
     permission_required = 'view'
-    
+    def get_queryset(self):
+        return Empleado.objects.filter(estado=True)
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         # El Mixin PermisoRequeridoMixin se ejecuta primero
