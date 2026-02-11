@@ -1,0 +1,52 @@
+{% extends "generic_listar.html" %}
+{% load humanize %}
+{% load static %}
+
+{% block titulo %}
+    <h1 class="text-center">Lista de Facturas Inactivas</h1>
+{% endblock titulo %}
+
+{% block agregar %}
+<a href="{% url 'apy:factura_lista' %}" class="btn btn-primary btn-xs">
+    <i class="fas fa-list"></i> Lista de Facturas Activas
+</a>
+{% endblock %}
+{% block columnas %}
+    <th>ID</th>
+    <th>Fecha</th>
+    <th>Empresa</th>
+    <th>Detalle Servicio</th>
+    <th>Empleado</th>
+    <th>Cliente</th>
+    <th>Subtotal</th>
+    <th>Método de Pago</th>
+    <th>Acciones</th>
+{% endblock %}
+
+{% block iterar %}
+    {% for f in object_list %}
+    <tr>
+        <td>{{ f.id }}</td>
+        <td>{{ f.fecha }}</td>
+        <td>{{ f.empresa.nombre }}</td>
+        <td>{{ f.detalle_servicio }}</td>
+        <td>{{ f.empleado.nombre }}</td>
+        <td>{{ f.cliente.nombre }}</td>
+        <td> {{f.subtotal|intcomma}}</td>
+        <td>{{ f.metodo_pago }}</td>
+        
+        <!-- Acciones -->
+        <td>
+            <a href="{% url 'apy:factura_activar' f.id %}" 
+               class="btn btn-success btn-sm" 
+               data-toggle="tooltip" 
+               data-placement="top" 
+               title="Activar factura"
+               onclick="return confirm('¿Está seguro de activar esta factura?');">
+                <i class="fas fa-power-off"></i>
+            </a>
+        </td>
+    </tr>
+
+    {% endfor %}
+{% endblock %}

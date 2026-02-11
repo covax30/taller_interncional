@@ -1,0 +1,258 @@
+{% extends 'body.html' %}
+{% load static %}
+{% load static tz %} 
+{% load widget_tweaks %}
+
+{% block content %}
+<style>
+    /* Oculta los inputs de archivo */
+    #id_profile_imagen, #id_profile_imagen_solo {
+        width: 0.1px;
+        height: 0.1px;
+        opacity: 0;
+        overflow: hidden;
+        position: absolute;
+        z-index: -1;
+    }
+
+</style>
+
+{% with user.is_superuser as is_admin %}
+    
+    {# LÓGICA DEL AVATAR #}
+    {% if user.profile.imagen.url and user.profile.imagen.url|length > 0 and 'default.png' not in user.profile.imagen.url %}
+        {% with user.profile.imagen.url as user_avatar_url %}{% endwith %}
+    {% else %}
+        {% if is_admin %}
+            {% static 'img/gerente.png' as user_avatar_url %} 
+        {% else %}
+            {% static 'img/empleado.png' as user_avatar_url %}
+        {% endif %}
+    {% endif %}
+
+{# Contenedor principal: usa 'bg-body' para adaptarse al modo oscuro/claro #}
+<div class="container rounded mt-5 mb-5 shadow-sm p-4 bg-body"> 
+    <div class="row">
+        
+        {# COLUMNA IZQUIERDA (col-md-4) #}
+        <div class="col-md-4 border-right d-flex align-items-start pt-5">
+            <div class="d-flex flex-column align-items-center text-center p-3 py-3 w-100"> 
+                
+                {# IMAGEN DE PERFIL #}
+                <img src="{% if user.profile.imagen %}{{ user.profile.imagen.url }}{% else %}{{ user_avatar_url }}{% endif %}"
+                    id="user-avatar-img" 
+                    data-default-src="{{ user_avatar_url }}"
+                    class="rounded-circle shadow-sm mb-3"
+                    style="width:230px;height:230px;object-fit:cover; border: 5px solid rgba(0,0,0,0.05);">
+
+                <span class="font-weight-bold h4 text-primary mb-0">
+                    {{ user.username }}
+                </span>
+                <span class="text-muted small mb-2">
+                    {{ user.email }}
+                </span>
+                <span class="badge bg-{{ user.is_superuser|yesno:'danger,success' }} p-2 mb-4">
+                    {{ user.is_superuser|yesno:'Gerente (Admin),Empleado' }}
+                </span>
+
+                <hr class="w-100">
+
+                {# SUBIDA DE IMAGEN (FORMULARIO INDEPENDIENTE) #}
+                <h5 class="mt-2 mb-3 text-body">Gestionar Imagen</h5>
+                
+                <form method="POST" enctype="multipart/form-data" action="{% url 'login:actualizar_perfil_imagen' %}" id="image-upload-form" class="w-100">
+                    {% csrf_token %}
+                    
+                    <div class="d-none">
+                        {{ profile_form.imagen|attr:"id:id_profile_imagen_solo" }}
+                        {{ profile_form.imagen_clear|attr:"id:id_imagen_clear_solo"|attr:"name:imagen_clear" }}
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        {# BOTÓN 1: SELECCIONAR #}
+                        <button type="button" id="btn-seleccionar-archivo" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-file-image"></i> Seleccionar Imagen
+                        </button>
+
+                        {# BOTÓN 2: SUBIR #}
+                        <button type="submit" id="btn-guardar-imagen-unica" class="btn btn-success btn-sm" disabled>
+                            <i class="fas fa-upload"></i> Subir Imagen Ahora
+                        </button>
+
+                        {# BOTÓN 3: ELIMINAR (Solo si existe imagen) #}
+                        {% if user.profile.imagen and 'default.png' not in user.profile.imagen.url %}
+                            <button type="button" id="btn-eliminar-imagen" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash-alt"></i> Eliminar Actual
+                            </button>
+                        {% endif %}
+                    </div>
+
+                    <div class="mt-3">
+                        <small class="text-muted d-block" id="file-name-display" style="font-size: 0.8rem;">
+                            {% if user.profile.imagen and 'default.png' not in user.profile.imagen.url %}
+                                <i class="fas fa-check-circle text-success"></i> {{ user.profile.imagen.name|truncatechars:20 }}
+                            {% else %}
+                                No hay archivo seleccionado
+                            {% endif %}
+                        </small>
+                        
+                        <p class="text-info mt-2 small" style="line-height: 1.2; font-size: 0.75rem;">
+                            <i class="fas fa-info-circle"></i> "Subir Imagen Ahora" solo actualiza tu foto de perfil.
+                        </p>
+                    </div>
+
+                    {% if profile_form.imagen.errors %}
+                        <div class="alert alert-danger mt-2 small p-1">{{ profile_form.imagen.errors }}</div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+        
+        {# COLUMNA DERECHA (col-md-8): Formularios de Edición #}
+        <div class="col-md-8">
+            <div class="p-3 py-5">
+                
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="text-right text-body">Ajustes de Perfil</h4>
+                </div>
+                
+                {# Información de la Cuenta #}
+                <h5 class="mt-2 mb-3 text-body">Información de la Cuenta</h5>
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6"><h6>Cuenta Creada:</h6></div>
+                            <div class="col-md-6 text-end"><h6>{{ user.date_joined|date:"d/m/Y" }}</h6></div>
+                            
+                            <div class="col-md-6"><h6>Último inicio de sesión:</h6></div>
+                            <div class="col-md-6 text-end">
+                                <h6 class="">
+                                    {{ user.last_login|default:"Nunca"|localtime|date:"d/m/Y H:i" }}
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {# FORMULARIO PRINCIPAL (Datos Personales y Perfil) #}
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %} 
+                    
+                    {# Campos ocultos de Imagen del FORMULARIO PRINCIPAL (Necesarios para el botón "Guardar Cambios") #}
+                   <div class="d-none">
+                        {# Formulario principal #}
+                        {{ profile_form.imagen|attr:"id:id_profile_imagen" }}
+                        {{ profile_form.imagen_clear|attr:"id:id_imagen_clear"|attr:"name:imagen_clear" }}
+                    </div>
+                    
+                    {# Datos Personales #}
+                    <h5 class="mt-4 mb-3 text-body">Datos Personales y Contacto</h5>
+                    
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-4">
+                                {{ form.first_name|add_class:"form-control" }} 
+                                <label for="{{ form.first_name.id_for_label }}">Primer Nombre</label>
+                                {% if form.first_name.errors %}<small class="text-danger">{{ form.first_name.errors }}</small>{% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-4">
+                                {{ form.last_name|add_class:"form-control" }} 
+                                <label for="{{ form.last_name.id_for_label }}">Primer Apellido</label>
+                                {% if form.last_name.errors %}<small class="text-danger">{{ form.last_name.errors }}</small>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-4">
+                                {{ form.email|add_class:"form-control" }} 
+                                <label for="{{ form.email.id_for_label }}">Email</label>
+                                {% if form.email.errors %}<small class="text-danger">{{ form.email.errors }}</small>{% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-4">
+                                {{ form.username|add_class:"form-control" }} 
+                                <label for="{{ form.username.id_for_label }}">Nombre de Usuario</label>
+                                {% if form.username.errors %}<small class="text-danger">{{ form.username.errors }}</small>{% endif %}
+                            </div>
+                        </div> 
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-4">
+                                {{ profile_form.telefono|add_class:"form-control" }} 
+                                <label for="{{ profile_form.telefono.id_for_label }}">Número de Teléfono</label>
+                                {% if profile_form.telefono.errors %}<small class="text-danger">{{ profile_form.telefono.errors }}</small>{% endif %}
+                            </div>
+                        </div> 
+                    </div>
+                    
+                    <div class="mt-5 text-center">
+                        <a href="{% url 'apy:perfil_usuario' %}" class="btn btn-secondary me-2">
+                            <i class="fas fa-arrow-left"></i> Volver
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+
+                <hr class="mt-5 mb-4">
+
+                {# FORMULARIO DE CAMBIO DE CONTRASEÑA #}
+                <h4 class="text-right text-body mt-4 mb-3">Cambiar Contraseña</h4>
+
+                <form method="POST" action="{% url 'password_change' %}">
+                    {% csrf_token %}
+                    
+                    {% if password_form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ password_form.non_field_errors }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <div class="form-floating mb-4">
+                                {{ password_form.old_password|add_class:"form-control" }}
+                                <label>Contraseña Antigua</label>
+                                {% if password_form.old_password.errors %}<small class="text-danger">{{ password_form.old_password.errors }}</small>{% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-4">
+                                {{ password_form.new_password1|add_class:"form-control" }}
+                                <label>Nueva Contraseña</label>
+                                {% if password_form.new_password1.errors %}<small class="text-danger">{{ password_form.new_password1.errors }}</small>{% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-4">
+                                {{ password_form.new_password2|add_class:"form-control" }}
+                                <label>Confirmar Nueva Contraseña</label>
+                                {% if password_form.new_password2.errors %}<small class="text-danger">{{ password_form.new_password2.errors }}</small>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-lock"></i> Actualizar Contraseña
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/perfil_usuario.js' %}"></script>
+<script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
+<script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
+{% endwith %}
+{% endblock %}

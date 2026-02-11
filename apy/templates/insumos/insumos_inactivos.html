@@ -1,0 +1,47 @@
+
+{% extends "generic_listar.html" %}
+{% load humanize %}
+{% block titulo %}
+        <i class="fa-solid fa-hammer"></i>
+        <h1 class="text-center">Listar Insumos Inactivos </h1>
+{% endblock titulo %}
+
+{% block agregar %}
+<a href="{{listar_url}}" class=" btn btn-primary btn btn-xs" title="lista insumo"><i class="fas fa-list"></i>
+          lista de Insumos
+</a>
+{% endblock %}
+
+{% block columnas %}
+
+        <th>Id Marca</th>
+        <th>Costo</th>
+        <th>Stock</th>
+        <th>Cantidad</th>
+        <th>Acciones</th>
+
+{% endblock %}
+
+{% block iterar %}
+
+      {% for i in object_list %}
+      <tr>
+        <td>{{i.id_marca}}</td>
+        <td>{{i.costo|intcomma }}</td>
+        <td>{{i.stock}}</td>
+        <td>{{ i.cantidad }}</td>
+        <form method="post">
+
+          <td>
+            <a href="{% url 'apy:insumo_activar' i.id %}" 
+              class="btn btn-success btn-xs" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="Activar insumo">
+              <i class="fas fa-power-off"></i>
+           </a>
+          </td>
+      </tr>
+      {% endfor %}
+
+{% endblock %}

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.template.loader import render_to_string
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse_lazy
@@ -28,6 +28,9 @@ class RepuestoListView(PermisoRequeridoMixin, ListView):
     module_name = 'Repuestos' 
     permission_required = 'view'
     
+    def get_queryset(self):
+        return Repuesto.objects.filter(estado=True)
+    
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
@@ -38,6 +41,35 @@ class RepuestoListView(PermisoRequeridoMixin, ListView):
         context['crear_url'] = reverse_lazy('apy:repuesto_crear')
         context['entidad'] = 'Repuesto'
         return context
+    
+#--- Vistas de Repuestos Inactivos (CBVs)---------------
+class RepuestoInactivosListView(PermisoRequeridoMixin, ListView):
+    model = Repuesto
+    template_name = 'repuestos/repuestos_inactivos.html'
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Repuestos' 
+    permission_required = 'view' 
+    # --------------------------------
+    
+    def get_queryset(self):
+        return Repuesto.objects.filter(estado=False)
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+    
+    def post(self, request, *args, **kwargs):
+        nombre = {'nombre' : 'Repuesto'}
+        return JsonResponse(nombre)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Repuestos Inactivos'
+        context['crear_url'] = reverse_lazy('apy:repuesto_crear')
+        context['entidad'] = 'Repuesto'
+        
+        return context    
     
 class RepuestoCreateView(PermisoRequeridoMixin, CreateView): 
     model = Repuesto
@@ -50,8 +82,9 @@ class RepuestoCreateView(PermisoRequeridoMixin, CreateView):
     permission_required = 'add'
     
     def form_valid(self, form):
+        form.instance.estado = True 
         messages.success(self.request, "repuesto creado correctamente")
-        return super().form_valid(form) 
+        return super().form_valid(form)  
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -59,27 +92,6 @@ class RepuestoCreateView(PermisoRequeridoMixin, CreateView):
         context['entidad'] = 'Repuesto'
         context['listar_url'] = reverse_lazy('apy:repuesto_lista')
         return context
-    
-    def form_valid(self, form):
-        self.object = form.save()
-
-        if self.request.headers.get("x-requested-with") == "XMLHttpRequest":
-            return JsonResponse({
-                "success": True,
-                "id": self.object.id,
-                "nombre": str(self.object.nombre)
-            })
-
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        if self.request.headers.get("x-requested-with") == "XMLHttpRequest":
-            return JsonResponse({
-                "success": False,
-                "errors": form.errors
-            }, status=400)
-        return super().form_invalid(form)
-
     
 class RepuestoUpdateView(UpdateView):
     model = Repuesto
@@ -111,9 +123,16 @@ class RepuestoDeleteView(PermisoRequeridoMixin, DeleteView):
     module_name = 'Repuestos'
     permission_required = 'delete'
     
-    def form_valid(self, form):
-        messages.success(self.request, "Repuesto eliminado correctamente")
-        return super().form_valid(form)
+    def post(self, request, *args, **kwargs):
+        
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        
+        self.object.estado = False
+        self.object.save()
+        
+        messages.success(self.request, f"Repuesto {Repuesto} desactivado ")
+        return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -121,6 +140,34 @@ class RepuestoDeleteView(PermisoRequeridoMixin, DeleteView):
         context['entidad'] = 'Repuesto'
         context['listar_url'] = reverse_lazy('apy:repuesto_lista')
         return context
+    
+#-------Vistas para Activar Repuestos (CBVs)----------------
+class RepuestoActivateView(PermisoRequeridoMixin, DeleteView): 
+    model = Repuesto
+    template_name = 'repuestos/activar_repuestos.html'
+    success_url = reverse_lazy('apy:repuesto_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Repuestos'
+    permission_required = 'change'
+    
+    def post(self, request, *args, **kwargs):
+        
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        
+        self.object.estado = True
+        self.object.save()
+        
+        messages.success(self.request, f"Repuesto {Repuesto} activado ")
+        return HttpResponseRedirect(success_url)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Activar Repuesto'
+        context['entidad'] = 'Repuesto'
+        context['listar_url'] = reverse_lazy('apy:repuesto_lista')
+        return context    
 
 # --------------Vistas de Repuestos (VBFs estandarizadas)---------------
 
@@ -155,6 +202,7 @@ class RepuestoCreateModalView(CreateView):
 
     def form_valid(self, form):
         try:
+            form.instance.estado = True 
             self.object = form.save()
             return JsonResponse({
                 "success": True,

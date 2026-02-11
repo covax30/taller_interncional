@@ -1,30 +1,17 @@
 {% extends 'body.html' %}
 {% load static %}
+{% load static tz %} 
 
-<!-- ESTILOS ESPECÍFICOS PARA ESTADÍSTICAS -->
 {% block extra_head %}
-<!-- Bootstrap Icons para los iconos -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
-  crossorigin="anonymous" />
+<link rel="stylesheet" href="{% static 'css/apexcharts.css' %}">
 
-<!-- ApexCharts para los gráficos -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.css"
-  integrity="sha256-4MX+61mt9NVvvuPjUWdUdyfZfxSB1/Rf9WtqRHgG5S0=" crossorigin="anonymous" />
-
-<!-- JSVectorMap para mapas (opcional) -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/css/jsvectormap.min.css"
-  integrity="sha256-+uGLJmmTKOqBr+2E6KDYs/NRsHxSkONXFHUL0fy2O/4=" crossorigin="anonymous" />
+<link rel="stylesheet" href="{% static 'css/jsvectormap.min.css' %}">
 {% endblock %}
 
-<!-- CONTENIDO PRINCIPAL DE ESTADÍSTICAS -->
 {% block content %}
-<!--begin::App Main-->
 <main class="app-main">
-  <!--begin::App Content Header-->
   <div class="app-content-header">
-    <!--begin::Container-->
     <div class="container-fluid">
-      <!--begin::Row-->
       <div class="row">
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-end">
@@ -33,21 +20,12 @@
           </ol>
         </div>
       </div>
-      <!--end::Row-->
+      </div>
     </div>
-    <!--end::Container-->
-  </div>
-  <!--end::App Content Header-->
-
-  <!--begin::App Content-->
   <div class="app-content">
-    <!--begin::Container-->
     <div class="container-fluid">
-      <!--begin::Row - Widgets de Estadísticas-->
       <div class="row">
-        <!--begin::Col-->
         <div class="col-lg-3 col-6">
-          <!--begin::Small Box Widget 1-->
           <div class="small-box text-bg-primary">
             <div class="inner">
               <h3 id="contador-insumos">{{ total_insumos|default:0 }}</h3>
@@ -67,7 +45,6 @@
         </div>
 
         <div class="col-lg-3 col-6">
-          <!--begin::Small Box Widget 2 - VEHICULOS REGISTRADOS-->
           <div class="small-box text-bg-success">
             <div class="inner">
               <h3 id="contador-vehiculos">{{ total_vehiculos|default:0 }}</h3>
@@ -88,7 +65,6 @@
         </div>
 
         <div class="col-lg-3 col-6">
-          <!--begin::Small Box Widget 3 - CLIENTES REGISTRADOS-->
           <div class="small-box text-bg-warning">
             <div class="inner">
               <h3 id="contador-clientes">{{ total_clientes|default:0 }}</h3>
@@ -110,7 +86,6 @@
         </div>
 
         <div class="col-lg-3 col-6">
-          <!--begin::Small Box Widget 4-->
           <div class="small-box text-bg-danger">
             <div class="inner">
               <h3 id="contador-gastos">{{ total_gastos|default:0 }}</h3>
@@ -126,11 +101,7 @@
           </div>
         </div>
       </div>
-      <!--end::Row-->
-
-      <!--begin::Row - Gráficos y Chat-->
       <div class="row">
-        <!-- Start col -->
         <div class="card card-success">
               <div class="card-header">
                 <h3 class="card-title"><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">Gráfico de barras</font></font></h3>
@@ -149,8 +120,7 @@
                   <canvas id="barChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%; display: block; width: 329px;" width="658" height="500" class="chartjs-render-monitor"></canvas>
                 </div>
               </div>
-              <!-- /.card-body -->
-            </div>
+              </div>
 
       </div>
     </div>
@@ -158,15 +128,12 @@
 </main>
 {% endblock %}
 
-<!-- SCRIPTS ESPECÍFICOS PARA ESTADÍSTICAS -->
 {% block extra_scripts %}
-<!-- SortableJS para elementos arrastrables -->
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js" crossorigin="anonymous"></script>
+<script src="{% static 'js/Sortable.min.js' %}" crossorigin="anonymous"></script>
 
-<!-- ApexCharts para gráficos -->
-<script src="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.min.js"
-  integrity="sha256-+vh8GkaU7C9/wbSLIcwq82tQ2wTf44aOHA8HlBMwRI8=" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/apexcharts.min.js' %}" crossorigin="anonymous"></script>
+
+<script src="{% static 'js/chart.js' %}"></script>
             <script>
   const meses = {{ meses|safe }};
   const totales = {{ totales|safe }};
@@ -352,7 +319,6 @@
     monthly_chart.render();
   });
 </script>
-<!-- JS de Sienna Accessibility -->
 <script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
 <script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
 {% endblock %}

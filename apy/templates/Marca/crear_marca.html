@@ -2,21 +2,32 @@
 {% load widget_tweaks %}
 {% block form %}
     {% csrf_token %}
-
-    {% for field in form.visible_fields %}
     <div class="form-group mb-3">
-        <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
-        {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
-
-        {% if field.errors %}
+        <label for ="{{form.nombre.id_for_label}}">Nombre de la marca:</label>
+        <div class= "input-group">
+            {{form.nombre|add_class:'form-control'|attr:'autocomplete:off'}}
+        </div>
+        {% if form.nombre.errors %} 
             <div class="invalid-feedback d-block">
-                {% for error in field.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
+                {% for error in form.nombre.errors%} 
+                <small> {{error}} </small> <br>
+                {%endfor%}    
             </div>
-        {% endif %}
+        {% endif%}             
     </div>
-    {% endfor %}
+        <div class="form-group mb-3">
+        <label for ="{{form.tipo.id_for_label}}">Tipo de marca:</label>
+        <div class= "input-group">
+            {{form.tipo|add_class:'form-control'|attr:'autocomplete:off'}}
+        </div>
+        {% if form.tipo.errors %} 
+            <div class="invalid-feedback d-block">
+                {% for error in form.tipo.errors%} 
+                <small> {{error}} </small> <br>
+                {%endfor%}    
+            </div>
+        {% endif%}             
+    </div>
 {% endblock %}
 
 {% block Cancelar %}

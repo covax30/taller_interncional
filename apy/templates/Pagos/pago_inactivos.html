@@ -1,0 +1,64 @@
+{% extends "generic_listar.html" %}
+{% load humanize %}
+
+{% block titulo %}
+        <i class="fa-solid fa-comments-dollar"></i>
+        <h1 class="text-center">Lista de Pagos Inactivos</h1>
+{% endblock titulo %}
+
+{% block agregar %}
+<a href="{% url 'apy:pagos_lista' %}" class="btn btn-primary btn-xs">
+    <i class="fas fa-list"></i> Lista de pagos activos
+</a>
+{% endblock %}
+
+{% block columnas %}
+
+        <th>Id Pago</th>
+        <th>Tipo Pago</th>
+        <th>Fecha</th>
+        <th>Hora</th>
+        <th>Monto</th>
+        <th>Id Proveedor</th>
+        <th>Id Administrador</th>
+        <th>Id Herramientas</th>
+        <th>Id Insumos</th>
+        <th>Id Repuestos</th>
+        <th>Id Nómina</th>
+        <th>Acciones</th>
+
+{% endblock %}
+
+{% block iterar %}
+
+      {% for p in object_list %}
+      <tr>
+        <td>{{ p.id_pago }}</td>
+        <td>{{ p.tipo_pago }}</td>
+        <td>{{ p.fecha }}</td>
+        <td>{{ p.hora }}</td>
+        <td>{{ p.monto|intcomma }}</td>
+        <td>{{ p.id_proveedor }}</td>
+        <td>{{ p.id_admin }}</td>
+        <td>{{ p.id_herramienta }}</td>
+        <td>{{ p.id_insumos }}</td>
+        <td>{{ p.id_repuestos }}</td>
+        <td>{{ p.id_nomina }}</td>
+        
+      <form method="post">
+
+        <td>
+            <a href="{% url 'apy:pagos_activar' p.id_pago %}" 
+              class="btn btn-danger btn-xs" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="Eliminar pago">
+              <i class="fas fa-trash-alt"></i>
+           </a>
+          </td>
+      </tr>
+      {% endfor %}
+
+
+
+{% endblock %}

@@ -9,6 +9,7 @@
 <a href="{{crear_url}}" class=" btn btn-primary btn btn-xs" title="Agregar marca"><i class="fas fa-plus"></i>
           Agregar
 </a>
+<a href="{% url 'apy:marca_inactivos' %}" class="btn btn-secondary">Marcas  Inactivas</a>
 {% endblock %}
 
 {% block columnas %}
@@ -18,7 +19,7 @@
         <th>Tipo </th>
         <th>Acciones</th>
 
-{% endblock %}
+{% endblock %} 
 
 {% block iterar %}
 
@@ -44,7 +45,7 @@
               data-toggle="tooltip" 
               data-placement="top" 
               title="Eliminar marca">
-              <i class="fas fa-trash-alt"></i>
+              <i class="fas fa-power-off"></i>
            </a>
           </td>
       </tr>

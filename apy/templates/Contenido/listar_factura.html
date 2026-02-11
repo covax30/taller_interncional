@@ -7,8 +7,11 @@
 {% endblock titulo %}
 
 {% block agregar %}
-<a href="{{crear_url}}" class="btn btn-primary btn-xs">
+<a href="{{ crear_url }}" class="btn btn-outline-primary btn-xs">
     <i class="fas fa-plus"></i> Agregar
+</a>
+<a href="{% url 'apy:factura_inactivos' %}" class="btn btn-outline-secondary btn-xs">
+    <i class="fas fa-list"></i> Lista de Facturas Inactivas
 </a>
 {% endblock %}
 
@@ -19,6 +22,7 @@
     <th>Detalle Servicio</th>
     <th>Empleado</th>
     <th>Cliente</th>
+    <th>Subtotal</th>
     <th>Método de Pago</th>
     <th>Acciones</th>
 {% endblock %}
@@ -26,109 +30,57 @@
 {% block iterar %}
     {% for f in object_list %}
     <tr>
-        <!-- Campo correcto según tu modelo -->
         <td>{{ f.id }}</td>
-        
-        <!-- Fecha - con formato -->
-        <td>
-            {% if f.Fecha %}
-                {{ f.Fecha|date:"d/m/Y" }}
-            {% else %}
-                <span class="text-muted">No especificada</span>
-            {% endif %}
-        </td>
-        
-        <!-- Empresa -->
-        <td>
-            {% if f.id_empresa %}
-                {{ f.id_empresa.nombre }}
-            {% else %}
-                <span class="text-muted">Sin empresa</span>
-            {% endif %}
-        </td>
-        
-        <!-- Detalle Servicio -->
-        <td>
-            {% if f.id_Detalles_servicios %}
-                Detalle #{{ f.id_Detalles_servicios.id }}
-            {% else %}
-                <span class="text-muted">Sin detalle</span>
-            {% endif %}
-        </td>
-        
-        <!-- Empleado -->
-        <td>
-            {% if f.id_empleado %}
-                {{ f.id_empleado.nombre }}
-            {% else %}
-                <span class="text-muted">Sin empleado</span>
-            {% endif %}
-        </td>
-        
-        <!-- Cliente -->
-        <td>
-            {% if f.id_cliente %}
-                {{ f.id_cliente.nombre }} 
-                <small class="text-muted">({{ f.id_cliente.identificacion }})</small>
-            {% else %}
-                <span class="text-muted">Sin cliente</span>
-            {% endif %}
-        </td>
-        
-        <!-- Método de Pago -->
-        <td>
-            {% if f.metodo_pago %}
-                <span class="badge 
-                    {% if f.metodo_pago == 'efectivo' %}bg-success
-                    {% elif f.metodo_pago == 'transferencia' %}bg-primary
-                    {% else %}bg-secondary{% endif %}">
-                    {{ f.get_metodo_pago_display }}
-                </span>
-            {% else %}
-                <span class="text-muted">No especificado</span>
-            {% endif %}
-        </td>
+        <td>{{ f.fecha }}</td>
+        <td>{{ f.empresa.nombre }}</td>
+        <td>{{ f.detalle_servicio }}</td>
+        <td>{{ f.empleado.nombre }}</td>
+        <td>{{ f.cliente.nombre }}</td>
+        <td> {{f.subtotal|intcomma}}</td>
+        <td>{{ f.metodo_pago }}</td>
         
         <!-- Acciones -->
         <td>
+
+        <div class="btn-group" role="group">
+                <a href="{% url 'apy:factura_detalle' f.id %}" 
+                   class="btn btn-outline-info btn-sm" 
+                   title="Ver detalles de la factura">
+                    <i class="fas fa-eye"></i>
+                </a>    
             <div class="btn-group" role="group">
                 <a href="{% url 'apy:factura_editar' f.id %}" 
-                   class="btn btn-warning btn-sm" 
+                   class="btn btn-outline-warning btn-sm" 
                    title="Editar factura">
                     <i class="fas fa-edit"></i>
                 </a>
                 <a href="{% url 'apy:factura_eliminar' f.id %}" 
-                   class="btn btn-danger btn-sm" 
+                   class="btn btn-outline-danger btn-sm" 
                    title="Eliminar factura"
                    onclick="return confirm('¿Está seguro de eliminar esta factura?');">
                     <i class="fas fa-trash-alt"></i>
                 </a>
-                
             </div>
-        </td>
-    </tr>
-    {% empty %}
-    <tr>
-        <td colspan="8" class="text-center text-muted py-4">
-            <i class="fas fa-file-invoice fa-2x mb-2"></i><br>
-            No hay facturas registradas
-        </td>
-    </tr>
-    {% endfor %}
-{% endblock %}
+            
+<button type="button" 
+        class="btn btn-outline-secondary btn-sm btn-pdf-factura" 
+        data-id="{{ f.id }}" 
+        title="Generar PDF de la factura">
+    <i class="fas fa-file-pdf"></i>
+</button>
 
-{% block javascript %}
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-  {% if messages %}
-    {% for message in messages %}
-      Swal.fire({
-        icon: '{% if "success" in message.tags %}success{% elif "error" in message.tags %}error{% else %}info{% endif %}',
-        title: '{{ message|escapejs }}',
-        timer: 2500,
-        showConfirmButton: false
-      });
+
+
+
+        </td>
+    </tr>
+  
     {% endfor %}
-  {% endif %}
-</script>
+
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+<script src="{% static 'AdminLTE/dist/js/imprimir_factura.js' %}"></script>
+
 {% endblock %}

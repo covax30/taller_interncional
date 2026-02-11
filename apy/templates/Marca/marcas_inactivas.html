@@ -1,0 +1,45 @@
+{% extends "generic_listar.html" %}
+
+{% block titulo %}
+        <i class="fa-solid fa-star"></i>
+        <h1 class="text-center">Lista de Marcas Inactivas </h1>
+{% endblock titulo %}
+
+{% block agregar %}
+<a href="{% url 'apy:marca_lista' %}" class="btn btn-primary">  <i class="fas fa-list"></i>  lista de marcas </a>
+{% endblock %}
+
+{% block columnas %}
+
+        <th>Id de la Marca</th>
+        <th>Nombre</th>
+        <th>Tipo </th>
+        <th>Acciones</th>
+
+{% endblock %} 
+
+{% block iterar %}
+
+      {% for m in object_list %}
+      <tr>
+        <td>{{ m.id }}</td>
+        <td>{{ m.nombre}}</td>
+        <td>{{ m.tipo}}</td>
+        
+        
+        <form method="post">
+
+          <td>
+
+            <a href="{% url 'apy:marca_activar' m.id %}" 
+              class="btn btn-success btn-xs" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="activar marca">
+              <i class="fas fa-power-off"></i>
+           </a>
+          </td>
+      </tr>
+      {% endfor %}
+
+{% endblock %}

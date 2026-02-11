@@ -26,14 +26,8 @@ def validar_telefono(value):
     
 def validar_identificacion(value):
     s = str(value).strip()
-
-    # Verifica solo números (sin letras ni símbolos)
-    if not re.fullmatch(r'^\d+$', s):
-        raise ValidationError('La identificación debe contener únicamente números')
-
-    # Verifica la longitud
-    if not (8 <= len(s) <= 11):
-        raise ValidationError('La identificación debe tener entre 8 y 11 dígitos')
+    if not re.fullmatch(r'^\d{7,10}(-\d{1})?$', s):
+        raise ValidationError('Ingrese solo números (Cédula) o el formato 123456789-0 (NIT).')
     
 def validar_edad(value):
     if value < 16 or value > 90:
@@ -71,14 +65,19 @@ color_regex = RegexValidator(
         message="El color solo debe contener letras."
     )
 
+nit_validator = RegexValidator(
+    regex=r'^(\d{1,3}(\.?\d{3}){2})\-\d$',
+    message="El NIT debe tener el formato: 123456789-0 o 12.345.678-0"
+)
+
 
 #------ MODULOS ERICK ---------
 
 #------ ENTIDAD de TIPO mantenmimiento ---------1
 class TipoMantenimiento(models.Model):
-    
     nombre = models.CharField(max_length=50, unique=True)
     descripcion = models.TextField(blank=True, null=True)
+    estado = models.BooleanField(default=True)
 
     def __str__(self):
         return self.nombre
@@ -95,12 +94,13 @@ class Marca(models.Model):
     ]
     nombre = models.CharField(max_length=100)
     tipo = models.CharField(max_length=100, choices=tipo)
+    estado = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.nombre} "
 #------ ENTIDAD REPUESTOS --------3
 class Repuesto(models.Model):
-    id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE) 
+    id_marca = models.ForeignKey(Marca, on_delete=models.PROTECT) 
     nombre = models.CharField(max_length=100)
     CATEGORIA_OPCIONES = [
         ('automotriz', 'Automotriz'),
@@ -116,6 +116,7 @@ class Repuesto(models.Model):
             'required': 'El precio del repuesto es obligatorio.'
         } , validators=[validar_monto]
     )
+    estado = models.BooleanField(default=True)
     
     def __str__(self):
         return f"{self.nombre} "   
@@ -134,8 +135,9 @@ class Herramienta(models.Model):
     ]
     tipo = models.CharField(max_length=100, choices=TIPO_OPCIONES)
     material = models.CharField(max_length=100)
-    id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE)
+    id_marca = models.ForeignKey(Marca, on_delete=models.PROTECT)
     stock = models.IntegerField()
+    estado = models.BooleanField(default=True)
 
     def __str__(self):
         return self.nombre
@@ -143,8 +145,8 @@ class Herramienta(models.Model):
 #------ ENTIDAD INSUMOS --------
 class Insumos(models.Model):
 
-    id_marca = models.ForeignKey(Marca, on_delete=models.CASCADE)
-    costo = models.IntegerField(  # 🔹 ENTEROS, sin decimales
+    id_marca = models.ForeignKey(Marca, on_delete=models.PROTECT)
+    costo = models.IntegerField(  
         error_messages={
             'invalid': 'Ingrese un número válido para el costo.',
             'required': 'El costo del insumo es obligatorio.'
@@ -159,7 +161,8 @@ class Insumos(models.Model):
     ]
 
     cantidad = models.CharField(max_length=20, choices=CANTIDAD_OPCIONES)
-
+    estado = models.BooleanField(default=True)
+    
     def __str__(self):
 
         return f"{self.id_marca} ({self.cantidad})"
@@ -178,8 +181,8 @@ class Module(models.Model):
         return self.name
 
 class Permission(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='custom_permissions', verbose_name="Usuario")
-    module = models.ForeignKey(Module, on_delete=models.CASCADE, verbose_name="Módulo")
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name='custom_permissions', verbose_name="Usuario")
+    module = models.ForeignKey(Module, on_delete=models.PROTECT, verbose_name="Módulo")
     
     # Campos booleanos para los permisos
     view = models.BooleanField(default=False, verbose_name="Ver")
@@ -196,9 +199,28 @@ class Permission(models.Model):
     def __str__(self):
         return f"Permisos de {self.user.username} en {self.module.name}"
 
-
-
-
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    
+    telefono = models.CharField(
+        max_length=20, 
+        blank=True, 
+        null=True, 
+        verbose_name='Número de Teléfono'
+    )
+    
+    # Campo para la imagen de perfil
+    imagen = models.ImageField(
+        upload_to='perfiles/',          # Guarda las imágenes en media/perfiles/
+        default='perfiles/default.png', # Imagen por defecto (debes crearla)
+        null=True,                      # Permite null en la DB (aunque default hace que casi nunca sea null)
+        blank=True                      # Permite que el campo esté vacío en el formulario
+    )
+    
+    # ... otros campos del perfil ...
+    
+    def __str__(self):
+        return f'Perfil de {self.user.username}'
 class Cliente(models.Model):
 
     TIPO_CLIENTE = [
@@ -207,34 +229,42 @@ class Cliente(models.Model):
     ]
     tipo = models.CharField(max_length=20, choices=TIPO_CLIENTE, blank=True, null=True)
     nombre = models.CharField(max_length=255, verbose_name="Nombre/Razón Social", blank=True, null=True)
-    identificacion = models.CharField(max_length=50, unique=True, verbose_name="Documento/NIT", blank=True, null=True)
+    identificacion = models.CharField(
+        max_length=50, 
+        unique=True, 
+        verbose_name="Documento/NIT", 
+        validators=[validar_identificacion], 
+        blank=False, 
+        null=False 
+    )
     telefono = models.CharField(max_length=20, blank=True, null=True)
     correo = models.EmailField(validators=[validar_email], blank=True, null=True)
     direccion = models.TextField(verbose_name="Dirección", blank=True, null=True)
     estado = models.BooleanField(default=True, verbose_name="Activo")
 
     def __str__(self):
-        return f"{self.id} - {self.nombre}"
+        return f"{self.nombre} - {self.identificacion}"
     
 
 
 
 class Vehiculo(models.Model):
-    id_vehiculo = models.AutoField(primary_key=True)
-    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)  
+    id_vehiculo = models.AutoField(primary_key=True) 
+    id_cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)  
     placa = models.CharField(max_length=10, unique=True,validators=[placa_regex])
     modelo_vehiculo = models.CharField(max_length=4,validators=[modelo_regex])
     marca_vehiculo = models.CharField(max_length=100, validators=[marca_regex])
     color = models.CharField(max_length=100, validators=[color_regex])
+    estado = models.BooleanField(default=True, verbose_name="Activo")
 
     def __str__(self):
-        return f"{self.placa} - {self.marca_vehiculo} - {self.modelo_vehiculo}- {self.color} - {self.id_cliente.nombre}"
+        return f"{self.placa} -  {self.marca_vehiculo} - {self.modelo_vehiculo}- {self.color} - {self.id_cliente.id}"
     
 
 class EntradaVehiculo(models.Model):
     id_entrada = models.AutoField(primary_key=True)
-    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE) # LLAVE
-    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)  # LLAVE
+    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT) 
+    id_cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT) 
     fecha_ingreso = models.DateField()
     hora_ingreso = models.TimeField()
 
@@ -244,8 +274,8 @@ class EntradaVehiculo(models.Model):
 
 class SalidaVehiculo(models.Model):
     id_salida = models.AutoField(primary_key=True)
-    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE) # LLAVE
-    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)  # LLAVE
+    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT) 
+    id_cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)  
     diagnostico = models.CharField(max_length=100)
     fecha_salida = models.DateField()
     hora_salida = models.TimeField()
@@ -256,19 +286,6 @@ class SalidaVehiculo(models.Model):
 
  
 #-------------MODULOS DE karol-----------
-#-------------Modulo Administrador-----------
-class Administrador(models.Model):
-    id_admin = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=100)
-    apellidos = models.CharField(max_length=100)
-    identificacion = models.IntegerField( unique=True, validators=[validar_identificacion])
-    edad = models.PositiveIntegerField(validators=[validar_edad])
-    correo = models.EmailField(unique=True, validators=[validar_email])
-    telefono = models.IntegerField( validators=[validar_telefono])
-    fecha_ingreso = models.DateField()
-    
-    def __str__(self):
-        return f"{self.nombre} {self.apellidos}"
 
 
 #--------------Modulo Pago Servicio Publicos-----------
@@ -291,6 +308,7 @@ class PagoServiciosPublicos(models.Model):
             'required': 'El monto de la nomina es obligatorio.'
         } , validators=[validar_monto]
     )
+    estado = models.BooleanField(default=True)
     
     def __str__(self):
         return f"{self.id_servicio} - {self.servicio} -{self.monto}"
@@ -301,6 +319,7 @@ class Proveedores(models.Model):
     nombre = models.CharField(max_length=100)
     telefono = models.CharField(max_length=20, validators=[validar_telefono])
     correo = models.EmailField(unique=True, validators=[validar_email])
+    estado = models.BooleanField(default=True)
     
     def __str__(self):
         return f"{self.id_proveedor} {self.correo}"
@@ -323,7 +342,9 @@ class Gastos(models.Model):
         ('costo variable', 'Costo variable'),
     ]
     tipo_gastos=models.CharField(max_length=100, choices=TIPO_GASTOS_OPCIONES)
-    id_pagos_servicios = models.ForeignKey(PagoServiciosPublicos, on_delete=models.CASCADE)
+    id_pagos_servicios = models.ForeignKey(PagoServiciosPublicos, on_delete=models.PROTECT)
+    estado = models.BooleanField(default=True)
+    
     def __str__(self):
         return f"{self.tipo_gastos} - ${self.monto}"
      #class meta
@@ -338,36 +359,22 @@ class Empleado(models.Model):
     identificacion = models.CharField(max_length=20, unique=True, validators=[validar_identificacion]) 
     Correo= models.EmailField(max_length=254, unique=True, validators=[validar_email])
     direccion = models.CharField(max_length=255)
+    estado = models.BooleanField(default=True)  
     def __str__(self):
         return f"{self.nombre} ({self.identificacion})"
     #class meta
         #verbose_name = 'Empleado'
         #verbose_name_plural = 'Empleado'
-        
-
-#-------- Empleado-------
-class Empleado_Mantenimiento(models.Model): 
-    id_empleado_mantenimiento = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=100)
-    telefono = models.CharField(max_length=15, validators=[validar_telefono])
-    identificacion = models.CharField(max_length=20, unique=True, validators=[validar_identificacion]) 
-    Correo= models.EmailField(max_length=254, unique=True, validators=[validar_email])
-    direccion = models.CharField(max_length=255)
-    def __str__(self):
-        return f"{self.nombre} ({self.identificacion})"
-    #class meta
-        #verbose_name = 'Empleado'
-        #verbose_name_plural = 'Empleado'
-
 
 
 #------ ENTIDAD GESTION DE MANTENIMIENTO --------2
 class Mantenimiento(models.Model):
     fallas = models.TextField()
     procesos = models.CharField(max_length=50)
-    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE)
-    id_empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE)
-    id_tipo_mantenimiento = models.ForeignKey(TipoMantenimiento, on_delete=models.CASCADE)
+    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT)
+    id_empleado = models.ForeignKey(Empleado, on_delete=models.PROTECT)
+    id_tipo_mantenimiento = models.ForeignKey(TipoMantenimiento, on_delete=models.PROTECT)
+    estado = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.fallas} - {self.id_tipo_mantenimiento}"
@@ -385,10 +392,11 @@ class Informes(models.Model):
     )
     fecha = models.DateField()
     hora = models.TimeField()
-    id_repuesto = models.ForeignKey(Repuesto, on_delete=models.CASCADE)
-    id_empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE)
+    id_repuesto = models.ForeignKey(Repuesto, on_delete=models.PROTECT)
+    id_empleado = models.ForeignKey(Empleado, on_delete=models.PROTECT)
     tipo_informe = models.CharField(max_length=100)
-    id_mantenimiento = models.ForeignKey(Mantenimiento, on_delete=models.CASCADE)
+    id_mantenimiento = models.ForeignKey(Mantenimiento, on_delete=models.PROTECT)
+    estado = models.BooleanField(default=True)
     
     def __str__(self):
         return f"{self.id_informe} {self.tipo_informe}"
@@ -410,7 +418,9 @@ class Nomina(models.Model):
         } , validators=[validar_monto]
     )
     fecha_pago =  models.DateField() 
-    id_empleado =   models.ForeignKey(Empleado, on_delete=models.CASCADE)            
+    id_empleado =   models.ForeignKey(Empleado, on_delete=models.PROTECT) 
+    estado = models.BooleanField(default=True)
+               
     def __str__(self):
         return f"{self.rol} - ${self.monto} - {self.fecha_pago}"
      #class meta
@@ -430,88 +440,80 @@ class Pagos(models.Model):
             'required': 'El monto del pago es obligatorio.'
         } , validators=[validar_monto]
     )
-    id_proveedor = models.ForeignKey(Proveedores, on_delete=models.CASCADE)
-    id_admin = models.ForeignKey(Administrador, on_delete=models.CASCADE)
-    id_herramienta = models.ForeignKey(Herramienta, on_delete=models.CASCADE)
-    id_insumos = models.ForeignKey(Insumos, on_delete=models.CASCADE)
-    id_repuesto = models.ForeignKey(Repuesto, on_delete=models.CASCADE)
-    id_nomina= models.ForeignKey(Nomina, on_delete=models.CASCADE, blank=True, null=True) 
+    id_proveedor = models.ForeignKey(Proveedores, on_delete=models.PROTECT)
+    id_herramienta = models.ForeignKey(Herramienta, on_delete=models.PROTECT)
+    id_insumos = models.ForeignKey(Insumos, on_delete=models.PROTECT)
+    id_repuesto = models.ForeignKey(Repuesto, on_delete=models.PROTECT)
+    id_nomina= models.ForeignKey(Nomina, on_delete=models.PROTECT , blank=True, null=True) 
+    estado = models.BooleanField(default=True)
     
     def __str__(self):
         return f"{self.id_pago} {self.monto}"
 
 # ----- modulo detalle servicio  ---------
-
-def validar_monto(value):
-    if value <= 0:
-        raise ValidationError('El monto debe ser mayor a cero.')
-
 class DetalleServicio(models.Model):
-    id_vehiculo = models.ForeignKey('Vehiculo', on_delete=models.CASCADE)
+    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT,related_name="servicios")
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    estado = models.CharField(max_length=20, default='pendiente')
-    
-    
+    estado = models.BooleanField(default=True)
+
+    #class Meta:
+        #verbose_name = "Detalle de Servicio"
+        #verbose_name_plural = "Detalles de Servicio"
+
+    # ---------- TOTALES ----------
     @property
     def total_repuestos(self):
-        """Calcula el total de TODOS los repuestos del servicio"""
-        try:
-            return sum(detalle_repuesto.subtotal for detalle_repuesto in self.detallerepuesto_set.all())
-        except (AttributeError, TypeError):
-            return 0
-    
+        return sum(
+            d.subtotal for d in self.detallerepuesto_set.all()
+        )
+
     @property
     def total_mantenimientos(self):
-        """Calcula el total de TODOS los mantenimientos del servicio"""
-        try:
-            return sum(detalle_tipo.subtotal for detalle_tipo in self.detalletipomantenimiento_set.all())
-        except (AttributeError, TypeError):
-            return 0
-    
+        return sum(
+            d.subtotal for d in self.detalletipomantenimiento_set.all()
+        )
+
     @property
     def total_insumos(self):
-        """Calcula el total de TODOS los insumos del servicio"""
-        try:
-            return sum(detalle_insumo.subtotal for detalle_insumo in self.detalleinsumos_set.all())
-        except (AttributeError, TypeError):
-            return 0
-    
-    
+        return sum(
+            d.subtotal for d in self.detalleinsumos_set.all()
+        )
+
     @property
     def subtotal(self):
-        total = 0
-        for detalle_repuesto in self.detallerepuesto_set.all():
-            total += detalle_repuesto.subtotal
-        for detalle_tipo in self.detalletipomantenimiento_set.all():
-            total += detalle_tipo.subtotal
-        for detalle_insumo in self.detalleinsumos_set.all():
-            total += detalle_insumo.subtotal
-        return total
+        return (
+            self.total_repuestos +
+            self.total_mantenimientos +
+            self.total_insumos
+        )
 
     @property
     def total_items(self):
-        return (self.detallerepuesto_set.count() + 
-                self.detalletipomantenimiento_set.count() + 
-                self.detalleinsumos_set.count())
+        return (
+            self.detallerepuesto_set.count() +
+            self.detalletipomantenimiento_set.count() +
+            self.detalleinsumos_set.count()
+        )
 
     def __str__(self):
-        return f"Servicio {self.id} - Vehículo: {self.id_vehiculo.placa}"
+        return f"Servicio #{self.id} - {self.id_vehiculo.placa}"
+
 class DetalleRepuesto(models.Model):
-    detalle_servicio = models.ForeignKey(DetalleServicio, on_delete=models.CASCADE)
-    id_repuesto = models.ForeignKey('Repuesto', on_delete=models.CASCADE)
+    detalle_servicio = models.ForeignKey(DetalleServicio, on_delete=models.PROTECT)
+    id_repuesto = models.ForeignKey(Repuesto, on_delete=models.PROTECT)
     cantidad = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
     precio_unitario = models.PositiveIntegerField(validators=[validar_monto])
     
     @property
     def subtotal(self):
-        return self.cantidad * self.precio_unitario
+        return self.cantidad 
     
     def __str__(self):
         return f"Repuesto: {self.id_repuesto.nombre} - Cantidad: {self.cantidad}"
 
 class DetalleTipoMantenimiento(models.Model):
-    detalle_servicio = models.ForeignKey(DetalleServicio, on_delete=models.CASCADE)
-    id_tipo_mantenimiento = models.ForeignKey('TipoMantenimiento', on_delete=models.CASCADE)
+    detalle_servicio = models.ForeignKey(DetalleServicio, on_delete=models.PROTECT)
+    id_tipo_mantenimiento = models.ForeignKey(TipoMantenimiento, on_delete=models.PROTECT)
     cantidad = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
     precio_unitario = models.PositiveIntegerField(validators=[validar_monto])
     
@@ -523,8 +525,8 @@ class DetalleTipoMantenimiento(models.Model):
         return f"Mantenimiento: {self.id_tipo_mantenimiento.nombre}"
 
 class DetalleInsumos(models.Model):
-    detalle_servicio = models.ForeignKey(DetalleServicio, on_delete=models.CASCADE)
-    id_insumos = models.ForeignKey('Insumos', on_delete=models.CASCADE)
+    detalle_servicio = models.ForeignKey(DetalleServicio, on_delete=models.PROTECT)
+    id_insumos = models.ForeignKey(Insumos, on_delete=models.PROTECT)
     cantidad = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
     precio_unitario = models.PositiveIntegerField(validators=[validar_monto])
     
@@ -538,44 +540,47 @@ class DetalleInsumos(models.Model):
  #-----Empresa----------------------
 class Empresa(models.Model):
     nombre = models.CharField(max_length=255,default= "Taller Mecanica Diesel Internacional Arturo Patiño"  )
-    nit = models.CharField(max_length=50,default="74.187366-2")
+    nit = models.CharField(max_length=50,default="74.187366-2",validators=[nit_validator])
     direccion =  models.CharField(default="calle 9 #32-37 Barrio La Isla", max_length=200)
     telefono = models.CharField(default="3118112714 - 3133342841", max_length=50)
     estado = models.BooleanField(default=True) 
 
     
     def __str__(self):
-        return self.nombre
+        return f"{self.nombre} - {self.nit} en {self.direccion} {self.telefono}"   
     
-#----- modulo de cliente base para factura----
-class ClienteFactura(models.Model):
-    TIPO_CLIENTE= [
-        ('cliente particular', 'Cliente Particular'),
-        ('empresa', 'Empresa'),
-    ]
-    tipo = models.CharField(max_length=20, choices=TIPO_CLIENTE)   
-    nombre = models.CharField(max_length=255, verbose_name="Nombre/Razón Social")
-    identificacion = models.CharField(max_length=50,  unique=True, verbose_name="Documento/NIT") 
-    telefono = models.CharField(max_length=20)
-    email = models.EmailField(validators=[validar_email])
-    direccion = models.TextField(verbose_name="Dirección")
-    estado = models.BooleanField(default=True, verbose_name="Activo")
+
 #-----------Factura-----------------
 class Factura(models.Model):
-    id_empresa = models.ForeignKey(Empresa, on_delete=models.PROTECT, null=True, blank=True)  # Agregado null/blank
-    Fecha = models.DateField(null=True, blank=True)  # Agregado
-    id_Detalles_servicios = models.ForeignKey(DetalleServicio, on_delete=models.PROTECT, null=True, blank=True)  # Agregado
-    id_empleado = models.ForeignKey(Empleado, on_delete=models.PROTECT, null=True, blank=True)  # Agregado
-    id_cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT, null=True, blank=True)
-    opciones_pago = [
+
+    METODO_PAGO = [
         ('efectivo', 'Efectivo'),
         ('transferencia', 'Transferencia'),
     ]
-    metodo_pago = models.CharField(max_length=50, choices=opciones_pago, null=True, blank=True)  # Agregado
+
+    empresa = models.ForeignKey( Empresa, on_delete=models.PROTECT)
+    cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
+    empleado = models.ForeignKey(Empleado,on_delete=models.PROTECT)
+    detalle_servicio = models.OneToOneField(DetalleServicio,on_delete=models.PROTECT,related_name="factura")
+    fecha = models.DateField(auto_now_add=True)
+    metodo_pago = models.CharField(max_length=50, choices=METODO_PAGO  )
+    estado = models.BooleanField(default=True)
+
+    #class Meta:
+        #verbose_name = "Factura"
+        #verbose_name_plural = "Facturas"
+
+    # ---------- TOTALES ----------
+    @property
+    def subtotal(self):
+        if not self.detalle_servicio:
+            return 0
+        return self.detalle_servicio.subtotal
+
 
     def __str__(self):
-        cliente_nombre = self.id_cliente.nombre if self.id_cliente else "Sin cliente"
-        return f"Factura {self.id} - {cliente_nombre}"
+        return f"Factura #{self.id} - {self.cliente.nombre}"
+
 
     
 #--------------Modulo Compra (STEVEN)-----------------
@@ -585,6 +590,7 @@ class Compra(models.Model):
     id_proveedor = models.ForeignKey(Proveedores, on_delete=models.CASCADE)  # LLAVE
     fecha_compra = models.DateField()
     hora_compra = models.TimeField()
+    estado = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.id_factura_compra} - {self.proveedor} - {self.fecha_compra} {self.hora_compra}"
@@ -611,8 +617,7 @@ class Caja(models.Model):
     )
     fecha= models.DateField()
     hora=models.TimeField()
-    id_admin=models.ForeignKey(Administrador, on_delete=models.CASCADE) 
-    id_Factura= models.ForeignKey(Factura, on_delete=models.CASCADE, blank=True, null=True)
+    estado = models.BooleanField(default=True)
     def __str__(self):
         return f"{self.tipo_movimiento} - {self.monto} en {self.fecha} {self.hora}"   
     #class meta
