@@ -36,6 +36,10 @@ class EmpleadoListView(PermisoRequeridoMixin, ListView):
     module_name = 'Empleados' 
     permission_required = 'view'
     
+    
+    def get_queryset(self):
+        return Empleado.objects.filter(estado=True)
+    
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         # El Mixin PermisoRequeridoMixin se ejecuta primero
@@ -113,6 +117,8 @@ class EmpleadoUpdateView(PermisoRequeridoMixin, UpdateView):
     permission_required = 'change'
     
     def form_valid(self, form):
+        
+        form.instance.estado = True 
         messages.success(self.request, "Empleado actualizado correctamente")
         return super().form_valid(form)
     

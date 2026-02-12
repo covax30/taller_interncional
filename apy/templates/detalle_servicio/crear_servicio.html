@@ -873,47 +873,5 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('✅ Todos los event listeners configurados');
 });
 </script>
-<style>
-    /* VARIABLES DE COLOR: Aquí definimos la paleta para cada modo */
-    :root {
-        --card-header-bg: #007bff; /* Azul fuerte para modo claro */
-        --card-header-text: #ffffff;
-        --input-bg: #ffffff;
-        --input-border: #ced4da;
-        --input-text: #495057;
-    }
 
-    /* Colores automáticos cuando se activa el Dark Mode */
-    .dark-mode {
-        --card-header-bg: transparent; 
-        --card-header-text: #5b99c2; /* Azul pastel para modo oscuro */
-        --input-bg: #2b2b36;
-        --input-border: #3f3f4d;
-        --input-text: #e0e0e0;
-    }
-
-    /* APLICACIÓN DE COLORES A TUS ELEMENTOS */
-    
-    /* 1. Encabezados de tarjetas (Headers) */
-    .card-header.bg-primary { 
-        background-color: var(--card-header-bg) !important; 
-        color: var(--card-header-text) !important;
-        border-top: 4px solid #5b99c2; /* Línea de acento */
-    }
-
-    .dark-mode .card-header.bg-success { border-top: 4px solid #6db47b !important; color: #6db47b !important; background: transparent !important; }
-    .dark-mode .card-header.bg-warning { border-top: 4px solid #d4b46c !important; color: #d4b46c !important; background: transparent !important; }
-
-    /* 2. Inputs y campos de texto */
-    .form-control, .input-group-text, .select2-selection {
-        background-color: var(--input-bg) !important;
-        border: 1px solid var(--input-border) !important;
-        color: var(--input-text) !important;
-    }
-
-    /* 3. Ajuste de sombras para que no se vean raras en claro */
-    .card.shadow {
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
-    }
-</style>
 {% endblock %}

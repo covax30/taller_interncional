@@ -90,6 +90,8 @@ class MantenimientoUpdateView(PermisoRequeridoMixin, UpdateView):
     permission_required = 'change'
     
     def form_valid(self, form):
+        
+        form.instance.estado = True 
         messages.success(self.request, "Mantenimiento editado correctamente")
         return super().form_valid(form)
     

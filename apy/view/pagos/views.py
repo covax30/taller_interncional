@@ -91,6 +91,8 @@ class PagosUpdateView(PermisoRequeridoMixin, UpdateView):
     permission_required = 'change'
     
     def form_valid(self, form):
+        
+        form.instance.estado = True 
         messages.success(self.request, "Pago actualizado correctamente")
         return super().form_valid(form)
     
