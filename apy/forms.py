@@ -7,7 +7,7 @@ from django.contrib.auth.hashers import make_password
 from django import forms  # Asegúrate de usar la importación estándar de forms
 from django.contrib.auth.models import User, Permission  # Importación de modelos de Django
 from django.core.exceptions import ValidationError
-from .models import Profile
+from .models import Profile,DetalleServicio
 
 from apy.models import *
 
@@ -40,6 +40,11 @@ class FacturaForm(ModelForm):
                 }
             ),
             'detalle_servicio': Select(
+                attrs={
+                    'class': 'form-control',
+                }
+            ),
+            'orden_servicio': Select(
                 attrs={
                     'class': 'form-control',
                 }
@@ -243,17 +248,52 @@ class DetalleInsumoForm(ModelForm):
 class DetalleServicioForm(ModelForm):
     class Meta:
         model = DetalleServicio
-        fields = ['id_vehiculo']
+        fields = ['id_vehiculo','cliente','id_entrada','empresa','id_salida','proceso'  ]
         widgets = {
             'id_vehiculo': Select(attrs={
                 'class': 'form-control',
                 'placeholder': 'Seleccione un vehículo'
+            }),
+            'cliente': Select(attrs={
+                'class': 'form-control',
+                'placeholder': 'Seleccione un cliente'
+            }),
+            'id_entrada': Select(attrs={
+                'class': 'form-control',
+                'placeholder': 'Seleccione una entrada de vehículo'
+            }),
+            'empresa': Select(attrs={   
+                'class': 'form-control',
+                'placeholder': 'Seleccione una empresa'
+            }),
+            'id_salida': Select(attrs={   
+                'class': 'form-control',
+                'placeholder': 'Seleccione una salida de vehículo'
+            }),
+            'proceso': Select(attrs={
+                'class': 'form-control',
+                'placeholder': 'Seleccione el proceso del servicio'
             }),
         }
         error_messages = {
             'id_vehiculo': {
                 'required': 'El vehículo es obligatorio.',
             },
+            'cliente': {
+                'required': 'El cliente es obligatorio.',
+            },
+            'id_entrada': {
+                'required': 'La entrada del vehículo es obligatoria.',
+            },
+            'empresa': {
+                    'required': 'La empresa es obligatoria.',
+                },
+            
+            'proceso': {
+                    'required': 'El proceso del servicio es obligatorio.',
+                },
+        
+            
         }
 
     def __init__(self, *args, **kwargs):

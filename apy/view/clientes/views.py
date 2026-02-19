@@ -239,10 +239,11 @@ class ClienteCreateModalView(CreateView):
         form.instance.estado = True
         try:
             self.object = form.save()
-            return JsonResponse({
+            display_text = f"{self.object.identificacion} - {self.object.nombre}"
+            return JsonResponse({ 
                 "success": True,
                 "id": self.object.id,
-                "text": str(self.object),
+                "text": display_text,
                 "message": "Cliente registrado correctamente ✅"
             })
         except Exception as e:

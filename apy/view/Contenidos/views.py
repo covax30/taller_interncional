@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse_lazy
+from urllib3 import request
 from apy.forms import *
 from django.contrib import messages
 # Importar modelos necesarios
@@ -85,7 +86,7 @@ class FacturaCreateView(PermisoRequeridoMixin, CreateView):
         form.instance.estado = True 
         messages.success(self.request, "Factura creada correctamente")
         return super().form_valid(form)
-    
+ 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context ['titulo'] = 'Crear Factura'
@@ -93,6 +94,29 @@ class FacturaCreateView(PermisoRequeridoMixin, CreateView):
         context ['listar_url'] = reverse_lazy('apy:factura_lista')
         return context
     
+def agregar_fila_repuesto(request):
+    # Asegúrate de usar el nombre correcto de tu formulario de detalles
+    # Si no lo tienes creado, puedes usar FacturaForm o el específico de repuestos
+    form = RepuestoscantidadForm()
+    return render(request, 'Contenido/parcial_fila_repuesto.html', {'form': form})    
+
+def filtrar_items(request):
+    tipo = request.GET.get('tipo_seleccion')
+    
+    if tipo == 'repuestos':
+        # Usamos tu formulario existente RepuestoscantidadForm
+        form = RepuestoscantidadForm()
+        campo = form['id_repuesto']
+    elif tipo == 'mantenimiento':
+        form = DetalleTipo_MantenimientoForm()
+        campo = form['id_tipo_mantenimiento']
+    elif tipo == 'insumos':
+        form = DetalleInsumoForm()
+        campo = form['id_insumos']
+    else:
+        return HttpResponse('<select class="form-control"><option>---------</option></select>')
+
+    return render(request, 'Contenido/parcial_select_filtrado.html', {'campo': campo})
 class FacturaUpdateView(PermisoRequeridoMixin, UpdateView): 
     model = Factura
     form_class = FacturaForm
@@ -251,7 +275,7 @@ class DetalleFacturaView(DetailView):
         return Factura.objects.select_related(
             'empresa', 
             'cliente', 
-            'empleado', 
+            'empleado',  
             'detalle_servicio'
         ).prefetch_related(
             # 2. prefetch_related: Para los detalles que quieres SEPARAR
@@ -274,3 +298,4 @@ class DetalleFacturaView(DetailView):
         })
 
         return context
+    
