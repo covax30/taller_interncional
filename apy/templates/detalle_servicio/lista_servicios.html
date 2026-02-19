@@ -57,7 +57,7 @@
     <th>ID</th>
     <th>Vehículo</th>
     <th>Cliente</th>
-    <th>Fecha</th>
+    <th>Fecha de emicion </th>
     
     <th>Total</th>
     <th>Acciones</th>
@@ -85,6 +85,9 @@
                 </a>
                 <a href="{% url 'apy:eliminar_servicio' servicio.id %}" class="btn btn-danger btn-sm" title="Eliminar">
                     <i class="fas fa-trash"></i>
+                </a>
+                <a href="{% url 'apy:imprimir_servicio' servicio.id %}" target="_blank" class="btn btn-danger btn-sm" title="Generar PDF">
+                    <i class="fas fa-file-pdf"></i>
                 </a>
             </div>
         </td>

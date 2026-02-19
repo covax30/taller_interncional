@@ -10,6 +10,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
 
 
+
 #------------------FUNCION DE VALIDACION ----------------------
 def validar_email (value):  
     if re.search(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', value) is None:
@@ -266,7 +267,7 @@ class EntradaVehiculo(models.Model):
     hora_ingreso = models.TimeField()
 
     def __str__(self):
-        return f"{self.id_cliente.id_cliente} - {self.id_vehiculo.placa} - {self.fecha_ingreso} {self.hora_ingreso}"
+        return f"{self.id_cliente} - {self.id_vehiculo.placa} - {self.fecha_ingreso} {self.hora_ingreso}"
     
 
 class SalidaVehiculo(models.Model):
@@ -276,10 +277,10 @@ class SalidaVehiculo(models.Model):
     diagnostico = models.CharField(max_length=100)
     fecha_salida = models.DateField()
     hora_salida = models.TimeField()
-
     def __str__(self):
-        return f"{self.id_cliente.id_cliente} - {self.id_vehiculo.placa} - {self.diagnostico}"
-
+    # Usamos .id (el identificador por defecto de Django) 
+    # o simplemente self.id_cliente (que usará el nombre del cliente)
+        return f"{self.id_cliente} - {self.id_vehiculo.placa} - {self.diagnostico}"
 
  
 #-------------MODULOS DE karol-----------
@@ -449,8 +450,17 @@ class Pagos(models.Model):
 
 # ----- modulo detalle servicio  ---------
 class DetalleServicio(models.Model):
+    PROCESO_OPCIONES = [
+        ('terminado', 'Terminado'),
+        ('proceso', 'En proceso'),
+    ]
     id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT,related_name="servicios")
+    cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
+    id_entrada = models.ForeignKey(EntradaVehiculo, on_delete=models.PROTECT, blank=True, null=True)
+    empresa = models.ForeignKey('Empresa', on_delete=models.PROTECT, blank=True, null=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    id_salida = models.ForeignKey(SalidaVehiculo, on_delete=models.PROTECT, blank=True, null=True)
+    proceso = models.CharField(max_length=20, choices=PROCESO_OPCIONES, default='proceso')
     estado = models.BooleanField(default=True)
 
     #class Meta:
@@ -500,23 +510,28 @@ class DetalleRepuesto(models.Model):
     id_repuesto = models.ForeignKey(Repuesto, on_delete=models.PROTECT)
     cantidad = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
     precio_unitario = models.PositiveIntegerField(validators=[validar_monto])
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     
-    @property
-    def subtotal(self):
-        return self.cantidad 
-    
+    def save(self, *args, **kwargs):
+        self.subtotal = self.cantidad * self.precio_unitario
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"Repuesto: {self.id_repuesto.nombre} - Cantidad: {self.cantidad}"
+    
 
 class DetalleTipoMantenimiento(models.Model):
     detalle_servicio = models.ForeignKey(DetalleServicio, on_delete=models.PROTECT)
     id_tipo_mantenimiento = models.ForeignKey(TipoMantenimiento, on_delete=models.PROTECT)
     cantidad = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
     precio_unitario = models.PositiveIntegerField(validators=[validar_monto])
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     
-    @property
-    def subtotal(self):
-        return self.cantidad * self.precio_unitario
+    def save(self, *args, **kwargs):
+        self.subtotal = self.cantidad * self.precio_unitario
+        super().save(*args, **kwargs)
+
+    
 
     def __str__(self):
         return f"Mantenimiento: {self.id_tipo_mantenimiento.nombre}"
@@ -526,10 +541,11 @@ class DetalleInsumos(models.Model):
     id_insumos = models.ForeignKey(Insumos, on_delete=models.PROTECT)
     cantidad = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
     precio_unitario = models.PositiveIntegerField(validators=[validar_monto])
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     
-    @property
-    def subtotal(self):
-        return self.cantidad * self.precio_unitario
+    def save(self, *args, **kwargs):
+        self.subtotal = self.cantidad * self.precio_unitario
+        super().save(*args, **kwargs)
     
     def __str__(self):
         return f"Insumo: {self.id_insumos} - Cantidad: {self.cantidad}"
@@ -549,34 +565,33 @@ class Empresa(models.Model):
 
 #-----------Factura-----------------
 class Factura(models.Model):
-
     METODO_PAGO = [
         ('efectivo', 'Efectivo'),
         ('transferencia', 'Transferencia'),
     ]
-
-    empresa = models.ForeignKey( Empresa, on_delete=models.PROTECT)
-    cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
-    empleado = models.ForeignKey(Empleado,on_delete=models.PROTECT)
-    detalle_servicio = models.OneToOneField(DetalleServicio,on_delete=models.PROTECT,related_name="factura")
+    ORDEN_SERVICIO_OPCIONES = [
+        ('mantenimiento', 'Mantenimiento'),
+        ('repuestos', 'Repuestos'),
+        ('insumos', 'Insumos'),
+    ]
+    # USAR MINÚSCULAS AQUÍ:
+    empresa = models.ForeignKey(Empresa, on_delete=models.PROTECT)
+    cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
+    empleado = models.ForeignKey(Empleado, on_delete=models.PROTECT)
+    detalle_servicio = models.OneToOneField(DetalleServicio, on_delete=models.PROTECT, related_name="factura")
+    
     fecha = models.DateField(auto_now_add=True)
-    metodo_pago = models.CharField(max_length=50, choices=METODO_PAGO  )
+    orden_servicio = models.CharField(max_length=20, choices=ORDEN_SERVICIO_OPCIONES)
+    metodo_pago = models.CharField(max_length=50, choices=METODO_PAGO)
     estado = models.BooleanField(default=True)
 
-    #class Meta:
-        #verbose_name = "Factura"
-        #verbose_name_plural = "Facturas"
-
-    # ---------- TOTALES ----------
     @property
     def subtotal(self):
-        if not self.detalle_servicio:
-            return 0
-        return self.detalle_servicio.subtotal
-
+        return self.detalle_servicio.subtotal if self.detalle_servicio else 0
 
     def __str__(self):
         return f"Factura #{self.id} - {self.cliente.nombre}"
+
 
 
     

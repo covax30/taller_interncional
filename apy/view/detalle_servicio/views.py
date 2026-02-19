@@ -1,6 +1,6 @@
 from django.views.generic import CreateView, UpdateView, ListView, DeleteView, DetailView
 from django.urls import reverse_lazy
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404, render
 from django.db import transaction
 from django.contrib import messages
 from django.http import HttpResponseRedirect, JsonResponse
@@ -281,3 +281,23 @@ class DetalleCreateModalView(CreateView):
             "html": html,
             "message": "Por favor, corrige los errores en el formulario ❌"
         })
+        
+def imprimir_servicio_factura(request, pk):
+    # Buscamos el servicio directamente
+    servicio = get_object_or_404(DetalleServicio, pk=pk)
+    
+    # Obtenemos sus detalles (usando los related_names de tus formsets)
+    context = {
+        'servicio': servicio,
+        'vehiculo': servicio.id_vehiculo,
+        'cliente': servicio.id_vehiculo.id_cliente,
+        'repuestos': servicio.detallerepuesto_set.all(),
+        'mantenimientos': servicio.detalletipomantenimiento_set.all(),
+        'insumos': servicio.detalleinsumos_set.all(),
+        # Calculamos el gran total en el servidor para seguridad
+        'total': sum(r.subtotal for r in servicio.detallerepuesto_set.all()) +
+                 sum(m.subtotal for m in servicio.detalletipomantenimiento_set.all()) +
+                 sum(i.subtotal for i in servicio.detalleinsumos_set.all()),
+    }
+    return render(request, 'detalle_servicio/factura_impresion.html', context)
+        

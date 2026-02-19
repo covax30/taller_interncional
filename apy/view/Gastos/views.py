@@ -106,6 +106,8 @@ class GastosUpdateView(PermisoRequeridoMixin, UpdateView):
     permission_required = 'change'
     
     def form_valid(self, form):
+        
+        form.instance.estado = True 
         messages.success(self.request, "Gasto editado correctamente")
         return super().form_valid(form)
     

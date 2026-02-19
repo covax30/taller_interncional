@@ -60,6 +60,8 @@ urlpatterns = [
     path('factura/activar/<int:pk>/', FacturaActivarView.as_view(), name="factura_activar"),
     path('factura/json/<int:pk>/', factura_detalle_json, name='factura_json'),
     path('factura/detalle/<int:pk>/', DetalleFacturaView.as_view(), name='factura_detalle'),
+    path('factura/agregar-fila/', agregar_fila_repuesto, name='agregar_fila'),
+    path('factura/filtrar-items/', filtrar_items, name='filtrar_items'),
     
     # ------Url modulo detalle servicio----------------
     path('servicios/', ListServicioView.as_view(), name='lista_servicios'),  
@@ -70,6 +72,7 @@ urlpatterns = [
     path('servicios/inactivos/', ServicioInactivosListView.as_view(), name='servicios_inactivos'),  
     path('servicios/activar/<int:pk>/', ServicioActivateView.as_view(), name='servicio_activar'),
     path('servicios/modal/crear/', DetalleCreateModalView.as_view(), name='servicio_modal_crear'),
+    path('servicios/imprimir/<int:pk>/', imprimir_servicio_factura, name='imprimir_servicio'),
     
     # -------------URL modulo proveedor---------------
     path('Proveedor/listar/', ProveedorListView.as_view(), name='proveedor_lista'),
@@ -118,6 +121,7 @@ urlpatterns = [
     path('entrada_vehiculo/agregar/', EntradaVehiculoCreateView.as_view(), name='entrada_vehiculo_crear'),
     path('entrada_vehiculo/editar/<int:pk>/', EntradaVehiculoUpdateView.as_view(), name='entrada_vehiculo_editar'),
     path('entrada_vehiculo/eliminar/<int:pk>/', EntradaVehiculoDeleteView.as_view(), name='entrada_vehiculo_eliminar'),
+    path("entrada_vehiculo/modal/crear/", EntradaCreateModalView.as_view(), name="entrada_vehiculo_modal_crear"),
     
     path('salida_vehiculo/listar/', SalidaVehiculoListView.as_view(), name='salida_vehiculo_lista'),
     path('salida_vehiculo/agregar/', SalidaVehiculoCreateView.as_view(), name='salida_vehiculo_crear'),
