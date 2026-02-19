@@ -198,13 +198,10 @@ class Permission(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    
-    telefono = models.CharField(
-        max_length=20, 
-        blank=True, 
-        null=True, 
-        verbose_name='Número de Teléfono'
-    )
+    identificacion = models.CharField(max_length=11, validators=[validar_identificacion], null=True, blank=True)
+    telefono = models.CharField(max_length=10, validators=[validar_telefono], null=True, blank=True)
+    direccion = models.CharField(max_length=150, null=True, blank=True) # <-- Nuevo campo
+    imagen = models.ImageField(upload_to='users/%Y/%m/%d', null=True, blank=True)
     
     # Campo para la imagen de perfil
     imagen = models.ImageField(

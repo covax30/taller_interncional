@@ -1,7 +1,7 @@
 {% extends "generic_listar.html"%}
 
 {% block titulo %}
-    <h1 class="text-center">Lista de Usuarios del Sistema</h1>
+    <h1 class="text-center">Gestion de Usuarios del Sistema</h1>
 {% endblock %}
 
 {% block agregar %}
@@ -12,9 +12,13 @@
 
 {% block columnas %}
     <th>ID</th>
-    <th>Nombre de Usuario</th>
-    <th>Email</th>
+    <th>Nombre Completo</th>
+    <th>Usuario</th>
+    <th>Identificación</th> 
     <th>Rol</th>
+    <th>Email</th>
+    <th>Teléfono</th> 
+    <th>Dirección</th> 
     <th>Fecha de Creación</th>
     <th>Acciones</th>
 {% endblock %}
@@ -23,22 +27,50 @@
     {% for user in object_list %}
         <tr>
             <td>{{ user.id }}</td>
+            <td class="fw-bold">{{ user.get_full_name|default:"Sin Nombre" }}</td>
             <td>{{ user.username }}</td>
-            <td>{{ user.email }}</td>
-            <td>
+            <td>{{ user.profile.identificacion|default:"---" }}</td>
+            <td>    
                 {% if user.is_superuser %}
-                    <span class="badge bg-danger">Gerente (Admin)</span>
-                {% elif user.is_staff %}
-                    <span class="badge bg-warning">Staff</span>
+                    <span class="badge rounded-pill bg-danger shadow-sm">
+                        <i class="fas fa-user-shield me-1"></i> Gerente
+                    </span>
                 {% else %}
-                    <span class="badge bg-success">Empleado</span>
+                    <span class="badge rounded-pill bg-success shadow-sm">
+                        <i class="fas fa-user-cog me-1"></i> Empleado
+                    </span>
                 {% endif %}
-            </td>
+            </td>   
+            <td>{{ user.email }}</td>
+            <td>{{ user.profile.telefono|default:"---" }}</td>
+            <td>{{ user.profile.direccion|default:"---" }}</td>
             <td>{{ user.date_joined|date:"Y-m-d H:i" }}</td>
-            <td>
-                <a href="{% url 'apy:registro_usuario_editar' user.id %}" class="btn btn-info btn-xs" title="Editar"><i class="fas fa-edit"></i></a>
-                <a href="{% url 'apy:registro_usuario_eliminar' user.id %}" class="btn btn-danger btn-xs" title="Eliminar"><i class="fas fa-trash-alt"></i></a>
-            </td>
+            <td class="text-center">
+                    <div class="d-flex justify-content-center gap-2">
+                        {# BOTÓN EDITAR #}
+                        <a href="{% url 'apy:registro_usuario_editar' user.id %}" 
+                        class="btn btn-outline-info btn-sm shadow-sm" 
+                        title="Editar datos de {{ user.username }}">
+                            <i class="fas fa-edit"></i>
+                        </a>
+
+                        {% if request.user.id == user.id %}
+                            {# BOTÓN ELIMINAR DESHABILITADO (Mismo Admin) #}
+                            <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="No puedes eliminarte a ti mismo">
+                                <button class="btn btn-light btn-sm text-muted border shadow-sm" style="pointer-events: none;" disabled>
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </span>
+                        {% else %}
+                            {# BOTÓN ELIMINAR ACTIVO #}
+                            <a href="{% url 'apy:registro_usuario_eliminar' user.id %}" 
+                            class="btn btn-outline-danger btn-sm shadow-sm" 
+                            title="Eliminar usuario">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </td>
         </tr>
     {% endfor %}
     
