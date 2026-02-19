@@ -1,0 +1,53 @@
+
+{% extends "generic_listar.html" %}
+
+{% block titulo %}
+        <i class="fa-solid fa-wrench"></i>
+        <h1 class="text-center">Lista de Herramientas Inactivas</h1>
+{% endblock titulo %}
+
+{% block agregar %}
+<a href="{{listar_url}}" class=" btn btn-primary btn btn-xs" title="lista herramienta"><i class="fas fa-list"></i>
+          lista Herramientas
+</a>
+{% endblock %}
+
+{% block columnas %}
+
+        <th>Nombre</th>
+        <th>Color</th>
+        <th>Tipo</th>
+        <th>Material</th>
+        <th>Id marca</th>
+        <th>Stock</th>
+        <th>Acciones</th>
+
+{% endblock %}
+
+{% block iterar %}
+
+      {% for h in object_list %}
+      <tr>
+        <td>{{h.nombre}}</td>
+        <td>{{h.color}}</td>
+        <td>{{h.tipo}}</td>
+        <td>{{h.material}}</td>
+        <td>{{h.id_marca}}</td>
+        <td>{{h.stock}}</td>
+
+        <form method="post">
+
+          <td>
+            
+            <a href="{% url 'apy:herramienta_activar' h.id %}" 
+              class="btn btn-success btn-xs" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="Activar herramienta">
+              <i class="fas fa-power-off"></i>
+           </a>
+          </td>
+      </tr>
+      {% endfor %}
+
+{% endblock %}

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse_lazy
@@ -20,6 +20,10 @@ class HerramientaListView(PermisoRequeridoMixin, ListView):
     model = Herramienta
     template_name = 'herramienta/listar.html'
     
+    def get_queryset(self):
+        return Herramienta.objects.filter(estado=True)
+    
+    
     # --- Configuración de Permisos ---
     module_name = 'Herramientas' 
     permission_required = 'view'
@@ -35,6 +39,30 @@ class HerramientaListView(PermisoRequeridoMixin, ListView):
         context['crear_url'] = reverse_lazy('apy:herramienta_crear')
         context['entidad'] = 'Herramienta'
         return context
+    
+#---- vista para liistar herramientas inactivos ---
+class HerramientaInactivosListView(PermisoRequeridoMixin, ListView): 
+    model = Herramienta
+    template_name = 'herramienta/herramientas_inactivos.html'
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Herramientas' 
+    permission_required = 'view' 
+    
+    def get_queryset(self):
+        return Herramienta.objects.filter(estado=False)
+    
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        # Usa el Mixin importado de apy.decorators
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Lista de Herramientas Inactivas'
+        context['listar_url'] = reverse_lazy('apy:herramienta_lista')
+        context['entidad'] = 'Herramienta'
+        return context    
 
 class HerramientaCreateView(PermisoRequeridoMixin, CreateView): 
     model = Herramienta
@@ -47,6 +75,7 @@ class HerramientaCreateView(PermisoRequeridoMixin, CreateView):
     permission_required = 'add'
     
     def form_valid(self, form):
+        form.instance.estado = True
         messages.success(self.request, "Herramienta creada correctamente")
         return super().form_valid(form)
     
@@ -87,16 +116,48 @@ class HerramientaDeleteView(PermisoRequeridoMixin, DeleteView):
     module_name = 'Herramientas'
     permission_required = 'delete'
     
-    def form_valid(self, form):
-        messages.success(self.request, "Herramienta eliminada correctamente")
-        return super().form_valid(form)
+    def post(self, request, *args, **kwargs):
+        
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        
+        self.object.estado = False
+        self.object.save()
+        
+        messages.success(self.request,     f" Herramienta {Herramienta} desactivada correctamente")
+        return HttpResponseRedirect(success_url)
+    
+
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Eliminar Herramienta'
         context['entidad'] = 'Herramienta'
         context['listar_url'] = reverse_lazy('apy:herramienta_lista')
-        return context  
+        return context
+    
+#--- Vista para activar herramientas ---
+class HerramientaActivateView(PermisoRequeridoMixin, DeleteView):   
+    model = Herramienta
+    template_name = 'herramienta/activar_herramientas.html'
+    success_url = reverse_lazy('apy:herramienta_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Herramientas'
+    permission_required = 'change'
+    
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.estado = True
+        self.object.save()
+        messages.success(self.request, "Herramienta activada correctamente")
+        return redirect(self.success_url)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Activar Herramienta'
+        context['listar_url'] = reverse_lazy('apy:herramienta_lista')
+        return context      
     
 class HerramientaCreateModalView(CreateView):
     model = Herramienta

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from apy.models import Empleado, Module, Permission # <-- Asegúrate de importar Module y Permission
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.urls import reverse_lazy
@@ -52,6 +52,34 @@ class EmpleadoListView(PermisoRequeridoMixin, ListView):
         context['entidad'] = 'Empleado'
         return context
     
+#--- vista para listar empleados inactivos ---   
+class EmpleadoInactivosListView(PermisoRequeridoMixin, ListView):       
+    model = Empleado
+    template_name ='Empleado/empleados_inactivos.html'
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Empleados' 
+    permission_required = 'view' 
+    
+    def get_queryset(self):
+        return Empleado.objects.filter(estado=False)
+    
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        # Usa el Mixin importado de apy.decorators
+        return super().dispatch(request, *args, **kwargs)
+    
+    def post(self, request, *args, **kwargs):
+        nombre = {'nombre' : 'empleados inactivos'}
+        return JsonResponse(nombre)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Lista de Empleados Inactivos'
+        context['listar_url'] = reverse_lazy('apy:empleado_lista')
+        context['entidad'] = 'Empleado'
+        return context 
+    
 class EmpleadoCreateView(PermisoRequeridoMixin, CreateView):
     model = Empleado
     form_class = EmpleadoForm
@@ -63,6 +91,7 @@ class EmpleadoCreateView(PermisoRequeridoMixin, CreateView):
     permission_required = 'add'
     
     def form_valid(self, form):
+        form.instance.estado = True 
         messages.success(self.request, "Empleado creado correctamente")
         return super().form_valid(form)
     
@@ -103,9 +132,16 @@ class EmpleadoDeleteView(PermisoRequeridoMixin, DeleteView):
     module_name = 'Empleados'
     permission_required = 'delete'
     
-    def form_valid(self, form):
-        messages.success(self.request, "Empleado eliminado correctamente")
-        return super().form_valid(form)
+    def post(self, request, *args, **kwargs):
+        
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        
+        self.object.estado = False
+        self.object.save()
+        
+        messages.success(self.request,     f"Empleado {Empleado} desactivado correctamente")
+        return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -113,6 +149,34 @@ class EmpleadoDeleteView(PermisoRequeridoMixin, DeleteView):
         context['entidad'] = 'Empleados'
         context['listar_url'] = reverse_lazy('apy:empleado_lista')
         return context
+    
+#--- Vista para activar empleados ---
+class EmpleadoActivateView(PermisoRequeridoMixin, DeleteView):   
+    model = Empleado
+    template_name = 'Empleado/activar_empleado.html'
+    success_url = reverse_lazy('apy:empleado_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Empleados'
+    permission_required = 'change'
+    
+    def post(self, request, *args, **kwargs):
+        
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        
+        self.object.estado = True
+        self.object.save()
+        
+        messages.success(self.request, f"Empleado {self.object.nombre} activado ")
+        return HttpResponseRedirect(success_url)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Activar Empleado'
+        context['entidad'] = 'Empleados'
+        context['listar_url'] = reverse_lazy('apy:empleado_lista')
+        return context    
     
 class EmpleadoCreateModalView(CreateView):
     model = Empleado
@@ -147,28 +211,3 @@ class EmpleadoCreateModalView(CreateView):
             "message": "Por favor, corrige los errores en el formulario ❌"
         })
 
-class EmpleadoCreateModalMantenimientoView(CreateView):
-    model = Empleado_Mantenimiento
-    form_class = Empleado_Mantenimiento_Form
-    template_name = "Empleado/empleado_mantenimiento_form.html"
-
-    @method_decorator(csrf_exempt)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        self.object = form.save()
-        return JsonResponse({
-            "success": True,
-            "id": self.object.id_empleado_mantenimiento,
-            "text": str(self.object),
-            "message": "Empleado registrado correctamente"
-        })
-
-    def form_invalid(self, form):
-        html = render_to_string(self.template_name, {"form": form}, request=self.request)
-        return JsonResponse({
-            "success": False,
-            "html": html,
-            "message": "Por favor corrige los errores"
-        })

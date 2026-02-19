@@ -24,24 +24,24 @@ class FacturaForm(ModelForm):
         model = Factura
         fields = '__all__'
         widgets = {
-            'Fecha':DateInput(
+            'fecha':DateInput(
                 attrs={
                     'type': 'date',
                     'placeholder':'Ingrese la fecha',
                 }
             ),
             
-            'id_empleado': Select(
+            'empleado': Select(
                 attrs={
                     'class': 'form-control',
                 }
             ),
-            'id_cliente': Select(
+            'cliente': Select(
                 attrs={
                     'class': 'form-control',
                 }
             ),
-            'id_Detalles_servicios': Select(
+            'detalle_servicio': Select(
                 attrs={
                     'class': 'form-control',
                 }
@@ -55,35 +55,20 @@ class FacturaForm(ModelForm):
 
 
         error_messages = {
-            'id_operacion': {
-                'required': 'El id de la operacion es obligatorio',
+            'fecha': {
+                'required': 'La fecha es obligatoria',
             },
-            'tipo_pago': {
-                'required': 'El tipo de pago es obligatorio',
+            'empleado': {
+                'required': 'El empleado es obligatorio',
             },
-            'id_cliente': {
-                'required': 'El id del cliente es obligatorio',
+            'cliente': {
+                'required': 'El  cliente es obligatorio',
             },
-            'id_vehiculo': {
-                'required': 'El id del vehiculo es obligatorio',
+            'detalle_servicio': {
+                'required': 'El detalle de servicios es obligatorio',
             },
-            'id_tipo_mantenimiento': {
-                'required': 'El id de tipo de mantenimiento es obligatorio',
-            },
-            'servicio_prestado': {
-                'required': 'El servicio prestado es obligatorio',
-            },
-            'nombre_empresa': {
-                'required': 'El nombre de la empresa es obligatorio',
-            },
-            'direccion_empresa': {
-                'required': 'La direccion de la empresa es obligatoria',
-            },
-            'id_empleado': {
-                'required': 'El id del empleado es obligatorio',
-            },
-            'monto': {
-                'required': 'El monto es obligatorio',
+            'metodo_pago': {
+                'required': 'El metodo de pago es obligatorio',
             }
         }
         
@@ -107,7 +92,7 @@ class EmpresaForm(ModelForm):
                 attrs={
                     'class': 'form-control'
                     }),
-            'nit': NumberInput(
+            'nit': TextInput(
                 attrs={
                     'class': 'form-control', 'min': '1'
                     }),
@@ -151,7 +136,7 @@ class RepuestoscantidadForm(ModelForm):
         widgets = {
             'id_repuesto': Select(attrs={'class': 'form-control'}),
             'cantidad': NumberInput(attrs={'class': 'form-control', 'min': '1'}),
-            'precio_unitario': NumberInput(attrs={'class': 'form-control', 'placeholder': '0.00', 'step': '0.01'}),
+            'precio_unitario': NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese el precio unitario', 'step': '0.01'}),
         }
         
         error_messages = {
@@ -238,8 +223,9 @@ class DetalleInsumoForm(ModelForm):
             ),
             'precio_unitario': NumberInput(
                 attrs={
-                    'placeholder': 'Ingrese el costo del insumo',
-                    'step': '0.01'
+                    'placeholder': 'Ingrese el precio unitario',
+                    'step': '0.01',
+                    'class': 'form-control',
                 }
             )
         }
@@ -560,7 +546,7 @@ class ClienteForm(ModelForm):
                     'placeholder':'Ingrese el nombre del cliente',
                 }
             ),
-            'identificacion':NumberInput(
+            'identificacion':TextInput(
                 attrs={
                     'placeholder':'Ingrese el documento del cliente',
                 }
@@ -584,7 +570,7 @@ class ClienteForm(ModelForm):
             
         }
         error_messages = {
-            'documento': {
+            'identificacion': {
                 'required': 'El docmuento de identidad es obligatorio',
                 'unique': 'Ya existe un cliente con ese documento de identidad',
                 'invalid': 'Por favor ingrese solo números en el documento de identidad',
@@ -607,7 +593,7 @@ class VehiculoForm(ModelForm):
         # Configura cómo se muestran los clientes en el select
         if 'id_cliente' in self.fields:
             self.fields['id_cliente'].label_from_instance = (
-                lambda obj: f"{obj.id} - {obj.nombre}"  # ← CAMBIADO de obj.id_cliente a obj.id
+                lambda obj: f"{obj.id} - {obj.nombre}"  
             )
             self.fields['id_cliente'].widget.attrs.update({
                 'class': 'form-control foreign-key-field',
@@ -840,89 +826,6 @@ class CompraForm(ModelForm):
             },
         }
      
-       
-# -----------Formulario modelo administrador------------------
-class AdministradorForm(ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['nombre'].widget.attrs['autofocus'] = True
-        
-    class Meta:
-        model = Administrador
-        fields = '__all__'
-        widgets = {
-            'nombre':TextInput(
-                attrs={
-                    'placeholder':'Ingrese el nombre del administrador',
-                }
-            ),
-            'apellidos':TextInput(
-                attrs={
-                    'placeholder':'Ingrese los apellidos del administrador',
-                }
-            ),
-            'identificacion':NumberInput(
-                attrs={
-                    'placeholder':'Ingrese la identificacion del administrador',
-                    'pattern': '[0-9]+',
-                    'title': 'Solo se permiten números',
-                    'maxlength': '20'
-                }
-            ),
-            'edad':NumberInput(
-                attrs={
-                    'placeholder':'Ingrese la edad del administrador',
-                    'min': 1,
-                    'max': 100
-                }
-            ),
-            'correo':EmailInput(
-                attrs={
-                    'placeholder':'Ingrese el correo del administrador',
-                }
-            ),
-            'telefono':NumberInput(
-                attrs={
-                    'placeholder':'Ingrese el telefono del administrador',
-                    'type': 'tel'
-                }
-            ),
-            'fecha_ingreso':DateInput(
-                attrs={
-                    'placeholder':'Ingrese la fecha de ingreso del administrador',
-                    'type': 'date'
-                }
-            )
-        }
-        error_messages = {
-            'nombre': {
-                'required': 'El nombre es obligatorio',
-            },
-            'apellidos': {
-                'required': 'El apellido es obligatorio',
-            },
-            'identificacion': {
-                'required': 'La identificación es obligatoria',
-                'unique': 'Ya existe un administrador con esa identificación',
-                'invalid': 'Por favor ingrese solo números en la identificación',
-            },
-            'edad': {
-                'required': 'La edad es obligatoria',
-                'invalid': 'Por favor ingrese solo números en la edad',
-            },
-            'correo': {
-                'required': 'El correo es obligatorio',
-                'invalid': 'El correo no tiene un formato válido',
-                'unique': 'Ya existe un administrador con ese correo',
-            },
-            'telefono': {
-                'required': 'El teléfono es obligatorio',
-                'invalid': 'Por favor ingrese solo números en el telefono',
-            },
-            'fecha_ingreso': {
-                'required': 'La fecha de ingreso es obligatoria',
-            },
-        }
         
 
     
@@ -1216,62 +1119,6 @@ class EmpleadoForm(ModelForm):
         }
         
         
-class Empleado_Mantenimiento_Form(ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['nombre'].widget.attrs['autofocus'] = True
-        
-    class Meta:
-        model = Empleado_Mantenimiento
-        fields = '__all__'
-        widgets = {
-            'nombre':TextInput(
-                attrs={
-                    'placeholder':'Ingrese el nombre del empleado',
-                }
-            ),
-            'telefono':NumberInput(
-                attrs={
-                    'placeholder':'Ingrese el telefono del empleado',
-                }
-            ),
-            'identificacion':NumberInput(
-                attrs={
-                    'placeholder':'Ingrese la identificacion del empleado',
-                }
-            ),
-            'Correo':TextInput(
-                attrs={
-                    'placeholder':'Ingrese el correo del empleado',
-                }
-            ),
-            'direccion':TextInput(
-                attrs={
-                    'placeholder':'Ingrese la direccion del empleado',
-                }
-            )
-            
-       }  
-        error_messages = {
-            'nombre': {
-                'required': 'El nombre del empleado es obligatorio',
-            },
-            'telefono': {
-                'required': 'El telefono del empleado es obligatorio',
-            },
-            'identificacion': {
-                'required': 'La identificacion del empleado es obligatoria',
-            },
-            'Correo': {
-                'required': 'El correo del empleado es obligatorio',
-                'invalid': 'El correo no tiene un formato válido',
-                'unique': 'Ya existe un administrador con ese correo',
-            },
-            'direccion': {
-                'required': 'La direccion del empleado es obligatoria',
-            },
-        }
-
 
  #------- formulario Gastos -------     
         

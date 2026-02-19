@@ -1,0 +1,43 @@
+{% extends "generic_listar.html" %}
+
+{% block titulo %}
+        <h1 class="text-center">Listar Tipos de Mantenimientos Inactivos</h1>
+{% endblock titulo %}
+
+{% block agregar %}
+
+<a href="{% url 'apy:tipo_mantenimiento_lista' %}" class="btn btn-primary">  <i class="fas fa-list"></i>  Lista de Tipos de Mantenimientos</a>
+{% endblock %}
+
+{% block columnas %}
+        <th>Id tipo mantenimiento</th>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Acciones</th>
+
+{% endblock %}
+
+{% block iterar %}
+
+      {% for t in object_list %}
+      <tr>
+        <td>{{t.id}}</td>
+        <td>{{t.nombre}}</td>
+        <td>{{t.descripcion}}</td>
+
+        <form method="post">
+
+          <td>
+            <a href="{% url 'apy:tipo_mantenimiento_activar' t.id %}" 
+              class="btn btn-success btn-xs" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="Activar tipo de mantenimiento">
+              <i class="fas fa-power-off"></i>
+           </a>
+          </td>
+      </tr>
+      {% endfor %}
+
+
+{% endblock %}

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse_lazy
@@ -21,6 +21,9 @@ class CajaListView(PermisoRequeridoMixin, ListView):
     module_name = 'Caja' 
     permission_required = 'view'
     
+    def get_queryset(self):
+        return Caja.objects.filter(estado=True)
+    
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         # El Mixin se ejecuta antes de super().dispatch
@@ -37,6 +40,24 @@ class CajaListView(PermisoRequeridoMixin, ListView):
         context['entidad'] = 'Caja'
         return context
     
+class CajaInactivaListView(PermisoRequeridoMixin, ListView):
+    model = Caja
+    template_name = 'Caja/caja_inactiva.html'
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Caja' 
+    permission_required = 'view'
+    
+    def get_queryset(self):
+        return Caja.objects.filter(estado=False)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Lista Ingreso a Caja Inactivos'
+        context['listar_url'] = reverse_lazy('apy:caja_lista')
+        context['crear_url'] = reverse_lazy('apy:caja_crear')
+        return context    
+    
 class CajaCreateView(PermisoRequeridoMixin, CreateView):
     model = Caja
     form_class = CajaForm
@@ -48,6 +69,7 @@ class CajaCreateView(PermisoRequeridoMixin, CreateView):
     permission_required = 'add'
     
     def form_valid(self, form):
+        form.instance.estado = True 
         messages.success(self.request, "Caja creada correctamente")
         return super().form_valid(form)
     
@@ -88,9 +110,16 @@ class CajaDeleteView(PermisoRequeridoMixin, DeleteView):
     module_name = 'Caja'
     permission_required = 'delete'
     
-    def form_valid(self, form):
-        messages.success(self.request, "Caja eliminada correctamente")
-        return super().form_valid(form)
+    def post(self, request, *args, **kwargs):
+        
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        
+        self.object.estado = False
+        self.object.save()
+        
+        messages.success(self.request,     f"Ingreso a caja {Caja} desactivado correctamente")
+        return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -98,3 +127,31 @@ class CajaDeleteView(PermisoRequeridoMixin, DeleteView):
         context['entidad'] = 'Caja'
         context['listar_url'] = reverse_lazy('apy:caja_lista')
         return context
+    
+# Activar Caja
+class CajaActivateView(PermisoRequeridoMixin, DeleteView):
+    model = Caja
+    template_name = 'Caja/activar_caja.html'
+    success_url = reverse_lazy('apy:caja_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Caja'
+    permission_required = 'change'
+    
+    def post(self, request, *args, **kwargs):
+        
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        
+        self.object.estado = True
+        self.object.save()
+        
+        messages.success(self.request,     f"Ingreso a caja {Caja} activado correctamente")
+        return HttpResponseRedirect(success_url)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Activar Registro Caja'
+        context['entidad'] = 'Caja'
+        context['listar_url'] = reverse_lazy('apy:caja_lista')
+        return context    

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from apy.models import * # Necesitas importar los modelos, incluyendo 'Insumos', 'Module', y 'Permission'
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse_lazy
@@ -19,9 +19,13 @@ class InsumoListView(PermisoRequeridoMixin, ListView):
     model = Insumos
     template_name = 'insumos/listar.html'
     
+    
     # --- Configuración de Permisos ---
     module_name = 'Insumos' 
     permission_required = 'view'
+    
+    def get_queryset(self):
+        return Insumos.objects.filter(estado=True)
     
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -34,6 +38,29 @@ class InsumoListView(PermisoRequeridoMixin, ListView):
         context['entidad'] = 'Insumo'
         return context
     
+#-- vista para listar insumos inactivos --
+class InsumoInactivoListView(PermisoRequeridoMixin, ListView): 
+    model = Insumos
+    template_name = 'insumos/insumos_inactivos.html'
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Insumos' 
+    permission_required = 'view'
+    
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_queryset(self):
+        return Insumos.objects.filter(estado=False)  
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Lista de Insumos Inactivos'
+        context['listar_url'] = reverse_lazy('apy:insumo_lista')
+        context['entidad'] = 'Insumo'
+        return context    
+    
 class InsumoCreateView(PermisoRequeridoMixin, CreateView): 
     model = Insumos
     form_class = InsumoForm
@@ -45,6 +72,7 @@ class InsumoCreateView(PermisoRequeridoMixin, CreateView):
     permission_required = 'add'
     
     def form_valid(self, form):
+        form.instance.estado = True 
         messages.success(self.request, "Insumo creado correctamente")
         return super().form_valid(form) 
     
@@ -86,13 +114,48 @@ class InsumoDeleteView(PermisoRequeridoMixin, DeleteView):
     module_name = 'Insumos' 
     permission_required = 'delete'
     
-    def form_valid(self, form):
-        messages.success(self.request, "Insumo eliminado correctamente")
-        return super().form_valid(form)
+    def post(self, request, *args, **kwargs):
+        
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        
+        self.object.estado = False
+        self.object.save()
+        
+        messages.success(self.request,     f"Insumo {Insumos} desactivado correctamente")
+        return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Eliminar Insumo'
+        context['entidad'] = 'Insumo'
+        context['listar_url'] = reverse_lazy('apy:insumo_lista')
+        return context
+    
+#--- Vista para activar insumo ---
+class InsumoActivateView(PermisoRequeridoMixin, DeleteView): 
+    model = Insumos
+    template_name = 'insumos/activar_insumos.html'
+    success_url = reverse_lazy('apy:insumo_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Insumos' 
+    permission_required = 'change'
+    
+    def post(self, request, *args, **kwargs):
+        
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        
+        self.object.estado = True
+        self.object.save()
+        
+        messages.success(self.request,     f"Insumo {Insumos} activado correctamente")
+        return HttpResponseRedirect(success_url)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Activar Insumo'
         context['entidad'] = 'Insumo'
         context['listar_url'] = reverse_lazy('apy:insumo_lista')
         return context
@@ -128,6 +191,7 @@ class InsumoCreateModalView(CreateView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
+        form.instance.estado = True 
         try:
             self.object = form.save()
             return JsonResponse({
