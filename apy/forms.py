@@ -1,3 +1,4 @@
+from pyexpat.errors import messages
 from django import forms
 from django.forms import ModelForm, Select, NumberInput, DateInput, TimeInput, TextInput, EmailInput
 from django.forms import inlineformset_factory
@@ -7,6 +8,7 @@ from django.contrib.auth.hashers import make_password
 from django import forms  # Asegúrate de usar la importación estándar de forms
 from django.contrib.auth.models import User, Permission  # Importación de modelos de Django
 from django.core.exceptions import ValidationError
+from django.shortcuts import redirect
 from .models import Profile
 
 from apy.models import *
@@ -349,19 +351,27 @@ class ProveedorForm(ModelForm):
 # ------------------- FORMS STEVEN -------------------    
  
 class RegistroUsuarioForm(forms.ModelForm):
+    
+    old_password = forms.CharField(
+        label='Contraseña Antigua',
+        widget=forms.PasswordInput(attrs={'placeholder': 'Contraseña actual', 'class': 'form-control'}),
+        required=False
+    )
+    
     # Campos de Contraseña
     password = forms.CharField(
         label='Contraseña',
         widget=forms.PasswordInput(attrs={'placeholder': 'Contraseña', 'class': 'form-control'}),
         strip=False,
-        required=True # Por defecto, requerido para la CREACIÓN
+        required=True  # Se ajusta en el __init__ si es edición
     )
     password2 = forms.CharField(
         label='Confirmar Contraseña',
         widget=forms.PasswordInput(attrs={'placeholder': 'Repita la contraseña', 'class': 'form-control'}),
         strip=False,
-        required=True # Por defecto, requerido para la CREACIÓN
+        required=True  # Se ajusta en el __init__ si es edición
     )
+    
     # Campo de Rol
     role = forms.ChoiceField(
         label='Rol',
@@ -369,97 +379,108 @@ class RegistroUsuarioForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'form-control'}),
         required=True
     )
-    
-    # Atributo para el mensaje de éxito (se puede inicializar aquí o en save)
+
+    # Campos adicionales del Perfil (Centralizando lo que era de Empleado)
+    identificacion = forms.CharField(
+        label='Identificación', 
+        required=True, # Obligatorio para evitar el IntegrityError
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    direccion = forms.CharField(
+        label='Dirección', 
+        required=False, 
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    telefono = forms.CharField(
+        label='Teléfono', 
+        required=False, 
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+
     success_message = 'Usuario registrado con éxito.' 
 
     class Meta:
         model = User
-        # Solo incluimos los campos del modelo en 'fields'
-        fields = ('username', 'email') 
-        widgets = {
-            'username': forms.TextInput(attrs={'placeholder': 'Nombre de usuario', 'class': 'form-control'}),
-            'email': forms.EmailInput(attrs={'placeholder': 'Correo electrónico', 'class': 'form-control'}),
-        }
-
+        fields = ('username', 'email', 'first_name', 'last_name')
+        
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
-        # Lógica para la EDICIÓN (cuando self.instance.pk existe)
-        if self.instance.pk:
-            # 1. Hacemos las contraseñas opcionales
+        # CAMBIO CLAVE 1: Hacer contraseña opcional al editar
+        if self.instance and self.instance.pk:
             self.fields['password'].required = False
             self.fields['password2'].required = False
             
-            # 2. Inicializamos el campo 'role'
+        if self.instance and self.instance.pk:
+            # --- ESTO ES LO QUE FALTA ---
+            # Sincronizamos el campo 'role' con la realidad de la DB
             if self.instance.is_superuser:
                 self.initial['role'] = 'admin'
             else:
                 self.initial['role'] = 'normal'
-        
-        # Eliminado: Ya lo hiciste correctamente con el widget al definir el campo 'role'
-        # self.fields['role'].widget.attrs['class'] = 'form-control'
-
-    def clean_password2(self):
-        """Valida que las contraseñas coincidan y hashea la nueva."""
-        password = self.cleaned_data.get('password')
-        password2 = self.cleaned_data.get('password2')
-
-        # Si se ingresa una de las dos, la otra es obligatoria y deben coincidir
-        if password or password2:
-            if not (password and password2) or (password != password2):
-                 # Usamos la clase ValidationError importada
-                raise ValidationError("Las contraseñas no coinciden o falta una.") 
             
-            # Si coinciden, hasheamos la contraseña y la guardamos temporalmente
-            self._password_hash = make_password(password)
-        else:
-            # Si estamos editando y no se proporcionó contraseña, aseguramos que el hash sea None
-            self._password_hash = None
-            
-        # Retorna el valor del campo que se está limpiando
-        return password2
+            # Cargar datos de perfil
+            try:
+                perfil = self.instance.profile
+                self.initial['identificacion'] = perfil.identificacion
+                self.initial['direccion'] = perfil.direccion
+                self.initial['telefono'] = perfil.telefono
+            except:
+                pass
 
     def save(self, commit=True):
-        user = self.instance # user es self.instance si es UpdateView, o un nuevo objeto si es CreateView
+        user = super().save(commit=False)
         
-        if self.instance.pk:
-            # --- LÓGICA DE ACTUALIZACIÓN (UPDATEVIEW) ---
-            user = super().save(commit=False) # Guarda username, email
-            
-            # Si se proporcionó una nueva contraseña hasheada
-            new_password_hash = getattr(self, '_password_hash', None) 
-            if new_password_hash:
-                user.password = new_password_hash
-            
-            # Lógica del Rol (siempre se actualiza en la edición)
-            role = self.cleaned_data.get('role')
-            user.is_staff = (role == 'admin')
-            user.is_superuser = (role == 'admin')
-            self.success_message = f'Usuario {user.username} actualizado con éxito.'
-
+        # CAMBIO CLAVE 2: Guardar contraseña correctamente
+        # Si hay algo escrito en el campo password, se encripta
+        password = self.cleaned_data.get('password')
+        if password:
+            user.set_password(password) # set_password es OBLIGATORIO para que funcione el login
+        
+        # CAMBIO CLAVE 3: Gestión de Roles (Diferencia Gerente de Empleado)
+        role = self.cleaned_data.get('role')
+        if role == 'admin':
+            user.is_superuser = True
+            user.is_staff = True
         else:
-            # --- LÓGICA DE CREACIÓN (CREATEVIEW) ---
-            password_hash = getattr(self, '_password_hash')
-            
-            # Usamos create para poder pasar el password hasheado directamente
-            user = User.objects.create( 
-                username=self.cleaned_data['username'],
-                email=self.cleaned_data['email'],
-                password=password_hash
-            )
-            
-            # Lógica del Rol
-            role = self.cleaned_data.get('role')
-            user.is_staff = (role == 'admin')
-            user.is_superuser = (role == 'admin')
-            self.success_message = f'{"Gerente" if role == "admin" else "Empleado"} {user.username} registrado con éxito.'
-
+            # Aquí es donde se asegura que sea Empleado
+            user.is_superuser = False 
+            user.is_staff = True # Sigue siendo staff para el taller (uniforme verde oscuro)
+        
         if commit:
             user.save()
-        
+            # Guardar Perfil
+            Profile.objects.update_or_create(
+                user=user,
+                defaults={
+                    'identificacion': self.cleaned_data.get('identificacion'),
+                    'direccion': self.cleaned_data.get('direccion'),
+                    'telefono': self.cleaned_data.get('telefono'),
+                }
+            )
         return user
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get("password")
+        password2 = cleaned_data.get("password2")
+        role = cleaned_data.get('role')
 
+        # VALIDACIÓN 1: Coincidencia de contraseñas nuevas
+        if password or password2:
+            if password != password2:
+                raise forms.ValidationError("Las nuevas contraseñas no coinciden.")
+
+        # VALIDACIÓN 2: Protección del último Admin (tu lógica actual)
+        if self.instance and self.instance.pk and self.instance.is_superuser:
+            if role == 'normal':
+                admins_activos = User.objects.filter(is_superuser=True).count()
+                if admins_activos <= 1:
+                    raise forms.ValidationError(
+                        "Error: Debe existir al menos un administrador en el sistema."
+                    )
+        
+        return cleaned_data
+    
 # 1. Formulario para editar el modelo User (SIN TELEFONO)
 class PerfilUsuarioForm(forms.ModelForm):
     class Meta:
@@ -487,29 +508,35 @@ class PerfilUsuarioForm(forms.ModelForm):
         if User.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
             raise forms.ValidationError("Este correo electrónico ya está registrado.")
         return email
-
-# 2. Formulario para editar el modelo Profile (CON TELEFONO E IMAGEN)
+    
+# 2. Formulario para editar el modelo Profile (CON TODO LO QUE FALTA)
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        # Incluimos 'telefono' e 'imagen'
-        fields = ['telefono', 'imagen'] 
+        # Añadimos identificacion y direccion que faltaban
+        fields = ['identificacion', 'direccion', 'telefono', 'imagen'] 
         labels = {
+            'identificacion': 'Número de Identificación',
+            'direccion': 'Dirección de Residencia',
             'telefono': 'Número de Teléfono',
-            'imagen': 'Imagen de Perfil', # Etiqueta para el campo de imagen
+            'imagen': 'Imagen de Perfil',
         }
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Estilos para el campo de teléfono
-        self.fields['telefono'].widget.attrs.update({
-            'class': 'form-control', 
-            'placeholder': 'Número de Teléfono (Ej: +57 300 000 0000)'
-        })
-        # Estilos para el campo de archivo (opcional, FileInput ya es el default)
-        self.fields['imagen'].widget.attrs.update({
-            'class': 'form-control-file' 
-        })
+        # Aplicamos estilos Bootstrap a todos los campos de forma dinámica
+        placeholder_map = {
+            'identificacion': 'Ingrese su documento de identidad',
+            'direccion': 'Calle, Carrera, Ciudad...',
+            'telefono': 'Número de Teléfono (Ej: 3000000000)',
+        }
+        
+        for name, field in self.fields.items():
+            if name != 'imagen': # La imagen suele llevar otra clase o manejo
+                field.widget.attrs.update({
+                    'class': 'form-control',
+                    'placeholder': placeholder_map.get(name, '')
+                })
     
 class ClienteForm(ModelForm):
     def __init__(self, *args, **kwargs):

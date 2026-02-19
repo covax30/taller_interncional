@@ -3,113 +3,132 @@
 {% load static tz %} 
 
 {% block content %}
+<style>
+    .profile-card-info {
+        background-color: #f8f9fa;
+        border-radius: 12px;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+    .static-field {
+        background-color: #ffffff;
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        padding: 10px 15px;
+        display: flex; /* Flex para que el icono y el texto no se amontonen */
+        align-items: center;
+        color: #212529;
+        min-height: 45px;
+        word-break: break-word; /* Crucial para correos largos en móviles */
+    }
+    
+    /* Ajuste para que los labels no se vean tan pegados en móvil */
+    @media (max-width: 767.98px) {
+        .static-field {
+            font-size: 0.9rem;
+            padding: 8px 12px;
+        }
+        .border-end {
+            border-end: none !important;
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 1rem;
+        }
+    }
+</style>
+
 {% with user.is_superuser as is_admin %}
     
-    {# LÓGICA DE DEFINICIÓN DE user_avatar_url #}
+    {# LÓGICA DE AVATAR #}
     {% if user.is_superuser %}
         {% static 'img/gerente.png' as avatar_default %}
     {% else %}
         {% static 'img/empleado.png' as avatar_default %}
     {% endif %}
     
-<div class="container rounded mt-5 mb-5 shadow-sm p-4 bg-body"> 
-    <div class="row justify-content-center">
+<div class="container rounded mt-5 mb-5 shadow-sm p-4 bg-body border"> 
+    <div class="row">
         
-        {# COLUMNA IZQUIERDA (col-md-4) - Vista Estática #}
-        <div class="col-md-4 border-right d-flex align-items-center pt-3"> 
-            <div class="d-flex flex-column align-items-center text-center p-3 py-3 w-100">
+        {# COLUMNA IZQUIERDA: Vista de Imagen y Estado #}
+        <div class="col-md-4 border-end"> 
+            <div class="d-flex flex-column align-items-center text-center p-3 py-md-5 w-100">
                 
-                {# CAMBIO 2: Reducción de margen superior de mt-5 a mt-3 #}
-                <img src="{% if user.profile.imagen %}{{ user.profile.imagen.url }}{% else %}{{ avatar_default }}{% endif %}" 
-                alt="Imagen de Perfil" 
-                class="rounded-circle mt-3" 
-                style="width: 250px; height: 250px; object-fit: cover;">
+                <div class="position-relative">
+                    <img src="{% if user.profile.imagen %}{{ user.profile.imagen.url }}{% else %}{{ avatar_default }}{% endif %}" 
+                         alt="Imagen de Perfil" 
+                         class="rounded-circle shadow mb-3 img-fluid" 
+                         style="width: 210px; height: 210px; object-fit: cover; border: 6px solid #f8f9fa;">
+                </div>
                 
-                <span class="font-weight-bold mt-3 h4 text-primary">
-                    {{ user.username }}
-                </span>
-                <span class="text-muted">
-                    {{ user.email }}
-                </span>
-                <span class="badge bg-{{ user.is_superuser|yesno:'danger,success' }} mt-2 p-2">
+                <span class="font-weight-bold h4 text-body mb-0 text-break">{{ user.username }}</span>
+                <span class="text-muted mb-2 small text-break"><i class="fas fa-envelope me-1"></i>{{ user.email }}</span>
+                
+                <span class="badge rounded-pill bg-{{ user.is_superuser|yesno:'danger,success' }} px-3 py-2 mb-4">
+                    <i class="fas {% if user.is_superuser %}fa-user-tie{% else %}fa-tools{% endif %} me-1"></i>
                     {{ user.is_superuser|yesno:'Gerente (Admin),Empleado' }}
                 </span>
             </div>
         </div>
         
-        {# COLUMNA DERECHA (col-md-8) - Detalles del Perfil #}
+        {# COLUMNA DERECHA: Detalles del Perfil #}
         <div class="col-md-8">
-            <div class="p-3 py-5">
+            <div class="px-3 py-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4 class="text-right text-body">Detalles del Perfil</h4>
-                    
-                    <a href="{% url 'apy:editar_usuario' %}" class="btn btn-warning">
-                        <i class="fas fa-edit"></i> Editar Información
+                    <h3 class="fw-bold text-body">Mi Perfil</h3>
+                    <a href="{% url 'apy:editar_usuario' %}" class="btn btn-warning btn-sm rounded-pill px-4 shadow-sm text-dark">
+                        <i class="fas fa-edit me-1"></i> Editar Información
                     </a>
                 </div>
                 
-                {# INFORMACIÓN DE LA CUENTA (Resto del código sin cambios) #}
-                <div class="card shadow-sm mb-5">
-                    <div class="card-header bg-dark text-white"> 
-                        Información de la Cuenta
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <h6 class="text-muted small">FECHA DE CREACIÓN</h6>
-                                <p class="mb-0 fs-5">{{ user.date_joined|date:"d/m/Y" }}</p>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <h6 class="text-muted small">ÚLTIMO ACCESO</h6>
-                                <p class="mb-0 fs-5">
-                                    {{ user.last_login|default:"Nunca"|localtime|date:"d/m/Y H:i" }}
-                                </p>
-                            </div>
+                {# Información de la Cuenta Estilizada (Caja Gris) #}
+                <div class="profile-card-info p-3 mb-4 bg-body rounded border">
+                    <div class="row text-center text-md-start bg-body g-2">
+                        <div class="col-6 col-md-6 border-md-end">
+                            <small class="text-muted text-uppercase d-block fw-bold" style="font-size: 0.7rem;">Miembro desde</small>
+                            <span class="h6 mb-0 text-body d-block"><i class="far fa-calendar-alt me-2"></i>{{ user.date_joined|date:"d M, Y" }}</span>
+                        </div>
+                        <div class="col-6 col-md-6">
+                            <small class="text-muted text-uppercase d-block fw-bold" style="font-size: 0.7rem;">Último Acceso</small>
+                            <span class="h6 mb-0 text-body d-block"><i class="far fa-clock me-2"></i>{{ user.last_login|default:"Nunca"|localtime|date:"d/m/Y H:i" }}</span>
                         </div>
                     </div>
                 </div>
                 
                 {# DATOS PERSONALES #}
-                <h5 class="mb-3 text-body">Datos Personales</h5>
-                
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label text-muted">Primer Nombre</label>
-                        <p class="form-control-static border p-2 rounded bg-light">
-                            {{ user.first_name|default:"(No Registrado)" }}
-                        </p>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label text-muted">Primer Apellido</label>
-                        <p class="form-control-static border p-2 rounded bg-light">
-                            {{ user.last_name|default:"(No Registrado)" }}
-                        </p>
-                    </div>
-                </div> 
-                
-                {# INFORMACIÓN DE CONTACTO #}
-                <h5 class="mb-3 mt-4 text-body">Información de Contacto</h5>
-                
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label text-muted">Email</label>
-                        <p class="form-control-static border p-2 rounded bg-light">
-                            {{ user.email }}
-                        </p>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label text-muted">Número de Teléfono</label>
-                        <p class="form-control-static border p-2 rounded bg-light">
-                        {{ user.profile.telefono|default:"(No Registrado)" }}</p> 
-                    </div>
+                <div class="d-flex align-items-center mb-3">
+                    <h6 class="text-uppercase fw-bold text-muted small mb-0">Datos Personales</h6>
+                    <hr class="flex-grow-1 ms-3 opacity-25">
                 </div>
                 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label text-muted">Nombre de Usuario (Sistema)</label>
-                        <p class="form-control-static border p-2 rounded bg-light">
-                            {{ user.username }}
-                        </p>
+                <div class="row g-3"> {# g-3 controla el espaciado responsivo entre columnas #}
+                    <div class="col-sm-6 col-md-6 mb-1">
+                        <label class="small fw-bold text-muted mb-1 ml-1">Nombres</label>
+                        <div class="static-field bg-body rounded border text-body text-truncate"><i class="fas fa-user-circle me-2 text-muted opacity-50"></i>{{ user.first_name|default:"---" }}</div>
+                    </div>
+                    <div class="col-sm-6 col-md-6 mb-1">
+                        <label class="small fw-bold text-muted mb-1 ml-1">Apellidos</label>
+                        <div class="static-field bg-body rounded border text-body text-truncate"><i class="fas fa-user-circle me-2 text-muted opacity-50"></i>{{ user.last_name|default:"---"|truncatechars:20 }}</div>
+                    </div>
+                    <div class="col-sm-6 col-md-6 mb-1">
+                        <label class="small fw-bold text-muted mb-1 ml-1">Correo</label>
+                        <div class="static-field bg-body rounded border text-body text-truncate d-block">
+                            <i class="fas fa-at me-2 text-muted opacity-50"></i>
+                            <span>{{ user.email }}</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-6 mb-1">
+                        <label class="small fw-bold text-muted mb-1 ml-1">Usuario</label>
+                        <div class="static-field bg-body rounded border text-body text-truncate"><i class="fas fa-user-tag me-2 text-muted opacity-50"></i>{{ user.username|truncatechars:20 }}</div>
+                    </div>
+                    <div class="col-sm-6 col-md-6 mb-1">
+                        <label class="small fw-bold text-muted mb-1 ml-1">Teléfono</label>
+                        <div class="static-field bg-body rounded border text-body"><i class="fas fa-phone me-2 text-muted opacity-50"></i>{{ user.profile.telefono|default:"---"|truncatechars:20 }}</div>
+                    </div>
+                    <div class="col-sm-6 col-md-6 mb-1">
+                        <label class="small fw-bold text-muted mb-1 ml-1">Cédula</label>
+                        <div class="static-field bg-body rounded border text-body"><i class="fas fa-id-card me-2 text-muted opacity-50"></i>{{ user.profile.identificacion|default:"---"|truncatechars:20 }}</div>
+                    </div>
+                    <div class="col-12 mb-1">
+                        <label class="small fw-bold text-muted mb-1 ml-1">Dirección</label>
+                        <div class="static-field bg-body rounded border text-body"><i class="fas fa-map-marker-alt me-2 text-muted opacity-50"></i>{{ user.profile.direccion|default:"No registrada"|truncatechars:40 }}</div>
                     </div>
                 </div>
 

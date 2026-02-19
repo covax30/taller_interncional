@@ -1,3 +1,4 @@
+from django.shortcuts import redirect
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
@@ -60,8 +61,9 @@ class RegistroUpdateView(SuperuserRequiredMixin, UpdateView):
         return context
 
     def form_valid(self, form):
+        # Al llamar a form.save(), se ejecuta nuestra lógica personalizada de roles y perfil
         self.object = form.save() 
-        messages.success(self.request, "Usuario actualizado correctamente.")
+        messages.success(self.request, f"Usuario {self.object.username} actualizado correctamente.")
         return super().form_valid(form)
 
 
@@ -83,6 +85,25 @@ class RegistroDeleteView(SuperuserRequiredMixin, DeleteView):
     def form_valid(self, form):
         messages.success(self.request, f"Usuario '{self.object.username}' eliminado correctamente.")
         return super().form_valid(form)
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Obtenemos el usuario que se quiere eliminar
+        user_to_delete = self.get_object()
+        
+        # 1. EVITAR AUTO-ELIMINACIÓN
+        if user_to_delete.id == request.user.id:
+            messages.error(request, "¡Operación cancelada! No puedes eliminar tu propia cuenta de administrador.")
+            return redirect('apy:registro_usuario_lista')
+            
+        # 2. EVITAR ELIMINAR AL ÚLTIMO ADMIN
+        if user_to_delete.is_superuser:
+            total_admins = User.objects.filter(is_superuser=True).count()
+            if total_admins <= 1:
+                messages.error(request, "No puedes eliminar al único administrador del sistema.")
+                return redirect('apy:registro_usuario_lista')
+                
+        return super().dispatch(request, *args, **kwargs)
+    
 
 # 4. VISTA DE LISTADO (RegistroUsuarioListView) - PROTEGIDA
 
