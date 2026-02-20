@@ -32,35 +32,43 @@
                 
                 <div class="card-body p-4">
                     <div class="row">
-                        <div class="col-md-6 border-end">
+                        
+
+                        <div class="col-md-6 ps-md-4 border-end">
+                            <h6 class="text-muted fw-bold mb-3"><i class="fas fa-car me-2"></i>DATOS DEL VEHÍCULO</h6>
+                            <div class="form-group mb-0">
+                                <label class="form-label">Registro de Ingreso:</label>
+                                <div class="input-group" style="display: flex; flex-wrap: nowrap;">
+                                    <div style="flex-grow: 1;">
+                                    {{ form.id_entrada|add_class:"form-control" }}
+                                    </div>
+                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-id_entrada">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="form-label">Vehículo Asociado:</label>
+                                <div class="input-group" style="display: flex; flex-wrap: nowrap;">
+                            <div style="flex-grow: 1;">
+                                 {{ form.id_vehiculo|add_class:"form-control" }}
+                            </div>
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-id_vehiculo">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                            </div>
+                            
+                        </div>
+                        <div class="col-md-6 ">
                             <h6 class="text-muted fw-bold mb-3"><i class="fas fa-user me-2"></i>DATOS DEL CLIENTE</h6>
                             <div class="form-group mb-4">
                                 <label class="form-label">Seleccionar Cliente:</label>
-                                <div class="input-group">
-                                    {{ form.cliente|add_class:"form-control" }}
+                                <div class="input-group" style="display: flex; flex-wrap: nowrap;">
+                                    <div style="flex-grow: 1;">
+                                        {{ form.cliente|add_class:"form-control" }}
+                                    </div>
                                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-id_cliente">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6 ps-md-4">
-                            <h6 class="text-muted fw-bold mb-3"><i class="fas fa-car me-2"></i>DATOS DEL VEHÍCULO</h6>
-                            <div class="form-group mb-3">
-                                <label class="form-label">Vehículo Asociado:</label>
-                                <div class="input-group">
-                                    {{ form.id_vehiculo|add_class:"form-control" }}
-                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-id_vehiculo">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="form-group mb-0">
-                                <label class="form-label">Registro de Ingreso:</label>
-                                <div class="input-group">
-                                    {{ form.id_entrada|add_class:"form-control" }}
-                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-id_entrada">
                                         <i class="fas fa-plus"></i>
                                     </button>
                                 </div>
@@ -85,9 +93,7 @@
                                 <label class="form-label">Seleccionar remitente:</label>
                                 <div class="input-group">
                                     {{ form.empresa|add_class:"form-control" }}
-                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-empresa">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
+                                   
                                 </div>
                             </div>
                         </div>
@@ -95,10 +101,12 @@
                         <div class="col-md-6 ps-md-4">
                             <h6 class="text-muted fw-bold mb-3"><i class="fas fa-car me-2"></i>DATOS DEL EMPLEADO A CARGO </h6>
                             <div class="form-group mb-3">
-                                <label class="form-label">Vehículo Asociado:</label>
-                                <div class="input-group">
-                                    {{ form.id_vehiculo|add_class:"form-control" }}
-                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-id_vehiculo">
+                                <label class="form-label">Empleado:</label>
+                                <div class="input-group" style="display: flex; flex-wrap: nowrap;">
+                                    <div style="flex-grow: 1;">
+                                    {{ form.empleado|add_class:"form-control" }}
+                                    </div>
+                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-empleado">
                                         <i class="fas fa-plus"></i>
                                     </button>
                                 </div>
@@ -129,11 +137,13 @@
                             {{ form.id }}
                             <div class="col-md-4">
                                 <label class="small fw-bold">Repuesto:</label>
-                                <div class="input-group">
+                                <div class="input-group"style="display: flex; flex-wrap: nowrap;">
                                     {{ form.id_repuesto|add_class:'form-control' }}
+                                    <div style="flex-grow: 1;">
                                     <button type="button" class="btn btn-outline-secondary btn-add-repuesto" data-toggle="modal" data-target="#modal-id_repuesto" data-select="#{{ form.id_repuesto.id_for_label }}">
                                         <i class="fas fa-plus"></i>
                                     </button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-2">
@@ -178,11 +188,13 @@
                             {{ form.id }}
                             <div class="col-md-4">
                                 <label class="small fw-bold">Tipo Mantenimiento:</label>
-                                <div class="input-group">
+                                <div class="input-group" style="display: flex; flex-wrap: nowrap;">
                                     {{ form.id_tipo_mantenimiento|add_class:'form-control' }}
+                                    <div style="flex-grow: 1;">
                                     <button type="button" class="btn btn-outline-secondary btn-add-mantenimiento" data-toggle="modal" data-target="#modal-id_tipo_mantenimiento" data-select="#{{ form.id_tipo_mantenimiento.id_for_label }}">
                                         <i class="fas fa-plus"></i>
                                     </button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-2">
@@ -227,11 +239,13 @@
                             {{ form.id }}
                             <div class="col-md-4">
                                 <label class="small fw-bold">Insumo:</label>
-                                <div class="input-group">
+                                <div class="input-group" style="display: flex; flex-wrap: nowrap;">
                                     {{ form.id_insumos|add_class:'form-control' }}
+                                    <div style="flex-grow: 1;">
                                     <button type="button" class="btn btn-outline-secondary btn-add-insumo" data-toggle="modal" data-target="#modal-id_insumos" data-select="#{{ form.id_insumos.id_for_label }}">
                                         <i class="fas fa-plus"></i>
                                     </button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-2">
@@ -273,8 +287,9 @@
             <div class="col-md-6">
                 <h6 class="text-muted fw-bold mb-3"><i class="fas fa-car me-2"></i>DATOS DEL VEHÍCULO</h6>
                 <div class="form-group mb-0">
+
                     <label class="form-label">Registro de Salida:</label>
-                    <div class="input-group">
+                    <div class="input-group" style="display: flex; flex-wrap: nowrap;">
                         {{ form.id_salida|add_class:"form-control" }}
                         <button type="button" class="btn btn-primary">
                             <i class="fas fa-history"></i>
@@ -384,6 +399,26 @@
             </div>
         </div>
     </div>
+<!--modal salida -->
+    <div class="modal fade" id="modal-id_salida" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Salida de Vehículo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                        style="background-color: #dc3545; color: white; border: none; 
+                                border-radius: 50%; width: 35px; height: 35px;
+                                font-size: 1.5rem; line-height: 1; 
+                                display: flex; justify-content: center; align-items: center;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
 
 <!-- Modal Insumos -->
     <div class="modal fade" id="modal-id_insumos" tabindex="-1" role="dialog">
@@ -427,7 +462,28 @@
         </div>
     </div>
 
-<!-- Script Vehiculo. --><script>
+<!-- Script Vehiculo. -->
+ <!-- Modal Vehiculo -->
+    <div class="modal fade" id="modal-id_vehiculo" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Vehículo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                        style="background-color: #dc3545; color: white; border: none; 
+                                border-radius: 50%; width: 35px; height: 35px;
+                                font-size: 1.5rem; line-height: 1; 
+                                display: flex; justify-content: center; align-items: center;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+<script>
     window.DjangoConfig = {
         indices: {
             repuestos: {{ repuesto_formset.total_form_count|default:0 }},
@@ -435,12 +491,59 @@
             insumos: {{ insumo_formset.total_form_count|default:0 }}
         },
         urls: {
-            vehiculo: "{% url 'apy:vehiculo_modal_crear' %}",
+            id_vehiculo: "{% url 'apy:vehiculo_modal_crear' %}",
             cliente: "{% url 'apy:cliente_modal_crear' %}",
+            entrada: "{% url 'apy:entrada_vehiculo_modal_crear' %}",
+            empresa: "{% url 'apy:empresa_modal_crear' %}",
+            empleado: "{% url 'apy:empleado_modal_crear' %}",
+            id_tipo_mantenimiento: "{% url 'apy:tipo_mantenimiento_modal_crear' %}",
+            salida: "{% url 'apy:salida_vehiculo_modal_crear' %}",
+             
             insumos: "{% url 'apy:insumos_modal_crear' %}",
             repuesto: "{% url 'apy:repuesto_modal_crear' %}"
         }
     };
+</script>
+
+<script src="{% static 'js/servicios.js' %}"></script>
+
+<script>
+    $(document).ready(function() {
+        // Función para inicializar Select2 en cualquier elemento
+        function aplicarSelect2(selector) {
+            $(selector).select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: 'Seleccione una opción',
+                allowClear: true
+            });
+        }
+
+        // Inicializar todos los select actuales al cargar la página
+        aplicarSelect2('select.form-control');
+
+        // Lógica de Modales AJAX
+        $(document).on('click', '[data-toggle="modal"]', function() {
+            var target = $(this).data('target');
+            var urlKey = target.replace('#modal-', '').replace('id_', '');
+            var url = window.DjangoConfig.urls[urlKey];
+
+            if (url) {
+                $.ajax({
+                    url: url,
+                    success: function(data) {
+                        $(target).find(".modal-body").html(data.html || data);
+                        // Inicializar Select2 dentro del modal si es necesario
+                        $(target).find('select').select2({
+                            theme: 'bootstrap-5',
+                            width: '100%',
+                            dropdownParent: $(target) // Evita que el buscador se bloquee
+                        });
+                    }
+                });
+            }
+        });
+    });
 </script>
 <template id="repuesto-template">
     <div class="repuesto-form row mb-3 border-bottom pb-3">
@@ -523,7 +626,5 @@
     </div>
 </template>
 
-
-<script src="{% static 'js/servicios.js' %}"></script>
 
 {% endblock %}

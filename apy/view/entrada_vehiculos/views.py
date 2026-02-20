@@ -7,6 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse_lazy
 from apy.forms import *
 from django.contrib import messages
+from django.template.loader import render_to_string
 # Se elimina la importación local de AccessMixin
 from apy.decorators import PermisoRequeridoMixin # Usando el Mixin centralizado
 
@@ -115,7 +116,7 @@ class EntradaCreateModalView(CreateView):
             self.object = form.save()
             return JsonResponse({ 
                 "success": True,
-                "id": self.object.id,
+                "id": self.object.id_entrada,
                 "text": str(self.object),
                 "message": "Entrada de Vehiculo registrado correctamente ✅"
             })

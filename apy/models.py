@@ -458,6 +458,7 @@ class DetalleServicio(models.Model):
     cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
     id_entrada = models.ForeignKey(EntradaVehiculo, on_delete=models.PROTECT, blank=True, null=True)
     empresa = models.ForeignKey('Empresa', on_delete=models.PROTECT, blank=True, null=True)
+    empleado = models.ForeignKey(Profile, on_delete=models.PROTECT, blank=True, null=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     id_salida = models.ForeignKey(SalidaVehiculo, on_delete=models.PROTECT, blank=True, null=True)
     proceso = models.CharField(max_length=20, choices=PROCESO_OPCIONES, default='proceso')

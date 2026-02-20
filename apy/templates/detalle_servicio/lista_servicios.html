@@ -59,7 +59,7 @@
     <th>Cliente</th>
     <th>Fecha de emicion </th>
     
-    <th>Total</th>
+    <th>Estado</th>
     <th>Acciones</th>
 {% endblock %}
 
@@ -74,7 +74,7 @@
         <td>{{ servicio.id_vehiculo.id_cliente.nombre }}</td>
         <td>{{ servicio.fecha_creacion|date:"d/m/Y H:i" }}</td>
         
-        <td><strong>${{ servicio.subtotal|intcomma}}</strong></td>
+        <td><strong>{{ servicio.proceso}}</strong></td>
         <td>
             <div class="btn-group" role="group">
                 <a href="{% url 'apy:detalle_servicio' servicio.id %}" class="btn btn-info btn-sm" title="Ver detalles">
