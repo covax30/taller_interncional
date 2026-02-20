@@ -71,7 +71,27 @@ nit_validator = RegexValidator(
     message="El NIT debe tener el formato: 123456789-0 o 12.345.678-0"
 )
 
+def validar_por_tipo(numero, tipo):
+    numero = str(numero).strip().upper()
 
+    # Diccionario de reglas: { 'TIPO': (Regex, Mensaje de error) }
+    reglas = {
+        'CC': (r'^\d{5,10}$', 'La Cédula debe tener entre 5 y 10 dígitos numéricos.'),
+        'TI': (r'^\d{10,11}$', 'La Tarjeta de Identidad debe tener 10 u 11 dígitos.'),
+        'RC': (r'^\d{10,11}$', 'El Registro Civil debe tener 10 u 11 dígitos.'),
+        'NIT': (r'^\d{7,10}-\d{1}$', 'El NIT debe tener formato 123456789-0.'),
+        'CE': (r'^\d{3,9}$', 'La Cédula de Extranjería debe ser numérica (hasta 9 dígitos).'),
+        'PAS': (r'^[A-Z0-9]{5,20}$', 'El Pasaporte debe ser alfanumérico (5-20 caracteres).'),
+        'PPT': (r'^[A-Z0-9]{4,15}$', 'El PPT debe ser alfanumérico.'),
+    }
+
+    if tipo not in reglas:
+        raise ValidationError("Tipo de documento no soportado.")
+
+    regex, mensaje = reglas[tipo]
+
+    if not re.fullmatch(regex, numero):
+        raise ValidationError(mensaje)
 #------ MODULOS ERICK ---------
 
 #------ ENTIDAD de TIPO mantenmimiento ---------1
@@ -313,16 +333,58 @@ class PagoServiciosPublicos(models.Model):
     
 #--------------Modulo Proveedores--------------
 class Proveedores(models.Model):
+    DOCUMENT_CHOICES = [
+        ('CC', 'Cédula de Ciudadanía'),
+        ('CE', 'Cédula de Extranjería'),
+        ('NIT', 'NIT'),
+        ('TI', 'Tarjeta de Identidad'),
+        ('RC', 'Registro Civil'),
+        ('PAS', 'Pasaporte'),
+        ('PPT', 'Permiso por Protección Temporal'),
+    ]
+
     id_proveedor = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
     telefono = models.CharField(max_length=20, validators=[validar_telefono])
+    
+    # IMPORTANTE: Quité el unique=True de aquí porque podrías tener varios 
+    # proveedores con CC, pero diferentes números. El unique va en la identificación.
+    tipo_identificacion = models.CharField(choices=DOCUMENT_CHOICES, max_length=5)
+    
+    identificacion = models.CharField(max_length=20, unique=True)
     correo = models.EmailField(unique=True, validators=[validar_email])
     estado = models.BooleanField(default=True)
-    
-    def __str__(self):
-        return f"{self.id_proveedor} {self.correo}"
-    
 
+    def clean(self):
+        """
+        Este método se ejecuta antes de guardar los datos.
+        Valida la identificación dependiendo del tipo seleccionado.
+        """
+        super().clean()
+        
+        # Obtenemos los valores y limpiamos espacios
+        tipo = self.tipo_identificacion
+        valor = str(self.identificacion).strip().upper()
+
+        # Diccionario de Reglas: { 'TIPO': (Regex, Mensaje) }
+        reglas = {
+            'CC': (r'^\d{5,10}$', 'La Cédula de Ciudadanía debe tener entre 5 y 10 dígitos numéricos.'),
+            'CE': (r'^\d{3,9}$', 'La Cédula de Extranjería debe tener hasta 9 dígitos numéricos.'),
+            'NIT': (r'^\d{7,10}-\d{1}$', 'El NIT debe seguir el formato 123456789-0.'),
+            'TI': (r'^\d{10,11}$', 'La Tarjeta de Identidad debe tener 10 u 11 dígitos numéricos.'),
+            'RC': (r'^\d{10,11}$', 'El Registro Civil debe tener 10 u 11 dígitos numéricos.'),
+            'PAS': (r'^[A-Z0-9]{5,20}$', 'El Pasaporte debe tener entre 5 y 20 caracteres alfanuméricos.'),
+            'PPT': (r'^[A-Z0-9]{4,15}$', 'El PPT debe tener entre 4 y 15 caracteres alfanuméricos.'),
+        }
+
+        if tipo in reglas:
+            regex, mensaje = reglas[tipo]
+            if not re.fullmatch(regex, valor):
+                # Lanzamos el error específicamente en el campo identificación
+                raise ValidationError({'identificacion': mensaje})
+
+    def __str__(self):
+        return f"{self.nombre} - {self.identificacion}"
 
 
 class Gastos(models.Model):

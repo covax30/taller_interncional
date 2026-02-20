@@ -343,27 +343,46 @@ class ProveedorForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['nombre'].widget.attrs['autofocus'] = True
-        
+
     class Meta:
         model = Proveedores
         fields = '__all__'
         widgets = {
-            'nombre':TextInput(
-                attrs={
-                    'placeholder':'Ingrese el nombre del proveedor',
-                }
-            ),
-            'telefono':NumberInput(
-                attrs={
-                    'placeholder':'Ingrese el telefono del proveedor',
-                }
-            ),
-            'correo':EmailInput(
-                attrs={
-                    'placeholder':'Ingrese el correo del proveedor',
-                }
-            )
+            'nombre': TextInput(attrs={'placeholder': 'Ingrese el nombre'}),
+            'telefono': TextInput(attrs={'placeholder': 'Ingrese el teléfono'}), # Cambiado a TextInput por si el tel tiene + o espacios
+            'tipo_identificacion': Select(attrs={'class': 'form-control'}),
+            'identificacion': TextInput(attrs={'placeholder': 'Ingrese el número de documento'}),
+            'correo': EmailInput(attrs={'placeholder': 'Ingrese el correo'}),
         }
+        # ... tus error_messages aquí ...
+
+    def clean(self):
+        """Validación personalizada que cruza tipo y número"""
+        cleaned_data = super().clean()
+        tipo = cleaned_data.get('tipo_identificacion')
+        identificacion = cleaned_data.get('identificacion')
+
+        if tipo and identificacion:
+            valor = str(identificacion).strip().upper()
+            
+            # Definición de reglas por cada tipo del SELECT
+            reglas = {
+                'CC': (r'^\d{5,10}$', 'La Cédula debe tener entre 5 y 10 dígitos numéricos.'),
+                'TI': (r'^\d{10,11}$', 'La Tarjeta de Identidad debe tener 10 u 11 dígitos.'),
+                'RC': (r'^\d{10,11}$', 'El Registro Civil debe tener 10 u 11 dígitos.'),
+                'NIT': (r'^\d{7,10}-\d{1}$', 'El NIT debe tener formato 123456789-0.'),
+                'CE': (r'^\d{3,9}$', 'La Cédula de Extranjería debe ser numérica (hasta 9 dígitos).'),
+                'PAS': (r'^[A-Z0-9]{5,20}$', 'El Pasaporte debe ser alfanumérico (5-20 caracteres).'),
+                'PPT': (r'^[A-Z0-9]{4,15}$', 'El PPT debe ser alfanumérico.'),
+            }
+
+            if tipo in reglas:
+                regex, mensaje = reglas[tipo]
+                if not re.fullmatch(regex, valor):
+                    # Agrega el error específicamente al campo 'identificacion'
+                    self.add_error('identificacion', mensaje)
+        
+        return cleaned_data
         error_messages = {
             'nombre': {
                 'required': 'El nombre del proveedor es obligatorio',
