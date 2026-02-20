@@ -249,7 +249,7 @@ class DetalleInsumoForm(ModelForm):
 class DetalleServicioForm(ModelForm):
     class Meta:
         model = DetalleServicio
-        fields = ['id_vehiculo','cliente','id_entrada','empresa','id_salida','proceso'  ]
+        fields = ['id_vehiculo','cliente','id_entrada','empresa','id_salida','proceso' ,'empleado' ]
         widgets = {
             'id_vehiculo': Select(attrs={
                 'class': 'form-control',
@@ -266,6 +266,10 @@ class DetalleServicioForm(ModelForm):
             'empresa': Select(attrs={   
                 'class': 'form-control',
                 'placeholder': 'Seleccione una empresa'
+            }),
+            'empleado': Select(attrs={
+                'class': 'form-control',
+                'placeholder': 'Seleccione un empleado'
             }),
             'id_salida': Select(attrs={   
                 'class': 'form-control',

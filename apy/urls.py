@@ -129,7 +129,8 @@ urlpatterns = [
     path('salida_vehiculo/listar/', SalidaVehiculoListView.as_view(), name='salida_vehiculo_lista'),
     path('salida_vehiculo/agregar/', SalidaVehiculoCreateView.as_view(), name='salida_vehiculo_crear'),
     path('salida_vehiculo/editar/<int:pk>/', SalidaVehiculoUpdateView.as_view(), name='salida_vehiculo_editar'),
-    path('salida_vehiculo/eliminar/<int:pk>/', SalidaVehiculoDeleteView.as_view(), name='salida_vehiculo_eliminar'),   
+    path('salida_vehiculo/eliminar/<int:pk>/', SalidaVehiculoDeleteView.as_view(), name='salida_vehiculo_eliminar'),  
+    path("salida_vehiculo/modal/crear/", SalidaCreateModalView.as_view(), name="salida_vehiculo_modal_crear"),
     
     # --------------urls Usuario y permisos-------------- 
     path('perfil/', datos_usuario ,name='perfil_usuario'),
