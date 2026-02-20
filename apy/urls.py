@@ -155,6 +155,7 @@ urlpatterns = [
     path("informes/inactivos/", InformesInactivosListView.as_view(), name="informes_inactivos"),
     path('informes/activar/<int:pk>/', InformesActivateView.as_view(), name="informes_activar"),
     path('informes/excel/<int:id>/', informe_excel, name='informes_excel'),
+    path('obtener-totales/<int:id>/', obtener_totales_servicio, name='obtener_totales'),  
 
     
     #--------URL modulo pago de sercicios publicos----------------

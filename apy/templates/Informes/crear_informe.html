@@ -112,7 +112,7 @@
     </script>
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function() { 
     // Función para calcular subtotales de cada fila
     function calcularSubtotales() {
         let totalRepuestos = 0;
@@ -152,6 +152,39 @@
     });
 });
     </script>
+
+<script>
+    const selectServicio = document.querySelector('select[name="detalle_servicio"]');
+    const inputManoObra = document.querySelector('#id_mano_obra');
+
+    if (selectServicio) {
+        selectServicio.addEventListener('change', function() {
+            const servicioId = this.value;
+            if (servicioId) {
+                // Probamos con la ruta absoluta de tu app
+                fetch('/apy/obtener-totales/' + servicioId + '/') 
+                    .then(response => {
+                        if (!response.ok) throw new Error('Error en la red');
+                        return response.json();
+                    })
+                    .then(data => {
+                        // IDs correctos según tu HTML
+                        document.getElementById('disp_repuestos').innerText = `$ ${data.total_repuestos.toLocaleString()}`;
+                        document.getElementById('disp_insumos').innerText = `$ ${data.total_insumos.toLocaleString()}`;
+                        
+                        const manoObra = parseFloat(inputManoObra.value) || 0;
+                        const totalGral = parseFloat(data.subtotal) + manoObra;
+                        
+                        document.getElementById('disp_total').innerText = `$ ${totalGral.toLocaleString()}`;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert("No se pudieron cargar los totales. Verifica la consola.");
+                    });
+            }
+        });
+    }
+</script>
 
 {% endblock %}
 

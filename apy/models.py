@@ -523,11 +523,11 @@ class DetalleInsumos(models.Model):
     id_insumos = models.ForeignKey(Insumos, on_delete=models.PROTECT)
     cantidad = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
     precio_unitario = models.PositiveIntegerField(validators=[validar_monto])
-    subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    #subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     
-    def save(self, *args, **kwargs):
-        self.subtotal = self.cantidad * self.precio_unitario
-        super().save(*args, **kwargs)
+    @property
+    def subtotal(self):
+        return self.cantidad * self.precio_unitario
     
     def __str__(self):
         return f"Insumo: {self.id_insumos} - Cantidad: {self.cantidad}"
