@@ -113,6 +113,7 @@ class EmpleadoUpdateView(PermisoRequeridoMixin, UpdateView):
     permission_required = 'change'
     
     def form_valid(self, form):
+        
         messages.success(self.request, "Empleado actualizado correctamente")
         return super().form_valid(form)
     

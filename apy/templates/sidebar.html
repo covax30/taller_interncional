@@ -1,5 +1,5 @@
 {% load static %}
-<aside class="app-sidebar bg-dark shadow" data-bs-theme="dark">
+<aside class="app-sidebar bg-body-emphasis shadow border-end" >
         <!--begin::Sidebar Brand-->
         <div class="sidebar-brand">
           <!--begin::Brand Link-->
@@ -314,7 +314,20 @@
                       <p>respaldos</p>
                     </a>
                   </li>
-                  <!-- 5to item-->
+                 </ul> 
+              </li>
+              <!--fin super item-->
+              <!--78er super item-->
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="nav-icon bi-question-circle-fill"></i>
+                  <p>
+                    Soporte Técnico
+                    <i class="nav-arrow bi bi-chevron-right"></i>
+                  </p>
+                </a>
+               <ul class="nav nav-treeview">
+                  <!-- 1er item-->
                   <li class="nav-item" >
                     <a href="{% url 'apy:ayuda' %}" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
@@ -322,7 +335,6 @@
                     </a>
                   </li>
               </li>
-              <!--fin super item-->
             </ul>
             <!--end::Sidebar Menu-->
           </nav>

@@ -61,6 +61,16 @@
     <!-- CSS de Sienna Accessibility -->
     <link rel="stylesheet" href="{% static 'js/sienna-accessibility/custom.css' %}">
 
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
+
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+
     
 
     <script>
@@ -84,6 +94,31 @@
         headers: { "X-CSRFToken": csrftoken }
     });
     </script>
+    <style>
+    /* Estilo para el modo Claro */
+    [data-bs-theme="light"] .app-header, 
+    [data-bs-theme="light"] .app-footer,
+    [data-bs-theme="light"] .app-sidebar {
+        background-color: #3a3b72 !important; /* Un crema muy elegante y sutil */
+        border-color: #312e3d !important;
+        color: #243241 !important;
+    }
+
+    /* Ajuste para los iconos y texto en el sidebar claro */
+    [data-bs-theme="light"] .nav-link, 
+    [data-bs-theme="light"] .nav-link i,
+    [data-bs-theme="light"] .brand-text {
+        color: #ffffff !important;
+    }
+
+    /* El input del buscador para que no se pierda en el crema */
+    [data-bs-theme="light"] .input-group input {
+        background-color: #ffffff !important;
+        border: 1px solid #534677 !important;
+    }
+
+    
+</style>
 
   </head>
 

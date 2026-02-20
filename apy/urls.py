@@ -41,6 +41,7 @@ from apy.view.permisos.views import *
 from apy.view.registro_usuarios.views import *
 
 from apy.view.ayuda.views import *
+from apy.view.buscador.views import *
 
 app_name = 'apy'
 
@@ -51,6 +52,8 @@ urlpatterns = [
     #--------URL modulo factura----------------
 
     path('inicio/index/', index.as_view(), name='index'),
+    
+    path('buscar/', buscador_global, name='buscador_global'),
     
     path('factura/listar/', FacturaListView.as_view() , name='factura_lista'),
     path('factura/agregar/', FacturaCreateView.as_view(), name='factura_crear'),
