@@ -873,36 +873,13 @@ class CompraForm(ModelForm):
 class InformeForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['repuestos_usados'].widget.attrs['autofocus'] = True
+        self.fields['tipo_informe'].widget.attrs['autofocus'] = True
         
     class Meta:
         model = Informes
         fields = '__all__'
         widgets = {
-            'repuestos_usados':TextInput(
-                attrs={
-                    'placeholder':'Ingrese los nombres de los repuestos usados',
-                }
-            ),
-            'costo_mano_obra':NumberInput(
-                attrs={
-                    'placeholder':'Ingrese el costo de mano de obra',
-                    'step': '0.01'
-                }
-            ),
-            'fecha':DateInput(
-                attrs={
-                    'placeholder':'Ingrese la fecha de la creacion del informe',
-                    'type': 'date'
-                }
-            ),
-            'hora':TimeInput(
-                attrs={
-                    'placeholder':'Ingrese la hora de la creacion del informe',
-                    'type': 'time'
-                }
-            ),
-            'id_repuesto':Select(
+            'detalle_servicio':Select(
                 attrs={
                     'class': 'form-control',
                 }
@@ -912,21 +889,29 @@ class InformeForm(ModelForm):
                     'class': 'form-control',
                 }
             ),
-            'id_tipo_mantenimiento':Select(
+            'tipo_informe': forms.Select(
                 attrs={
-                    'class': 'form-control',
+                    'class': 'form-control'
                 }
             ),
-            'tipo_informe':TextInput(
+            'costo_mano_obra': forms.NumberInput(
                 attrs={
-                    'placeholder':'Ingrese el tipo de informe',
+                    'class': 'form-control', 
+                    'placeholder': 'Ej: 50000'
                 }
             ),
-            'id_mantenimiento':Select(
+            'fecha':DateInput(
                 attrs={
-                    'class': 'form-control',
+                    'placeholder':'Ingrese la fecha de la creacion del informe',
+                    'type': 'date'
                 }
-            )
+            ),
+            'diagnostico_final': forms.Textarea(
+                attrs={'class': 'form-control', 
+                       'rows': 3, 
+                       'placeholder': 'Describa el estado final del vehículo...'
+                    }
+            ),
         }
         error_messages = {
             'repuestos_usados': {

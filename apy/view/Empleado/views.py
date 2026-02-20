@@ -118,7 +118,6 @@ class EmpleadoUpdateView(PermisoRequeridoMixin, UpdateView):
     
     def form_valid(self, form):
         
-        form.instance.estado = True 
         messages.success(self.request, "Empleado actualizado correctamente")
         return super().form_valid(form)
     

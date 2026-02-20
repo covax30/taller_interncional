@@ -9,6 +9,7 @@
 
 {% block columnas %}
   <th>Id Entrada</th>
+  <th>Id Cliente</th>
   <th>Id Vehículo</th>
   <th>Fecha de Entrada</th>
   <th>Hora de Entrada</th>
@@ -20,6 +21,7 @@
   {% for e in object_list %}
     <tr>
         <td>{{ e.id_entrada }}</td>
+        <td>{{ e.id_cliente.nombre }}</td>
         <td>{{ e.id_vehiculo.placa }}</td>
         <td>{{ e.fecha_ingreso }}</td>
         <td>{{ e.hora_ingreso }}</td>

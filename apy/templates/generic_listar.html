@@ -96,6 +96,31 @@ html[data-bs-theme="dark"] .dataTables_wrapper input {
   text-align: center;
   vertical-align: middle;
 }
+
+/* Alineación del buscador de la tabla */
+.dataTables_filter {
+    margin-top: 10px; /* Separación de los botones */
+}
+
+.dataTables_filter label {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Ajuste del input de búsqueda */
+.dataTables_filter input {
+    width: 250px !important;
+    border-radius: 20px !important; /* Estilo redondeado más moderno */
+    padding: 5px 15px !important;
+}
+
+/* Quitamos el margen por defecto de los botones de Datatables para controlarlo nosotros */
+.dt-buttons {
+    margin-bottom: 0 !important;
+}
+
         </style>
       </div>
     </div>
@@ -112,33 +137,45 @@ html[data-bs-theme="dark"] .dataTables_wrapper input {
 <!-- ================== SCRIPTS PARA FILTROS EN COLUMNAS ================== -->
 <script>
 $(document).ready(function() {
-
   var table = $('#example1').DataTable({
       responsive: true,
       autoWidth: false,
       orderCellsTop: true,
       fixedHeader: true,
+      // === AGREGAMOS ESTAS DOS LÍNEAS PARA LOS BOTONES ===
+      "dom": '<"row align-items-center mb-3"<"col-md-6"l><"col-md-6 d-flex flex-column align-items-end"Bf>>rtip',
+      buttons: [
+          
+          {
+              extend: 'excelHtml5',
+              text: '<i class="fas fa-file-excel"></i> Excel',
+              className: 'btn btn-success btn-sm shadow-sm',
+              exportOptions: { columns: ':not(:last-child)' } // No exporta la columna de acciones
+          },
+          {
+              extend: 'pdfHtml5',
+              text: '<i class="fas fa-file-pdf"></i> PDF',
+              className: 'btn btn-danger btn-sm shadow-sm ms-2',
+              exportOptions: { columns: ':not(:last-child)' }
+          }
+      ],
       language: {
           url: "../../../static/lenguajes/espanol.json"
       },
       initComplete: function () {
           var api = this.api();
-
-          // Insertar filtros dentro del mismo th
           api.columns().every(function (colIdx) {
               var column = this;
               var th = $(column.header());
               var title = th.text().trim();
 
               if (title && title !== 'Acciones') {
-                  // Limpiamos el th y agregamos el título + input debajo
                   th.html(`
                     <div style="display:flex; flex-direction:column; align-items:center;">
                       <span style="font-weight:600;">${title}</span>
                       <input type="text" placeholder="Buscar ${title}" style="width:100%; font-size:12px; margin-top:4px; border-radius:4px; padding:3px;">
                     </div>
                   `);
-
                   $('input', th).on('keyup change clear', function () {
                       if (column.search() !== this.value) {
                           column.search(this.value).draw();
@@ -148,7 +185,6 @@ $(document).ready(function() {
           });
       }
   });
-
 });
 
 </script>
