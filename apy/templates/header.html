@@ -21,7 +21,7 @@
            
             <!--end::Navbar Search-->
             <ul class="navbar-nav ms-auto">
-      <li class="nav-item dropdown">
+      <li class="nav-item dropdown" title="Selecciona el tema">
         <button
           class="btn btn-link nav-link py-2 px-0 px-lg-2 dropdown-toggle d-flex align-items-center"
           id="bd-theme"
@@ -39,6 +39,7 @@
           class="dropdown-menu dropdown-menu-end"
           aria-labelledby="bd-theme-text"
           style="--bs-dropdown-min-width: 8rem;"
+          
         >
           <li>
             <button
@@ -82,7 +83,7 @@
 
 
             <!--begin::Fullscreen Toggle-->
-            <li class="nav-item">
+            <li class="nav-item" title="pantalla completa">
               <a class="nav-link" href="#" data-lte-toggle="fullscreen">
                 <i data-lte-icon="maximize" class="bi bi-arrows-fullscreen"></i>
                 <i data-lte-icon="minimize" class="bi bi-fullscreen-exit" style="display: none"></i>
@@ -135,9 +136,19 @@
             </li>
             {% endif %}
             <!--end::User Menu Dropdown-->
-            <a class="nav-link" href="{% url 'login:login'%}">
-                    <i class="fas fa-power-off" aria-hidden="true"></i>
-            </a>
+<li class="nav-item">
+  <form action="{% url 'login:logout' %}" method="post" style="display: inline;" title="Cerrar sesión">
+    {% csrf_token %}
+    <button 
+      type="submit" 
+      class="nav-link btn btn-link" 
+      style="padding: 0; border: none;"
+      onclick="return confirm('¿Realmente quieres cerrar sesión?');"
+    >
+      <i class="fas fa-power-off text-danger" aria-hidden="true"></i>
+    </button>
+  </form>
+</li>
           </ul>
           
           <!--end::End Navbar Links-->

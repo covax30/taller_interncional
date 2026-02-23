@@ -1,105 +1,51 @@
-/* Archivo: custom.css */
-
-/* ---------------------------------------------------- */
-/* --- ESTILOS PARA EL FONDO ANIMADO (YA LO TIENES) --- */
-/* ---------------------------------------------------- */
+/* --- 1. FONDO ANIMADO --- */
 #slideshow-background {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    z-index: -10;
-    background-color: #333; /* Fallback */
-    overflow: hidden;
+    position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -10;
+    background-color: #1a1a1a; overflow: hidden;
 }
-
 #slideshow-background:after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    z-index: -10;
-    background-size: cover;
-    background-position: center;
-    opacity: 0;
-    animation: slideshow 25s infinite;
+    content: ''; position: absolute; width: 100%; height: 100%; top: 0; left: 0;
+    z-index: -10; background-size: cover; background-position: center;
+    opacity: 0; animation: slideshow 25s infinite;
 }
-
 @keyframes slideshow {
-    /* ... (tus definiciones de imágenes y opacidades para el slideshow) ... */
     0% { background-image: url('/static/login/css/img/fondo1.jpg'); opacity: 1; }
-    16% { opacity: 1; }
     20% { opacity: 0; }
-    
     20.1% { background-image: url('/static/login/css/img/fondo2.jpg'); opacity: 0; }
-    24% { opacity: 1; }
-    36% { opacity: 1; }
-    40% { opacity: 0; }
-    
+    40% { opacity: 1; }
     40.1% { background-image: url('/static/login/css/img/fondo3.jpg'); opacity: 0; }
-    56% { opacity: 1; }
-    60% { opacity: 0; } 
-
-    60.1% { background-image: url('/static/login/css/img/fondo4.jpg'); opacity: 0; }
-    76% { opacity: 1; }
-    80% { opacity: 0; } 
-
-    80.1% { background-image: url('/static/login/css/img/fondo5.jpg'); opacity: 0; }
-    96% { opacity: 1; }
-    100% { opacity: 0; } 
-}
-/* Archivo: custom.css (SOLUCIÓN DE ESPECIFICIDAD) */
-
-/* ---------------------------------------------------- */
-/* --- 1. APLICAR EFECTO A LA TARJETA COMPLETA (.card) --- */
-/* ---------------------------------------------------- */
-
-/* Utilizamos el BODY y la clase login-page para máxima especificidad */
-.login-page .login-box .card {
-    /* Fondo semi-transparente para la tarjeta */
-    background-color: rgba(255, 255, 255, 0.15) !important; 
-    
-    /* PROPIEDADES CLAVE: Desenfoque del fondo (frosted glass) */
-    backdrop-filter: blur(10px); 
-    -webkit-backdrop-filter: blur(10px); 
-    
-    /* Estilos de diseño */
-    border-radius: 0.75rem !important;
-    border: 1px solid rgba(255, 255, 255, 0.18) !important;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
-    /* Asegura que el color de fondo de AdminLTE no interfiera */
-    color: white !important; 
+    60% { opacity: 1; }
 }
 
-
-/* ---------------------------------------------------- */
-/* --- 2. ASEGURAR QUE LOS ELEMENTOS INTERNOS SEAN TRANSPARENTES --- */
-/* ---------------------------------------------------- */
-
-.login-page .login-box .card-body {
-    background-color: transparent !important; /* MANTENER ESTO TRANSPARENTE */
+/* --- 2. CRISTAL EQUILIBRADO (Selector de alta prioridad) --- */
+html body.login-page .login-box .card {
+    background-color: rgba(0, 0, 0, 0.65) !important; 
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5) !important;
 }
 
-/* 3. Asegurar que el texto del logo sea visible */
-.login-page .login-box .login-logo a {
+/* Forzamos transparencia en el interior */
+html body.login-page .card-body {
+    background: transparent !important;
     color: white !important;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
 }
 
-/* 4. Asegurar que el texto del cuerpo sea visible */
-.login-page .login-box .login-box-msg,
-.login-page .login-box .form-check-label,
-.login-page .login-box a {
-    color: white !important;
-    text-shadow: 1px 1px 2px black;
+/* --- 3. INPUTS Y OTROS --- */
+html body.login-page .form-control {
+    background-color: white !important;
+    color: #000 !important;
 }
 
-/* [Opcional] Para los iconos de los inputs */
-.login-page .login-box .input-group-text {
-    background: rgba(255, 255, 255, 0.2) !important; 
-    border-color: rgba(255, 255, 255, 0.3) !important; 
+html body.login-page .input-group-text {
+    background-color: white !important;
+    color: #007bff !important;
+}
+
+html body.login-page .btn-volver {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
     color: white !important;
 }
