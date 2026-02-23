@@ -30,6 +30,32 @@
         {% endif%}             
     </div>
     <div class="form-group mb-3">
+        <label for ="{{form.tipo_identificacion.id_for_label}}">Tipo de documento:</label>
+        <div class= "input-group">
+            {{form.tipo_identificacion|add_class:'form-control'|attr:'autocomplete:off'}}
+        </div>
+        {% if form.tipo_identificacion.errors %} 
+            <div class="invalid-feedback d-block">
+                {% for error in form.tipo_identificacion.errors%} 
+                <small> {{error}} </small> <br>
+                {%endfor%}    
+            </div>
+        {% endif%}             
+    </div>
+    <div class="form-group mb-3">
+        <label for ="{{form.identificacion.id_for_label}}">numero de identificacion:</label>
+        <div class= "input-group">
+            {{form.identificacion|add_class:'form-control'|attr:'autocomplete:off'}}
+        </div>
+        {% if form.identificacion.errors %} 
+            <div class="invalid-feedback d-block">
+                {% for error in form.identificacion.errors%} 
+                <small> {{error}} </small> <br>
+                {%endfor%}    
+            </div>
+        {% endif%}             
+    </div>
+    <div class="form-group mb-3">
         <label for ="{{form.correo.id_for_label}}">Correo del proveedor:</label>
         <div class= "input-group">
             {{form.correo|add_class:'form-control'|attr:'autocomplete:off'}}

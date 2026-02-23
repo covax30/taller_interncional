@@ -3,11 +3,18 @@ from django.urls import reverse_lazy
 from django.shortcuts import redirect, get_object_or_404, render
 from django.db import transaction
 from django.contrib import messages
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.template.loader import render_to_string
 from apy.decorators import PermisoRequeridoMixin
+
+# Librería para el PDF
+from xhtml2pdf import pisa
+
+# Modelos y Formularios (Asegúrate de que estos nombres coincidan con los tuyos)
+from apy.models import DetalleServicio, Repuesto, TipoMantenimiento, Insumos
+from apy.forms import DetalleServicioForm, DetalleRepuestoFormSet, DetalleTipoMantenimientoFormSet, DetalleInsumosFormSet
 
 
 from apy.models import (
@@ -318,7 +325,7 @@ def imprimir_servicio_factura(request, pk):
     # Buscamos el servicio directamente
     servicio = get_object_or_404(DetalleServicio, pk=pk)
     
-    # Obtenemos sus detalles (usando los related_names de tus formsets)
+    # Obtenemos sus detalles
     context = {
         'servicio': servicio,
         'vehiculo': servicio.id_vehiculo,
@@ -326,10 +333,21 @@ def imprimir_servicio_factura(request, pk):
         'repuestos': servicio.detallerepuesto_set.all(),
         'mantenimientos': servicio.detalletipomantenimiento_set.all(),
         'insumos': servicio.detalleinsumos_set.all(),
-        # Calculamos el gran total en el servidor para seguridad
         'total': sum(r.subtotal for r in servicio.detallerepuesto_set.all()) +
                  sum(m.subtotal for m in servicio.detalletipomantenimiento_set.all()) +
                  sum(i.subtotal for i in servicio.detalleinsumos_set.all()),
     }
-    return render(request, 'detalle_servicio/factura_impresion.html', context)
-        
+
+    # LÓGICA DE PDF (xhtml2pdf)
+    html_string = render_to_string('detalle_servicio/factura_impresion.html', context)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="Factura_{pk}.pdf"'
+
+    # Convertimos el HTML a PDF
+    pisa_status = pisa.CreatePDF(html_string, dest=response)
+
+    # ESTE RETURN debe estar alineado con 'pisa_status'
+    if pisa_status.err:
+        return HttpResponse('Ocurrió un error al generar el PDF', status=500)
+       
+    return response 

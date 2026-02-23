@@ -3,73 +3,6 @@
 {% block form %}
     {% csrf_token %}
 
-<<<<<<< HEAD
-
-     <!-- Id Cliente con modal -->
-=======
-    <!-- Id Cliente con modal --> 
->>>>>>> dayan
-    <div class="form-group mb-3">
-        <label for="{{ form.id_cliente.id_for_label }}">Cliente:</label>
-        <div class="input-group">
-            {{ form.id_cliente }}
-            <div class="input-group-append">
-                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_cliente">
-                    <i class="fas fa-plus"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-<<<<<<< HEAD
-    
-    <!-- Modal Cliente -->
-    <div class="modal fade" id="modal-id_cliente" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-            <div class="modal-header d-flex justify-content-between align-items-center">
-                <h5 class="modal-title mb-0">Crear Cliente</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
-                        style="background-color: #dc3545; color: white; border: none; 
-                                border-radius: 50%; width: 35px; height: 35px;
-                                font-size: 1.5rem; line-height: 1; 
-                                display: flex; justify-content: center; align-items: center;">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Aquí se cargará el form por AJAX -->
-            </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Script Cliente. -->
-    <script>
-        $("#modal-id_cliente").on("show.bs.modal", function(){
-            var modal = $(this);
-            $.ajax({
-                url: "{% url 'apy:cliente_modal_crear' %}",
-                success: function(data){
-                    modal.find(".modal-body").html(data.html || data);
-                }
-            });
-        });
-    </script>
-=======
->>>>>>> dayan
-
-    <!-- Id Vehiculo con modal -->
-    <div class="form-group mb-3">
-        <label for="{{ form.id_vehiculo.id_for_label }}">Vehículo:</label>
-        <div class="input-group">
-            {{ form.id_vehiculo }}
-            <div class="input-group-append">
-                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_vehiculo">
-                    <i class="fas fa-plus"></i>
-                </button>
-            </div>
-        </div>
-    </div>
 
     <!-- Fecha -->
     <div class="form-group mb-3">
@@ -102,61 +35,7 @@
     </div>
 
 
-    <!-- Modal Vehiculo -->
-    <div class="modal fade" id="modal-id_vehiculo" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-            <div class="modal-header d-flex justify-content-between align-items-center">
-                <h5 class="modal-title mb-0">Crear Vehículo</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
-                        style="background-color: #dc3545; color: white; border: none; 
-                                border-radius: 50%; width: 35px; height: 35px;
-                                font-size: 1.5rem; line-height: 1; 
-                                display: flex; justify-content: center; align-items: center;">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Aquí se cargará el form por AJAX -->
-            </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Modal Cliente -->
-    <div class="modal fade" id="modal-id_cliente" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-            <div class="modal-header d-flex justify-content-between align-items-center">
-                <h5 class="modal-title mb-0">Crear Cliente</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
-                        style="background-color: #dc3545; color: white; border: none; 
-                                border-radius: 50%; width: 35px; height: 35px;
-                                font-size: 1.5rem; line-height: 1; 
-                                display: flex; justify-content: center; align-items: center;">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Aquí se cargará el form por AJAX -->
-            </div>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Script Vehiculo. -->
-    <script>
-        $("#modal-id_vehiculo").on("show.bs.modal", function(){
-            var modal = $(this);
-            $.ajax({
-                url: "{% url 'apy:vehiculo_modal_crear' %}",
-                success: function(data){
-                    modal.find(".modal-body").html(data.html || data);
-                }
-            });
-        });
-    </script>
 
     <!-- Script Cliente. -->
     <script>
@@ -173,10 +52,6 @@
 
 {% endblock %}
 
-{% block modals %}
-    {% include "apy/vehiculos/modal_vehiculo.html" %}
-    {% include "apy/clientes/modal_cliente.html" %} 
-{% endblock %}
 
 {% block Cancelar %}
                 <button type="submit" class="btn btn-primary btn-flat" title="Agregar ingreso de vehículo">

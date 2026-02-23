@@ -151,47 +151,7 @@ def generar_vehiculos(n=10):
             
     print(f"✅ {n} Vehículos creados con éxito.")
     
-def generar_entradas(n=10):
-    vehiculos = Vehiculo.objects.all()
-    if not vehiculos.exists():
-        print("❌ Error: No hay vehículos para entradas.")
-        return
 
-    for _ in range(n):
-        v = random.choice(vehiculos)
-        # Usamos datetime.time para evitar el error de argumentos
-        hora_ingreso = datetime.time(random.randint(7, 12), random.randint(0, 59))
-        fecha_ingreso = datetime.date.today() - datetime.timedelta(days=random.randint(1, 10))
-        
-        EntradaVehiculo.objects.create(
-            id_vehiculo=v,
-            id_cliente=v.id_cliente,
-            fecha_ingreso=fecha_ingreso,
-            hora_ingreso=hora_ingreso
-        )
-    print(f"✅ {n} Entradas creadas.")
-
-def generar_salidas(n=5):
-    entradas = EntradaVehiculo.objects.all()
-    if not entradas.exists():
-        print("❌ Error: No hay entradas para generar salidas.")
-        return
-
-    for entrada in random.sample(list(entradas), min(len(entradas), n)):
-        # La salida debe ser después de la entrada
-        fecha_salida = entrada.fecha_ingreso + datetime.timedelta(days=random.randint(0, 2))
-        hora_salida = datetime.time(random.randint(14, 18), 0)
-        
-        SalidaVehiculo.objects.get_or_create(
-            id_vehiculo=entrada.id_vehiculo,
-            id_cliente=entrada.id_cliente,
-            defaults={
-                'diagnostico': "Mantenimiento finalizado exitosamente.",
-                'fecha_salida': fecha_salida,
-                'hora_salida': hora_salida
-            }
-        )
-    print(f"✅ {n} Salidas creadas.")
 if __name__ == '__main__':
     print("Iniciando poblado de datos...")
     try:
@@ -202,8 +162,7 @@ if __name__ == '__main__':
         generar_insumos(10)
         generar_repuestos(15)
         generar_vehiculos(10)
-        generar_salidas(5)
-        generar_entradas(10)
+        
         print("¡Proceso finalizado con éxito!")
     except Exception as e:
         print(f"❌ Error durante el proceso: {e}")
