@@ -47,7 +47,7 @@ class InformesCreateView(PermisoRequeridoMixin, CreateView):
     success_url = reverse_lazy('apy:informes_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Informes'
+    module_name = 'Informes' 
     permission_required = 'add'
     
     def form_valid(self, form):
@@ -97,7 +97,7 @@ class InformesUpdateView(PermisoRequeridoMixin, UpdateView):
     success_url = reverse_lazy('apy:informes_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Informes'
+    module_name = 'Informes' 
     permission_required = 'change'
     
     def form_valid(self, form):
@@ -120,7 +120,7 @@ class InformesDeleteView(PermisoRequeridoMixin, DeleteView):
     context_object_name = 'object'
     
     # --- Configuración de Permisos ---
-    module_name = 'Informes'
+    module_name = 'Informes' 
     permission_required = 'delete'
     
     @method_decorator(csrf_exempt)
@@ -135,7 +135,7 @@ class InformesDeleteView(PermisoRequeridoMixin, DeleteView):
         self.object.estado = False
         self.object.save()
         
-        messages.success(self.request,     f"Informe {Informes} desactivado correctamente")
+        messages.success(self.request, f"Informe {self.object.id_informe} desactivado correctamente")
         return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):
@@ -152,14 +152,15 @@ class InformesActivateView(PermisoRequeridoMixin, DeleteView):
     success_url = reverse_lazy('apy:informes_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Informes'
-    permission_required = 'change'
+    module_name = 'Informes' 
+    permission_required = 'delete'
     
-    def form_valid(self, form):
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
         self.object.estado = True
         self.object.save()
-        messages.success(self.request, "informe activado correctamente")
-        return super().form_valid(form)
+        messages.success(self.request, "Informe activado correctamente")
+        return HttpResponseRedirect(self.get_success_url())
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

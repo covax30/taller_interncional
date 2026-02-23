@@ -3,111 +3,140 @@ from apy.models import Module, Permission
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db import transaction
-# IMPORTACIONES NECESARIAS PARA PROTEGER LA VISTA
 from django.contrib.auth.decorators import login_required 
-from apy.decorators import permiso_requerido_fbv # <-- Usamos el decorador FBV
+from apy.decorators import permiso_requerido_fbv
 
-# Usamos el decorador de función que lanza el 403
-# Requerimos el permiso 'view' para el módulo 'Permisos'
+@login_required
 @permiso_requerido_fbv(module_name='Permisos', permission_required='view')
 def permisos_usuarios(request):
     user_to_edit = None
-    
-    # --- 1. Obtener posibles fuentes del ID de usuario ---
-    user_id_from_select = request.POST.get('user') 
-    user_id_from_hidden = request.POST.get('user_id_to_edit') 
-    user_id_from_get = request.GET.get('user_id')  
-    
-    selected_user_id = user_id_from_select or user_id_from_hidden or user_id_from_get
+    selected_user_id = request.POST.get('user') or request.POST.get('user_id_to_edit') or request.GET.get('user_id')
 
-    # --- 2. Determinar el tipo de acción (CLAVE) ---
-    is_post = request.method == 'POST'
-    is_save_action = is_post and 'save_permissions' in request.POST 
-
-    # --- 3. Guardado de permisos ---
-    # NOTA: No se requiere una protección 'add/change' aquí porque 
-    # solo los superusuarios o aquellos con permisos de 'Permisos:view' 
-    # pueden acceder a esta URL, y la lógica de guardado está dentro.
-    if is_save_action:
-        user_id_to_save = user_id_from_hidden 
-        
+    # --- Lógica de Guardado ---
+    if request.method == 'POST' and 'save_permissions' in request.POST:
+        user_id_to_save = request.POST.get('user_id_to_edit')
         try:
             user_to_edit = User.objects.get(id=user_id_to_save)
-            
-            # SEGURIDAD: Si es superusuario, no permitimos guardar cambios
             if user_to_edit.is_superuser:
-                messages.error(request, "Acción denegada: No se pueden alterar los permisos de un Administrador.")
-                return redirect(f"{reverse('apy:permisos_usuarios')}?user_id={user_to_edit.id}")
-            
-        except User.DoesNotExist:
-            messages.error(request, "Error: el usuario no existe.")
-            return redirect('apy:permisos_usuarios')
-
-        # --- PROTECCIÓN PARA EL ADMIN ---
-        if user_to_edit.is_superuser:
-            messages.warning(request, "Los permisos del Administrador (Superusuario) son totales y no pueden ser modificados por seguridad.")
+                messages.error(request, "No se pueden alterar los permisos de un Administrador.")
+            else:
+                with transaction.atomic():
+                    Permission.objects.filter(user=user_to_edit).delete()
+                    for module in Module.objects.all():
+                        v = f'perm_{module.id}_view' in request.POST
+                        a = f'perm_{module.id}_add' in request.POST
+                        c = f'perm_{module.id}_change' in request.POST
+                        d = f'perm_{module.id}_delete' in request.POST
+                        if any([v, a, c, d]):
+                            Permission.objects.create(user=user_to_edit, module=module, view=v, add=a, change=c, delete=d)
+                messages.success(request, f"Permisos de {user_to_edit.username} guardados. ✅")
             return redirect(f"{reverse('apy:permisos_usuarios')}?user_id={user_to_edit.id}")
-        # --------------------------------
-        
-        try:
-            with transaction.atomic():
-                # Borramos permisos previos del usuario
-                Permission.objects.filter(user=user_to_edit).delete()
-
-                for module in Module.objects.all():
-                    view_perm = f'perm_{module.id}_view' in request.POST
-                    add_perm = f'perm_{module.id}_add' in request.POST
-                    change_perm = f'perm_{module.id}_change' in request.POST
-                    delete_perm = f'perm_{module.id}_delete' in request.POST
-
-                    if view_perm or add_perm or change_perm or delete_perm:
-                        Permission.objects.create(
-                            user=user_to_edit,
-                            module=module,
-                            view=view_perm,
-                            add=add_perm,
-                            change=change_perm,
-                            delete=delete_perm
-                        )
-
-            messages.success(request, f"Permisos del usuario {user_to_edit.username} guardados con éxito. ✅")
-            return redirect(f"{reverse('apy:permisos_usuarios')}?user_id={user_to_edit.id}")
-
         except Exception as e:
-            messages.error(request, f"Error al guardar permisos: {e}")
-            return redirect(f"{reverse('apy:permisos_usuarios')}?user_id={user_to_edit.id}")
+            messages.error(request, f"Error: {e}")
 
-    # --- 4. Carga del usuario seleccionado/por defecto (GET o POST sin acción de guardar) ---
+    # --- Carga de Usuario ---
     if selected_user_id:
-        try:
-            user_to_edit = User.objects.get(id=selected_user_id)
-        except User.DoesNotExist:
-            user_to_edit = None
-
+        user_to_edit = User.objects.filter(id=selected_user_id).first()
+    
     if not user_to_edit:
-        user_to_edit = User.objects.first()
-        if not user_to_edit:
-            messages.warning(request, "No hay usuarios registrados para gestionar permisos.")
-            return render(request, 'Permisos/permisos.html', {'users': [], 'modules': []})
+        # Evitar errores si no hay usuarios, pero priorizar el primero no-superuser si existe
+        user_to_edit = User.objects.filter(is_superuser=False).first() or User.objects.first()
 
-    # --- 5. Construcción del contexto (Igual que antes) ---
-    all_users = User.objects.all().order_by('username')
-    modules = Module.objects.all()
+    # --- Estructura basada en tu nuevo Sidebar ---
+    # Las llaves son los "Super Items" y las listas son los nombres de los módulos en la DB
+    menu_estructurado = {
+        "Análisis y Reportes": [
+            {"nombre": "Estadísticas Generales", "module": "EstadisticasGenerales"},
+            {"nombre": "Informes", "module": "Informes"},
+        ],
+        "Gestión de Vehículos": [
+            {"nombre": "Entrada de Vehículo", "module": "EntradaVehiculos"},
+            {"nombre": "Salida de Vehículo", "module": "SalidaVehiculos"},
+            {"nombre": "Vehículos", "module": "Vehiculos"},
+            {"nombre": "Marcas", "module": "Marca"},
+        ],
+        "Mantenimiento y Repuestos": [
+            {"nombre": "Gestión de Mantenimientos", "module": "GestionMantenimiento"},
+            {"nombre": "Gestión de Repuestos", "module": "Repuestos"},
+            {"nombre": "Tipos de Mantenimiento", "module": "TipoMantenimientos"},
+            {"nombre": "Herramientas", "module": "Herramientas"},
+            {"nombre": "Gestión de Insumos", "module": "Insumos"},
+        ],
+        "Administración": [
+            {"nombre": "Gastos", "module": "Gastos"},
+            {"nombre": "Factura", "module": "Factura"},
+            {"nombre": "Pagos", "module": "Pagos"},
+            {"nombre": "Caja", "module": "Caja"},
+            {"nombre": "Servicios Públicos", "module": "PagoServicios"},
+        ],
+        "Gestión de Clientes": [
+            {"nombre": "Proveedores", "module": "Proveedor"},
+            {"nombre": "Clientes", "module": "Clientes"},
+        ],
+        "Gestión y Seguridad": [
+            {"nombre": "Gestión de Usuarios", "module": "GestionUsuarios"},
+            {"nombre": "Permisos", "module": "Permisos"},
+            {"nombre": "Respaldos", "module": "Respaldos"},
+        ]
+    }
+    
+    modulos_agrupados = {}
+    ids_procesados = []
 
-    for module in modules:
-        permissions = Permission.objects.filter(user=user_to_edit, module=module).first()
-        module.current_permissions = {
-            'view': permissions.view if permissions else False,
-            'add': permissions.add if permissions else False,
-            'change': permissions.change if permissions else False,
-            'delete': permissions.delete if permissions else False,
-        }
+    if user_to_edit:
+        for categoria, items in menu_estructurado.items():
+            lista_objs = []
+            for item in items:
+                # Buscamos por el nombre técnico que definimos arriba
+                m = Module.objects.filter(name=item['module']).first()
+                if m and m.id not in ids_procesados:
+                    p = Permission.objects.filter(user=user_to_edit, module=m).first()
+                    m.current_permissions = {
+                        'view': p.view if p else False,
+                        'add': p.add if p else False,
+                        'change': p.change if p else False,
+                        'delete': p.delete if p else False,
+                    }
+                    lista_objs.append(m)
+                    ids_procesados.append(m.id)
+            
+            if lista_objs:
+                modulos_agrupados[categoria] = lista_objs
+
+        # Módulos huérfanos
+        otros = Module.objects.exclude(id__in=ids_procesados)
+        if otros.exists():
+            lista_otros = []
+            for m in otros:
+                p = Permission.objects.filter(user=user_to_edit, module=m).first()
+                m.current_permissions = {
+                    'view': p.view if p else False, 
+                    'add': p.add if p else False, 
+                    'change': p.change if p else False, 
+                    'delete': p.delete if p else False
+                }
+                lista_otros.append(m)
+            modulos_agrupados["Módulos Adicionales (Revisar)"] = lista_otros
+
+        # Módulos huérfanos (por si olvidaste alguno en la lista de arriba)
+        otros = Module.objects.exclude(id__in=ids_procesados)
+        if otros.exists():
+            lista_otros = []
+            for m in otros:
+                p = Permission.objects.filter(user=user_to_edit, module=m).first()
+                m.current_permissions = {
+                    'view': p.view if p else False, 
+                    'add': p.add if p else False, 
+                    'change': p.change if p else False, 
+                    'delete': p.delete if p else False
+                }
+                lista_otros.append(m)
+            modulos_agrupados["Módulos Adicionales (Sin Categoría)"] = lista_otros
 
     context = {
-        'users': all_users,
-        'modules': modules,
+        'users': User.objects.all().order_by('username'),
         'user_to_edit': user_to_edit,
+        'modulos_agrupados': modulos_agrupados,
         'titulo': 'Administración de Permisos'
     }
-
     return render(request, 'Permisos/permisos.html', context)

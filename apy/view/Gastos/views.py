@@ -16,7 +16,7 @@ from apy.decorators import PermisoRequeridoMixin, permiso_requerido_fbv
 
 # **VARIABLE DE CONFIGURACIÓN DEL MÓDULO**
 # Definimos el nombre exacto de la DB en una variable para fácil mantenimiento
-GASTOS_MODULE_NAME = 'Registro de movimientos de caja (Ingresos/Gastos)'
+GASTOS_MODULE_NAME = 'Gastos'
 
 # --------------Vistas de Gastos (CBVs)---------------
 
@@ -153,7 +153,7 @@ class GastosActivateView(PermisoRequeridoMixin, DeleteView):
     
     # --- Configuración de Permisos ---
     module_name = GASTOS_MODULE_NAME # <-- CORRECCIÓN APLICADA
-    permission_required = 'change'
+    permission_required = 'delete'
     
     def post(self, request, *args, **kwargs):
         

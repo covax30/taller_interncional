@@ -207,16 +207,6 @@ class Profile(models.Model):
     direccion = models.CharField(max_length=150, null=True, blank=True) # <-- Nuevo campo
     imagen = models.ImageField(upload_to='users/%Y/%m/%d', null=True, blank=True)
     
-    # Campo para la imagen de perfil
-    imagen = models.ImageField(
-        upload_to='perfiles/',          # Guarda las imágenes en media/perfiles/
-        default='perfiles/default.png', # Imagen por defecto (debes crearla)
-        null=True,                      # Permite null en la DB (aunque default hace que casi nunca sea null)
-        blank=True                      # Permite que el campo esté vacío en el formulario
-    )
-    
-    # ... otros campos del perfil ...
-    
     def __str__(self):
         return f'Perfil de {self.user.username}'
 class Cliente(models.Model):
@@ -349,28 +339,13 @@ class Gastos(models.Model):
        #verbose_name = 'Gastos'
         #verbose_name_plural = 'Gastos'          
 
-#-------- Empleado-------
-class Empleado(models.Model): 
-   
-    nombre = models.CharField(max_length=100)
-    telefono = models.CharField(max_length=15, validators=[validar_telefono])
-    identificacion = models.CharField(max_length=20, unique=True, validators=[validar_identificacion]) 
-    Correo= models.EmailField(max_length=254, unique=True, validators=[validar_email])
-    direccion = models.CharField(max_length=255)
-    estado = models.BooleanField(default=True)  
-    def __str__(self):
-        return f"{self.nombre} ({self.identificacion})"
-    #class meta
-        #verbose_name = 'Empleado'
-        #verbose_name_plural = 'Empleado'
-
 
 #------ ENTIDAD GESTION DE MANTENIMIENTO --------2
 class Mantenimiento(models.Model):
     fallas = models.TextField()
     procesos = models.CharField(max_length=50)
     id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT)
-    id_empleado = models.ForeignKey(Empleado, on_delete=models.PROTECT)
+    id_empleado = models.ForeignKey(Profile, on_delete=models.PROTECT, db_column='id_usuario_id')
     id_tipo_mantenimiento = models.ForeignKey(TipoMantenimiento, on_delete=models.PROTECT)
     estado = models.BooleanField(default=True)
 
@@ -379,35 +354,8 @@ class Mantenimiento(models.Model):
 
     
 #------------Modulo Informes-----------
-
     
     
-#-------- nomina------
-class Nomina(models.Model):
-    
-    TIPO_ROL = [
-        ('administrador', 'Administrador'),
-        ('empleado', 'Empleado'),
-    ]
-    
-    rol = models.CharField(max_length=100, choices=TIPO_ROL)
-    monto = models.IntegerField(  # 🔹 ENTEROS, sin decimales
-        error_messages={
-            'invalid': 'Ingrese un número válido para el monto.',
-            'required': 'El monto de la nomina es obligatorio.'
-        } , validators=[validar_monto]
-    )
-    fecha_pago =  models.DateField() 
-    id_empleado =   models.ForeignKey(Empleado, on_delete=models.PROTECT) 
-    estado = models.BooleanField(default=True)
-               
-    def __str__(self):
-        return f"{self.rol} - ${self.monto} - {self.fecha_pago}"
-     #class meta
-        #verbose_name = 'Nomina'
-        #verbose_name_plural = 'Nomina'
-
-
 #--------------Modulo Pagos-----------------
 class Pagos(models.Model):
     id_pago = models.AutoField(primary_key=True)
@@ -424,7 +372,6 @@ class Pagos(models.Model):
     id_herramienta = models.ForeignKey(Herramienta, on_delete=models.PROTECT)
     id_insumos = models.ForeignKey(Insumos, on_delete=models.PROTECT)
     id_repuesto = models.ForeignKey(Repuesto, on_delete=models.PROTECT)
-    id_nomina= models.ForeignKey(Nomina, on_delete=models.PROTECT , blank=True, null=True) 
     estado = models.BooleanField(default=True)
     
     def __str__(self):
@@ -620,18 +567,6 @@ class Factura(models.Model):
 
     
 #--------------Modulo Compra (STEVEN)-----------------
-class Compra(models.Model):
-    id_compra = models.AutoField(primary_key=True)
-    id_factura_compra = models.ForeignKey(Factura, on_delete=models.CASCADE)
-    id_proveedor = models.ForeignKey(Proveedores, on_delete=models.CASCADE)  # LLAVE
-    fecha_compra = models.DateField()
-    hora_compra = models.TimeField()
-    estado = models.BooleanField(default=True)
-
-    def __str__(self):
-        return f"{self.id_factura_compra} - {self.proveedor} - {self.fecha_compra} {self.hora_compra}"
-
-
 #-----------Caja-----------------
 class Caja(models.Model):
     TIPO_OPCIONES = [

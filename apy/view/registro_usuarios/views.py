@@ -31,6 +31,10 @@ class RegistroUsuarioCreateView(SuperuserRequiredMixin, CreateView):
     form_class = RegistroUsuarioForm
     template_name = 'registro_usuarios/registro_usuarios.html' 
     success_url = reverse_lazy('apy:registro_usuario_lista') 
+    
+    # --- Configuración de Permisos ---
+    module_name = 'GestionUsuarios'
+    permission_required = 'add'
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -52,6 +56,10 @@ class RegistroUpdateView(SuperuserRequiredMixin, UpdateView):
     form_class = RegistroUsuarioForm 
     template_name = 'registro_usuarios/registro_usuarios.html' 
     success_url = reverse_lazy('apy:registro_usuario_lista') 
+    
+    # --- Configuración de Permisos ---
+    module_name = 'GestionUsuarios'
+    permission_required = 'change'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -74,6 +82,10 @@ class RegistroDeleteView(SuperuserRequiredMixin, DeleteView):
     model = User
     template_name = 'registro_usuarios/eliminar_registro_usuarios.html'
     success_url = reverse_lazy('apy:registro_usuario_lista') 
+    
+    # --- Configuración de Permisos ---
+    module_name = 'GestionUsuarios'
+    permission_required = 'delete'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -112,9 +124,14 @@ class RegistroUsuarioListView(SuperuserRequiredMixin, ListView):
     model = User 
     template_name = 'registro_usuarios/listar_registro_usuarios.html' 
     context_object_name = 'object_list' 
+    
+    # --- Configuración de Permisos ---
+    module_name = 'GestionUsuarios'
+    permission_required = 'view'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['crear_url'] = reverse_lazy('apy:registro_usuario_crear') 
         context['entidad'] = 'Usuarios'
+        context['titulo'] = 'Gestión de Usuarios'
         return context

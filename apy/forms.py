@@ -11,70 +11,6 @@ from django.core.exceptions import ValidationError
 from .models import Profile,DetalleServicio
 
 from apy.models import *
-
-# -----------Formulario modelo factura------------------
-# -----------Formulario modelo factura------------------
-class FacturaForm(ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['metodo_pago'].widget.attrs['autofocus'] = True
-        
-    class Meta:
-        model = Factura
-        fields = '__all__'
-        widgets = {
-            'fecha':DateInput(
-                attrs={
-                    'type': 'date',
-                    'placeholder':'Ingrese la fecha',
-                }
-            ),
-            
-            'empleado': Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-            'cliente': Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-            'detalle_servicio': Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-            'orden_servicio': Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-            'metodo_pago': Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-        }
-
-
-        error_messages = {
-            'fecha': {
-                'required': 'La fecha es obligatoria',
-            },
-            'empleado': {
-                'required': 'El empleado es obligatorio',
-            },
-            'cliente': {
-                'required': 'El  cliente es obligatorio',
-            },
-            'detalle_servicio': {
-                'required': 'El detalle de servicios es obligatorio',
-            },
-            'metodo_pago': {
-                'required': 'El metodo de pago es obligatorio',
-            }
-        }
         
 
 class EmpresaForm(ModelForm):
@@ -817,59 +753,6 @@ class SalidaVehiculoForm(ModelForm):
             },
         }
         
-class CompraForm(ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['id_factura_compra'].widget.attrs['autofocus'] = True
-        
-    class Meta:
-        model = Compra
-        fields = '__all__'
-        widgets = {
-            'id_factura_compra':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-            'id_compra':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-            'id_proveedor':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-            'fecha_compra': DateInput(
-                attrs={
-                    'type': 'date',
-                    'placeholder':'Ingrese la fecha de compra',
-                }
-            ),
-            'hora_compra':TimeInput(
-                attrs={
-                    'type': 'time',
-                    'placeholder':'Ingrese la hora de compra',
-                }
-            )
-        }
-        error_messages = {
-            'id_factura_compra': {
-                'required': 'El id de la factura de compra es obligatorio',
-            },
-            'id_proveedor': {
-                'required': 'El id del proveedor es obligatorio',
-            },
-            'fecha_compra': {
-                'required': 'La fecha de la compra es obligatoria',
-            },
-            'hora_compra': {
-                'required': 'La hora de la compra es obligatoria',
-            },
-        }
-     
-        
 
     
         
@@ -1046,11 +929,6 @@ class PagosForm(ModelForm):
                     'class': 'form-control',
                 }
             ),
-            'id_nomina':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            )
         }
         error_messages = {
             'tipo_pago': {
@@ -1080,74 +958,10 @@ class PagosForm(ModelForm):
             'id_repuestos': {
                 'required': 'El id de los repuestos es obligatorio',
             },
-            'id_nomina': {
-                'required': 'El id de la nomina es obligatorio',
-            },
         }
    
         
 #------- formularios Yury--------        
-        
-#------- formulario Empleado -------        
-        
-class EmpleadoForm(ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['nombre'].widget.attrs['autofocus'] = True
-        
-    class Meta:
-        model = Empleado
-        fields = '__all__'
-        widgets = {
-            'nombre':TextInput(
-                attrs={
-                    'placeholder':'Ingrese el nombre del empleado',
-                }
-            ),
-            'telefono':NumberInput(
-                attrs={
-                    'placeholder':'Ingrese el telefono del empleado',
-                }
-            ),
-            'identificacion':NumberInput(
-                attrs={
-                    'placeholder':'Ingrese la identificacion del empleado',
-                }
-            ),
-            'Correo':TextInput(
-                attrs={
-                    'placeholder':'Ingrese el correo del empleado',
-                }
-            ),
-            'direccion':TextInput(
-                attrs={
-                    'placeholder':'Ingrese la direccion del empleado',
-                }
-            )
-            
-       }  
-        error_messages = {
-            'nombre': {
-                'required': 'El nombre del empleado es obligatorio',
-            },
-            'telefono': {
-                'required': 'El telefono del empleado es obligatorio',
-            },
-            'identificacion': {
-                'required': 'La identificacion del empleado es obligatoria',
-            },
-            'Correo': {
-                'required': 'El correo del empleado es obligatorio',
-                'invalid': 'El correo no tiene un formato válido',
-                'unique': 'Ya existe un administrador con ese correo',
-            },
-            'direccion': {
-                'required': 'La direccion del empleado es obligatoria',
-            },
-        }
-        
-        
-
  #------- formulario Gastos -------     
         
 class GastosForm(ModelForm):
@@ -1228,57 +1042,7 @@ class MarcaForm(ModelForm):
                 'required': 'E tipo de marca es obligatoria',
             },
         }
-
-        
-#-----formularo Nomina ---------------
-class   NominaForm(ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['rol'].widget.attrs['autofocus'] = True
-        
-    class Meta:
-        model = Nomina
-        fields = '__all__'
-        widgets = {
-            'rol':Select(
-                attrs={
-                    'placeholder':'Ingrese rol del empleado',
-                }
-            ),
-            'monto':NumberInput(
-             attrs={
-                  'placeholder':'Ingrese el monto del empleado',
-                }
-            ),
-            
-            'fecha_pago':DateInput(
-                attrs={
-                    'class': 'form-control',
-                    'type': 'date' ,
-                }
-            ),
-           
-            'id_empleado':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            )
-        }
-        error_messages = {
-            'rol': {
-                'required': 'El rol es obligatorio',
-            },
-            'monto': {
-                'required': 'El monto es obligatorio',
-            },
-            'fecha_pago': {
-                'required': 'La fecha de pago de la nomina es obligatoria',
-            },
-            'id_empleado': {
-                'required': 'El id del empleado es obligatorio',
-            }
-        }
-        
+    
    #------- formulario Caja ---------------
 class CajaForm(ModelForm): 
 
@@ -1318,11 +1082,6 @@ class CajaForm(ModelForm):
                     'class': 'form-control',
                 }
             ),
-            'id_Factura':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
         }       
         error_messages = {
             'tipo_mantenimiento': {
@@ -1339,9 +1098,6 @@ class CajaForm(ModelForm):
             },
             'id_admin': {
                 'required': 'El id del administrador es obligatorio',
-            },
-            'id_Factura': {
-                'required': 'El id de la factura es obligatorio',
             },
         }  
        
@@ -1371,11 +1127,6 @@ class MantenimientoForm(ModelForm):
                 }
             ),
             'id_empleado':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-            'id_empleado_mantenimiento':Select(
                 attrs={
                     'class': 'form-control',
                 }

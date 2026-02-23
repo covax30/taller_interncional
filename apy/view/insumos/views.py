@@ -124,7 +124,7 @@ class InsumoDeleteView(PermisoRequeridoMixin, DeleteView):
         self.object.estado = False
         self.object.save()
         
-        messages.success(self.request,     f"Insumo {Insumos} desactivado correctamente")
+        messages.success(self.request,     f"Insumo {self.object.nombre} desactivado correctamente")
         return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):
@@ -142,8 +142,8 @@ class InsumoActivateView(PermisoRequeridoMixin, DeleteView):
     
     # --- Configuración de Permisos ---
     module_name = 'Insumos' 
-    permission_required = 'change'
-    
+    permission_required = 'delete'   
+     
     def post(self, request, *args, **kwargs):
         
         self.object = self.get_object()
@@ -165,7 +165,7 @@ class InsumoActivateView(PermisoRequeridoMixin, DeleteView):
 # --------------Vistas de Insumos (VBFs estandarizadas)---------------
 
 # Proteger la vista de estadísticas
-@permiso_requerido_fbv(module_name='Insumos', permission_required='view') 
+@permiso_requerido_fbv(module_name = 'Insumos', permission_required='view') 
 def estadisticas_view(request):
     # Contar total de insumos
     total_insumos = Insumos.objects.count()
@@ -182,11 +182,15 @@ def api_contador_insumos(request):
     total_insumos = Insumos.objects.count()
     return JsonResponse({'total_insumos': total_insumos})
 
-class InsumoCreateModalView(CreateView):
+class InsumoCreateModalView(PermisoRequeridoMixin, CreateView):
     model = Insumos
     form_class = InsumoForm
     template_name = "insumos/modal_insumos.html"
     success_url = reverse_lazy("apy:insumo_lista")
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Insumos'
+    permission_required = 'add'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -216,11 +220,15 @@ class InsumoCreateModalView(CreateView):
             "message": "Por favor, corrige los errores en el formulario ❌"
         })
         
-class DetalleInsumoCreateModalView(CreateView):
+class DetalleInsumoCreateModalView(PermisoRequeridoMixin, CreateView):
     model = Insumos
     form_class = InsumoForm
     template_name = "insumos/modal_detalleinsumos.html"
     success_url = reverse_lazy("apy:detalleinsumo_lista")
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Insumos'
+    permission_required = 'add'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
