@@ -17,7 +17,7 @@ class SalidaVehiculoListView(PermisoRequeridoMixin, ListView):
     template_name = 'salida_vehiculos/listar_salida_vehiculos.html'
 
     # --- Configuración de Permisos ---
-    module_name = 'Salida Vehiculo' 
+    module_name = 'SalidaVehiculos'
     permission_required = 'view'
     
     @method_decorator(csrf_exempt)
@@ -42,7 +42,7 @@ class SalidaVehiculoCreateView(PermisoRequeridoMixin, CreateView):
     success_url = reverse_lazy('apy:salida_vehiculo_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Salida Vehiculo'
+    module_name = 'SalidaVehiculos'
     permission_required = 'add'
 
     def form_valid(self, form):
@@ -63,7 +63,7 @@ class SalidaVehiculoUpdateView(PermisoRequeridoMixin, UpdateView):
     success_url = reverse_lazy('apy:salida_vehiculo_lista')
 
     # --- Configuración de Permisos ---
-    module_name = 'Salida Vehiculo'
+    module_name = 'SalidaVehiculos'
     permission_required = 'change'
 
     def form_valid(self, form):
@@ -83,7 +83,7 @@ class SalidaVehiculoDeleteView(PermisoRequeridoMixin, DeleteView):
     success_url = reverse_lazy('apy:salida_vehiculo_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Salida Vehiculo'
+    module_name = 'SalidaVehiculos'
     permission_required = 'delete'
     
     def form_valid(self, form):

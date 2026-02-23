@@ -20,7 +20,7 @@ class MantenimientoListView(PermisoRequeridoMixin, ListView):
     template_name = 'gestion_mantenimiento/listar.html'
     
     # --- Configuración de Permisos ---
-    module_name = 'Mantenimientos' 
+    module_name = 'GestionMantenimiento' 
     permission_required = 'view'
     def get_queryset(self):
         return Mantenimiento.objects.filter(estado=True)
@@ -42,7 +42,7 @@ class MantenimientoInactivosListView(PermisoRequeridoMixin, ListView):
     template_name = 'gestion_mantenimiento/mantenimientos_inactivos.html'
     
     # --- Configuración de Permisos ---
-    module_name = 'Mantenimientos' 
+    module_name = 'GestionMantenimiento' 
     permission_required = 'view' 
     # --------------------------------
     
@@ -64,7 +64,7 @@ class MantenimientoCreateView(PermisoRequeridoMixin, CreateView):
     success_url = reverse_lazy('apy:mantenimiento_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Mantenimientos'
+    module_name = 'GestionMantenimiento' 
     permission_required = 'add'
     
     def form_valid(self, form):
@@ -86,7 +86,7 @@ class MantenimientoUpdateView(PermisoRequeridoMixin, UpdateView):
     success_url = reverse_lazy('apy:mantenimiento_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Mantenimientos'
+    module_name = 'GestionMantenimiento'
     permission_required = 'change'
     
     def form_valid(self, form):
@@ -106,7 +106,7 @@ class MantenimientoDeleteView(PermisoRequeridoMixin, DeleteView):
     success_url = reverse_lazy('apy:mantenimiento_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Mantenimientos'
+    module_name = 'GestionMantenimiento'
     permission_required = 'delete'
     
     #--- Sobrescribir el método post para desactivar en lugar de eliminar ---
@@ -136,7 +136,7 @@ class MantenimientoActivateView(PermisoRequeridoMixin, DeleteView):
     success_url = reverse_lazy('apy:mantenimiento_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Mantenimientos'
+    module_name = 'GestionMantenimiento'
     permission_required = 'change'
     
     #--- Sobrescribir el método post para activar el mantenimiento ---
@@ -158,11 +158,15 @@ class MantenimientoActivateView(PermisoRequeridoMixin, DeleteView):
         context['listar_url'] = reverse_lazy('apy:mantenimiento_lista')
         return context  
     
-class MantenimientoCreateModalView(CreateView):
+class MantenimientoCreateModalView(PermisoRequeridoMixin, CreateView):
     model = Mantenimiento
     form_class = MantenimientoForm
     template_name = "gestion_mantenimiento/modal_mantenimiento.html"
     success_url = reverse_lazy("apy:mantenimiento_lista")
+    
+    # --- Configuración de Permisos ---
+    module_name = 'GestionMantenimiento'
+    permission_required = 'add'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):

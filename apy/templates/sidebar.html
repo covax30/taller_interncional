@@ -20,310 +20,94 @@
         <!--begin::Sidebar Wrapper-->
         <div class="sidebar-wrapper">
           <nav class="mt-2">
+
+            <!-- Linea para pruebas de permisos<div style="color: yellow; font-size: 10px;">DEBUG: {{ user_perms }}</div> -->
+
             <!--begin::Sidebar Menu-->
-            <ul
-              class="nav sidebar-menu flex-column"
-              data-lte-toggle="treeview"
-              role="navigation"
-              aria-label="Main navigation"
-              data-accordion="false"
-              id="navigation"
-            >
-               
-              <!--1er super item-->
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon bi bi-graph-down"></i>
-                  <p>
-                    Análisis y Reportes
-                    <i class="nav-arrow bi bi-chevron-right"></i>
-                  </p>
-                </a>
-                <ul class="nav nav-treeview">
+                <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation" data-accordion="false">
+                        
+                  {% if user_perms == 'all' or user_perms.EstadisticasGenerales.view or user_perms.Informes.view %}
                   <li class="nav-item">
-
-                    <!-- 1er item-->
-                    <a href="{% url 'apy:estadisticas' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Estadísticas Generales</p>
-                    </a>
+                    <a href="#" class="nav-link"><i class="nav-icon bi bi-graph-down"></i><p>Análisis y Reportes<i class="nav-arrow bi bi-chevron-right"></i></p></a>
+                    <ul class="nav nav-treeview">
+                      {% if user_perms == 'all' or user_perms.EstadisticasGenerales.view %}
+                      <li class="nav-item"><a href="{% url 'apy:estadisticas' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Estadísticas Generales</p></a></li>
+                      {% endif %}
+                      {% if user_perms == 'all' or user_perms.Informes.view %}
+                      <li class="nav-item"><a href="{% url 'apy:informes_lista' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Informes</p></a></li>
+                      {% endif %}
+                    </ul>
                   </li>
+                  {% endif %}
+
+                  {% if user_perms == 'all' or user_perms.EntradaVehiculos.view or user_perms.SalidaVehiculos.view or user_perms.Vehiculos.view or user_perms.Marca.view %}
+                  <li class="nav-item">
+                    <a href="#" class="nav-link"><i class="nav-icon bi bi-car-front-fill"></i><p>Gestión de Vehículos<i class="nav-arrow bi bi-chevron-right"></i></p></a>
+                    <ul class="nav nav-treeview">
+                      {% if user_perms == 'all' or user_perms.EntradaVehiculos.view %}<li class="nav-item"><a href="{% url 'apy:entrada_vehiculo_lista' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Entrada de Vehículo</p></a></li>{% endif %}
+                      {% if user_perms == 'all' or user_perms.SalidaVehiculos.view %}<li class="nav-item"><a href="{% url 'apy:salida_vehiculo_lista' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Salida de Vehículo</p></a></li>{% endif %}
+                      {% if user_perms == 'all' or user_perms.Vehiculos.view %}<li class="nav-item"><a href="{% url 'apy:vehiculo_lista' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Vehículos</p></a></li>{% endif %}
+                      {% if user_perms == 'all' or user_perms.Marca.view %}<li class="nav-item"><a href="{% url 'apy:marca_lista' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Marcas</p></a></li>{% endif %}
+                    </ul>
+                  </li>
+                  {% endif %}
+
+                  {% if user_perms == 'all' or user_perms.GestionMantenimiento.view or user_perms.Repuestos.view or user_perms.TipoMantenimientos.view or user_perms.Herramientas.view or user_perms.Insumos.view %}
+                  <li class="nav-item">
+                    <a href="#" class="nav-link"><i class="nav-icon bi bi-wrench"></i><p>Mantenimiento y Repuestos<i class="nav-arrow bi bi-chevron-right"></i></p></a>
+                    <ul class="nav nav-treeview">
+                      {% if user_perms == 'all' or user_perms.GestionMantenimiento.view %}<li class="nav-item"><a href="{% url 'apy:mantenimiento_lista' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Mantenimientos</p></a></li>{% endif %}
+                      {% if user_perms == 'all' or user_perms.Repuestos.view %}<li class="nav-item"><a href="{% url 'apy:repuesto_lista' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Repuestos</p></a></li>{% endif %}
+                      {% if user_perms == 'all' or user_perms.TipoMantenimientos.view %}<li class="nav-item"><a href="{% url 'apy:tipo_mantenimiento_lista' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Tipos Mantenimiento</p></a></li>{% endif %}
+                      {% if user_perms == 'all' or user_perms.Herramientas.view %}<li class="nav-item"><a href="{% url 'apy:herramienta_lista' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Herramientas</p></a></li>{% endif %}
+                      {% if user_perms == 'all' or user_perms.Insumos.view %}<li class="nav-item"><a href="{% url 'apy:insumo_lista' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Insumos</p></a></li>{% endif %}
+                    </ul>
+                  </li>
+                  {% endif %}
+
+                  {% if user_perms == 'all' or user_perms.Gastos.view or user_perms.Factura.view or user_perms.Pagos.view or user_perms.Caja.view or user_perms.PagoServicios.view %}
+                  <li class="nav-item">
+                    <a href="#" class="nav-link"><i class="nav-icon bi bi-currency-dollar"></i><p>Administración<i class="nav-arrow bi bi-chevron-right"></i></p></a>
+                    <ul class="nav nav-treeview">
+                      {% if user_perms == 'all' or user_perms.Gastos.view %}<li class="nav-item"><a href="{% url 'apy:gasto_lista' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Gastos</p></a></li>{% endif %}
+                      {% if user_perms == 'all' or user_perms.Factura.view %}<li class="nav-item"><a href="{% url 'apy:lista_servicios' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Factura</p></a></li>{% endif %}
+                      {% if user_perms == 'all' or user_perms.Pagos.view %}<li class="nav-item"><a href="{% url 'apy:pagos_lista' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Pagos</p></a></li>{% endif %}
+                      {% if user_perms == 'all' or user_perms.Caja.view %}<li class="nav-item"><a href="{% url 'apy:caja_lista' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Caja</p></a></li>{% endif %}
+                      {% if user_perms == 'all' or user_perms.PagoServicios.view %}<li class="nav-item"><a href="{% url 'apy:pago_servicios_lista' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Servicios Públicos</p></a></li>{% endif %}
+                    </ul>
+                  </li>
+                  {% endif %}
+
+                  {% if user_perms == 'all' or user_perms.Proveedor.view or user_perms.Clientes.view %}
+                  <li class="nav-item">
+                    <a href="#" class="nav-link"><i class="nav-icon bi bi-people-fill"></i><p>Gestión de Clientes<i class="nav-arrow bi bi-chevron-right"></i></p></a>
+                    <ul class="nav nav-treeview">
+                      {% if user_perms == 'all' or user_perms.Proveedor.view %}<li class="nav-item"><a href="{% url 'apy:proveedor_lista' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Proveedores</p></a></li>{% endif %}
+                      {% if user_perms == 'all' or user_perms.Clientes.view %}<li class="nav-item"><a href="{% url 'apy:cliente_lista' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Clientes</p></a></li>{% endif %}
+                    </ul>
+                  </li>
+                  {% endif %}
+
+                  {% if user_perms == 'all' or user_perms.GestionUsuarios.view or user_perms.Permisos.view or user_perms.Respaldos.view %}
+                  <li class="nav-item">
+                    <a href="#" class="nav-link"><i class="nav-icon bi bi-shield-fill"></i><p>Gestión y Seguridad<i class="nav-arrow bi bi-chevron-right"></i></p></a>
+                    <ul class="nav nav-treeview">
+                      {% if user_perms == 'all' or user_perms.GestionUsuarios.view %}<li class="nav-item"><a href="{% url 'apy:registro_usuario_lista' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Gestión de Usuarios</p></a></li>{% endif %}
+                      {% if user_perms == 'all' or user_perms.Permisos.view %}<li class="nav-item"><a href="{% url 'apy:permisos_usuarios' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Permisos</p></a></li>{% endif %}
+                      {% if user_perms == 'all' or user_perms.Respaldos.view %}<li class="nav-item"><a href="{% url 'backup_module:configuracion_respaldo' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Respaldos</p></a></li>{% endif %}
+                    </ul>
+                  </li>
+                  {% endif %}
 
                   <li class="nav-item">
-
-                    <!-- 1er item-->
-                    <a href="{% url 'apy:informes_lista' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Informes</p>
-                    </a>
+                    <a href="#" class="nav-link"><i class="nav-icon bi bi-gear-fill"></i><p>Configuración<i class="nav-arrow bi bi-chevron-right"></i></p></a>
+                    <ul class="nav nav-treeview">
+                      <li class="nav-item"><a href="{% url 'apy:perfil_usuario' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Mi usuario</p></a></li>
+                      <li class="nav-item"><a href="{% url 'apy:ayuda' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Ayuda</p></a></li>
+                    </ul>
                   </li>
-
+                        
                 </ul>
-              </li>
-              <!--fin super item-->
-              <!--2er super item-->
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon bi bi-car-front-fill"></i>
-
-                  <p>
-                    Gestión de Vehículos
-                    <i class="nav-arrow bi bi-chevron-right"></i>
-                  </p>
-                </a>
-                <ul class="nav nav-treeview">
-                  <!-- 1er item-->
-                  <li class="nav-item">
-                    <a href="{% url 'apy:entrada_vehiculo_lista' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Entrada de Vehículo</p>
-                    </a>
-                  </li>
-                  <!-- 2er item-->
-                  <li class="nav-item">
-                    <a href="{% url 'apy:salida_vehiculo_lista' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Salida de Vehículo</p>
-                    </a>
-                  </li>
-                  <!-- 3er item-->
-                  <li class="nav-item">
-                    <a href="{% url 'apy:vehiculo_lista' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Vehículos</p>
-                    </a>
-                  </li>
-                  <!-- 4er item-->
-                  <li class="nav-item">
-                    <a href="{% url 'apy:marca_lista' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Marcas</p>
-                    </a>
-                  </li>
-
-                </ul>
-              </li>
-              <!--fin super item-->
-              <!--3er super item-->
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon bi bi-wrench"></i>
-                  <p>
-                    Mantenimiento y Repuestos
-                    <i class="nav-arrow bi bi-chevron-right"></i>
-                  </p>
-                </a>
-                <ul class="nav nav-treeview">
-                  <!-- 1er item-->
-                  <li class="nav-item">
-                    <a href="{% url 'apy:mantenimiento_lista' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Gestión de Mantenimientos</p>
-                    </a>
-                  </li>
-                  <!-- 2er item-->
-                  <li class="nav-item">
-                    <a href="{% url 'apy:repuesto_lista' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Gestión de Repuestos</p>
-                    </a>
-                  </li>
-                  <!-- 3er item-->
-                  <li class="nav-item">
-                    <a href="{% url 'apy:tipo_mantenimiento_lista' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Tipos de Mantenimiento</p>
-                    </a>
-                  </li>
-                  <!-- 4er item-->
-                  <li class="nav-item">
-                    <a href="{% url 'apy:herramienta_lista' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Herramientas</p>
-                    </a>
-                  </li>
-                  <!-- 5er item-->
-                  <li class="nav-item">
-                    <a href="{% url 'apy:insumo_lista' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Gestión de Insumos</p>
-                    </a>
-                  </li>
-
-                </ul>
-              </li>
-              <!--fin super item-->
-              <!--4er super item-->
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon bi bi-currency-dollar"></i>
-
-                  <p>
-                    Administración
-                    <i class="nav-arrow bi bi-chevron-right"></i>
-                  </p>
-                </a>
-                <ul class="nav nav-treeview">
-       
-                  <!-- 2er item-->
-                  <li class="nav-item">
-                    <a href="{% url 'apy:gasto_lista' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Gastos</p>
-                    </a>
-                  </li>
-                  <!-- 3er item-->
-                  <li class="nav-item">
-                    <a href="{% url 'apy:factura_lista' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Facturas</p>
-                    </a>
-                  </li>
-                  <!-- 4er item-->
-                  <li class="nav-item">
-                    <a href="{% url 'apy:lista_servicios' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Detalle servicio</p>
-                    </a>
-                  </li>
-                  <!-- 5er item-->
-                  <li class="nav-item">
-                    <a href="{% url 'apy:pagos_lista' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Pagos</p>
-                    </a>
-                  </li>
-                  <!-- 6er item-->
-                  <li class="nav-item">
-                    <a href="{% url 'apy:caja_lista' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Caja</p>
-                    </a>
-                  </li>
-                  <!-- 7er item-->
-                  <li class="nav-item">
-                    <a href="{% url 'apy:nomina_lista' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Nómina</p>
-                    </a>
-                  </li>
-                  <!-- 8er item-->
-                  <li class="nav-item">
-                    <a href="{% url 'apy:pago_servicios_lista' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Servicios Públicos</p>
-                    </a>
-                  </li>
-
-                </ul>
-              </li>
-              <!--fin super item-->
-              <!--5er super item-->
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon bi bi-people-fill"></i>
-
-                  <p>
-                    Gestión de Clientes
-                    <i class="nav-arrow bi bi-chevron-right"></i>
-                  </p>
-                </a>
-                <ul class="nav nav-treeview">
-                  <!-- 1er item-->
-                  <li class="nav-item">
-                    <a href="{% url 'apy:proveedor_lista' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Proveedores</p>
-                    </a>
-                  </li>
-                  <!-- 2er item-->
-                  <li class="nav-item">
-                    <a href="{% url 'apy:cliente_lista' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Clientes</p>
-                    </a>
-                  </li>
-                  <!-- 3er item-->
-                  <li class="nav-item">
-                    <a href="{% url 'apy:compra_lista' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Compras</p>
-                    </a>
-                  </li>
-                  
-                </ul>
-              </li>
-              <!--fin super item-->
-              <!--6er super item-->
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon bi bi-building-fill"></i>
-
-                  <p>
-                    Recursos Humanos
-                    <i class="nav-arrow bi bi-chevron-right"></i>
-                  </p>
-                </a>
-                <ul class="nav nav-treeview">
-                  <!-- 1er item-->
-                  <li class="nav-item">
-                    <a href="{% url 'apy:empleado_lista' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Empleados</p>
-                    </a>
-                  </li>
-                  
-                </ul>
-              </li>
-              <!--fin super item-->
-              <!--7er super item-->
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon bi bi-gear-fill"></i>
-                  <p>
-                    Configuración
-                    <i class="nav-arrow bi bi-chevron-right"></i>
-                  </p>
-                </a>
-               <ul class="nav nav-treeview">
-                  <!-- 1er item-->
-                  <li class="nav-item">
-                    <a href="{% url 'apy:perfil_usuario' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Usuario</p>
-                    </a>
-                  </li>
-                   <!-- 2er item-->
-                  <li class="nav-item">
-                    <a href="{% url 'apy:registro_usuario_lista' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Registro de usuarios</p>
-                    </a>
-                  </li>
-                  <!-- 3er item-->
-                  <li class="nav-item">
-                    <a href="{% url 'apy:permisos_usuarios' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Permisos</p>
-                    </a>
-                  </li>
-                  <!-- 4er item-->
-                   <li class="nav-item">
-                    <a href="{% url 'backup_module:configuracion_respaldo' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>respaldos</p>
-                    </a>
-                  </li>
-                  <!-- 5to item-->
-                  <li class="nav-item" >
-                    <a href="{% url 'apy:ayuda' %}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Ayuda</p>
-                    </a>
-                  </li>
-              </li>
-              <!--fin super item-->
-            </ul>
             <!--end::Sidebar Menu-->
           </nav>
         </div>

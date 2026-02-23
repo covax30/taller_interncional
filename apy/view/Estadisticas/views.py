@@ -50,50 +50,52 @@ def check_custom_permission(user, module_name, permission_required):
             f"Error de configuración: Módulo '{module_name}' no encontrado."
         )
 
-
 @login_required(login_url=reverse_lazy('apy:login'))
 def estadisticas(request):
     
-    # --- 1. VERIFICACIÓN DE PERMISOS PERSONALIZADOS ---
+    # --- 1. VERIFICACIÓN DE PERMISOS INDEPENDIENTE ---
     try:
         check_custom_permission(
             request.user, 
-            module_name='Caja', 
+        module_name='EstadisticasGenerales',
             permission_required='view'
         )
     except PermissionDenied as e:
-        # Si la excepción es capturada, puedes usar messages antes de redirigir
-        # o simplemente dejar que el manejador 403 de Django actúe.
-        # Aquí elegimos redirigir con un mensaje para el flujo de UX (User Experience).
-        messages.warning(request, str(e))
-        return redirect(reverse_lazy('apy:caja_lista')) # Usamos la lista de caja como fallback
-        
+        # Si no tiene permiso, lo mandamos al index (o dashboard)
+        # para evitar el bucle de redirección infinita.
+        messages.error(request, "No tienes acceso al panel de estadísticas.")
+        return redirect('apy:index') 
 
-    # Filtramos solo los ingresos
+    # --- 2. OBTENCIÓN DE DATOS ---
     ingresos_por_mes = (
         Caja.objects
-        .filter(tipo_movimiento='Ingreso')  # Filtra solo los movimientos de ingreso
+        .filter(tipo_movimiento='Ingreso')
         .annotate(mes=TruncMonth('fecha'))
         .values('mes')
         .annotate(total=Sum('monto'))
         .order_by('mes')
     )
 
+    # Nombres de meses en español
+    meses_es = [
+        "", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ]
+
     meses = []
     totales = []
 
     for ingreso in ingresos_por_mes:
-        mes_num = ingreso['mes'].month
-        # NOTA: month_name devuelve nombres de meses en inglés. 
-        # Si necesitas español, considera usar un array predefinido de meses en español.
-        meses.append(month_name[mes_num])  # convierte 1 → "January"
-        totales.append(float(ingreso['total']))
+        if ingreso['mes']:
+            mes_num = ingreso['mes'].month
+            meses.append(meses_es[mes_num])
+            totales.append(float(ingreso['total'] or 0))
 
     context = {
         'meses': meses,
         'totales': totales,
-        'titulo': 'Estadísticas de Ingresos',
-        'entidad': 'Caja'
+        'titulo': 'Panel General de Estadísticas',
+        'entidad': 'Reportes'
     }
 
     return render(request, 'estadisticas.html', context)

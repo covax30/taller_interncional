@@ -78,12 +78,12 @@ class RepuestoCreateView(PermisoRequeridoMixin, CreateView):
     success_url = reverse_lazy('apy:repuesto_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Repuestos'
+    module_name = 'Repuestos' 
     permission_required = 'add'
     
     def form_valid(self, form):
         form.instance.estado = True 
-        messages.success(self.request, "repuesto creado correctamente")
+        messages.success(self.request, f"Repuesto {form.instance.nombre} creado correctamente")
         return super().form_valid(form)  
     
     def get_context_data(self, **kwargs):
@@ -93,18 +93,18 @@ class RepuestoCreateView(PermisoRequeridoMixin, CreateView):
         context['listar_url'] = reverse_lazy('apy:repuesto_lista')
         return context
     
-class RepuestoUpdateView(UpdateView):
+class RepuestoUpdateView(PermisoRequeridoMixin, UpdateView):
     model = Repuesto
     form_class = RepuestoForm
     template_name = 'repuestos/crear.html'
     success_url = reverse_lazy('apy:repuesto_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Repuestos'
+    module_name = 'Repuestos' 
     permission_required = 'change'
     
     def form_valid(self, form):
-        messages.success(self.request, "Repuesto actualizado correctamente")
+        messages.success(self.request, f"Repuesto {self.object.nombre} actualizado correctamente")
         return super().form_valid(form) 
     
     def get_context_data(self, **kwargs):
@@ -120,7 +120,7 @@ class RepuestoDeleteView(PermisoRequeridoMixin, DeleteView):
     success_url = reverse_lazy('apy:repuesto_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Repuestos'
+    module_name = 'Repuestos' 
     permission_required = 'delete'
     
     def post(self, request, *args, **kwargs):
@@ -131,7 +131,7 @@ class RepuestoDeleteView(PermisoRequeridoMixin, DeleteView):
         self.object.estado = False
         self.object.save()
         
-        messages.success(self.request, f"Repuesto {Repuesto} desactivado ")
+        messages.success(self.request, f"Repuesto {self.object.nombre} desactivado correctamente")
         return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):
@@ -148,8 +148,8 @@ class RepuestoActivateView(PermisoRequeridoMixin, DeleteView):
     success_url = reverse_lazy('apy:repuesto_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Repuestos'
-    permission_required = 'change'
+    module_name = 'Repuestos' 
+    permission_required = 'delete'
     
     def post(self, request, *args, **kwargs):
         
@@ -159,7 +159,7 @@ class RepuestoActivateView(PermisoRequeridoMixin, DeleteView):
         self.object.estado = True
         self.object.save()
         
-        messages.success(self.request, f"Repuesto {Repuesto} activado ")
+        messages.success(self.request, f"Repuesto {self.object.nombre} activado correctamente")
         return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):
@@ -190,11 +190,15 @@ def repuestos_bajo_stock_api(request):
     ]
     return JsonResponse(data, safe=False)
 
-class RepuestoCreateModalView(CreateView):
+class RepuestoCreateModalView(PermisoRequeridoMixin, CreateView):
     model = Repuesto
     form_class = RepuestoForm
     template_name = "repuestos/modal_form.html"
     success_url = reverse_lazy("apy:repuesto_lista")
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Repuestos'
+    permission_required = 'add'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -223,10 +227,15 @@ class RepuestoCreateModalView(CreateView):
             "html": html,
             "message": "Por favor, corrige los errores en el formulario ❌"
         })
-class DetalleRepuestoCreateModalView(CreateView):
+        
+class DetalleRepuestoCreateModalView(PermisoRequeridoMixin, CreateView):
     model = DetalleRepuesto
     form_class = RepuestoscantidadForm
     template_name = "repuestos/modal_detallerepuesto.html"
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Repuestos'
+    permission_required = 'add'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):

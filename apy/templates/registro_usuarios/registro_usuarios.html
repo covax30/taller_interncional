@@ -33,6 +33,20 @@
             padding: 1.5rem !important;
         }
     }
+
+    /* Elimina el ojo nativo en navegadores basados en Chromium (Edge, Chrome) */
+    input::-ms-reveal,
+    input::-ms-clear {
+        display: none;
+    }
+
+    /* Para otros navegadores que intenten meter iconos internos */
+    input::-webkit-contacts-auto-fill-button,
+    input::-webkit-credentials-auto-fill-button {
+        visibility: hidden;
+        position: absolute;
+        right: 0;
+    }
 </style>
 
 {% with user_to_edit=object %}
@@ -146,24 +160,33 @@
                         <span class="text-muted small">Para mantener la contraseña actual, deja estos campos en blanco.</span>
                     </div>
 
-                    <div class="form-floating mb-3">
-                        {{ form.old_password|add_class:"form-control border-warning-subtle bg-body text-body" }}
+                    <div class="form-floating mb-3 position-relative">
+                        {{ form.old_password|add_class:"form-control border-warning-subtle bg-body text-body pe-5" }}
                         <label class="text-body"><i class="fas fa-unlock me-2 text-muted"></i>Contraseña Actual</label>
+                        <button type="button" class="btn position-absolute top-50 end-0 translate-middle-y border-0 text-muted toggle-password" style="z-index: 10;">
+                            <i class="fas fa-eye"></i>
+                        </button>
                         {% if form.old_password.errors %}<div class="text-danger small mt-1">{{ form.old_password.errors }}</div>{% endif %}
                     </div>
                     {% endif %}
 
                     <div class="row g-3">
                         <div class="col-sm-6">
-                            <div class="form-floating mb-1">
-                                {{ form.password|add_class:"form-control bg-body text-body" }} 
+                            <div class="form-floating mb-1 position-relative">
+                                {{ form.password|add_class:"form-control bg-body text-body pe-5" }} 
                                 <label class="text-body"><i class="fas fa-lock me-2 text-muted"></i>{% if user_to_edit %}Nueva Clave{% else %}Clave{% endif %}</label>
+                                <button type="button" class="btn position-absolute top-50 end-0 translate-middle-y border-0 text-muted toggle-password" style="z-index: 10;">
+                                    <i class="fas fa-eye"></i>
+                                </button>
                             </div>
                         </div>
                         <div class="col-sm-6">
-                            <div class="form-floating mb-1">
-                                {{ form.password2|add_class:"form-control bg-body text-body" }} 
+                            <div class="form-floating mb-1 position-relative">
+                                {{ form.password2|add_class:"form-control bg-body text-body pe-5" }} 
                                 <label class="text-body"><i class="fas fa-check-double me-2 text-muted"></i>Confirmar</label>
+                                <button type="button" class="button btn position-absolute top-50 end-0 translate-middle-y border-0 text-muted toggle-password" style="z-index: 10;">
+                                    <i class="fas fa-eye"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -217,4 +240,5 @@
 
 <script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
 <script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
+<script src="{% static 'js/password_eye.js' %}"></script>
 {% endblock %}

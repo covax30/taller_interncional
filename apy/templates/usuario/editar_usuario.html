@@ -10,44 +10,52 @@
         width: 0.1px; height: 0.1px; opacity: 0; overflow: hidden; position: absolute; z-index: -1;
     }
     .profile-card-info {
-        background-color: var(--bs-tertiary-bg); /* Adaptable a tema */
+        background-color: var(--bs-tertiary-bg); 
         border-radius: 12px;
         border: 1px solid rgba(0,0,0,0.05);
     }
     /* Mejora de responsividad para el borde lateral */
     @media (max-width: 767.98px) {
         .border-end {
-            border-end: none !important;
+            border-right: none !important;
             border-bottom: 1px solid var(--bs-border-color);
             margin-bottom: 2rem;
         }
+    }
+    /* Elimina el ojo nativo en navegadores Chromium */
+    input::-ms-reveal,
+    input::-ms-clear {
+        display: none;
+    }
+    input::-webkit-contacts-auto-fill-button,
+    input::-webkit-credentials-auto-fill-button {
+        visibility: hidden;
+        position: absolute;
+        right: 0;
     }
 </style>
 
 {% with user.is_superuser as is_admin %}
     
-    {# LÓGICA DEL AVATAR #}
-    {% if user.profile.imagen.url and user.profile.imagen.url|length > 0 and 'default.png' not in user.profile.imagen.url %}
-        {% with user.profile.imagen.url as user_avatar_url %}{% endwith %}
-    {% else %}
-        {% if is_admin %}
-            {% static 'img/gerente.png' as user_avatar_url %} 
-        {% else %}
-            {% static 'img/empleado.png' as user_avatar_url %}
-        {% endif %}
-    {% endif %}
+{# 1. Definición de Avatar por defecto según Rol #}
+{% if user.is_superuser %}
+    {% static 'img/gerente.png' as avatar_defecto %}
+{% else %}
+    {% static 'img/empleado.png' as avatar_defecto %}
+{% endif %}
 
 <div class="container rounded mt-5 mb-5 shadow-sm p-4 bg-body border"> 
     <div class="row">
         
-        {# COLUMNA IZQUIERDA: Gestión de Imagen y Estado #}
+        {# COLUMNA IZQUIERDA #}
         <div class="col-md-4 border-end">
             <div class="d-flex flex-column align-items-center text-center p-3 py-md-5 w-100"> 
                 
                 <div class="position-relative">
-                    <img src="{% if user.profile.imagen %}{{ user.profile.imagen.url }}{% else %}{{ user_avatar_url }}{% endif %}"
+                    {# 2. Lógica Segura para evitar ValueError #}
+                    <img src="{% if user.profile.imagen and user.profile.imagen.name %}{{ user.profile.imagen.url }}{% else %}{{ avatar_defecto }}{% endif %}"
                         id="user-avatar-img" 
-                        data-default-src="{{ user_avatar_url }}"
+                        data-default-src="{{ avatar_defecto }}"
                         class="rounded-circle shadow mb-3 img-fluid"
                         style="width:210px; height:210px; object-fit:cover; border: 6px solid var(--bs-tertiary-bg);">
                 </div>
@@ -57,7 +65,7 @@
                 
                 <span class="badge rounded-pill bg-{{ user.is_superuser|yesno:'danger,success' }} px-3 py-2 mb-4">
                     <i class="fas {% if user.is_superuser %}fa-user-tie{% else %}fa-tools{% endif %} me-1"></i>
-                    {{ user.is_superuser|yesno:'Gerente (Admin),Empleado' }}
+                    {{ user.is_superuser|yesno:'Gerente,Empleado' }}
                 </span>
 
                 <div class="d-flex align-items-center w-100 mb-3">
@@ -69,31 +77,31 @@
                     {% csrf_token %}
                     <div class="d-none">
                         {{ profile_form.imagen|attr:"id:id_profile_imagen_solo" }}
-                        {{ profile_form.imagen_clear|attr:"id:id_imagen_clear_solo"|attr:"name:imagen_clear" }}
                     </div>
 
                     <div class="d-grid gap-2">
                         <button type="button" id="btn-seleccionar-archivo" class="btn btn-outline-primary btn-sm rounded-pill">
-                            <i class="fas fa-camera me-1"></i> Cambiar Foto
+                            <i class="fas fa-camera me-1"></i> Subir Nueva Foto
                         </button>
 
                         <button type="submit" id="btn-guardar-imagen-unica" class="btn btn-success btn-sm rounded-pill" disabled>
-                            <i class="fas fa-check me-1"></i> Aplicar Cambio
+                            <i class="fas fa-check me-1"></i> Confirmar Cambio
                         </button>
 
-                        {% if user.profile.imagen and 'default.png' not in user.profile.imagen.url %}
+                        {# 3. Botón eliminar solo si hay algo que eliminar en la DB #}
+                        {% if user.profile.imagen and user.profile.imagen.name %}
                             <button type="button" id="btn-eliminar-imagen" class="btn btn-link text-danger btn-sm text-decoration-none">
-                                <i class="fas fa-trash-alt me-1"></i> Quitar foto actual
+                                <i class="fas fa-trash-alt me-1"></i> Eliminar mi foto
                             </button>
                         {% endif %}
                     </div>
 
-                    <div class="mt-3 p-2 bg-body-tertiary rounded shadow-sm border">
+                    <div class="mt-3 p-2 bg-body-tertiary rounded border">
                         <small class="text-muted d-block text-truncate" id="file-name-display" style="font-size: 0.75rem;">
-                            {% if user.profile.imagen and 'default.png' not in user.profile.imagen.url %}
+                            {% if user.profile.imagen and user.profile.imagen.name %}
                                 <i class="fas fa-image text-primary"></i> {{ user.profile.imagen.name }}
                             {% else %}
-                                <i class="fas fa-times-circle"></i> Sin cambios
+                                <i class="fas fa-info-circle"></i> No has subido una foto aún
                             {% endif %}
                         </small>
                     </div>
@@ -101,7 +109,7 @@
             </div>
         </div>
         
-        {# COLUMNA DERECHA: Ajustes y Contraseña #}
+        {# COLUMNA DERECHA #}
         <div class="col-md-8">
             <div class="px-md-3 py-4">
                 
@@ -110,7 +118,6 @@
                     <i class="fas fa-cog fa-spin text-body opacity-50" style="--fa-animation-duration: 10s;"></i>
                 </div>
 
-                {# Información de la Cuenta Estilizada #}
                 <div class="profile-card-info p-3 mb-4 rounded border">
                     <div class="row text-center text-md-start g-2">
                         <div class="col-6 col-md-6 border-md-end">
@@ -181,7 +188,6 @@
                         </div>
                     </div>
                     
-                    {# --- BOTONES DE ACCIÓN --- #}
                     <div class="mt-4 d-flex flex-column flex-sm-row justify-content-end gap-2">
                         <a href="{% url 'apy:perfil_usuario' %}" class="btn btn-outline-secondary px-4 rounded-pill bg-body">
                             <i class="fas fa-arrow-left me-1"></i> Volver
@@ -192,7 +198,6 @@
                     </div>
                 </form>
 
-                {# SECCIÓN DE CONTRASEÑA #}
                 <div class="d-flex align-items-center mt-5 mb-3">
                     <h6 class="text-uppercase fw-bold text-muted small mb-0 text-danger">Seguridad de la Cuenta</h6>
                     <hr class="flex-grow-1 ms-3 opacity-25">
@@ -200,28 +205,31 @@
 
                 <form method="POST" action="{% url 'password_change' %}">
                     {% csrf_token %}
-                    {% if password_form.non_field_errors %}
-                        <div class="alert alert-danger p-2 small">{{ password_form.non_field_errors }}</div>
-                    {% endif %}
-                    
-                    <div class="form-floating mb-3">
-                        {{ password_form.old_password|add_class:"form-control border-danger-subtle bg-body text-body" }}
+                    <div class="form-floating mb-3 position-relative">
+                        {{ password_form.old_password|add_class:"form-control border-danger-subtle bg-body text-body pe-5" }}
                         <label class="text-body"><i class="fas fa-key me-2 text-muted"></i>Contraseña Actual</label>
-                        {% if password_form.old_password.errors %}<small class="text-danger">{{ password_form.old_password.errors }}</small>{% endif %}
+                        <button type="button" class="btn position-absolute top-50 end-0 translate-middle-y border-0 text-muted toggle-password">
+                            <i class="fas fa-eye"></i>
+                        </button>
                     </div>
 
                     <div class="row g-3">
                         <div class="col-sm-6">
-                            <div class="form-floating mb-1">
-                                {{ password_form.new_password1|add_class:"form-control bg-body text-body" }}
+                            <div class="form-floating mb-1 position-relative">
+                                {{ password_form.new_password1|add_class:"form-control bg-body text-body pe-5" }}
                                 <label class="text-body"><i class="fas fa-lock me-2 text-muted"></i>Nueva Contraseña</label>
-                                {% if password_form.new_password1.errors %}<small class="text-danger">{{ password_form.new_password1.errors }}</small>{% endif %}
+                                <button type="button" class="btn position-absolute top-50 end-0 translate-middle-y border-0 text-muted toggle-password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
                             </div>
                         </div>
                         <div class="col-sm-6">
-                            <div class="form-floating mb-1">
-                                {{ password_form.new_password2|add_class:"form-control bg-body text-body" }}
+                            <div class="form-floating mb-1 position-relative">
+                                {{ password_form.new_password2|add_class:"form-control bg-body text-body pe-5" }}
                                 <label class="text-body"><i class="fas fa-check-double me-2 text-muted"></i>Confirmar Nueva</label>
+                                <button type="button" class="btn position-absolute top-50 end-0 translate-middle-y border-0 text-muted toggle-password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -240,5 +248,6 @@
 <script src="{% static 'js/perfil_usuario.js' %}"></script>
 <script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
 <script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
+<script src="{% static 'js/password_eye.js' %}"></script>
 {% endwith %}
 {% endblock %}

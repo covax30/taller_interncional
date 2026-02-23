@@ -65,7 +65,7 @@ class PagosCreateView(PermisoRequeridoMixin, CreateView):
     success_url = reverse_lazy('apy:pagos_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Pagos'
+    module_name = 'Pagos' 
     permission_required = 'add'
     
     def form_valid(self, form):
@@ -87,7 +87,7 @@ class PagosUpdateView(PermisoRequeridoMixin, UpdateView):
     success_url = reverse_lazy('apy:pagos_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Pagos'
+    module_name = 'Pagos' 
     permission_required = 'change'
     
     def form_valid(self, form):
@@ -107,7 +107,7 @@ class PagosDeleteView(PermisoRequeridoMixin, DeleteView):
     success_url = reverse_lazy('apy:pagos_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Pagos'
+    module_name = 'Pagos' 
     permission_required = 'delete'
     
     def post(self, request, *args, **kwargs):
@@ -118,7 +118,7 @@ class PagosDeleteView(PermisoRequeridoMixin, DeleteView):
         self.object.estado = False
         self.object.save()
         
-        messages.success(self.request, f"Cliente {self.object.nombre} desactivado ")
+        messages.success(self.request, f"Pago {self.object.id} desactivado correctamente")
         return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):
@@ -135,8 +135,8 @@ class PagosActivateView(PermisoRequeridoMixin, DeleteView):
     success_url = reverse_lazy('apy:pagos_lista')  # cambia por tu URL real
 
     # --- Configuración de Permisos ---
-    module_name = 'Pagos'
-    permission_required = 'change'
+    module_name = 'Pagos' 
+    permission_required = 'delete'
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()

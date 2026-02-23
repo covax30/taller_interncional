@@ -60,38 +60,44 @@ class PerfilEditarView(View):
             }
             messages.error(request, "Error al guardar los datos. Revisa los campos marcados.")
             return render(request, self.template_name, context)
-
+        
 @method_decorator(login_required, name='dispatch')
 class ActualizarPerfilImagenView(View):
     success_url = reverse_lazy('apy:editar_usuario') 
 
     def post(self, request, *args, **kwargs):
+        # 1. Obtenemos el perfil
         profile_instance, _ = Profile.objects.get_or_create(user=request.user)
         
+        # 2. Lógica para ELIMINAR la imagen
         if request.POST.get('imagen_clear') == 'on':
             if profile_instance.imagen:
-                profile_instance.imagen.delete(save=True) # Borra archivo físico y limpia el campo
-            messages.success(request, "Imagen eliminada. Se ha restaurado la imagen por defecto.")
+                # Borra el archivo físico y pone el campo en NULL
+                profile_instance.imagen.delete(save=False) 
+                profile_instance.imagen = None
+                profile_instance.save(update_fields=['imagen']) 
+            
+            messages.success(request, "Imagen eliminada. Ahora verás tu avatar de rol.")
             return redirect(self.success_url)
 
-    # Si no es borrar, procesamos la subida normal
-        profile_form = ProfileForm(request.POST, request.FILES, instance=profile_instance)
-        if profile_form.is_valid():
-            profile_form.save() 
-            messages.success(request, "¡Imagen de perfil actualizada!")
+        # 3. Lógica para SUBIR/ACTUALIZAR imagen
+        if 'imagen' in request.FILES:
+            profile_instance.imagen = request.FILES['imagen']
+            
+            # EL TRUCO: update_fields=['imagen'] evita que Django valide 
+            # o intente guardar la identificación o el teléfono.
+            try:
+                profile_instance.save(update_fields=['imagen'])
+                messages.success(request, "¡Imagen de perfil actualizada!")
+            except Exception as e:
+                messages.error(request, f"Error al guardar la imagen: {e}")
+            
             return redirect(self.success_url)
-        else:
-            # Reutilizamos la lógica de carga para no perder el contexto en caso de error
-            user_form = PerfilUsuarioForm(instance=request.user)
-            password_form = PasswordChangeForm(request.user)
-            context = {
-                'form': user_form,
-                'profile_form': profile_form,
-                'password_form': password_form,
-            }
-            messages.error(request, "No se pudo procesar la imagen. Inténtalo de nuevo.")
-            return render(request, 'usuario/editar_usuario.html', context)
 
+        # Si llegan aquí sin enviar nada
+        messages.warning(request, "No se seleccionó ninguna imagen.")
+        return redirect(self.success_url)
+    
 @method_decorator(login_required, name='dispatch')
 class PerfilPasswordChangeDoneView(TemplateView):
     def get(self, request, *args, **kwargs):
