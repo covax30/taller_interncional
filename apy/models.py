@@ -281,26 +281,21 @@ class Vehiculo(models.Model):
 
 class EntradaVehiculo(models.Model):
     id_entrada = models.AutoField(primary_key=True)
-    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT) 
-    id_cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT) 
     fecha_ingreso = models.DateField()
     hora_ingreso = models.TimeField()
 
     def __str__(self):
-        return f"{self.id_cliente} - {self.id_vehiculo.placa} - {self.fecha_ingreso} {self.hora_ingreso}"
+        return f"{self.fecha_ingreso} - {self.hora_ingreso}"
     
 
 class SalidaVehiculo(models.Model):
     id_salida = models.AutoField(primary_key=True)
-    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT) 
-    id_cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)  
-    diagnostico = models.CharField(max_length=100)
     fecha_salida = models.DateField()
     hora_salida = models.TimeField()
     def __str__(self):
     # Usamos .id (el identificador por defecto de Django) 
     # o simplemente self.id_cliente (que usará el nombre del cliente)
-        return f"{self.id_cliente} - {self.id_vehiculo.placa} - {self.diagnostico}"
+        return f"{self.fecha_salida} - {self.hora_salida} "
 
  
 #-------------MODULOS DE karol-----------

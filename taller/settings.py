@@ -39,14 +39,15 @@ except OSError as e:
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # En settings.py:
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-fallback-key')
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
-
+SECRET_KEY = os.getenv('SECRET_KEY')
+DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 't')
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'taller_internacional.artisandev.site']
+CSRF_TRUSTED_ORIGINS = ['https://taller_internacional.artisandev.site']
+WHITENOISE_MANIFEST_STRICT = False
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    'django.contrib.admin', 
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -96,22 +97,21 @@ WSGI_APPLICATION = 'taller.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('DB_NAME', 'mydatabase'),
-        'USER': os.getenv('DB_USER', 'myuser'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'mypassword'),
-        'HOST': os.getenv('DB_HOST', 'localhost'),
-        'PORT': os.getenv('DB_PORT', '3307'),
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
     },
     
     'log_db': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'bckp_logs', 
-        # 🚨 CORRECCIÓN: Usar variables de entorno (DB_USER, DB_PASSWORD)
-        'USER': os.getenv('DB_USER', 'myuser'), 
-        'PASSWORD': os.getenv('DB_PASSWORD', 'mypassword'),
-        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'NAME': os.getenv('DB_LOG_NAME', 'bckp_logs'),
+        'USER': os.getenv('DB_USER'), 
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST', 'db'),
         # 🚨 CORRECCIÓN: Usar el mismo puerto que la base de datos 'default'
-        'PORT': os.getenv('DB_PORT', '3307'), 
+        'PORT': os.getenv('DB_PORT', '3306'), 
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
         }
@@ -205,7 +205,7 @@ STORAGES = {
     },
     
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
 

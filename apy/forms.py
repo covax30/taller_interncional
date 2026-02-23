@@ -168,6 +168,7 @@ class DetalleTipo_MantenimientoForm(ModelForm):
         model = DetalleTipoMantenimiento
         fields = ['id_tipo_mantenimiento', 'cantidad', 'precio_unitario']
         widgets = {
+            
             'id_tipo_mantenimiento': Select(
                 attrs={
                     'class': 'form-control',
@@ -190,6 +191,7 @@ class DetalleTipo_MantenimientoForm(ModelForm):
             ),  
         }
         error_messages = {
+                
             'id_tipo_mantenimiento': {
                 'required': 'El tipo de mantenimiento es obligatorio',
             },
@@ -249,7 +251,7 @@ class DetalleInsumoForm(ModelForm):
 class DetalleServicioForm(ModelForm):
     class Meta:
         model = DetalleServicio
-        fields = ['id_vehiculo','cliente','id_entrada','empresa','id_salida','proceso' ,'empleado' ]
+        fields = ['id_vehiculo','cliente','id_entrada','empresa','id_salida','proceso'  ]
         widgets = {
             'id_vehiculo': Select(attrs={
                 'class': 'form-control',
@@ -271,6 +273,7 @@ class DetalleServicioForm(ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Seleccione un empleado'
             }),
+            
             'id_salida': Select(attrs={   
                 'class': 'form-control',
                 'placeholder': 'Seleccione una salida de vehículo'
@@ -719,7 +722,7 @@ class VehiculoForm(ModelForm):
 class EntradaVehiculoForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['id_vehiculo'].widget.attrs['autofocus'] = True
+        self.fields['fecha_ingreso'].widget.attrs['autofocus'] = True
         
     class Meta:
         model = EntradaVehiculo
@@ -730,18 +733,7 @@ class EntradaVehiculoForm(ModelForm):
                     'class': 'form-control',
                 }
             ),
-            'id_vehiculo':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-            'id_cliente':Select(
-                attrs={
-                    'class': 'form-control',
-                    'placeholder':'Ingrese el telefono del administrador',
-                    'type': 'tel'
-                }
-            ),
+          
             'fecha_ingreso':DateInput(
                 attrs={
                     'type': 'date',
@@ -776,7 +768,7 @@ class EntradaVehiculoForm(ModelForm):
 class SalidaVehiculoForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['id_vehiculo'].widget.attrs['autofocus'] = True
+        self.fields['fecha_salida'].widget.attrs['autofocus'] = True
         
     class Meta:
         model = SalidaVehiculo
@@ -787,21 +779,7 @@ class SalidaVehiculoForm(ModelForm):
                     'class': 'form-control',
                 }
             ),
-            'id_vehiculo':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-            'id_cliente':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-            'diagnostico':TextInput(
-                attrs={
-                    'placeholder':'Ingrese el diagnóstico del vehículo',
-                }
-            ),
+            
             'fecha_salida':DateInput(
                 attrs={
                     'type': 'date',

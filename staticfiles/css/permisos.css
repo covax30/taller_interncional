@@ -1,0 +1,52 @@
+/* Estilo para los checkboxes sin marcar */
+.form-check-input:not(:checked) {
+    /* Fondo blanco para contraste con fondos oscuros */
+    background-color: #ffffff; 
+    /* Borde más grueso y visible (ej. color primario de Bootstrap o un color fuerte) */
+    border: 2px solid #0d6efd; 
+}
+
+/* Estilo para los checkboxes marcados */
+.form-check-input:checked {
+    /* Color de fondo primario de Bootstrap (Azul) para alto contraste */
+    background-color: #0d6efd; 
+    border-color: #0d6efd; 
+}
+
+/* Estilos para mantener la apariencia de AdminLTE en el tema oscuro */
+html[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: rgba(255, 255, 255, 0.05); /* Tono ligeramente más claro para las filas impares */
+}
+
+/* Asegurar que el texto dentro de la tabla se adapte al tema */
+.table th, .table td {
+    color: var(--bs-body-color);
+}
+
+/* Estilos para la gestión de permisos */
+
+/* 1. Efecto gris para checks desactivados (Admin) */
+.form-check-input:disabled {
+    opacity: 0.8 !important;
+    cursor: not-allowed;
+    /* Color gris acero para indicar bloqueo */
+    background-color: #6c757d !important; 
+    border-color: #495057 !important;
+    filter: grayscale(100%);
+}
+
+/* 2. Resaltado para la fila del admin (opcional) */
+.user-admin-row {
+    background-color: rgba(255, 193, 7, 0.05) !important;
+}
+
+/* 3. Estilo para los checkboxes normales (basado en tu código previo) */
+.form-check-input:not(:checked):not(:disabled) {
+    background-color: #ffffff;
+    border: 2px solid #0d6efd;
+}
+
+.form-check-input:checked:not(:disabled) {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
