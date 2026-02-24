@@ -158,9 +158,9 @@
         <td style="width: 48%; border: none; vertical-align: top; padding-right: 10px;">
             <div style="background: #f8f9fa; padding: 10px; border-left: 5px solid #2980b9;">
                 <h3 style="color: #2980b9; font-size: 11px; margin-top: 0;">DATOS DEL CLIENTE</h3>
-                <p style="margin: 2px 0;"><strong>Nombre:</strong> {{ cliente.nombre }}</p>
-                <p style="margin: 2px 0;"><strong>Identificación:</strong> {{ cliente.identificacion }}</p>
-                <p style="margin: 2px 0;"><strong>Teléfono:</strong> {{ cliente.telefono }}</p>
+                <p style="margin: 2px 0;"><strong>Nombre:</strong> {{ servicio.cliente.nombre }}</p>
+                <p style="margin: 2px 0;"><strong>Identificación:</strong> {{ servicio.cliente.identificacion }}</p>
+                <p style="margin: 2px 0;"><strong>Teléfono:</strong> {{ servicio.cliente.telefono }}</p>
             </div>
         </td>
         
@@ -169,8 +169,8 @@
         <td style="width: 48%; border: none; vertical-align: top; padding-left: 10px;">
             <div style="background: #f8f9fa; padding: 10px; border-left: 5px solid #2980b9;">
                 <h3 style="color: #2980b9; font-size: 11px; margin-top: 0;">DATOS DEL VEHÍCULO</h3>
-                <p style="margin: 2px 0;"><strong>Placa:</strong> {{ vehiculo.placa }}</p>
-                <p style="margin: 2px 0;"><strong>Marca/Modelo:</strong> {{ vehiculo.marca_vehiculo }} {{ vehiculo.modelo_vehiculo }}</p>
+                <p style="margin: 2px 0;"><strong>Placa:</strong> {{ servicio.id_vehiculo.placa }}</p>
+                <p style="margin: 2px 0;"><strong>Marca/Modelo:</strong> {{ servicio.id_vehiculo.marca_vehiculo }} {{ servicio.id_vehiculo.modelo_vehiculo }}</p>
                 <p style="margin: 2px 0;"><strong>Fecha Emisión:</strong> {{ servicio.fecha_creacion|date:"d/m/Y H:i" }}</p>
             </div>
         </td>
@@ -208,7 +208,7 @@
                 {% for i in insumos %}
                 <tr>
                     <td class="text-center">{{ i.cantidad }}</td>
-                    <td>Insumo: {{ i.id_insumos.id_marca.nombre }}</td>
+                    <td>Insumo: {{ i.id_insumos.nombre }}</td>
                     <td class="text-right">${{ i.precio_unitario }}</td>
                     <td class="text-right">${{ i.subtotal }}</td>
                 </tr>

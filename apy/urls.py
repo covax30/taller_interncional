@@ -120,6 +120,8 @@ urlpatterns = [
     path('registro/crear/', RegistroUsuarioCreateView.as_view(), name='registro_usuario_crear'), 
     path('registro/editar/<int:pk>/', RegistroUpdateView.as_view(), name='registro_usuario_editar'), 
     path('registro/eliminar/<int:pk>/', RegistroDeleteView.as_view(), name='registro_usuario_eliminar'),
+    path("empleado/modal/crear/", EmpleadoCreateModalView.as_view(), name="empleado_modal_crear"),  
+    
     
     path('permisos/', permisos_usuarios, name='permisos_usuarios'),  
   
@@ -128,14 +130,10 @@ urlpatterns = [
   
     
     #--------URL modulo informes----------------
-    path('informes/listar/', InformesListView.as_view() , name='informes_lista'),
-    path('informes/agregar/', InformesCreateView.as_view() , name='informes_crear'),
-    path('informes/editar/<int:pk>/', InformesUpdateView.as_view() , name='informes_editar'),
-    path('informes/eliminar/<int:pk>/', InformesDeleteView.as_view() , name='informes_eliminar'),
-    path("informes/inactivos/", InformesInactivosListView.as_view(), name="informes_inactivos"),
-    path('informes/activar/<int:pk>/', InformesActivateView.as_view(), name="informes_activar"),
-    path('informes/excel/<int:id>/', informe_excel, name='informes_excel'),
-    path('obtener-totales/<int:id>/', obtener_totales_servicio, name='obtener_totales'),  
+    path('informes/dashboard/', InformeDashboardView.as_view(), name='dashboard_informes'),
+    path('informes/lista/', InformeListView.as_view(), name='informe_lista'),
+    path('informes/nuevo/', CreateInformeView.as_view(), name='crear_informe'),
+    path('informes/exportar/excel/', exportar_informe_excel, name='exportar_excel'),
 
     
     #--------URL modulo pago de sercicios publicos----------------

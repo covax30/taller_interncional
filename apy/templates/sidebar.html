@@ -34,7 +34,7 @@
                       <li class="nav-item"><a href="{% url 'apy:estadisticas' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Estadísticas Generales</p></a></li>
                       {% endif %}
                       {% if user_perms == 'all' or user_perms.Informes.view %}
-                      <li class="nav-item"><a href="{% url 'apy:informes_lista' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Informes</p></a></li>
+                      <li class="nav-item"><a href="{% url 'apy:informe_lista' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Informes</p></a></li>
                       {% endif %}
                     </ul>
                   </li>
