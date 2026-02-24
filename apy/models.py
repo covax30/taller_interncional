@@ -77,7 +77,7 @@ nit_validator = RegexValidator(
 #------ ENTIDAD de TIPO mantenmimiento ---------1
 class TipoMantenimiento(models.Model):
     nombre = models.CharField(max_length=50, unique=True)
-    descripcion = models.TextField(blank=True, null=True)
+    descripcion = models.TextField()
     estado = models.BooleanField(default=True)
 
     def __str__(self):
@@ -225,8 +225,8 @@ class Cliente(models.Model):
         ('cliente particular', 'Cliente Particular'),
         ('empresa', 'Empresa'),
     ]
-    tipo = models.CharField(max_length=20, choices=TIPO_CLIENTE, blank=True, null=True)
-    nombre = models.CharField(max_length=255, verbose_name="Nombre/Razón Social", blank=True, null=True)
+    tipo = models.CharField(max_length=20, choices=TIPO_CLIENTE)
+    nombre = models.CharField(max_length=255, verbose_name="Nombre/Razón Social")
     identificacion = models.CharField(
         max_length=50, 
         unique=True, 
@@ -235,9 +235,9 @@ class Cliente(models.Model):
         blank=False, 
         null=False 
     )
-    telefono = models.CharField(max_length=20, blank=True, null=True)
-    correo = models.EmailField(validators=[validar_email], blank=True, null=True)
-    direccion = models.TextField(verbose_name="Dirección", blank=True, null=True)
+    telefono = models.CharField(max_length=20)
+    correo = models.EmailField(validators=[validar_email], unique=True)
+    direccion = models.TextField(verbose_name="Dirección")
     estado = models.BooleanField(default=True, verbose_name="Activo")
 
     def __str__(self):

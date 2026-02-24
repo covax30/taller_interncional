@@ -602,13 +602,20 @@ class ClienteForm(ModelForm):
             ),
             'direccion':TextInput(
                 attrs={
-                    'placeholder':'Ingrese el correo del cliente',
+                    'placeholder':'Ingrese la dirección del cliente',
                 }
             ),
             
             
         }
         error_messages = {
+            'tipo': {
+                'required': 'El tipo de cliente es obligatorio',
+            },
+            'nombre': {
+                'required': 'El nombre del cliente es obligatorio',
+                'invalid': 'Por favor ingrese solo letras en el nombre del cliente',
+            },
             'identificacion': {
                 'required': 'El docmuento de identidad es obligatorio',
                 'unique': 'Ya existe un cliente con ese documento de identidad',
@@ -623,6 +630,10 @@ class ClienteForm(ModelForm):
                 'invalid': 'El correo no tiene un formato válido',
                 'unique': 'Ya existe un cliente con ese correo',
             },
+            'direccion': {
+                'required': 'La dirección es obligatoria',
+                'invalid': 'Por favor ingrese solo letras y números en la dirección',
+            }
            
         }
 class VehiculoForm(ModelForm):

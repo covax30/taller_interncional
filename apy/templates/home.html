@@ -109,7 +109,7 @@
     [data-bs-theme="light"] .app-header, 
     [data-bs-theme="light"] .app-footer,
     [data-bs-theme="light"] .app-sidebar {
-        background-color: #3a3b72 !important; /* Un crema muy elegante y sutil */
+        background-color: #ffffff !important; /* Un crema muy elegante y sutil */
         border-color: #312e3d !important;
         color: #243241 !important;
     }
@@ -118,7 +118,7 @@
     [data-bs-theme="light"] .nav-link, 
     [data-bs-theme="light"] .nav-link i,
     [data-bs-theme="light"] .brand-text {
-        color: #ffffff !important;
+        color: #000000 !important;
     }
 
     /* El input del buscador para que no se pierda en el crema */
@@ -127,7 +127,23 @@
         border: 1px solid #534677 !important;
     }
 
-    
+    /* Forzar fondo sólido en el sidebar para ambos temas */
+.app-sidebar {
+    background-color: var(--bs-body-bg) !important;
+    opacity: 1 !important;
+    z-index: 1039 !important; /* Asegura que esté sobre el contenido */
+}
+
+/* Ajuste específico para modo claro */
+[data-bs-theme="light"] .app-sidebar {
+    background-color: #ffffff !important;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Agrega sombra para que no se pierda */
+}
+
+/* Ajuste específico para modo oscuro */
+[data-bs-theme="dark"] .app-sidebar {
+    background-color: #343a40 !important;
+}
 </style>
 
   </head>
