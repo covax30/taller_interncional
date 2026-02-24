@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'login',
     'widget_tweaks',
     'backup_module',
+    'axes',
 ]
 
 MIDDLEWARE = [
@@ -72,6 +73,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'apy.middleware.DisableBrowserCacheMiddleware', # <--- AQUÍ
 ]
 
 ROOT_URLCONF = 'taller.urls'
@@ -125,12 +127,14 @@ DATABASE_ROUTERS = ['backup_module.routers.LogRouter']
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
+# En tu settings.py busca AUTH_PASSWORD_VALIDATORS y asegúrate de que se vea así:
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {'min_length': 8},
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
@@ -138,9 +142,31 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
+    {
+        'NAME': 'login.validators.ComplexPasswordValidator',
+    },
 ]
 
 
+# El enlace de recuperación de contraseña expirará en 24 horas
+PASSWORD_RESET_TIMEOUT = 86400
+
+PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",  # ← bcrypt + SHA256 (recomendado)
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",        # fallback por si acaso
+    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+    "django.contrib.auth.hashers.Argon2PasswordHasher",
+    "django.contrib.auth.hashers.ScryptPasswordHasher",
+]
+
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesStandaloneBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+AXES_FAILURE_LIMIT = 5          # 5 intentos fallidos → bloqueo
+AXES_COOLOFF_TIME = 0.1          # 10 min de bloqueo
+AXES_LOCKOUT_PARAMETERS = ["ip_address", "username"]
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
@@ -197,7 +223,8 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'soportecnico.t.i.m@gmail.com'
-EMAIL_HOST_PASSWORD = 'pjqmmdgfnredlrtg'
+EMAIL_HOST_PASSWORD = 'vwnifvdwehnmpodg'
+
 
 # -----------------------------------------------------
 # 📦 WhiteNoise y Almacenamiento

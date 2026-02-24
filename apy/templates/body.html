@@ -69,10 +69,47 @@
         }
       });
     </script>
+
+    <script>
+    window.addEventListener('pageshow', function(event) {
+        // Si la página se carga desde el caché del historial (botón atrás)
+        if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+            // Forzamos recarga; como no hay sesión, Django los mandará al Login
+            window.location.reload();
+        }
+    });
+</script>
     <!--end::OverlayScrollbars Configure-->
 
     <!-- BLOQUE PARA SCRIPTS ADICIONALES DE PÁGINAS ESPECÍFICAS -->
     {% block extra_scripts %}
     {% endblock %}
     <script src="{% static 'AdminLTE/dist/js/theme_switcher.js' %}"> </script>
+JavaScript
+<script>
+function confirmarSalida() {
+    Swal.fire({
+        title: '¿Cerrar sesión?',
+        text: "Regresarás a la pantalla de ingreso.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#007bff',
+        cancelButtonColor: '#dc3545',
+        confirmButtonText: 'Sí, salir',
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const form = document.getElementById('logout-form-real');
+            if (form) {
+                // Forzamos el envío del formulario
+                console.log("Enviando formulario a: " + form.action);
+                form.submit();
+            } else {
+                alert("Error: No se encontró el formulario de salida.");
+            }
+        }
+    });
+}
+</script>
 {% endblock %}

@@ -15,9 +15,9 @@ document.addEventListener('DOMContentLoaded', function() {
             "Low Saturation": "Baja Saturación",
             "High Saturation": "Alta Saturación",
             // Los contrastes Alto, Bajo y Oscuro ya no se traducen
-            "Big Cursor": "Cursor Grande",
-            "Stop Animations": "Detener Animaciones",
-            "Reading Guide": "Guía de Lectura"
+            "Big Cursor": "Cursor gigante",
+            "Stop Animations": "Detener animus",
+            "Reading Guide": "Guía de lerr"
         };
 
         menu.querySelectorAll('.asw-btn').forEach(button => {

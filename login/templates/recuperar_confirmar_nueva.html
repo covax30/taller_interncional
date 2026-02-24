@@ -1,84 +1,174 @@
 {% load static %}
 {% load widget_tweaks %}
 <!doctype html>
-<html lang="en">
-  <head>
+<html lang="es">
+<head>
     <title>Definir Nueva Contraseña</title>
     <link rel="stylesheet" href="{% static 'fontawesome-free-7.0.1-web/css/all.min.css' %}" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
     <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/adminlte.min.css' %}" /> 
     <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/bootstrap.css' %}" />
-
     <link rel="stylesheet" href="{% static 'login/css/custom.css' %}" />
-  </head>
-  <body class="hold-transition login-page "> 
-    <div id="slideshow-background">
-    </div>
+    <style>
+        .login-page .login-box .card {
+            background-color: rgba(0, 0, 0, 0.65) !important;
+            backdrop-filter: blur(15px) !important;
+            -webkit-backdrop-filter: blur(15px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 20px !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8) !important;
+        }
+        .login-card-body, .card-body {
+            background: transparent !important;
+            color: white !important;
+        }
+        .form-control {
+            background-color: white !important;
+            color: #000 !important;
+            border: none !important;
+        }
+        .input-group-text {
+            background-color: white !important;
+            color: #007bff !important;
+            border: none !important;
+        }
+        .btn-primary {
+            background: #007bff !important;
+            border: none !important;
+            font-weight: bold !important;
+        }
+        .btn-volver {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border: 1px solid white !important;
+            color: white !important;
+            margin-top: 10px;
+        }
+        .login-logo b, .login-box-msg {
+            color: white !important;
+            text-shadow: 2px 2px 5px rgba(0,0,0,1) !important;
+        }
+    </style>
+    <link rel="stylesheet" href="{% static 'css/material-icons.css' %}">
+
+</head>
+<body class="hold-transition login-page"> 
+    <div id="slideshow-background"></div>
     <div class="login-box">
-      <div class="login-logo">
-        <a class="text-white"><b>Nueva Contraseña</b></a> 
-      </div>
-      <div class="card">
-        <div class="card-body login-card-body">
-          <p class="login-box-msg">
-            Por favor, introduce tu nueva contraseña.
-          </p>
-
-          <form method="post">
-            {% csrf_token %}
-
-            {% if form.non_field_errors %}
-                <div class="alert alert-danger alert-dismissible" role="alert">
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                    <h5><i class="icon fas fa-ban"></i> Error!</h5>
-                    {% for error in form.non_field_errors %}
-                        {{ error }}
-                    {% endfor %}
-                </div>
-            {% endif %}
-
-            <div class="input-group mb-3">
-                {% render_field form.new_password1 class="form-control" placeholder="Nueva Contraseña" type="password" %}
-                <div class="input-group-append">
-                    <div class="input-group-text">
-                        <span class="fas fa-lock"></span>
-                    </div>
-                </div>
-            </div>
-            {% for error in form.new_password1.errors %}
-                <div class="text-danger small mt-n2 mb-2">{{ error }}</div>
-            {% endfor %}
-            <p class="text-muted small mt-n2 mb-3">{{ form.new_password1.help_text|safe }}</p>
-
-            <div class="input-group mb-3">
-                {% render_field form.new_password2 class="form-control" placeholder="Confirmar Contraseña" type="password" %}
-                <div class="input-group-append">
-                    <div class="input-group-text">
-                        <span class="fas fa-lock"></span>
-                    </div>
-                </div>
-            </div>
-            {% for error in form.new_password2.errors %}
-                <div class="text-danger small mt-n2 mb-2">{{ error }}</div>
-            {% endfor %}
-
-            <div class="row">
-              <div class="col-12">
-                <button type="submit" class="btn btn-primary btn-block">
-                  <i class="fas fa-key"></i> Cambiar Contraseña
-                </button>
-              </div>
-            </div>
-          </form>
-
-          <p class="mt-3 mb-1 text-center">
-            <a href="{% url 'login:login' %}">Volver a Iniciar Sesión</a>
-          </p>
+        <div class="login-logo">
+            <a class="text-white"><b>Nueva Contraseña</b></a> 
         </div>
+        <div class="card">
+            <div class="card-body login-card-body">
+                
+                {% if validlink %}
+                    <p class="login-box-msg">Por favor, introduce tu nueva contraseña.</p>
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        <p class="text-muted small mt-n2 mb-3 text-center">
+                            {{ form.new_password1.help_text|safe }}
+                        </p>
+
+                        <div class="input-group mb-3">
+                            {% render_field form.new_password1 class="form-control" placeholder="Nueva Contraseña" type="password" %}
+                            <div class="input-group-append">
+                                <div class="input-group-text"><span class="fas fa-lock"></span></div>
+                            </div>
+                        </div>
+
+                        <div class="input-group mb-3">
+                            {% render_field form.new_password2 class="form-control" placeholder="Confirmar Contraseña" type="password" %}
+                            <div class="input-group-append">
+                                <div class="input-group-text"><span class="fas fa-lock"></span></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary btn-block shadow-sm" title="Cambiar contraseña">
+                                    <i class="fas fa-key"></i> Cambiar Contraseña
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                {% else %}
+                    <div class="text-center">
+                        <i class="fas fa-calendar-times fa-3x mb-3 text-warning"></i>
+                        <p class="login-box-msg"><b>¡El enlace ha expirado!</b></p>
+                        <p class="small">Por seguridad, los enlaces de recuperación solo funcionan una vez o tienen un tiempo límite.</p>
+                    </div>
+                {% endif %}
+
+                <div class="mt-4">
+                    <a href="{% url 'login:login' %}" class="btn btn-volver btn-block" title="Volver al Login">
+                        <i class="fas fa-arrow-left"></i> Volver al Login
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
+
     <script src="{% static 'AdminLTE/plugins/jquery/jquery.min.js' %}"></script>
     <script src="{% static 'AdminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static 'AdminLTE/dist/js/adminlte.min.js' %}"></script> 
-    </body>
+    <script src="{% static 'lib/sweetalert2/sweetalert2.all.min.js' %}"></script>
+
+    <script type="application/javascript">
+    {% if form.errors %}
+    var errorList = [];
+    
+    {% for field in form %}
+        {% for error in field.errors %}
+            var rawMsg = "{{ error|escapejs }}";
+            var finalMsg = rawMsg;
+
+            // --- TRADUCCIONES DE SEGURIDAD PERSONALIZADA (Viene de validators.py) ---
+            if (rawMsg.includes("MAYÚSCULA")) {
+                finalMsg = "<b>¡Falta una mayúscula!</b><br>La contraseña debe tener al menos una letra en MAYÚSCULA. 🔠";
+            }
+            else if (rawMsg.includes("NÚMERO")) {
+                finalMsg = "<b>¡Falta un número!</b><br>Debes incluir al menos un número (0-9). 🔢";
+            }
+            else if (rawMsg.includes("ESPECIAL")) {
+                finalMsg = "<b>¡Falta un símbolo!</b><br>Usa un carácter especial (ej: @, #, $, *, !). ✨";
+            }
+
+            // --- TRADUCCIONES ESTÁNDAR DE DJANGO ---
+            else if (rawMsg.includes("too short") || rawMsg.includes("at least 8 characters")) {
+                finalMsg = "<b>Muy corta:</b> Mínimo 8 caracteres. 📏";
+            }
+            else if (rawMsg.includes("didn't match")) {
+                finalMsg = "<b>¡Error!</b> Las contraseñas no coinciden. ❌";
+            }
+            else if (rawMsg.includes("too common")) {
+                finalMsg = "<b>Muy común:</b> Intenta algo más difícil de adivinar. 🔒";
+            }
+            else if (rawMsg.includes("entirely numeric")) {
+                finalMsg = "<b>No solo números:</b> Mezcla letras y números. 🔡";
+            }
+            
+            errorList.push(finalMsg);
+        {% endfor %}
+    {% endfor %}
+
+    // Errores generales (del formulario completo)
+    {% for error in form.non_field_errors %}
+        errorList.push("{{ error|escapejs }}");
+    {% endfor %}
+
+    if (errorList.length > 0) {
+        Swal.fire({
+            title: '¡Contraseña no válida!',
+            html: '<div style="text-align: left; font-size: 0.9em;">' + errorList.join('<hr style="margin: 10px 0; border-top: 1px solid #eee;">') + '</div>',
+            icon: 'warning',
+            confirmButtonColor: '#007bff',
+            confirmButtonText: 'Reintentar'
+        });
+    }
+    {% endif %}
+</script>
+
+    <script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
+    <script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
+</body>
 </html>

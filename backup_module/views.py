@@ -409,43 +409,40 @@ class SubirRespaldoExternoView(SuperuserRequiredMixin, View):
         archivo_respaldo = request.FILES.get('archivo_restauracion')
         
         if not archivo_respaldo:
-            messages.error(request, '❌ Debe seleccionar un archivo SQL o GZ para subir.')
+            messages.error(request, '❌ Debe seleccionar un archivo SQL para subir.')
             return redirect(reverse_lazy('backup_module:configuracion_respaldo'))
 
-        # Validar tipo de archivo
-        if not archivo_respaldo.name.lower().endswith(('.sql', '.gz', '.zip')):
-            messages.error(request, '❌ Formato de archivo no válido. Solo se permiten .sql, .gz o .zip.')
-            return redirect(reverse_lazy('backup_module:configuracion_respaldo'))
-        
         try:
-            # 1. Preparar y guardar el archivo subido en el directorio de backups
-            fs = FileSystemStorage(location=settings.BACKUP_ROOT)
+            # CORRECCIÓN: Usar ruta dinámica para la subida externa
+            backup_root = os.path.join(settings.BASE_DIR, 'db_backups')
+            if not os.path.exists(backup_root):
+                os.makedirs(backup_root)
+
+            fs = FileSystemStorage(location=backup_root)
             nombre_base = os.path.splitext(archivo_respaldo.name)[0]
             extension = os.path.splitext(archivo_respaldo.name)[1]
             nombre_final = f"EXTERNAL_{nombre_base}_{uuid.uuid4().hex[:6]}{extension}"
             
             filename = fs.save(nombre_final, archivo_respaldo)
-            ruta_completa_sql = os.path.join(settings.BACKUP_ROOT, filename)
+            ruta_completa_sql = os.path.join(backup_root, filename)
             
-            # Calcular el tamaño
             tamaño_bytes = os.path.getsize(ruta_completa_sql)
             tamaño_mb = tamaño_bytes / (1024 * 1024)
             
-            # 2. Crear el log en la BD (marcado como Éxito porque el archivo está listo)
             nuevo_log = BackupLog.objects.create(
                 fecha_inicio=timezone.now(),
                 fecha_fin=timezone.now(),
-                tipo='Externo', # Tipo: Externo
-                estado='Éxito', # Estado: Listo para restaurar
+                tipo='Externo',
+                estado='Éxito',
                 ruta_archivo=ruta_completa_sql,
                 usuario=request.user,
                 tamaño_mb=tamaño_mb,
             )
             
-            messages.success(request, f'✅ Archivo **{archivo_respaldo.name}** subido correctamente. Ya está disponible en el Historial (Log #{nuevo_log.pk}) para su restauración.')
+            messages.success(request, f'✅ Archivo **{archivo_respaldo.name}** subido correctamente.')
             
         except Exception as e:
-            messages.error(request, f'❌ Error al procesar o guardar el archivo: {e}')
+            messages.error(request, f'❌ Error al procesar el archivo: {e}')
         
         return redirect(reverse_lazy('backup_module:configuracion_respaldo'))
 # ------------------------------------------------------------------------------

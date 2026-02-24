@@ -63,8 +63,33 @@ document.addEventListener("DOMContentLoaded", function() {
         ], "asw-tools");
     var r = document.createElement("div");
     r.innerHTML = `
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons&text=${a.toString()}" rel="stylesheet">
     <style>
+        /* AQUÍ CONECTAMOS EL ARCHIVO QUE DESCARGASTE */
+        @font-face {
+            font-family: 'Material Icons';
+            font-style: normal;
+            font-weight: 400;
+            src: url('/static/fonts/MaterialIcons-Regular.ttf') format('truetype');
+        }
+
+        .material-icons {
+            font-family: 'Material Icons' !important;
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-smoothing: antialiased;
+            /* Esto oculta el texto técnico si la fuente falla */
+            overflow: hidden;
+            width: 24px;
+            height: 24px;
+        }
         .asw-menu, .asw-menu-btn { position: fixed; left: 20px; transition: .3s; z-index: 500000; }
         .asw-widget { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; font-weight: 400; -webkit-font-smoothing: antialiased; }
         .asw-widget * { box-sizing: border-box; }

@@ -12,6 +12,53 @@
     <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/bootstrap.css' %}" />
 
     <link rel="stylesheet" href="{% static 'login/css/custom.css' %}" />
+        <style>
+        /* --- 2. CAJA DE LOGIN (CRISTAL OSCURO) --- */
+        .login-page .login-box .card {
+            background-color: rgba(0, 0, 0, 0.65) !important; /* MUY OSCURO PERO TRANSPARENTE */
+            backdrop-filter: blur(15px) !important;
+            -webkit-backdrop-filter: blur(15px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 20px !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8) !important;
+        }
+
+        /* Quitamos el fondo blanco de AdminLTE */
+        .login-card-body, .card-body {
+            background: transparent !important;
+            color: white !important;
+        }
+
+        /* --- 3. INPUTS BLANCOS --- */
+        .form-control {
+            background-color: white !important;
+            color: #000 !important;
+            border: none !important;
+        }
+        .input-group-text {
+            background-color: white !important;
+            color: #007bff !important;
+            border: none !important;
+        }
+
+        /* --- 4. BOTONES Y TEXTOS --- */
+        .btn-primary {
+            background: #007bff !important;
+            border: none !important;
+            font-weight: bold !important;
+        }
+        .btn-volver {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border: 1px solid white !important;
+            color: white !important;
+            margin-top: 10px;
+        }
+        .login-logo b, .login-box-msg {
+            color: white !important;
+            text-shadow: 2px 2px 5px rgba(0,0,0,1) !important;
+        }
+    </style>
+<link rel="stylesheet" href="{% static 'css/material-icons.css' %}">
 
   </head>
   <body class="login-page ">
@@ -26,41 +73,52 @@
         <div class="card-body login-card-body">
           <p class="login-box-msg">Ingresa tu dirección de correo electrónico para recibir un enlace de restablecimiento.</p>
 
-          <form method="post">
+          <form method="post" novalidate>
             {% csrf_token %}
             <div class="input-group mb-3">
               {{ form.email|add_class:'form-control'|attr:'autocomplete:off'|attr:'placeholder:Email' }}
               <div class="input-group-text">
                 <span class="fas fa-envelope"></span> </div>
             </div>
-
-            {% if form.email.errors %}
-                {% for error in form.email.errors %}
-                    <p class="text-danger">{{ error }}</p>
-                {% endfor %}
-            {% endif %}
-            {% if form.non_field_errors %}
-                {% for error in form.non_field_errors %}
-                    <p class="text-danger">{{ error }}</p>
-                {% endfor %}
-            {% endif %}
-
             <div class="row">
               <div class="col-12">
                 <div class="d-grid gap-2">
-                  <button type="submit" class="btn btn-primary">Enviar enlace</button>
+                  <button type="submit" class="btn btn-primary" title="Enviar enlace">Enviar enlace</button>
                 </div>
               </div>
               </div>
             </form>
 
-          <p class="mt-3 mb-1">
-            <a href="{% url 'login:login' %}">Volver al inicio de sesión</a>
-          </p>
+          <a href="{% url 'login:login' %}" class="btn btn-volver btn-block" title="Volver al Login">
+                        <i class="fas fa-arrow-left"></i> Volver a Iniciar Sesión
+                    </a>
         </div>
         </div>
     </div>
     <script src="{% static 'lib/sweetalert2/sweetalert2.all.min.js' %}"></script>
     <script src="{% static 'lib/datatables-1.10.20/jquery-3.7.1.min.js' %}"></script>
+    <script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
+<script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
+    <script type="application/javascript">
+  {% if form.errors %}
+  var errors = '';
+  {% for field in form %}
+    {% for error in field.errors %}
+      errors += '{{ error }}\n';
+    {% endfor %}
+  {% endfor %}
+  {% for error in form.non_field_errors %}
+    errors += '{{ error }}\n';
+  {% endfor %}
+  Swal.fire({
+      title: '¡Error!',
+      text: errors,
+      icon: 'error',
+      confirmButtonColor: '#007bff'
+  });
+  {% endif %}
+</script>
+<script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
+<script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
     </body>
 </html>
