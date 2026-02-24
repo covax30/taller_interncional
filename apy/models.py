@@ -129,14 +129,7 @@ class Repuesto(models.Model):
     ]
     categoria = models.CharField(max_length=100, choices=CATEGORIA_OPCIONES)
     fabricante = models.CharField(max_length=100)
-    stock = models.IntegerField()
-    ubicacion = models.CharField(max_length=100)
-    precio = models.IntegerField( 
-        error_messages={
-            'invalid': 'Ingrese un número válido para el precio.',
-            'required': 'El precio del repuesto es obligatorio.'
-        } , validators=[validar_monto]
-    )
+    
     estado = models.BooleanField(default=True)
     
     def __str__(self):
@@ -155,9 +148,8 @@ class Herramienta(models.Model):
         ('de medición', 'De Medición'),
     ]
     tipo = models.CharField(max_length=100, choices=TIPO_OPCIONES)
-    material = models.CharField(max_length=100)
     id_marca = models.ForeignKey(Marca, on_delete=models.PROTECT)
-    stock = models.IntegerField()
+    
     estado = models.BooleanField(default=True)
 
     def __str__(self):
@@ -167,13 +159,13 @@ class Herramienta(models.Model):
 class Insumos(models.Model):
 
     id_marca = models.ForeignKey(Marca, on_delete=models.PROTECT)
+    nombre = models.CharField(max_length=100)
     costo = models.IntegerField(  
         error_messages={
             'invalid': 'Ingrese un número válido para el costo.',
             'required': 'El costo del insumo es obligatorio.'
         }, validators=[validar_monto]
     )
-    stock = models.IntegerField()
     CANTIDAD_OPCIONES = [
         ('galon', 'Galón'),
         ('litro', 'Litro'),

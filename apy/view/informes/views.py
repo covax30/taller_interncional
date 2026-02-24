@@ -12,6 +12,10 @@ from apy.decorators import PermisoRequeridoMixin
 from openpyxl import Workbook
 from django.http import HttpResponse
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from django.views.generic import TemplateView
+from django.db.models import Sum, Count
+from django.utils import timezone
+from apy.models import DetalleServicio, Cliente, Vehiculo, Informes
 
 
 # --------------Vistas de informes---------------
@@ -284,3 +288,5 @@ def informe_excel(request, id):
 
     wb.save(response)
     return response
+
+
