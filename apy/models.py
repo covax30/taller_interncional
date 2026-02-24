@@ -557,7 +557,7 @@ class Informes(models.Model):
     detalle_servicio = models.OneToOneField(DetalleServicio,on_delete=models.PROTECT,verbose_name="Detalle de Servicio")
     
     # 2. QUIÉN Y CUÁNDO
-    id_empleado = models.ForeignKey(Empleado, on_delete=models.PROTECT, verbose_name="Mecánico Responsable")
+    id_empleado = models.ForeignKey(Profile, on_delete=models.PROTECT, verbose_name="Mecánico Responsable")
     fecha = models.DateField(auto_now_add=True) # Se pone sola al crear
     hora = models.TimeField(auto_now_add=True)
     
@@ -605,7 +605,7 @@ class Factura(models.Model):
     # USAR MINÚSCULAS AQUÍ:
     empresa = models.ForeignKey(Empresa, on_delete=models.PROTECT)
     cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
-    empleado = models.ForeignKey(Empleado, on_delete=models.PROTECT)
+    empleado = models.ForeignKey(Profile, on_delete=models.PROTECT)
     detalle_servicio = models.OneToOneField(DetalleServicio, on_delete=models.PROTECT, related_name="factura")
     
     fecha = models.DateField(auto_now_add=True)
