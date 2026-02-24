@@ -174,10 +174,21 @@
                                 <label class="text-body"><i class="fas fa-phone me-2 text-muted"></i>Teléfono</label>
                             </div>
                         </div> 
-                        <div class="col-sm-6">
-                            <div class="form-floating mb-1">
-                                {{ profile_form.identificacion|add_class:"form-control bg-body text-body" }}
-                                <label class="text-body"><i class="fas fa-id-card me-2 text-muted"></i>Cédula</label>
+                        {# Reemplaza el bloque de Identificación actual por este #}
+                        <div class="row g-3">
+                            <div class="col-sm-4">
+                                <div class="form-floating mb-1">
+                                    {# Usamos profile_form porque es el que maneja los datos del modelo Profile #}
+                                    {{ profile_form.tipo_identificacion|add_class:"form-select bg-body text-body" }}
+                                    <label class="text-body"><i class="fas fa-fingerprint me-2 text-muted"></i>Tipo</label>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-8">
+                                <div class="form-floating mb-1">
+                                    {{ profile_form.identificacion|add_class:"form-control bg-body text-body" }}
+                                    <label class="text-body"><i class="fas fa-id-card me-2 text-muted"></i>Número de Identificación</label>
+                                </div>
                             </div>
                         </div>
                         <div class="col-12">

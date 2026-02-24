@@ -306,6 +306,12 @@ class RegistroUsuarioForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'form-control'}),
         required=True
     )
+    
+    tipo_identificacion = forms.ChoiceField(
+        label='Tipo de Documento',
+        choices=Profile.TIPO_DOC_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
 
     # Campos adicionales del Perfil (Centralizando lo que era de Empleado)
     identificacion = forms.CharField(
@@ -348,10 +354,11 @@ class RegistroUsuarioForm(forms.ModelForm):
             # Cargar datos de perfil
             try:
                 perfil = self.instance.profile
+                self.initial['tipo_identificacion'] = perfil.tipo_identificacion
                 self.initial['identificacion'] = perfil.identificacion
                 self.initial['direccion'] = perfil.direccion
                 self.initial['telefono'] = perfil.telefono
-            except:
+            except Profile.DoesNotExist:    
                 pass
 
     def save(self, commit=True):
@@ -371,7 +378,7 @@ class RegistroUsuarioForm(forms.ModelForm):
         else:
             # Aquí es donde se asegura que sea Empleado
             user.is_superuser = False 
-            user.is_staff = True # Sigue siendo staff para el taller (uniforme verde oscuro)
+            user.is_staff = True # Importante para que pueda entrar al sistema
         
         if commit:
             user.save()
@@ -379,6 +386,7 @@ class RegistroUsuarioForm(forms.ModelForm):
             Profile.objects.update_or_create(
                 user=user,
                 defaults={
+                    'tipo_identificacion': self.cleaned_data.get('tipo_identificacion'),
                     'identificacion': self.cleaned_data.get('identificacion'),
                     'direccion': self.cleaned_data.get('direccion'),
                     'telefono': self.cleaned_data.get('telefono'),
@@ -391,13 +399,16 @@ class RegistroUsuarioForm(forms.ModelForm):
         password = cleaned_data.get("password")
         password2 = cleaned_data.get("password2")
         role = cleaned_data.get('role')
+        
+        tipo = cleaned_data.get('tipo_identificacion')
+        identificacion = cleaned_data.get('identificacion')
 
         # VALIDACIÓN 1: Coincidencia de contraseñas nuevas
         if password or password2:
             if password != password2:
                 raise forms.ValidationError("Las nuevas contraseñas no coinciden.")
 
-        # VALIDACIÓN 2: Protección del último Admin (tu lógica actual)
+        # VALIDACIÓN 2: Protección del último Admin
         if self.instance and self.instance.pk and self.instance.is_superuser:
             if role == 'normal':
                 admins_activos = User.objects.filter(is_superuser=True).count()
@@ -406,6 +417,13 @@ class RegistroUsuarioForm(forms.ModelForm):
                         "Error: Debe existir al menos un administrador en el sistema."
                     )
         
+        # VALIDACIÓN 3: Validar identificación según tipo
+        if tipo and identificacion:
+            try:
+                validar_por_tipo(identificacion, tipo)
+            except ValidationError as e:
+                self.add_error('identificacion', e.message)
+                
         return cleaned_data
     
 # 1. Formulario para editar el modelo User (SIN TELEFONO)
@@ -441,7 +459,7 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         # Añadimos identificacion y direccion que faltaban
-        fields = ['identificacion', 'direccion', 'telefono', 'imagen'] 
+        fields = ['tipo_identificacion', 'identificacion', 'direccion', 'telefono', 'imagen'] 
         labels = {
             'identificacion': 'Número de Identificación',
             'direccion': 'Dirección de Residencia',
