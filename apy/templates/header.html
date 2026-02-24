@@ -91,7 +91,20 @@
             </li>
             <!--end::Fullscreen Toggle-->
 
-            <!--begin::User Menu Dropdown-->
+      <li class="nav-item">
+        <form action="{% url 'apy:buscador_global' %}" method="GET" class="d-flex align-items-center mt-1 ms-2">
+          <div class="input-group input-group-sm border rounded">
+            <input class="form-control bg-body text-body border-0" type="search" name="q"
+              placeholder="Buscar placa, cliente..." aria-label="Search" style=width: 150px; min-width: 100px;
+              max-width: 100%;>
+            <button class="btn btn-link text-body border-0" type="submit">
+              <i class="bi bi-search"></i>
+            </button>
+          </div>
+        </form>
+      </li>
+
+      <!--begin::User Menu Dropdown-->
             {% if user.is_authenticated %}
             <li class="nav-item dropdown user-menu">
               <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
@@ -155,19 +168,9 @@
             </li>
             {% endif %}
             <!--end::User Menu Dropdown-->
-<li class="nav-item">
-  <form action="{% url 'login:logout' %}" method="post" style="display: inline;" title="Cerrar sesión">
-    {% csrf_token %}
-    <button 
-      type="submit" 
-      class="nav-link btn btn-link" 
-      style="padding: 0; border: none;"
-      onclick="return confirm('¿Realmente quieres cerrar sesión?');"
-    >
-      <i class="fas fa-power-off text-danger" aria-hidden="true"></i>
-    </button>
-  </form>
-</li>
+            <a class="nav-link" href="{% url 'login:login'%}">
+                    <i class="fas fa-power-off" aria-hidden="true"></i>
+            </a>
           </ul>
           
           <!--end::End Navbar Links-->

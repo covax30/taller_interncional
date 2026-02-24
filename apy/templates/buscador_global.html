@@ -275,7 +275,6 @@
                                             <th>Nombre</th>
                                             <th>Categoría</th>
                                             <th>Fabricante</th>
-                                            <th>Stock</th>
                                             <th>Ubicación</th>
                                             <th>Precio</th>
                                             <th class="text-center">Acciones</th>
@@ -288,7 +287,6 @@
                                             <td>{{ r.nombre }}</td>
                                             <td>{{ r.categoria }}</td>
                                             <td>{{ r.fabricante }}</td>
-                                            <td>{{ r.stock }}</td>
                                             <td>{{ r.ubicacion }}</td>
                                             <td>${{ r.precio|intcomma }}</td>
                                             <td>
@@ -322,7 +320,6 @@
                                             <th>Tipo</th>
                                             <th>Material</th>
                                             <th>Id marca</th>
-                                            <th>Stock</th>
                                             <th class="text-center">Acciones</th>
                                         </tr>
                                     </thead>
@@ -334,7 +331,6 @@
                                             <td>{{ h.tipo }}</td>
                                             <td>{{ h.material }}</td>
                                             <td>{{ h.id_marca }}</td>
-                                            <td>{{ h.stock }}</td>
                                             <td>
                                                 <a href="{% url 'apy:herramienta_editar' h.id %}"
                                                     class="btn btn-primary btn-sm" title="Editar herramienta">
@@ -363,7 +359,6 @@
                                         <tr>
                                             <th>Id Marca</th>
                                             <th>Costo</th>
-                                            <th>Stock</th>
                                             <th>Cantidad</th>
                                             <th class="text-center">Acciones</th>
                                         </tr>
@@ -373,7 +368,6 @@
                                         <tr>
                                             <td>{{ i.id_marca }}</td>
                                             <td>{{ i.costo|intcomma }}</td>
-                                            <td>{{ i.stock }}</td>
                                             <td>{{ i.cantidad }}</td>
                                             <td>
                                                 <a href="{% url 'apy:insumo_editar' i.id %}"

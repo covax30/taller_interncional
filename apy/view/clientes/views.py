@@ -5,7 +5,7 @@ from apy.models import *
 # from apy.view.clientes.views import * # Si este archivo contiene estas vistas, esta importación puede ser redundante o generar un conflicto circular. Se recomienda revisar su necesidad.
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import HttpResponseRedirect, JsonResponse
-from django.contrib import messages
+
 from django.utils.decorators import method_decorator
 from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
@@ -15,7 +15,7 @@ from django.contrib.auth.mixins import AccessMixin # Solo necesaria si defines m
 from apy.models import * 
 from apy.forms import *
 from apy.decorators import PermisoRequeridoMixin, permiso_requerido_fbv # <-- Asumo que 'permiso_requerido_fbv' es tu decorador de función 
-
+from django.contrib import messages
 # --- VISTAS BASADAS EN CLASES (CBVs) - PROTEGIDAS ---
 
 class ClienteListView(PermisoRequeridoMixin, ListView):
@@ -86,7 +86,6 @@ class ClienteCreateView(PermisoRequeridoMixin, CreateView):
     
     def form_valid(self, form):
         form.instance.estado = True 
-        messages.success(self.request, "Cliente creado correctamente")
         response = super().form_valid(form)
         messages.success(self.request, "Cliente creado correctamente")
         
