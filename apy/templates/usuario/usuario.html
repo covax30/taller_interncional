@@ -123,8 +123,14 @@
                         <div class="static-field bg-body rounded border text-body"><i class="fas fa-phone me-2 text-muted opacity-50"></i>{{ user.profile.telefono|default:"---"|truncatechars:20 }}</div>
                     </div>
                     <div class="col-sm-6 col-md-6 mb-1">
-                        <label class="small fw-bold text-muted mb-1 ml-1">Cédula</label>
-                        <div class="static-field bg-body rounded border text-body"><i class="fas fa-id-card me-2 text-muted opacity-50"></i>{{ user.profile.identificacion|default:"---"|truncatechars:20 }}</div>
+                        <label class="small fw-bold text-muted mb-1 ml-1">Identificación</label>
+                        <div class="static-field bg-body rounded border text-body">
+                            <i class="fas fa-id-card me-2 text-muted opacity-50"></i>
+                            <span class="badge bg-secondary-subtle text-secondary border me-2" style="font-size: 0.7rem;">
+                                {{ user.profile.tipo_identificacion }}
+                            </span>
+                            {{ user.profile.identificacion|default:"---" }}
+                        </div>
                     </div>
                     <div class="col-12 mb-1">
                         <label class="small fw-bold text-muted mb-1 ml-1">Dirección</label>

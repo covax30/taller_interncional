@@ -72,15 +72,16 @@ nit_validator = RegexValidator(
 )
 
 def validar_por_tipo(numero, tipo):
+    """
+    Valida el número de identificación según el tipo de documento.
+    """
     numero = str(numero).strip().upper()
-
-    # Diccionario de reglas: { 'TIPO': (Regex, Mensaje de error) }
     reglas = {
-        'CC': (r'^\d{5,10}$', 'La Cédula debe tener entre 5 y 10 dígitos numéricos.'),
-        'TI': (r'^\d{10,11}$', 'La Tarjeta de Identidad debe tener 10 u 11 dígitos.'),
-        'RC': (r'^\d{10,11}$', 'El Registro Civil debe tener 10 u 11 dígitos.'),
+        'CC':  (r'^\d{5,10}$', 'La Cédula debe tener entre 5 y 10 dígitos numéricos.'),
+        'TI':  (r'^\d{10,11}$', 'La Tarjeta de Identidad debe tener 10 u 11 dígitos.'),
+        'RC':  (r'^\d{10,11}$', 'El Registro Civil debe tener 10 u 11 dígitos.'),
         'NIT': (r'^\d{7,10}-\d{1}$', 'El NIT debe tener formato 123456789-0.'),
-        'CE': (r'^\d{3,9}$', 'La Cédula de Extranjería debe ser numérica (hasta 9 dígitos).'),
+        'CE':  (r'^\d{3,9}$', 'La Cédula de Extranjería debe ser numérica (hasta 9 dígitos).'),
         'PAS': (r'^[A-Z0-9]{5,20}$', 'El Pasaporte debe ser alfanumérico (5-20 caracteres).'),
         'PPT': (r'^[A-Z0-9]{4,15}$', 'El PPT debe ser alfanumérico.'),
     }
@@ -89,9 +90,9 @@ def validar_por_tipo(numero, tipo):
         raise ValidationError("Tipo de documento no soportado.")
 
     regex, mensaje = reglas[tipo]
-
     if not re.fullmatch(regex, numero):
         raise ValidationError(mensaje)
+
 #------ MODULOS ERICK ---------
 
 #------ ENTIDAD de TIPO mantenmimiento ---------1
@@ -213,14 +214,32 @@ class Permission(models.Model):
         return f"Permisos de {self.user.username} en {self.module.name}"
 
 class Profile(models.Model):
+    TIPO_DOC_CHOICES = [
+        ('CC', 'Cédula de Ciudadanía'),
+        ('TI', 'Tarjeta de Identidad'),
+        ('RC', 'Registro Civil'),
+        ('NIT', 'NIT'),
+        ('CE', 'Cédula de Extranjería'),
+        ('PAS', 'Pasaporte'),
+        ('PPT', 'Permiso de Protección Temporal'),
+    ]
+    
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    identificacion = models.CharField(max_length=11, validators=[validar_identificacion], null=True, blank=True)
+    tipo_identificacion = models.CharField(max_length=5, choices=TIPO_DOC_CHOICES, default='CC')
+    identificacion = models.CharField(max_length=20, null=True, blank=True)
     telefono = models.CharField(max_length=10, validators=[validar_telefono], null=True, blank=True)
-    direccion = models.CharField(max_length=150, null=True, blank=True) # <-- Nuevo campo
+    direccion = models.CharField(max_length=150, null=True, blank=True)
     imagen = models.ImageField(upload_to='users/%Y/%m/%d', null=True, blank=True)
+    
+    def clean(self):
+        super().clean()
+        if self.tipo_identificacion and self.identificacion:
+            # Esto lanzará el error si no cumple la regex
+            validar_por_tipo(self.identificacion, self.tipo_identificacion)
     
     def __str__(self):
         return f'Perfil de {self.user.username}'
+    
 class Cliente(models.Model):
 
     TIPO_CLIENTE = [
