@@ -74,6 +74,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'apy.middleware.DisableBrowserCacheMiddleware', # <--- AQUÍ
+    'axes.middleware.AxesMiddleware',
 ]
 
 ROOT_URLCONF = 'taller.urls'

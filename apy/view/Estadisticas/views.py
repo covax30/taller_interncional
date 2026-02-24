@@ -43,12 +43,6 @@ def check_custom_permission(user, module_name, permission_required):
             f"Error de configuración: Módulo '{module_name}' no encontrado."
         )
 
-<<<<<<< HEAD
-@login_required(login_url=reverse_lazy('apy:login'))
-def estadisticas(request):
-    
-    # --- 1. VERIFICACIÓN DE PERMISOS INDEPENDIENTE ---
-=======
 # --- VISTA DE ESTADÍSTICAS ---
 
 @never_cache  # Capa de seguridad: prohíbe al navegador cachear esta página
@@ -56,7 +50,6 @@ def estadisticas(request):
 def estadisticas(request):
     
     # --- 1. VERIFICACIÓN DE PERMISOS ---
->>>>>>> erick
     try:
         check_custom_permission(
             request.user, 
@@ -64,20 +57,12 @@ def estadisticas(request):
             permission_required='view'
         )
     except PermissionDenied as e:
-<<<<<<< HEAD
         # Si no tiene permiso, lo mandamos al index (o dashboard)
         # para evitar el bucle de redirección infinita.
         messages.error(request, "No tienes acceso al panel de estadísticas.")
         return redirect('apy:index') 
 
     # --- 2. OBTENCIÓN DE DATOS ---
-=======
-        # UX: Si no tiene permiso, lo mandamos a la lista con un aviso
-        messages.warning(request, str(e))
-        return redirect(reverse_lazy('apy:caja_lista')) 
-
-    # --- 2. LÓGICA DE NEGOCIO (INGRESOS) ---
->>>>>>> erick
     ingresos_por_mes = (
         Caja.objects
         .filter(tipo_movimiento='Ingreso')
@@ -87,14 +72,9 @@ def estadisticas(request):
         .order_by('mes')
     )
 
-<<<<<<< HEAD
     # Nombres de meses en español
     meses_es = [
         "", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-=======
-    meses_espanol = [
-        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
->>>>>>> erick
         "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
     ]
 
@@ -102,17 +82,10 @@ def estadisticas(request):
     totales = []
 
     for ingreso in ingresos_por_mes:
-<<<<<<< HEAD
         if ingreso['mes']:
             mes_num = ingreso['mes'].month
             meses.append(meses_es[mes_num])
             totales.append(float(ingreso['total'] or 0))
-=======
-        mes_num = ingreso['mes'].month
-        # Usamos el array en español para que se vea mejor
-        meses.append(meses_espanol[mes_num - 1]) 
-        totales.append(float(ingreso['total']))
->>>>>>> erick
 
     context = {
         'meses': meses,
