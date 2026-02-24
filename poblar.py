@@ -15,7 +15,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'taller.settings')
 django.setup()
 
 # 2. IMPORTACIÓN DE TUS MODELOS
-from apy.models import EntradaVehiculo, Insumos, Marca, Empleado, Cliente, Repuesto, SalidaVehiculo, TipoMantenimiento, Vehiculo
+from apy.models import  Insumos, Marca, Cliente, Repuesto,TipoMantenimiento, Vehiculo
 
 fake = Faker('es_ES')
 
@@ -29,18 +29,6 @@ def poblar_marcas():
                 estado=True
             )
     print("✅ Marcas creadas")
-
-def poblar_empleados(n=5):
-    for _ in range(n):
-        Empleado.objects.create(
-            nombre=fake.name(),
-            telefono=str(random.randint(10000000, 99999999)), # 8 dígitos
-            identificacion=str(random.randint(10000000, 99999999)),
-            Correo=fake.unique.email(),
-            direccion=fake.address()[:255],
-            estado=True
-        )
-    print(f"✅ {n} Empleados creados")
 
 def poblar_clientes(n=10):
     for _ in range(n):
@@ -90,8 +78,8 @@ def generar_insumos(n=10):
     for _ in range(n):
         Insumos.objects.create(
             id_marca=random.choice(marcas), # Instancia real de Marca
-            costo=random.randint(10000, 500000), # Entero (no string)
-            stock=random.randint(5, 100),
+            nombre=fake.word().capitalize() + " " + fake.word().capitalize(),
+            costo=random.randint(10000, 500000), 
             cantidad=random.choice(opciones_unidad),
             estado=True
         )
@@ -113,10 +101,7 @@ def generar_repuestos(n=15):
             nombre=random.choice(repuestos_nombres) + " " + fake.word().capitalize(),
             categoria=random.choice(categorias),
             fabricante=fake.company(),
-            stock=random.randint(1, 200),
-            ubicacion=f"Pasillo {random.choice(['A', 'B', 'C'])}-{random.randint(1, 10)}",
-            # Asegúrate que el precio cumpla con tu 'validar_monto' (ej. > 0)
-            precio=random.randint(50000, 2000000), 
+            
             estado=True
         )
     print(f"✅ {n} Repuestos creados con éxito.")
@@ -156,7 +141,6 @@ if __name__ == '__main__':
     print("Iniciando poblado de datos...")
     try:
         poblar_marcas()
-        poblar_empleados(5)
         poblar_clientes(10)
         generar_tipos_mantenimiento()
         generar_insumos(10)

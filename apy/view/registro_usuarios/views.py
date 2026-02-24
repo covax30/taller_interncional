@@ -1,13 +1,21 @@
+from gettext import translation
+
+from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.contrib import messages
-from apy.forms import RegistroUsuarioForm 
+from apy.forms import ProfileForm, ProfileForm, RegistroUsuarioForm 
 from apy.decorators import PermisoRequeridoMixin
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.template.loader import render_to_string
 
 # MIXINS DE PROTECCIÓN
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+
+from apy.models import Profile
 
 # Clase base que implementa la lógica para verificar si el usuario es superusuario
 class SuperuserRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
@@ -135,3 +143,45 @@ class RegistroUsuarioListView(SuperuserRequiredMixin, ListView):
         context['entidad'] = 'Usuarios'
         context['titulo'] = 'Gestión de Usuarios'
         return context
+    
+class EmpleadoCreateModalView(CreateView):
+    model = Profile
+    form_class = ProfileForm
+    template_name = "registro_usuarios/modal_empleado.html"
+
+    def form_valid(self, form):
+        try:
+            with translation.atomic():
+                # 1. Creamos un usuario básico vinculado a la identificación
+                ident = form.cleaned_data['identificacion']
+                user, created = User.objects.get_or_create(
+                    username=ident,
+                    defaults={
+                        'first_name': 'Empleado',
+                        'last_name': ident,
+                        'is_active': True
+                    }
+                )
+                
+                # 2. Vinculamos el usuario al perfil antes de guardar
+                self.object = form.save(commit=False)
+                self.object.user = user
+                self.object.save()
+
+            return JsonResponse({
+                "success": True,
+                "id": self.object.id,
+                "text": f"{self.object.identificacion} - {self.object.telefono}",
+                "message": "Empleado registrado correctamente ✅"
+            })
+        except Exception as e:
+            return JsonResponse({"success": False, "message": str(e)}, status=500)
+
+    def form_invalid(self, form):
+        # Asegúrate de que render_to_string esté importado arriba
+        html = render_to_string(self.template_name, {"form": form}, request=self.request)
+        return JsonResponse({
+            "success": False,
+            "html": html,
+            "message": "Por favor, corrige los errores ❌"
+        })

@@ -158,6 +158,12 @@ class DetalleInsumoForm(ModelForm):
                     'placeholder': 'Ingrese el nombre del insumo',
                 }
             ),
+            'nombre': TextInput(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': 'Ingrese el nombre del insumo',
+                }
+            ),
             'cantidad': NumberInput(
                 attrs={
                     'placeholder': 'Ingrese la cantidad del insumo',
@@ -187,7 +193,7 @@ class DetalleInsumoForm(ModelForm):
 class DetalleServicioForm(ModelForm):
     class Meta:
         model = DetalleServicio
-        fields = ['id_vehiculo','cliente','id_entrada','empresa','id_salida','proceso'  ]
+        fields = ['id_vehiculo','cliente','id_entrada','empresa','id_salida','proceso' , 'empleado']
         widgets = {
             'id_vehiculo': Select(attrs={
                 'class': 'form-control',
@@ -754,49 +760,25 @@ class SalidaVehiculoForm(ModelForm):
     
         
 # -----------Formulario modelo informe------------------    
-class InformeForm(ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['tipo_informe'].widget.attrs['autofocus'] = True
-        
+class InformeForm(forms.ModelForm):
     class Meta:
         model = Informes
-        fields = '__all__'
+        fields = ['detalle_servicio', 'id_empleado', 'tipo_informe', 'costo_mano_obra', 'diagnostico_final']
         widgets = {
-            'detalle_servicio':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-            'id_empleado':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-            'tipo_informe': forms.Select(
-                attrs={
-                    'class': 'form-control'
-                }
-            ),
-            'costo_mano_obra': forms.NumberInput(
-                attrs={
-                    'class': 'form-control', 
-                    'placeholder': 'Ej: 50000'
-                }
-            ),
-            'fecha':DateInput(
-                attrs={
-                    'placeholder':'Ingrese la fecha de la creacion del informe',
-                    'type': 'date'
-                }
-            ),
-            'diagnostico_final': forms.Textarea(
-                attrs={'class': 'form-control', 
-                       'rows': 3, 
-                       'placeholder': 'Describa el estado final del vehículo...'
-                    }
-            ),
+            'detalle_servicio': forms.Select(attrs={'class': 'form-control select2'}),
+            'id_empleado': forms.Select(attrs={'class': 'form-control'}),
+            'tipo_informe': forms.Select(attrs={'class': 'form-control'}),
+            'costo_mano_obra': forms.NumberInput(attrs={'class': 'form-control'}),
+            'diagnostico_final': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Filtro: Solo servicios terminados que no tengan informe
+        self.fields['detalle_servicio'].queryset = DetalleServicio.objects.filter(
+            proceso='terminado', 
+            informes__isnull=True
+        )
         error_messages = {
             'repuestos_usados': {
                 'required': 'Los repuestos usados son obligatorios',
