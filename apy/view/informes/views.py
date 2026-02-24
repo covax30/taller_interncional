@@ -289,4 +289,14 @@ def informe_excel(request, id):
     wb.save(response)
     return response
 
-
+def obtener_totales_servicio(request, id):
+    try:
+        servicio = DetalleServicio.objects.get(pk=id)
+        data = {
+            'total_repuestos': servicio.total_repuestos,
+            'total_insumos': servicio.total_insumos,
+            'subtotal': servicio.subtotal,
+        }
+        return JsonResponse(data)
+    except DetalleServicio.DoesNotExist:
+        return JsonResponse({'error': 'No encontrado'}, status=404)
