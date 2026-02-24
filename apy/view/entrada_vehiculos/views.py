@@ -7,6 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse_lazy
 from apy.forms import *
 from django.contrib import messages
+from django.template.loader import render_to_string
 # Se elimina la importación local de AccessMixin
 from apy.decorators import PermisoRequeridoMixin # Usando el Mixin centralizado
 
@@ -17,7 +18,7 @@ class EntradaVehiculoListView(PermisoRequeridoMixin, ListView):
     template_name = 'entrada_vehiculos/listar_entrada_vehiculos.html'
 
     # --- Configuración de Permisos ---
-    module_name = 'Entrada Vehiculo' 
+    module_name = 'EntradaVehiculos' 
     permission_required = 'view'
     
     @method_decorator(csrf_exempt)
@@ -42,7 +43,7 @@ class EntradaVehiculoCreateView(PermisoRequeridoMixin, CreateView):
     success_url = reverse_lazy('apy:entrada_vehiculo_lista')
 
     # --- Configuración de Permisos ---
-    module_name = 'Entrada Vehiculo'
+    module_name = 'EntradaVehiculos'
     permission_required = 'add'
 
     def form_valid(self, form):
@@ -63,10 +64,12 @@ class EntradaVehiculoUpdateView(PermisoRequeridoMixin, UpdateView):
     success_url = reverse_lazy('apy:entrada_vehiculo_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Entrada Vehiculo'
+    module_name = 'EntradaVehiculos'
     permission_required = 'change'
     
     def form_valid(self, form):
+        
+        form.instance.estado = True 
         messages.success(self.request, "Entrada de Vehiculo actualizada correctamente")
         return super().form_valid(form)
     
@@ -83,7 +86,7 @@ class EntradaVehiculoDeleteView(PermisoRequeridoMixin, DeleteView):
     success_url = reverse_lazy('apy:entrada_vehiculo_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Entrada Vehiculo'
+    module_name = 'EntradaVehiculos'
     permission_required = 'delete'
     
     def form_valid(self, form):
@@ -96,3 +99,37 @@ class EntradaVehiculoDeleteView(PermisoRequeridoMixin, DeleteView):
         context['entidad'] = 'Entrada de Vehiculos'
         context['listar_url'] = reverse_lazy('apy:entrada_vehiculo_lista')
         return context
+    
+class EntradaCreateModalView(CreateView):
+    model = EntradaVehiculo
+    form_class = EntradaVehiculoForm
+    template_name = "entrada_vehiculos/modal_entrada.html"
+    success_url = reverse_lazy("apy:entrada_vehiculo_lista")
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.instance.estado = True
+        try:
+            self.object = form.save()
+            return JsonResponse({ 
+                "success": True,
+                "id": self.object.id_entrada,
+                "text": str(self.object),
+                "message": "Entrada de Vehiculo registrado correctamente ✅"
+            })
+        except Exception as e:
+            return JsonResponse({
+                "success": False,
+                "message": f"Error al guardar: {str(e)}"
+            }, status=500)
+    
+    def form_invalid(self, form):
+        html = render_to_string(self.template_name, {"form": form}, request=self.request) # pyright: ignore[reportUndefinedVariable]
+        return JsonResponse({
+            "success": False,
+            "html": html,
+            "message": "Por favor, corrige los errores en el formulario ❌"
+        })

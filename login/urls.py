@@ -1,8 +1,14 @@
-# Archivo: login/urls.py (SOLO se muestran las rutas modificadas)
+# Archivo: login/urls.py
 from django.urls import path, include 
 from django.contrib.auth import views as auth_views 
 from .views import Login_view, logout_redirect
 from .forms import CustomPasswordResetForm
+
+# Asegúrate de que esta importación sea correcta según la estructura de tu proyecto
+from apy.view.usuario.contraseña.views import PerfilPasswordChangeView 
+
+# ¡ESTA IMPORTACIÓN YA ESTÁ AQUÍ! Ahora solo falta el path.
+from apy.view.usuario.datos.views import ActualizarPerfilImagenView
 
 app_name = 'login'
 urlpatterns = [
@@ -44,5 +50,32 @@ urlpatterns = [
         form_class=CustomPasswordResetForm 
         
     ), name='password_reset'),
+    
+    
+    # ----------------------------------------------------
+    # FLUJO DE CAMBIO DE CONTRASEÑA (Dentro de sesión)
+    # ----------------------------------------------------
 
+    # 1. Mostrar el formulario de cambio de contraseña (TU VISTA)
+    path(
+        'cambiar-contrasena/',
+        PerfilPasswordChangeView.as_view(), # <-- Usa tu vista personalizada
+        name='password_change'              # <-- login:password_change
+    ),
+
+    # 2. Página de éxito después del cambio
+    path(
+        'cambio-exitoso/',
+        auth_views.PasswordChangeDoneView.as_view(template_name='login/password_change_done.html'), 
+        name='password_change_done'         # <-- login:password_change_done
+    ),
+    
+    # ----------------------------------------------------
+    # FLUJO DE ACTUALIZACIÓN DE IMAGEN (SOLO IMAGEN)
+    # ----------------------------------------------------
+    path(
+        'perfil/actualizar-imagen/',
+        ActualizarPerfilImagenView.as_view(),
+        name='actualizar_perfil_imagen' # <-- ¡ESTA ES LA RUTA FALTANTE QUE RESUELVE EL ERROR!
+    ),
 ]

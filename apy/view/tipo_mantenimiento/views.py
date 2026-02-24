@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.utils.decorators import method_decorator
 from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
@@ -19,8 +19,12 @@ class TipoMantenimientoListView(PermisoRequeridoMixin, ListView):
     template_name = 'tipo_mantenimiento/listar.html'
     
     # --- Configuración de Permisos ---
-    module_name = 'Tipo Mantenimiento' 
+    module_name = 'TipoMantenimientos' 
     permission_required = 'view'
+    
+    
+    def get_queryset(self):
+        return TipoMantenimiento.objects.filter(estado=True)
     
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -32,6 +36,35 @@ class TipoMantenimientoListView(PermisoRequeridoMixin, ListView):
         context['crear_url'] = reverse_lazy('apy:tipo_mantenimiento_crear')
         context['entidad'] = 'Tipo de Mantenimiento'
         return context
+    
+#--------------Vistas de Tipo de Mantenimiento Inactivos---------------
+class TipoMantenimientoInactivosListView(PermisoRequeridoMixin, ListView):
+    model = TipoMantenimiento
+    template_name = 'tipo_mantenimiento/tipoMantenimiento_inactivo.html'
+    
+    # --- Configuración de Permisos ---
+    module_name = 'TipoMantenimientos' 
+    permission_required = 'view' 
+    # --------------------------------
+    
+    def get_queryset(self):
+        return TipoMantenimiento.objects.filter(estado=False)
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+    
+    def post(self, request, *args, **kwargs):
+        nombre = {'nombre' : 'Tipo de Mantenimiento'}
+        return JsonResponse(nombre)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Lista de Tipos de Mantenimiento Inactivos'
+        context['listar_url'] = reverse_lazy('apy:tipo_mantenimiento_listar')
+        context['entidad'] = 'Tipo de Mantenimiento'
+        
+        return context                                                                                                                                                                                                                                                          
 
 class TipoMantenimientoCreateView(PermisoRequeridoMixin, CreateView): 
     model = TipoMantenimiento
@@ -40,10 +73,11 @@ class TipoMantenimientoCreateView(PermisoRequeridoMixin, CreateView):
     success_url = reverse_lazy('apy:tipo_mantenimiento_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Tipo Mantenimiento'
+    module_name = 'TipoMantenimientos' 
     permission_required = 'add'
     
     def form_valid(self, form):
+        form.instance.estado = True 
         messages.success(self.request, "Tipo de Mantenimiento creado correctamente")
         return super().form_valid(form)
     
@@ -65,10 +99,12 @@ class TipoMantenimientoUpdateView(PermisoRequeridoMixin, UpdateView):
     success_url = reverse_lazy('apy:tipo_mantenimiento_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Tipo Mantenimiento'
+    module_name = 'TipoMantenimientos' 
     permission_required = 'change'
     
     def form_valid(self, form):
+        
+        form.instance.estado = True 
         messages.success(self.request, "Tipo de Mantenimiento actualizado correctamente")
         return super().form_valid(form)
     
@@ -85,12 +121,19 @@ class TipoMantenimientoDeleteView(PermisoRequeridoMixin, DeleteView):
     success_url = reverse_lazy('apy:tipo_mantenimiento_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Tipo Mantenimiento'
+    module_name = 'TipoMantenimientos' 
     permission_required = 'delete'
     
-    def form_valid(self, form):
-        messages.success(self.request, "Tipo de Mantenimiento eliminado correctamente")
-        return super().form_valid(form)
+    def post(self, request, *args, **kwargs):
+        
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        
+        self.object.estado = False
+        self.object.save()
+        
+        messages.success(self.request, f"Tipo de mantenimiento {self.object.nombre} desactivado")
+        return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -98,12 +141,46 @@ class TipoMantenimientoDeleteView(PermisoRequeridoMixin, DeleteView):
         context['entidad'] = 'tipo de mantenimiento'
         context['listar_url'] = reverse_lazy('apy:tipo_mantenimiento_lista')
         return context
+    
+#---- vistas para activar tipo de mantenimiento ----
+class TipoMantenimientoActivateView(PermisoRequeridoMixin, DeleteView):
+    model = TipoMantenimiento
+    template_name = 'tipo_mantenimiento/activar_tipoMantenimiento.html'
+    success_url = reverse_lazy('apy:tipo_mantenimiento_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'TipoMantenimientos' 
+    permission_required = 'change'
+    
+    def post(self, request, *args, **kwargs):
+        
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        
+        self.object.estado = True
+        self.object.save()
+        
+        messages.success(self.request, f"Tipo de Mantenimiento {self.object.nombre} activado ")
+        return HttpResponseRedirect(success_url)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Activar tipo de mantenimiento'
+        context['entidad'] = 'tipo de mantenimiento'
+        context['listar_url'] = reverse_lazy('apy:tipo_mantenimiento_lista')
+        return context
+    
+        
 
-class TipoMantenimientoCreateModalView(CreateView):
+class TipoMantenimientoCreateModalView(PermisoRequeridoMixin, CreateView):
     model = TipoMantenimiento
     form_class = TipoMantenimientoForm
     template_name = "tipo_mantenimiento/modal_tipo_mantenimiento.html"
     success_url = reverse_lazy("apy:tipo_mantenimiento_lista")
+    
+    # --- Configuración de Permisos ---
+    module_name = 'TipoMantenimientos'
+    permission_required = 'add'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -132,10 +209,14 @@ class TipoMantenimientoCreateModalView(CreateView):
             "message": "Por favor, corrige los errores en el formulario ❌"
         })
         
-class DetalleTipoMantenimientoCreateModalView(CreateView):
+class DetalleTipoMantenimientoCreateModalView(PermisoRequeridoMixin, CreateView):
     model = DetalleTipoMantenimiento
     form_class = DetalleTipo_MantenimientoForm
     template_name = "tipo_mantenimiento/modal_detalletipo_mantenimiento.html"
+    
+    # --- Configuración de Permisos ---
+    module_name = 'TipoMantenimientos'
+    permission_required = 'add'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):

@@ -1,9 +1,20 @@
 from django.views.generic import CreateView, UpdateView, ListView, DeleteView, DetailView
 from django.urls import reverse_lazy
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404, render
 from django.db import transaction
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
+from django.template.loader import render_to_string
+from apy.decorators import PermisoRequeridoMixin
+
+# Librería para el PDF
+from xhtml2pdf import pisa
+
+# Modelos y Formularios (Asegúrate de que estos nombres coincidan con los tuyos)
+from apy.models import DetalleServicio, Repuesto, TipoMantenimiento, Insumos
+from apy.forms import DetalleServicioForm, DetalleRepuestoFormSet, DetalleTipoMantenimientoFormSet, DetalleInsumosFormSet
 
 
 from apy.models import (
@@ -21,24 +32,57 @@ from apy.forms import (
     DetalleInsumosFormSet
 )
 
-class ListaServiciosView(ListView):
+class ListServicioView(PermisoRequeridoMixin, ListView):
+    
+    module_name = 'Factura'
+    permission_required = 'view'
+    
     model = DetalleServicio
     template_name = 'detalle_servicio/lista_servicios.html'
     context_object_name = 'servicios'
     ordering = ['-fecha_creacion']
     
+    def get_queryset(self):
+        return DetalleServicio.objects.filter(estado=True)
+
+    
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['total_servicios'] = DetalleServicio.objects.count() 
-        context['servicios_pendientes'] = DetalleServicio.objects.filter(estado='pendiente').count()
-        return context
+        context['servicios_activos'] = DetalleServicio.objects.filter(estado=True).count()
 
-class CrearServicioView(CreateView):
+        return context
+    
+#---- vista para listar servicios inactivos -----
+class ServicioInactivosListView(PermisoRequeridoMixin, ListView):  
+    
+    module_name = 'Factura'
+    permission_required = 'view'
+    
+    model = DetalleServicio
+    template_name = 'detalle_servicio/modal_inactivos.html'
+    context_object_name = 'servicios_inactivos'
+    
+    def get_queryset(self):
+        return DetalleServicio.objects.filter(estado=False) 
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['total_servicios'] = DetalleServicio.objects.count() 
+        context['servicios_activos'] = DetalleServicio.objects.filter(estado=True).count()
+
+        return context    
+
+class CreateServicioView(PermisoRequeridoMixin, CreateView):
+    
+    module_name = 'Factura'
+    permission_required = 'add'
+    
     model = DetalleServicio
     form_class = DetalleServicioForm
     template_name = 'detalle_servicio/crear_servicio.html'
-    success_url = '/apy/servicios/'
+    success_url = reverse_lazy('apy:lista_servicios')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -59,6 +103,7 @@ class CrearServicioView(CreateView):
 
     @transaction.atomic
     def form_valid(self, form):
+        form.instance.estado = True
         context = self.get_context_data()
         repuesto_formset = context['repuesto_formset']
         mantenimiento_formset = context['mantenimiento_formset']
@@ -85,14 +130,19 @@ class CrearServicioView(CreateView):
             print("Errores en mantenimiento_formset:", mantenimiento_formset.errors)
             print("Errores en insumo_formset:", insumo_formset.errors)
             
+            form.instance.estado = True 
             messages.error(self.request, 'Por favor corrige los errores en el formulario.')
             return self.render_to_response(self.get_context_data(form=form))
 
-class EditarServicioView(UpdateView):
+class UpdateServicioView(PermisoRequeridoMixin, UpdateView):
+    
+    module_name = 'Factura'
+    permission_required = 'change'
+    
     model = DetalleServicio
     form_class = DetalleServicioForm
     template_name = 'detalle_servicio/crear_servicio.html'
-    success_url = '/apy/servicios/'
+    success_url = reverse_lazy('apy:lista_servicios')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -137,6 +187,8 @@ class EditarServicioView(UpdateView):
 
     @transaction.atomic
     def form_valid(self, form):
+        form.instance.estado = True
+
         context = self.get_context_data()
         repuesto_formset = context['repuesto_formset']
         mantenimiento_formset = context['mantenimiento_formset']
@@ -161,22 +213,51 @@ class EditarServicioView(UpdateView):
         else:
             messages.error(self.request, 'Corrige los errores antes de guardar.')
             return self.render_to_response(self.get_context_data(form=form))
+        
+    def form_invalid(self, form):
+        print("ERRORES FORM:", form.errors)
+        return super().form_invalid(form)
 
-class EliminarServicioView(DeleteView):
+class DeleteServicioView(PermisoRequeridoMixin, DeleteView):
+    
+    module_name = 'Factura'
+    permission_required = 'delete'
+    
     model = DetalleServicio
     template_name = 'detalle_servicio/eliminar_servicio.html'
-    success_url = '/apy/servicios/'
-    
-    def form_valid(self, form):
-        messages.success(self.request, "detalle eliminado correctamente")
-        return super().form_valid(form)
-    
+    success_url = reverse_lazy('apy:lista_servicios')  # cambia por tu URL real
 
-    def delete(self, request, *args, **kwargs):
-        messages.success(self.request, 'Servicio eliminado exitosamente!')
-        return super().delete(request, *args, **kwargs)
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.estado = False
+        self.object.save()
+        messages.success(self.request, f"Servicio {self.object.id} desactivado correctamente")
 
-class DetalleServicioView(DetailView):
+        return HttpResponseRedirect(self.get_success_url())
+    
+#---- vista para activar servicio -----
+class ServicioActivateView(PermisoRequeridoMixin, DeleteView):
+    
+    module_name = 'Factura'
+    permission_required = 'delete'
+    
+    model = DetalleServicio
+    template_name = 'detalle_servicio/activar_servicio.html'
+    success_url = reverse_lazy('apy:lista_servicios')  # cambia por tu URL real
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.estado = True
+        self.object.save()
+        messages.success(self.request, f"Servicio {self.object.id} activado correctamente")
+
+        return HttpResponseRedirect(self.get_success_url())    
+
+class DetalleServicioView(PermisoRequeridoMixin, DetailView):
+    
+    module_name = 'Factura'
+    permission_required = 'view'
+    
     model = DetalleServicio
     template_name = 'detalle_servicio/detalle_servicio.html'
     context_object_name = 'servicio'
@@ -201,3 +282,72 @@ class DetalleServicioView(DetailView):
         })
         
         return context
+
+class DetalleCreateModalView(PermisoRequeridoMixin, CreateView):
+    
+    module_name = 'Factura'
+    permission_required = 'add'
+    
+    model = DetalleServicio
+    form_class = DetalleServicioForm
+    template_name = 'detalle_servicio/modal_detalle.html'
+    success_url = reverse_lazy("apy:lista_servicios")
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.instance.estado = True 
+        try:
+            self.object = form.save()
+            return JsonResponse({
+                "success": True,
+                "id": self.object.id,
+                "text": str(self.object),
+                "message": "Servicio registrado correctamente ✅"
+            })
+        except Exception as e:
+            return JsonResponse({
+                "success": False,
+                "message": f"Error al guardar: {str(e)}"
+            }, status=500)
+    
+    def form_invalid(self, form):
+        html = render_to_string(self.template_name, {"form": form}, request=self.request)
+        return JsonResponse({
+            "success": False,
+            "html": html,
+            "message": "Por favor, corrige los errores en el formulario ❌"
+        })
+        
+def imprimir_servicio_factura(request, pk):
+    # Buscamos el servicio directamente
+    servicio = get_object_or_404(DetalleServicio, pk=pk)
+    
+    # Obtenemos sus detalles
+    context = {
+        'servicio': servicio,
+        'vehiculo': servicio.id_vehiculo,
+        'cliente': servicio.id_vehiculo.id_cliente,
+        'repuestos': servicio.detallerepuesto_set.all(),
+        'mantenimientos': servicio.detalletipomantenimiento_set.all(),
+        'insumos': servicio.detalleinsumos_set.all(),
+        'total': sum(r.subtotal for r in servicio.detallerepuesto_set.all()) +
+                 sum(m.subtotal for m in servicio.detalletipomantenimiento_set.all()) +
+                 sum(i.subtotal for i in servicio.detalleinsumos_set.all()),
+    }
+
+    # LÓGICA DE PDF (xhtml2pdf)
+    html_string = render_to_string('detalle_servicio/factura_impresion.html', context)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="Factura_{pk}.pdf"'
+
+    # Convertimos el HTML a PDF
+    pisa_status = pisa.CreatePDF(html_string, dest=response)
+
+    # ESTE RETURN debe estar alineado con 'pisa_status'
+    if pisa_status.err:
+        return HttpResponse('Ocurrió un error al generar el PDF', status=500)
+       
+    return response 

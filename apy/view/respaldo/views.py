@@ -37,6 +37,9 @@ class SuperuserRequiredMixin(UserPassesTestMixin):
 class RespaldoView(SuperuserRequiredMixin, View):
     template_name = 'respaldo/configuracion_respaldo.html'
     
+    module_name = 'Respaldos'
+    permission_required = 'view'
+    
     # Aplicar csrf_exempt a la vista completa para simplificar el manejo de POSTs en el mismo template
     # Aunque es mejor usar csrf_protect y csrf_token
     # @method_decorator(csrf_exempt)
@@ -46,7 +49,7 @@ class RespaldoView(SuperuserRequiredMixin, View):
 
     def get_context_data(self, **kwargs):
         context = {}
-        context['entidad'] = 'Módulo de Respaldo'
+        context['entidad'] = 'Respaldo'
         context['titulo'] = 'Configuración de Respaldo y Mantenimiento'
         
         # 1. Información de Último Respaldo
@@ -95,6 +98,9 @@ class RespaldoView(SuperuserRequiredMixin, View):
 
 class EjecutarRespaldoManualView(SuperuserRequiredMixin, View):
     
+    module_name = 'Respaldos'
+    permission_required = 'add'
+    
     def post(self, request, *args, **kwargs):
         # 1. Obtener datos del formulario (debería ser similar a lo que ya tienes)
         incluir_db = request.POST.get('incluir_base_datos') == 'on'
@@ -130,6 +136,9 @@ class EjecutarRespaldoManualView(SuperuserRequiredMixin, View):
 
 class ConfigurarRespaldoAutomaticoView(SuperuserRequiredMixin, View):
     
+    module_name = 'Respaldos'
+    permission_required = 'change'
+    
     @method_decorator(csrf_exempt) # Si tu proyecto requiere csrf_exempt en POSTs
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
@@ -163,6 +172,9 @@ class ConfigurarRespaldoAutomaticoView(SuperuserRequiredMixin, View):
 # ... otras clases y funciones ...
 
 class DescargarRespaldoView(SuperuserRequiredMixin, View):
+    
+    module_name = 'Respaldos'
+    permission_required = 'view'
     
     def get(self, request, pk, *args, **kwargs):
         try:

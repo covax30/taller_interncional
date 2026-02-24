@@ -7,6 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse_lazy
 from apy.forms import *
 from django.contrib import messages
+from django.template.loader import render_to_string
 # Se elimina la importación local de AccessMixin
 from apy.decorators import PermisoRequeridoMixin # <-- Se mantiene solo la importación
 
@@ -17,7 +18,7 @@ class SalidaVehiculoListView(PermisoRequeridoMixin, ListView):
     template_name = 'salida_vehiculos/listar_salida_vehiculos.html'
 
     # --- Configuración de Permisos ---
-    module_name = 'Salida Vehiculo' 
+    module_name = 'SalidaVehiculos'
     permission_required = 'view'
     
     @method_decorator(csrf_exempt)
@@ -42,7 +43,7 @@ class SalidaVehiculoCreateView(PermisoRequeridoMixin, CreateView):
     success_url = reverse_lazy('apy:salida_vehiculo_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Salida Vehiculo'
+    module_name = 'SalidaVehiculos'
     permission_required = 'add'
 
     def form_valid(self, form):
@@ -63,7 +64,7 @@ class SalidaVehiculoUpdateView(PermisoRequeridoMixin, UpdateView):
     success_url = reverse_lazy('apy:salida_vehiculo_lista')
 
     # --- Configuración de Permisos ---
-    module_name = 'Salida Vehiculo'
+    module_name = 'SalidaVehiculos'
     permission_required = 'change'
 
     def form_valid(self, form):
@@ -83,7 +84,7 @@ class SalidaVehiculoDeleteView(PermisoRequeridoMixin, DeleteView):
     success_url = reverse_lazy('apy:salida_vehiculo_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Salida Vehiculo'
+    module_name = 'SalidaVehiculos'
     permission_required = 'delete'
     
     def form_valid(self, form):
@@ -96,3 +97,37 @@ class SalidaVehiculoDeleteView(PermisoRequeridoMixin, DeleteView):
         context['entidad'] = 'Salida de Vehiculos' 
         context['listar_url'] = reverse_lazy('apy:salida_vehiculo_lista')
         return context
+    
+class SalidaCreateModalView(CreateView):
+    model = SalidaVehiculo
+    form_class = SalidaVehiculoForm
+    template_name = "salida_vehiculos/modal_salida.html"
+    success_url = reverse_lazy("apy:salida_vehiculo_lista")
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.instance.estado = True
+        try:
+            self.object = form.save()
+            return JsonResponse({ 
+                "success": True,
+                "id": self.object.id_salida,
+                "text": str(self.object),
+                "message": "Salida de Vehiculo registrada correctamente ✅"
+            })
+        except Exception as e:
+            return JsonResponse({
+                "success": False,
+                "message": f"Error al guardar: {str(e)}"
+            }, status=500)
+    
+    def form_invalid(self, form):
+        html = render_to_string(self.template_name, {"form": form}, request=self.request) # pyright: ignore[reportUndefinedVariable]
+        return JsonResponse({
+            "success": False,
+            "html": html,
+            "message": "Por favor, corrige los errores en el formulario ❌"
+        })    

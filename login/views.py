@@ -13,15 +13,19 @@ class Login_view(LoginView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        redirect_authenticated_user = True  # <--- Añade esta línea
         
         context ['titulo'] = 'Iniciar sesion'
         return context
 
 #logout
 
+# views.py
 class logout_redirect(RedirectView):
-    pattern_name ='login/'
+    # MAL: pattern_name = 'login/' 
+    # BIEN: Usa el namespace:nombre_ruta
+    pattern_name = 'login:login' 
     
     def dispatch(self, request, *args, **kwargs):
-        logout(request)
+        logout(request) # Aquí cerramos la sesión de verdad
         return super().dispatch(request, *args, **kwargs)

@@ -1,7 +1,7 @@
 {% extends "generic_listar.html"%}
 {% block titulo %}
     <i class="fa-solid fa-car"></i>
-    <h1 class="text-center">Lista Entrada de Vehículos</h1>
+    <h1 class="text-center">Lista de Entrada de Vehículos</h1>
 {% endblock %}
 {% block agregar %}
     <a href="{% url 'apy:entrada_vehiculo_crear' %}" class="btn btn-primary" title="Agregar entrada de vehículo">Agregar Entrada de Vehículo</a>
@@ -9,8 +9,6 @@
 
 {% block columnas %}
   <th>Id Entrada</th>
-  <th>Id Cliente</th>
-  <th>Id Vehículo</th>
   <th>Fecha de Entrada</th>
   <th>Hora de Entrada</th>
 
@@ -21,8 +19,6 @@
   {% for e in object_list %}
     <tr>
         <td>{{ e.id_entrada }}</td>
-        <td>{{ e.id_cliente.id_cliente }}</td>
-        <td>{{ e.id_vehiculo.placa }}</td>
         <td>{{ e.fecha_ingreso }}</td>
         <td>{{ e.hora_ingreso }}</td>
         <td>

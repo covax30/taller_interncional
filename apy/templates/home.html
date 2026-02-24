@@ -2,7 +2,10 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <title>AdminLTE 4 | Sidebar Mini</title>
+    <title>Taller Internacional de Motores
+    </title>
+    <title>Sistema Administrativo T.I.M</title>
+    <link rel="icon" href="{% static 'img/favico.jpg' %}" type="image/png">
     <link rel="stylesheet" href="{% static 'fontawesome-free-7.0.1-web/css/all.min.css' %}" />
 
     <!-- Configuración para dispositivos móviles y temas de color -->
@@ -10,7 +13,7 @@
     <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#007bff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
-
+    
     <!-- Metadatos para SEO y accesibilidad -->
     <meta name="title" content="AdminLTE 4 | Sidebar Mini" />
     <meta name="author" content="ColorlibHQ" />
@@ -18,46 +21,68 @@
     <meta name="keywords" content="bootstrap 5, dashboard, datatable, accesible, WCAG" />
     <meta name="supported-color-schemes" content="light dark" />
 
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
     <!-- Pre-carga y carga de estilos CSS -->
-    <link rel="preload" href="{% static 'AdminLTE/dist/css/adminlte.css' %}" as="style" />
     <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/adminlte.css' %}" />
-    <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/fonts.css' %}" />
-    <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/overlayscrollbar.css' %}" />
     <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/bootstrap.css' %}" />
-
-
 
     <!-- Estilos para DataTables responsivos -->
     <link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/css/jquery.dataTables.min.css' %}">
     <link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/css/responsive.bootstrap4.min.css' %}">
     
-
-
-
-
-
     <!-- BLOQUE PARA ESTILOS ADICIONALES DE PÁGINAS ESPECÍFICAS -->
     {% block extra_head %}
        <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/custom.css' %}" />
+       <style>
+        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection,
+        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-dropdown,
+        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-search__field {
+        background-color: #2b3035 !important; /* Color oscuro de BS5 */
+        color: #dee2e6 !important;
+        border-color: #495057 !important;
+    }
+    /* Fix para el dropdown que se ve blanco en tu imagen */
+    .select2-dropdown {
+        z-index: 9999 !important;
+    }
+    </style>
     {% endblock %}
 
     <!-- Scripts JS necesarios para funcionalidad -->
     <script src="{% static 'lib/datatables-1.10.20/jquery-3.7.1.min.js' %}"></script>
-    <script src="{% static 'AdminLTE/dist/js/overlayscrollbars.js' %}"></script>
-    <script src="{% static 'AdminLTE/dist/js/popper.js' %}"></script>
-    <script src="{% static 'AdminLTE/dist/js/bootstrap.js' %}"></script>
-    <script src="{% static 'AdminLTE/dist/js/adminlte.js' %}"></script>
 
-    <!-- Scripts para DataTables responsivos -->
+    <script src="{% static 'AdminLTE/dist/js/popper.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="{% static 'lib/datatables-1.10.20/datatables.min.js' %}"></script>
+    <script src="{% static 'AdminLTE/dist/js/adminlte.js' %}"></script>
     <script src="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/js/dataTables.responsive.min.js' %}"></script>
     <script src="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/js/responsive.bootstrap4.min.js' %}"></script>
+    <!-- iconos bootstrap -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap-icons.css' %}">
 
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-
-    <!-- CSS de Sienna Accessibility -->
+        <!-- CSS de Sienna Accessibility -->
     <link rel="stylesheet" href="{% static 'js/sienna-accessibility/custom.css' %}">
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
+
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+<link rel="stylesheet" href="{% static 'css/material-icons.css' %}">
+
+
+
+
+
 
     
 
@@ -82,6 +107,31 @@
         headers: { "X-CSRFToken": csrftoken }
     });
     </script>
+    <style>
+    /* Estilo para el modo Claro */
+    [data-bs-theme="light"] .app-header, 
+    [data-bs-theme="light"] .app-footer,
+    [data-bs-theme="light"] .app-sidebar {
+        background-color: #3a3b72 !important; /* Un crema muy elegante y sutil */
+        border-color: #312e3d !important;
+        color: #243241 !important;
+    }
+
+    /* Ajuste para los iconos y texto en el sidebar claro */
+    [data-bs-theme="light"] .nav-link, 
+    [data-bs-theme="light"] .nav-link i,
+    [data-bs-theme="light"] .brand-text {
+        color: #ffffff !important;
+    }
+
+    /* El input del buscador para que no se pierda en el crema */
+    [data-bs-theme="light"] .input-group input {
+        background-color: #ffffff !important;
+        border: 1px solid #534677 !important;
+    }
+
+    
+</style>
 
   </head>
 
@@ -113,27 +163,7 @@
     </div>
     </div>
 
-    <!-- Sub-Modal Empleado para Mantenimiento -->
-<div class="modal fade" id="modal-id_empleado_mantenimiento" tabindex="-1" role="dialog" data-backdrop="static">
-    <div class="modal-dialog modal-md" role="document">
-        <div class="modal-content">
-
-            <div class="modal-header d-flex justify-content-between align-items-center">
-                <h5 class="modal-title mb-0">Crear Empleado</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
-                        style="background-color: #dc3545; color: white; border: none; 
-                               border-radius: 50%; width: 35px; height: 35px;
-                               font-size: 1.5rem; line-height: 1; 
-                               display: flex; justify-content: center; align-items: center;">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-
-            <div class="modal-body"></div>
-
-        </div>
-    </div>
-    </div>
+    
 
 
     <!-- Sub-Modal Vehiculo. -->
@@ -142,6 +172,25 @@
             <div class="modal-content">
             <div class="modal-header d-flex justify-content-between align-items-center">
                 <h5 class="modal-title mb-0">Crear Vehiculo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                        style="background-color: #dc3545; color: white; border: none; 
+                                border-radius: 50%; width: 35px; height: 35px;
+                                font-size: 1.5rem; line-height: 1; 
+                                display: flex; justify-content: center; align-items: center;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body"></div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Sub-Modal Cliente. -->
+    <div class="modal fade" id="modal-id_cliente" tabindex="-1" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Cliente</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
                         style="background-color: #dc3545; color: white; border: none; 
                                 border-radius: 50%; width: 35px; height: 35px;
@@ -174,28 +223,7 @@
     </div>
     </div>
 
-    <!-- Sub-Modal Cliente -->
-    <div class="modal fade" id="modal-id_cliente" tabindex="-1" role="dialog" data-backdrop="static">
-        <div class="modal-dialog modal-md" role="document">
-
-            <div class="modal-content">
-
-                <div class="modal-header d-flex justify-content-between align-items-center">
-                    <h5 class="modal-title mb-0">Crear Cliente</h5>
-
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
-                            style="background-color: #dc3545; color: white; border: none;
-                                   border-radius: 50%; width: 35px; height: 35px;
-                                font-size: 1.5rem; line-height: 1;
-                                display: flex; justify-content: center; align-items: center;">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-
-            <div class="modal-body"></div>
-        </div>
-    </div>
-    </div>
+    
 
     <!-- Script Marca. -->
     <script>
@@ -223,6 +251,19 @@
     });
     </script>
 
+    <!-- Script Cliente. -->
+    <script>
+        $("#modal-id_cliente").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:cliente_modal_crear' %}",
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+            }
+        });
+    });
+    </script>
+
     <!-- Script Tipo Mantenimiento. -->
     <script>
         $("#modal-id_tipo_mantenimiento").on("show.bs.modal", function(){
@@ -236,30 +277,82 @@
     });
     </script>
 
-    <!-- Script Empleado Mantenimiento. -->
-    <script>
-        $("#modal-id_empleado_mantenimiento").on("show.bs.modal", function(){
-            var modal = $(this);
-            $.ajax({
-                url: "{% url 'apy:empleado_modal_crear_mantenimiento' %}",
-                success: function(data){
-                    modal.find(".modal-body").html(data.html || data);
-                }
-            });
-        });
-    </script>
 
     <script>
-        $("#modal-id_cliente").on("show.bs.modal", function(){
-            var modal = $(this);
-            $.ajax({
-                url: "{% url 'apy:cliente_modal_crear' %}",
-                success: function(data){
-                    modal.find(".modal-body").html(data.html || data);
+/* ✅ Evita duplicar eventos (clave del arreglo) */
+$(document).off('click', '#btnGuardarCliente').on('click', '#btnGuardarCliente', function(e) {
+    e.preventDefault();
+
+    const $btn = $(this);
+    const $modal = $('#modal-id_cliente');
+    const $form = $modal.find('form#clienteForm');
+
+    if (!$form.length) {
+        console.error('No se encontró el formulario #clienteForm dentro del modal.');
+        return;
+    }
+
+    const url = $form.attr('action');
+    const formData = new FormData($form[0]);
+
+    $btn.prop('disabled', true).addClass('disabled').text('Guardando...');
+
+    $.ajax({
+        url: url,
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        success: function(data) {
+            if (data.success) {
+                // Mensaje de éxito
+                const $msg = $modal.find('#msg-cliente');
+                $msg.html('<div class="alert alert-success">' + data.message + '</div>');
+
+                // Actualizar select en la página principal
+                const $select = $('#id_id_cliente');
+                if ($select.find('option[value="' + data.id + '"]').length === 0) {
+                    const option = new Option(data.text, data.id, true, true);
+                    $select.append(option).val(data.id).trigger('change');
+                } else {
+                    $select.val(data.id).trigger('change');
                 }
-            });
-        });
-    </script>
+
+                // Cerrar el modal correctamente
+                $modal.modal('hide');
+                $modal.modal('hide');
+                $('body').removeClass('modal-open');
+                $('body').css('padding-right', '');
+                $('.modal-backdrop').remove();
+                $modal.removeClass('show');
+                $modal.css('display', 'none');
+            } else {
+                if (data.html) {
+                    $modal.find('.modal-body').html(data.html);
+                } else {
+                    $modal.find('#msg-cliente').html('<div class="alert alert-danger">' + data.message + '</div>');
+                }
+            }
+        },
+        error: function(xhr, status, err) {
+            const $msg = $modal.find('#msg-cliente');
+            $msg.html('<div class="alert alert-danger">Error en el servidor. Revisa consola.</div>');
+            console.error('AJAX error:', status, err);
+        },
+        complete: function() {
+            $btn.prop('disabled', false).removeClass('disabled').text('Agregar');
+        }
+    });
+});
+
+/* ✅ Limpiar el formulario y mensajes al cerrar */
+$('#modal-id_cliente').on('hidden.bs.modal', function() {
+    const $form = $(this).find('form#clienteForm')[0];
+    if ($form) $form.reset();
+    $(this).find('#msg-cliente').html('');
+});
+</script>
 
 </body>
 

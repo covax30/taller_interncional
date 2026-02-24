@@ -1,0 +1,44 @@
+{% extends "generic_listar.html" %}
+{% load humanize %}
+
+{% block titulo %}
+        <i class="fa-solid fa-money-bill"></i>
+        <h1 class="text-center">Lista de Gastos</h1>
+{% endblock titulo %}
+
+{% block agregar %}
+<a href="{% url 'apy:gasto_lista' %}" class="btn btn-primary btn-xs" title="Agregar gasto">
+    <i class="fas fa-list"></i> Lista de Gastos
+</a>
+{% endblock %}
+
+{% block columnas %}
+    <th>Id del Monto</th>
+    <th>Descripción</th>
+    <th>Tipo Gastos</th>
+    <th>Id Pago Servicios</th>
+    <th>Monto</th>
+    <th>Acciones</th>
+{% endblock %}
+
+{% block iterar %}
+    {% for g in object_list %}
+    <tr>
+        <td>{{ g.id }}</td>
+        <td>{{ g.descripcion }}</td>
+        <td>{{ g.tipo_gastos }}</td>
+        <td>{{ g.id_pagos_servicios }}</td>
+        <td>{{ g.monto|intcomma }}</td>
+        <td>
+            <a href="{% url 'apy:gasto_activar' g.id %}" 
+               class="btn btn-danger btn-xs" 
+               data-toggle="tooltip" 
+               data-placement="top" 
+               title="Eliminar gasto">
+                <i class="fas fa-power-off"></i>
+            </a>
+        </td>
+    </tr>
+
+    {% endfor %}
+{% endblock %}

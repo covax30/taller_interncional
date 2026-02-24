@@ -15,31 +15,30 @@
   <th>Telefono</th>
   <th>Correo</th>
   <th>Documento</th>
+  <th>Dirección</th>
   <th>Acciones</th>
 {% endblock %}
 
 {% block iterar %}
   {% for c in object_list %}
     <tr>
-        <td>{{ c.id }}</td>  <!-- ← Cambiado de id_cliente a id -->
+        <td>{{ c.id }}</td> 
         <td>{{ c.nombre }}</td>
         <td>{{ c.telefono }}</td>
         <td>{{ c.correo }}</td>
-        <td>{{ c.identificacion }}</td>  <!-- ← ¡Ojo! En el modelo es 'identificacion', no 'documento' -->
+        <td>{{ c.identificacion }}</td> 
+        <td>{{ c.direccion }}</td>
 
         <td>
-            <!-- Usar c.id o c.pk -->
+            
             <a href="{% url 'apy:cliente_editar' c.id %}" class="btn btn-info btn-xs">
                 <i class="fas fa-edit"></i>
             </a>
             <a href="{% url 'apy:cliente_eliminar' c.id %}" class="btn btn-danger btn-xs">
-                <i class="fas fa-trash-alt"></i>
+                <i class="fas fa-power-off"></i>
             </a>
         </td>
     </tr>
-  {% empty %}
-    <tr>
-        <td colspan="6" class="text-center">No hay clientes registrados</td>
-    </tr>
   {% endfor %}
+
 {% endblock %}

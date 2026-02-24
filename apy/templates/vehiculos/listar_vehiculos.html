@@ -5,6 +5,7 @@
 {% endblock %}
 {% block agregar %}
     <a href="{% url 'apy:vehiculo_crear' %}" class="btn btn-primary" title="Agregar vehículo">Agregar Vehículo</a>
+    <a href="{% url 'apy:vehiculo_inactivos' %}" class="btn btn-secondary">Vehículos  Inactivos</a>
 {% endblock %}
 
 {% block columnas %}
@@ -13,7 +14,7 @@
   <th>Placa</th>
   <th>Modelo</th>
   <th>Marca</th>
-  <th>Color</th>
+  <th>Color</th> 
 
   <th>Acciones</th>
 {% endblock %}
@@ -25,7 +26,7 @@
         <td>{{ v.id_cliente }}</td>
         <td>{{ v.placa }}</td>
         <td>{{ v.modelo_vehiculo }}</td>
-        <td>{{ v.id_marca }}</td>
+        <td>{{ v.marca_vehiculo }}</td>
         <td>{{ v.color }}</td>
         <td>
           <a href="{% url 'apy:vehiculo_editar' v.id_vehiculo %}" 
@@ -40,24 +41,50 @@
               data-toggle="tooltip" 
               data-placement="top" 
               title="Eliminar vehículo">
-              <i class="fas fa-trash-alt"></i>
+              <i class="fas fa-power-off"></i>
            </a>
         </td>
     </tr>
   {% endfor %}
-  
-  <!-- Mensajes con SweetAlert -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+{% endblock %}
+{% block extra_js %}
 <script>
-  {% if messages %}
-    {% for message in messages %}
-      Swal.fire({
-        icon: '{% if "success" in message.tags %}success{% elif "error" in message.tags %}error{% else %}info{% endif %}',
-        title: '{{ message|escapejs }}',
-        timer: 2500,
-        showConfirmButton: false
-      });
-    {% endfor %}
-  {% endif %}
+    $(document).ready(function() {
+        // Buscamos la tabla. AdminLTE suele poner la clase 'table' 
+        // o puedes usar el selector 'table' si es la única en la página.
+        var table = $('table').DataTable({
+            "retrieve": true, // Importante para no duplicar si ya existe
+            "dom": '<"d-flex justify-content-between align-items-center mb-3"Bf>rtip',
+            "buttons": [
+                {
+                    extend: 'excelHtml5',
+                    text: '<i class="fas fa-file-excel"></i> Descargar Excel',
+                    className: 'btn btn-success btn-sm',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5] // Exporta todo menos la columna "Acciones"
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    text: '<i class="fas fa-file-pdf"></i> Generar PDF',
+                    className: 'btn btn-danger btn-sm',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5]
+                    },
+                    customize: function (doc) {
+                        doc.content[1].table.widths = ['10%', '20%', '15%', '20%', '20%', '15%'];
+                        doc.styles.tableHeader.fillColor = '#343a40'; // Encabezado oscuro como tu tema
+                    }
+                }
+            ],
+            "language": {
+                "url": "https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json"
+            }
+        });
+
+        // Mueve los botones al contenedor de "Agregar Vehículo" si quieres que estén arriba
+        table.buttons().container().appendTo('#block-agregar-container'); 
+    });
 </script>
 {% endblock %}

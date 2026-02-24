@@ -39,14 +39,15 @@ except OSError as e:
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # En settings.py:
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-fallback-key')
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
-
+SECRET_KEY = os.getenv('SECRET_KEY')
+DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 't')
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'taller_internacional.artisandev.site']
+CSRF_TRUSTED_ORIGINS = ['https://taller_internacional.artisandev.site']
+WHITENOISE_MANIFEST_STRICT = False
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    'django.contrib.admin', 
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -56,8 +57,8 @@ INSTALLED_APPS = [
     'apy',
     'login',
     'widget_tweaks',
-    
     'backup_module',
+    'axes',
 ]
 
 MIDDLEWARE = [
@@ -72,6 +73,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'apy.middleware.DisableBrowserCacheMiddleware', # <--- AQUÍ
+    'axes.middleware.AxesMiddleware',
 ]
 
 ROOT_URLCONF = 'taller.urls'
@@ -86,6 +89,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                
+                # Nuestro context processor personalizado para permisos de usuario
+                'apy.context_processors.user_permissions',
             ],
         },
     },
@@ -97,23 +103,39 @@ WSGI_APPLICATION = 'taller.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('DB_NAME', 'mydatabase'),
-        'USER': os.getenv('DB_USER', 'myuser'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'mypassword'),
-        'HOST': os.getenv('DB_HOST', 'localhost'),
-        'PORT': os.getenv('DB_PORT', '3307'),
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST', 'db'),
+        'PORT': os.getenv('DB_PORT'),
+    },
+    
+    'log_db': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.getenv('DB_LOG_NAME', 'bckp_logs'),
+        'USER': os.getenv('DB_USER'), 
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST', 'db'),
+        # 🚨 CORRECCIÓN: Usar el mismo puerto que la base de datos 'default'
+        'PORT': os.getenv('DB_PORT', '3306'), 
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        }
     }
 }
 
+DATABASE_ROUTERS = ['backup_module.routers.LogRouter']
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
+# En tu settings.py busca AUTH_PASSWORD_VALIDATORS y asegúrate de que se vea así:
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {'min_length': 8},
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
@@ -121,9 +143,31 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
+    {
+        'NAME': 'login.validators.ComplexPasswordValidator',
+    },
 ]
 
 
+# El enlace de recuperación de contraseña expirará en 24 horas
+PASSWORD_RESET_TIMEOUT = 86400
+
+PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",  # ← bcrypt + SHA256 (recomendado)
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",        # fallback por si acaso
+    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+    "django.contrib.auth.hashers.Argon2PasswordHasher",
+    "django.contrib.auth.hashers.ScryptPasswordHasher",
+]
+
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesStandaloneBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+AXES_FAILURE_LIMIT = 5          # 5 intentos fallidos → bloqueo
+AXES_COOLOFF_TIME = 0.1          # 10 min de bloqueo
+AXES_LOCKOUT_PARAMETERS = ["ip_address", "username"]
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
@@ -137,12 +181,13 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+# La línea USE_TZ = True ya está arriba, la dejamos
+# USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
+# -----------------------------------------------------
+## 📁 Configuración de Archivos Estáticos (STATIC)
+# -----------------------------------------------------
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
@@ -151,6 +196,16 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# -----------------------------------------------------
+## 🖼️ Configuración de Archivos de Usuario (MEDIA)
+# -----------------------------------------------------
+# La URL que usaremos para acceder a los archivos subidos (ej: la foto de perfil)
+MEDIA_URL = '/media/'
+# La ruta física donde Django guarda los archivos subidos (dentro del proyecto)
+MEDIA_ROOT = BASE_DIR / 'media'
+# -----------------------------------------------------
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -161,26 +216,28 @@ LOGIN_REDIRECT_URL = 'apy:estadisticas'
 LOGOUT_REDIRECT_URL = ''
 
 # -----------------------------------------------------
-# ✅ CONFIGURACIÓN DE CORREO CORREGIDA Y FINAL
+# ✅ CONFIGURACIÓN DE CORREO
 # -----------------------------------------------------
-# Asegúrate de que esta línea esté presente:
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' 
 # Si usas Gmail (lo más común):
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'soportecnico.t.i.m@gmail.com'
-EMAIL_HOST_PASSWORD = 'pjqmmdgfnredlrtg'
+EMAIL_HOST_PASSWORD = 'vwnifvdwehnmpodg'
+
 
 # -----------------------------------------------------
-# ✅ CONFIGURACIÓN DE ARCHIVOS MEDIA (Para Backups)
+# 📦 WhiteNoise y Almacenamiento
 # -----------------------------------------------------
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
-# WhiteNoise static files storage
 STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
+
+# La duplicación de MEDIA_URL y MEDIA_ROOT ha sido eliminada de aquí

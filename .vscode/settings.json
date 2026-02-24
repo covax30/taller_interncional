@@ -1,7 +1,9 @@
 {
     "liveServer.settings.port": 5501,
     "cSpell.words": [
-        "Detalle"
+        "Detalle",
+        "entrada",
+        "Insumo"
     ],
     "vscode-pets.petColor": "white",
     "vscode-pets.petSize": "medium",

@@ -5,9 +5,10 @@
  */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-    typeof define === 'function' && define.amd ? define(['exports'], factory) :
-    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.adminlte = {}));
-})(this, (function (exports) { 'use strict';
+        typeof define === 'function' && define.amd ? define(['exports'], factory) :
+            (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.adminlte = {}));
+})(this, (function (exports) {
+    'use strict';
 
     const domContentLoadedCallbacks = [];
     const onDOMContentLoaded = (callback) => {
@@ -732,8 +733,8 @@
      * AdminLTE Accessibility Module
      * WCAG 2.1 AA Compliance Features
      */
-    
-    // Initialize accessibility when DOM is ready
+
+     // Initialize accessibility when DOM is ready
     const initAccessibility = (config) => {
         return new AccessibilityManager(config);
     };
@@ -769,7 +770,6 @@
             document.body.classList.add('app-loaded');
         }, 400);
     });
-
     exports.CardWidget = CardWidget;
     exports.DirectChat = DirectChat;
     exports.FullScreen = FullScreen;

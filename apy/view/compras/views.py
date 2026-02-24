@@ -21,6 +21,9 @@ class CompraListView(PermisoRequeridoMixin, ListView):
     module_name = 'Compras' 
     permission_required = 'view'
     
+    def get_queryset(self):
+        return Compra.objects.filter(estado=True)
+    
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
@@ -68,6 +71,8 @@ class CompraUpdateView(PermisoRequeridoMixin, UpdateView):
     permission_required = 'change'
     
     def form_valid(self, form):
+        
+        form.instance.estado = True 
         messages.success(self.request, "Compra actualizada correctamente")
         return super().form_valid(form)
 

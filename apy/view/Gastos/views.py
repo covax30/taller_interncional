@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse_lazy
@@ -16,7 +16,7 @@ from apy.decorators import PermisoRequeridoMixin, permiso_requerido_fbv
 
 # **VARIABLE DE CONFIGURACIÓN DEL MÓDULO**
 # Definimos el nombre exacto de la DB en una variable para fácil mantenimiento
-GASTOS_MODULE_NAME = 'Registro de movimientos de caja (Ingresos/Gastos)'
+GASTOS_MODULE_NAME = 'Gastos'
 
 # --------------Vistas de Gastos (CBVs)---------------
 
@@ -27,6 +27,9 @@ class GastosListView(PermisoRequeridoMixin, ListView):
     # --- Configuración de Permisos ---
     module_name = GASTOS_MODULE_NAME # <-- CORRECCIÓN APLICADA
     permission_required = 'view'
+    
+    def get_queryset(self):
+        return Gastos.objects.filter(estado=True)
     
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -43,6 +46,34 @@ class GastosListView(PermisoRequeridoMixin, ListView):
         context['entidad'] = 'Gastos'
         return context
     
+#-----------------Vistas de Gastos (CBVs) de Inactivos---------------
+class GastosInactivosListView(PermisoRequeridoMixin, ListView):
+    model = Gastos
+    template_name = 'Gastos/gastos_inactivos.html'
+    
+    # --- Configuración de Permisos ---
+    module_name = GASTOS_MODULE_NAME # <-- CORRECCIÓN APLICADA
+    permission_required = 'view'
+    
+    def get_queryset(self):
+        return Gastos.objects.filter(estado=False)
+    
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+    
+    def post(self, request, *args, **kwargs):
+        nombre = {'nombre' : 'Gastos Inactivos'}
+        return JsonResponse(nombre)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Gastos Inactivos'
+        context['crear_url'] = reverse_lazy('apy:gasto_crear')
+        context['entidad'] = 'Gastos'
+        return context
+    
+        
 class GastosCreateView(PermisoRequeridoMixin, CreateView):
     form_class = GastosForm
     template_name = 'Gastos/crear_gasto.html'
@@ -53,6 +84,7 @@ class GastosCreateView(PermisoRequeridoMixin, CreateView):
     permission_required = 'add'
     
     def form_valid(self, form):
+        form.instance.estado = True 
         messages.success(self.request, "Gasto creado correctamente")
         return super().form_valid(form)
     
@@ -74,6 +106,8 @@ class GastosUpdateView(PermisoRequeridoMixin, UpdateView):
     permission_required = 'change'
     
     def form_valid(self, form):
+        
+        form.instance.estado = True 
         messages.success(self.request, "Gasto editado correctamente")
         return super().form_valid(form)
     
@@ -93,9 +127,16 @@ class GastosDeleteView(PermisoRequeridoMixin, DeleteView):
     module_name = GASTOS_MODULE_NAME # <-- CORRECCIÓN APLICADA
     permission_required = 'delete'
     
-    def form_valid(self, form):
-        messages.success(self.request, "Gasto eliminado correctamente")
-        return super().form_valid(form)
+    def post(self, request, *args, **kwargs):
+        
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        
+        self.object.estado = False
+        self.object.save()
+        
+        messages.success(self.request, f"Gasto {self.object.nombre} desactivado ")
+        return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -103,6 +144,34 @@ class GastosDeleteView(PermisoRequeridoMixin, DeleteView):
         context['entidad'] = 'Gastos'
         context['listar_url'] = reverse_lazy('apy:gasto_lista')
         return context
+    
+#----vista de activacion de gasto----
+class GastosActivateView(PermisoRequeridoMixin, DeleteView):
+    model = Gastos
+    template_name = 'Gastos/activar_gastos.html'
+    success_url = reverse_lazy('apy:gasto_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = GASTOS_MODULE_NAME # <-- CORRECCIÓN APLICADA
+    permission_required = 'delete'
+    
+    def post(self, request, *args, **kwargs):
+        
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        
+        self.object.estado = True
+        self.object.save()
+        
+        messages.success(self.request, f"Gasto {self.object.nombre} activado ")
+        return HttpResponseRedirect(success_url)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Activar Gastos'
+        context['entidad'] = 'Gastos'
+        context['listar_url'] = reverse_lazy('apy:gasto_lista')
+        return context    
     
 # --------------Vistas de Gastos (VBFs estandarizadas)---------------
 
