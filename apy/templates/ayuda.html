@@ -7,97 +7,551 @@
   <div class="col-md-12">
     <div class="card card-default">
       <div class="card-header">
-            <h3 class="card-tittle">
-                <i class="fa-solid fa-circle-info"></i>
-                Ayuda
-            </h3>
+        <h3 class="card-tittle">
+          <i class="fa-solid fa-circle-info"></i>
+          Ayuda
+        </h3>
+      </div>
+
+      <div class="card-body">
+        <p class="text-body">Haz clic en cada sección para desplegar la información detallada.</p>
+
+        <div class="accordion" id="accordionPrincipal">
+
+          <div class="card border-light shadow-sm mb-2">
+            <div class="card-header bg-body" id="headingPadreUno">
+              <h2 class="mb-0">
+                <button class="btn btn-link btn-block text-body d-flex justify-content-between align-items-center"
+                  type="button" data-toggle="collapse" data-target="#collapsePadreUno">
+                  <span>🔐 Inicio de Sesión y Recuperación</span>
+                  <i class="fas fa-chevron-down small text-muted"></i>
+                </button>
+              </h2>
+            </div>
+            <div id="collapsePadreUno" class="collapse" data-parent="#accordionPrincipal">
+              <div class="card-body bg-body">
+                <p class="small text-muted mb-3">Selecciona un tema específico:</p>
+
+                <div class="accordion" id="accordionHijoSesion">
+
+                  <div class="card mb-2">
+                    <div class="card-header bg-body" id="subHeadingPrimerInicio">
+                      <h2 class="mb-0">
+                        <button
+                          class="btn btn-link btn-block text-left text-primary d-flex justify-content-between align-items-center"
+                          style="font-size: 14px;" type="button" data-toggle="collapse"
+                          data-target="#collapsePrimerInicio">
+                          <span>Primer inicio de sesión</span>
+                          <i class="fas fa-plus fa-xs"></i>
+                        </button>
+                      </h2>
+                    </div>
+                    <div id="collapsePrimerInicio" class="collapse" data-parent="#accordionHijoSesion">
+                      <div class="card-body bg-body border-top">
+                        En tu primer inicio de sesión, utiliza las credenciales proporcionadas
+                        por tu administrador. Si no las tienes, contacta al departamento de TI para obtenerlas.
+                        Recuerda cambiar tu contraseña después de ingresar por primera vez para garantizar la seguridad
+                        de tu cuenta.
+                        <br>
+                        Recuerda que el sistema bloquea accesos no autorizados si el usuario no tiene permisos previos.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="card mb-2">
+                    <div class="card-header bg-body" id="subHeadingRequisitos">
+                      <h2 class="mb-0">
+                        <button
+                          class="btn btn-link btn-block text-left text-primary d-flex justify-content-between align-items-center"
+                          style="font-size: 14px;" type="button" data-toggle="collapse"
+                          data-target="#collapseRequisitos">
+                          <span>Requisitos de seguridad de la contraseña</span>
+                          <i class="fas fa-plus fa-xs"></i>
+                        </button>
+                      </h2>
+                    </div>
+                    <div id="collapseRequisitos" class="collapse" data-parent="#accordionHijoSesion">
+                      <div class="card-body bg-body border-top">
+                        Para garantizar la seguridad de tu cuenta, tu contraseña debe cumplir con los siguientes requisitos:
+                        <ul>
+                          <li>Al menos 8 caracteres de longitud.</li>
+                          <li>Incluir al menos una letra mayúscula.</li>
+                          <li>Incluir al menos una letra minúscula.</li>
+                          <li>Incluir al menos un número.</li>
+                          <li>Incluir al menos un carácter especial (por ejemplo: !@#$%^&*).</li>
+                        </ul>
+                        Recuerda que el sistema bloquea accesos no autorizados si el usuario no tiene permisos previos.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="card mb-2">
+                    <div class="card-header bg-body" id="subHeadingCredenciales">
+                      <h2 class="mb-0">
+                        <button
+                          class="btn btn-link btn-block text-left text-primary d-flex justify-content-between align-items-center"
+                          style="font-size: 14px;" type="button" data-toggle="collapse"
+                          data-target="#collapseCredenciales">
+                          <span>Gestión de credenciales de usuario</span>
+                          <i class="fas fa-plus fa-xs"></i>
+                        </button>
+                      </h2>
+                    </div>
+                    <div id="collapseCredenciales" class="collapse" data-parent="#accordionHijoSesion">
+                      <div class="card-body bg-body border-top">
+                        Tus credenciales son personales. Recuerda que el sistema bloquea accesos no autorizados si el
+                        usuario no tiene permisos previos.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="card mb-2">
+                    <div class="card-header bg-body" id="subHeadingRecuperacion">
+                      <h2 class="mb-0">
+                        <button
+                          class="btn btn-link btn-block text-left text-primary d-flex justify-content-between align-items-center"
+                          style="font-size: 14px;" type="button" data-toggle="collapse"
+                          data-target="#collapseRecuperacion">
+                          <span>Recuperación vía correo electrónico</span>
+                          <i class="fas fa-plus fa-xs"></i>
+                        </button>
+                      </h2>
+                    </div>
+                    <div id="collapseRecuperacion" class="collapse" data-parent="#accordionHijoSesion">
+                      <div class="card-body bg-body border-top">
+                        Tienes que tener en cuenta que si tu cuenta está vinculada a un correo electrónico, 
+                        puedes solicitar un enlace de recuperación para restablecer tu contraseña. 
+                        Asegúrate de revisar tu bandeja de entrada y la carpeta de spam para encontrar el correo de recuperación. 
+                        Si no recibes el correo, contacta al departamento de TI para asistencia adicional.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="card mb-2">
+                    <div class="card-header bg-body" id="subHeadingRestablecimiento">
+                      <h2 class="mb-0">
+                        <button
+                          class="btn btn-link btn-block text-left text-primary d-flex justify-content-between align-items-center"
+                          style="font-size: 14px;" type="button" data-toggle="collapse"
+                          data-target="#collapseRestablecimiento">
+                          <span>Validez de los enlaces de restablecimiento de contraseña</span>
+                          <i class="fas fa-plus fa-xs"></i>
+                        </button>
+                      </h2>
+                    </div>
+                    <div id="collapseRestablecimiento" class="collapse" data-parent="#accordionHijoSesion">
+                      <div class="card-body bg-body border-top">
+                        Los enlaces de restablecimiento de contraseña son válidos por un período limitado, generalmente de 24 horas. 
+                        Si el enlace ha expirado, deberás solicitar uno nuevo para restablecer tu contraseña. 
+                        Asegúrate de utilizar el enlace dentro del tiempo permitido para evitar inconvenientes. 
+                        No olvides que despues del primer uso de ese codigo que se envia al correo ese codigo se invalida 
+                        y no se puede volver a usar, por lo que si necesitas restablecer tu contraseña nuevamente, 
+                        tendrás que solicitar un nuevo enlace de restablecimiento.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="card mb-2">
+                    <div class="card-header bg-body" id="subHeadingCredencialesInvalida">
+                      <h2 class="mb-0">
+                        <button
+                          class="btn btn-link btn-block text-left text-primary d-flex justify-content-between align-items-center"
+                          style="font-size: 14px;" type="button" data-toggle="collapse"
+                          data-target="#collapseCredencialesInvalida">
+                          <span>Error de "Credenciales inválidas"</span>
+                          <i class="fas fa-plus fa-xs"></i>
+                        </button>
+                      </h2>
+                    </div>
+                    <div id="collapseCredencialesInvalida" class="collapse" data-parent="#accordionHijoSesion">
+                      <div class="card-body bg-body border-top">
+                        Si recibes un error de "Credenciales inválidas" al intentar iniciar sesión, verifica que estás ingresando tu nombre de usuario y contraseña correctamente. 
+                        Asegúrate de que la tecla de mayúsculas no esté activada y de que no haya espacios adicionales antes o después de tus credenciales. 
+                        Si continúas teniendo problemas, intenta restablecer tu contraseña utilizando el enlace de recuperación o contacta al departamento de TI para obtener asistencia.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="card mb-2">
+                    <div class="card-header bg-body" id="subHeadingCacheCookies">
+                      <h2 class="mb-0">
+                        <button
+                          class="btn btn-link btn-block text-left text-primary d-flex justify-content-between align-items-center"
+                          style="font-size: 14px;" type="button" data-toggle="collapse"
+                          data-target="#collapseCacheCookies">
+                          <span>Limpieza de cache y cookies</span>
+                          <i class="fas fa-plus fa-xs"></i>
+                        </button>
+                      </h2>
+                    </div>
+                    <div id="collapseCacheCookies" class="collapse" data-parent="#accordionHijoSesion">
+                      <div class="card-body bg-body border-top">
+                        Si experimentas problemas de inicio de sesión, como errores persistentes o dificultades para acceder a tu cuenta, 
+                        limpiar la caché y las cookies de tu navegador puede ayudar a resolver estos problemas. 
+                        Esto eliminará cualquier información almacenada que pueda estar causando conflictos con el proceso de autenticación. 
+                        Después de limpiar la caché y las cookies, intenta iniciar sesión nuevamente para ver si el problema se ha resuelto.
+                        El proceso para limpiar la caché y las cookies varía según el navegador que estés utilizando, utiliza el atajo de teclado 
+                        <strong>Ctrl + Shift + Delete</strong> para abrir el menu de borrar datos de navegación y selecciona la opción de limpiar caché y cookies, 
+                        luego confirma la acción y vuelve a intentar iniciar sesión.
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card border-light shadow-sm mb-2">
+            <div class="card-header bg-body" id="headingPadreDos">
+              <h2 class="mb-0">
+                <button class="btn btn-link btn-block text-body d-flex justify-content-between align-items-center"
+                  type="button" data-toggle="collapse" data-target="#collapsePadreDos">
+                  <span>🔑 Seguridad y Control de Acceso(Permisos)</span>
+                  <i class="fas fa-chevron-down small text-muted"></i>
+                </button>
+              </h2>
+            </div>
+            <div id="collapsePadreDos" class="collapse" data-parent="#accordionPrincipal">
+              <div class="card-body bg-body">
+                <p class="small text-muted mb-3">Selecciona un tema específico:</p>
+
+                <div class="accordion" id="accordionHijoDos">
+
+                  <div class="card mb-2">
+                    <div class="card-header bg-body" id="subHeadingNiveles">
+                      <h2 class="mb-0">
+                        <button
+                          class="btn btn-link btn-block text-left text-primary d-flex justify-content-between align-items-center"
+                          style="font-size: 14px;" type="button" data-toggle="collapse" data-target="#collapseNiveles">
+                          <span>Niveles de Acceso por Módulo</span>
+                          <i class="fas fa-plus fa-xs"></i>
+                        </button>
+                      </h2>
+                    </div>
+                    <div id="collapseNiveles" class="collapse" data-parent="#accordionHijoDos">
+                      <div class="card-body bg-body border-top">
+                        En el sistema, cada módulo tiene asignado un nivel de acceso específico. 
+                        Esto significa que dependiendo de tu rol y permisos, podrás acceder a ciertas 
+                        funcionalidades dentro de cada módulo. Por ejemplo, un usuario con rol de "Empleado" 
+                        puede tener acceso limitado a ciertos módulos como "Facturas" o "Informes", mientras 
+                        que un "Administrador" tendría acceso completo a todas las funcionalidades. Es importante 
+                        entender que el sistema bloquea accesos no autorizados si el usuario no tiene permisos previos, 
+                        por lo que siempre debes asegurarte de tener los permisos adecuados para realizar las tareas necesarias.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="card mb-2">
+                    <div class="card-header bg-body" id="subHeadingRoles">
+                      <h2 class="mb-0">
+                        <button
+                          class="btn btn-link btn-block text-left text-primary d-flex justify-content-between align-items-center"
+                          style="font-size: 14px;" type="button" data-toggle="collapse" data-target="#collapseRoles">
+                          <span>Asignación de Roles a Usuarios</span>
+                          <i class="fas fa-plus fa-xs"></i>
+                        </button>
+                      </h2>
+                    </div>
+                    <div id="collapseRoles" class="collapse" data-parent="#accordionHijoDos">
+                      <div class="card-body bg-body border-top">
+                        La asignación de roles a usuarios es un proceso fundamental para garantizar la seguridad y el control de acceso en el sistema. 
+                        Cada usuario debe ser asignado a un rol específico que determine sus permisos y nivel de acceso a las diferentes funcionalidades del sistema. 
+                        Por ejemplo, un usuario con rol de "Administrador" tendrá acceso completo a todas las funciones, mientras que un usuario con rol de "Empleado" tendrá acceso limitado a ciertas áreas. 
+                        Es importante que los administradores revisen regularmente las asignaciones de roles para asegurarse de que cada usuario tenga los permisos adecuados según sus responsabilidades laborales. 
+                        Recuerda que el sistema bloquea accesos no autorizados si el usuario no tiene permisos previos, por lo que es crucial mantener una gestión adecuada de los roles y permisos.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="card mb-2">
+                    <div class="card-header bg-body" id="subHeadingPerfil">
+                      <h2 class="mb-0">
+                        <button
+                          class="btn btn-link btn-block text-left text-primary d-flex justify-content-between align-items-center"
+                          style="font-size: 14px;" type="button" data-toggle="collapse" data-target="#collapsePerfil">
+                          <span>Auto-gestión de Perfil</span>
+                          <i class="fas fa-plus fa-xs"></i>
+                        </button>
+                      </h2>
+                    </div>
+                    <div id="collapsePerfil" class="collapse" data-parent="#accordionHijoDos">
+                      <div class="card-body bg-body border-top">
+                        La auto-gestión de perfil te permite actualizar tu información personal, cambiar tu contraseña.. 
+                        Es importante mantener tu perfil actualizado para garantizar que la información de contacto sea correcta 
+                        y que puedas recibir notificaciones importantes relacionadas con tu cuenta. 
+                        Recuerda que el sistema bloquea accesos no autorizados si el usuario no tiene permisos previos, 
+                        por lo que es fundamental mantener la seguridad de tu cuenta actualizando regularmente tu contraseña y revisando tus configuraciones de seguridad.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card border-light shadow-sm mb-2">
+            <div class="card-header bg-body" id="headingPadreTres">
+              <h2 class="mb-0">
+                <button class="btn btn-link btn-block text-body d-flex justify-content-between align-items-center"
+                  type="button" data-toggle="collapse" data-target="#collapsePadreTres">
+                  <span>💾 Copias de Seguridad y Respaldo de Datos(Backup)</span>
+                  <i class="fas fa-chevron-down small text-muted"></i>
+                </button>
+              </h2>
+            </div>
+            <div id="collapsePadreTres" class="collapse" data-parent="#accordionPrincipal">
+              <div class="card-body bg-body">
+                <p class="small text-muted mb-3">Selecciona un tema específico:</p>
+
+                <div class="accordion" id="accordionHijoTres">
+
+                  <div class="card mb-2">
+                    <div class="card-header bg-body" id="subHeadingRespaldoManual">
+                      <h2 class="mb-0">
+                        <button
+                          class="btn btn-link btn-block text-left text-primary d-flex justify-content-between align-items-center"
+                          style="font-size: 14px;" type="button" data-toggle="collapse"
+                          data-target="#collapseRespaldoManual">
+                          <span>Generación de Respaldo Manual</span>
+                          <i class="fas fa-plus fa-xs"></i>
+                        </button>
+                      </h2>
+                    </div>
+                    <div id="collapseRespaldoManual" class="collapse" data-parent="#accordionHijoTres">
+                      <div class="card-body bg-body border-top">
+                        Entrando en el tema de generación de respaldo manual, es importante destacar que este proceso 
+                        te permite crear una copia de seguridad de tus datos en cualquier momento. 
+                        Para generar un respaldo manual, simplemente accede a la sección de configuracion, seguido de eso 
+                        en la subsección de respaldos en el sistema y selecciona la opción de "Generar Respaldo" 
+                        donde tendras que seleccionar si deseas guardarlo en tu servidor local o en la nube(AWS/GCP).
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="card mb-2">
+                    <div class="card-header bg-body" id="subHeadingRespaldoAutomatico">
+                      <h2 class="mb-0">
+                        <button
+                          class="btn btn-link btn-block text-left text-primary d-flex justify-content-between align-items-center"
+                          style="font-size: 14px;" type="button" data-toggle="collapse"
+                          data-target="#collapseRespaldoAutomatico">
+                          <span>Generación de Respaldo Automatico</span>
+                          <i class="fas fa-plus fa-xs"></i>
+                        </button>
+                      </h2>
+                    </div>
+                    <div id="collapseRespaldoAutomatico" class="collapse" data-parent="#accordionHijoTres">
+                      <div class="card-body bg-body border-top">
+                        La generación de respaldo automático es una función que permite al sistema crear copias de seguridad de tus datos de forma periódica sin que tengas que intervenir manualmente. 
+                        Esto garantiza que siempre tengas una copia actualizada de tu información en caso de cualquier eventualidad. 
+                        Para configurar el respaldo automático, accede a la sección de configuracion, seguido de eso en la subsección de respaldos en el sistema y 
+                        podras observar el apartado de respaldo automatico donde tendras que seleccionarla frecuencia con la que quieres que se generen los respaldos, tambien la hora en la que quieres se generen esos respaldos.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="card mb-2">
+                    <div class="card-header bg-body" id="subHeadingDestinoAlmacenamiento">
+                      <h2 class="mb-0">
+                        <button
+                          class="btn btn-link btn-block text-left text-primary d-flex justify-content-between align-items-center"
+                          style="font-size: 14px;" type="button" data-toggle="collapse"
+                          data-target="#collapseDestinoAlmacenamiento">
+                          <span>Destino de almacenamiento</span>
+                          <i class="fas fa-plus fa-xs"></i>
+                        </button>
+                      </h2>
+                    </div>
+                    <div id="collapseDestinoAlmacenamiento" class="collapse" data-parent="#accordionHijoTres">
+                      <div class="card-body bg-body border-top">
+                        Al configurar el destino de almacenamiento para tus respaldos, tienes la opción de elegir 
+                        entre guardar tus copias de seguridad en tu servidor local o en la nube utilizando servicios como AWS o GCP. 
+                        Guardar tus respaldos en la nube ofrece ventajas como mayor seguridad, accesibilidad desde cualquier lugar y protección contra desastres locales. 
+                        Para seleccionar tu destino de almacenamiento, accede a la sección de configuracion, seguido de eso en la subsección de respaldos 
+                        en el sistema y selecciona tu opción preferida para garantizar que tus datos estén protegidos de acuerdo a tus necesidades.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="card mb-2">
+                    <div class="card-header bg-body" id="subHeadingRestauracion">
+                      <h2 class="mb-0">
+                        <button
+                          class="btn btn-link btn-block text-left text-primary d-flex justify-content-between align-items-center"
+                          style="font-size: 14px;" type="button" data-toggle="collapse"
+                          data-target="#collapseRestauracion">
+                          <span>Restauración de Archivos Externos</span>
+                          <i class="fas fa-plus fa-xs"></i>
+                        </button>
+                      </h2>
+                    </div>
+                    <div id="collapseRestauracion" class="collapse" data-parent="#accordionHijoTres">
+                      <div class="card-body bg-body border-top">
+                        La restauración de archivos externos es un proceso que te permite recuperar tus datos utilizando copias de seguridad que has guardado previamente, ya sea en tu servidor local o en la nube. 
+                        Para restaurar tus datos, accede a la sección de configuracion, seguido de eso en la subsección de respaldos en el sistema y selecciona la opción de "Restaurar Respaldo". 
+                        Luego, elige el archivo de respaldo que deseas restaurar teniendo en cuenta que debe terminar en <strong>".sql", ".gz", ".zip" </strong>y sigue las instrucciones para completar el proceso. 
+                        Es importante asegurarte de seleccionar el respaldo correcto para evitar sobrescribir datos importantes.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="card mb-2">
+                    <div class="card-header bg-body" id="subHeadingHistorial">
+                      <h2 class="mb-0">
+                        <button
+                          class="btn btn-link btn-block text-left text-primary d-flex justify-content-between align-items-center"
+                          style="font-size: 14px;" type="button" data-toggle="collapse"
+                          data-target="#collapseHistorial">
+                          <span>Historial de Copias de Seguridad</span>
+                          <i class="fas fa-plus fa-xs"></i>
+                        </button>
+                      </h2>
+                    </div>
+                    <div id="collapseHistorial" class="collapse" data-parent="#accordionHijoTres">
+                      <div class="card-body bg-body border-top">
+                        El historial de copias de seguridad es una función que te permite revisar todas las copias de seguridad que has generado, tanto manuales como automáticas. 
+                        Esto te brinda la posibilidad de verificar cuándo se realizaron los respaldos y qué datos se incluyeron en cada uno. 
+                        Para acceder al historial de copias de seguridad, accede a la sección de configuracion, seguido de eso en la subsección de respaldos en el sistema y selecciona la opción de "Historial de Respaldo". 
+                        Aquí podrás ver una lista detallada de todas tus copias de seguridad, lo que te ayudará a gestionar mejor tus datos y asegurarte de que siempre tengas una copia actualizada disponible.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card border-light shadow-sm mb-2">
+            <div class="card-header bg-body" id="headingPadreCuatro">
+              <h2 class="mb-0">
+                <button class="btn btn-link btn-block text-body d-flex justify-content-between align-items-center"
+                  type="button" data-toggle="collapse" data-target="#collapsePadreCuatro">
+                  <span>🔍 Uso del Buscador Global</span>
+                  <i class="fas fa-chevron-down small text-muted"></i>
+                </button>
+              </h2>
+            </div>
+            <div id="collapsePadreCuatro" class="collapse" data-parent="#accordionPrincipal">
+              <div class="card-body bg-body">
+                <p class="small text-muted mb-3">Selecciona un tema específico:</p>
+
+                <div class="accordion" id="accordionHijoBuscador">
+
+                  <div class="card mb-2">
+                    <div class="card-header bg-body" id="subHeadingCriterios">
+                      <h2 class="mb-0">
+                        <button
+                          class="btn btn-link btn-block text-left text-primary d-flex justify-content-between align-items-center"
+                          style="font-size: 14px;" type="button" data-toggle="collapse"
+                          data-target="#collapsePrimerInicio">
+                          <span>Criterios de Busqueda</span>
+                          <i class="fas fa-plus fa-xs"></i>
+                        </button>
+                      </h2>
+                    </div>
+                    <div id="collapseCriterios" class="collapse" data-parent="#accordionHijoBuscador">
+                      <div class="card-body bg-body border-top">
+                        Para obtener los mejores resultados al utilizar el buscador global, es importante seguir algunos criterios de búsqueda. 
+                        Asegúrate de ingresar palabras clave relevantes y específicas relacionadas con la información que estás buscando, teniendo cuidado en los espacios y caracteres especiales.
+                        Recuerda que el sistema bloquea accesos no autorizados si el usuario no tiene permisos previos, por lo que es fundamental tener los permisos adecuados para acceder a la información que necesitas.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="card mb-2">
+                    <div class="card-header bg-body" id="subHeadingInterpretacion">
+                      <h2 class="mb-0">
+                        <button
+                          class="btn btn-link btn-block text-left text-primary d-flex justify-content-between align-items-center"
+                          style="font-size: 14px;" type="button" data-toggle="collapse"
+                          data-target="#collapseInterpretacion">
+                          <span>Interpretacion de Resultados</span>
+                          <i class="fas fa-plus fa-xs"></i>
+                        </button>
+                      </h2>
+                    </div>
+                    <div id="collapseInterpretacion" class="collapse" data-parent="#accordionHijoBuscador">
+                      <div class="card-body bg-body border-top">
+                        Al interpretar los resultados del buscador global, es importante prestar atención a los detalles de 
+                        cada resultado, como el título, las columnas y los datos que estas contienen. 
+                        Ten en cuenta que los datos que se muestran se pueden ver divididos en secciones que tiene el titulo de la tabla y y el registro completo 
+                        debajo de ese titulo, cada columna tiene un nombre que te indica que tipo de dato es el que se muestra en esa columna, y debajo de cada columna se muestran los datos correspondientes a esa columna.
+                        Esto te ayudará a identificar rápidamente la información más relevante para tus necesidades. 
+                        Recuerda que el sistema bloquea accesos no autorizados si el usuario no tiene permisos previos, por lo que es fundamental tener los permisos adecuados para acceder a la información que necesitas.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="card mb-2">
+                    <div class="card-header bg-body" id="subHeadingCoincidencias">
+                      <h2 class="mb-0">
+                        <button
+                          class="btn btn-link btn-block text-left text-primary d-flex justify-content-between align-items-center"
+                          style="font-size: 14px;" type="button" data-toggle="collapse"
+                          data-target="#collapseCoincidencias">
+                          <span>Busqueda sin coincidencias</span>
+                          <i class="fas fa-plus fa-xs"></i>
+                        </button>
+                      </h2>
+                    </div>
+                    <div id="collapseCoincidencias" class="collapse" data-parent="#accordionHijoBuscador">
+                      <div class="card-body bg-body border-top">
+                        Si tu búsqueda no arroja coincidencias, es posible que los términos ingresados no sean lo suficientemente específicos o que la información que buscas no exista en el sistema. 
+                        Intenta refinar tus criterios de búsqueda utilizando palabras clave más precisas o revisando la ortografía de los términos ingresados.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card border-light shadow-sm mb-2">
+            <div class="card-header bg-body" id="headingTwo">
+              <h2 class="mb-0">
+                <button class="btn btn-link btn-block text-body d-flex justify-content-between align-items-center"
+                  type="button" data-toggle="collapse" data-target="#collapseTwo">
+                  <span>🏠 Navegación General</span>
+                  <i class="fas fa-chevron-down small text-muted"></i>
+                </button>
+              </h2>
+            </div>
+            <div id="collapseTwo" class="collapse" data-parent="#accordionAyuda">
+              <div class="card-body text-secondary">
+                <p>En el <strong>sidebar izquierdo</strong> encontrarás los accesos a todos los módulos: Facturas,
+                  Vehículos, Informes, Compras, etc.</p>
+                <p>En la parte superior podrás activar <strong>pantalla completa</strong> y gestionar tu perfil.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card border-light shadow-sm mb-2">
+            <div class="card-header bg-body" id="headingThree">
+              <h2 class="mb-0">
+                <button class="btn btn-link btn-block text-body d-flex justify-content-between align-items-center"
+                  type="button" data-toggle="collapse" data-target="#collapseThree">
+                  <span>👥 Roles de Usuario</span>
+                  <i class="fas fa-chevron-down small text-muted"></i>
+                </button>
+              </h2>
+            </div>
+            <div id="collapseThree" class="collapse" data-parent="#accordionAyuda">
+              <div class="card-body text-secondary">
+                <ul class="list-unstyled">
+                  <li><strong>• Administrador:</strong> Control total de registros.</li>
+                  <li><strong>• Empleado:</strong> Registro según área asignada.</li>
+                  <li><strong>• Invitado:</strong> Solo consulta de información.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
         </div>
-
-      <div class="card-body" style="line-height: 1.8; font-size: 16px;">
-        <p>
-          Bienvenido al <strong>Sistema de Gestión del Taller Internacional de Motores</strong>.  
-          Este sistema permite administrar todas las áreas del taller según el rol de cada usuario.
-          A continuación encontrarás una guía breve para aprovecharlo al máximo.
-        </p>
-
-        <h4>🔐 Inicio de Sesión y Recuperación de Contraseña</h4>
-        <p>
-          Ingresa con tu usuario y contraseña asignados.  
-          Si la olvidas, usa la opción <strong>“¿Olvidó su contraseña?”</strong> para recibir un correo con las instrucciones de recuperación.
-        </p>
-
-        <h4>🏠 Navegación General</h4>
-        <p>
-          En el <strong>sidebar izquierdo</strong> encontrarás los accesos a todos los módulos: Facturas, Vehículos, Informes, Compras, Proveedores, Repuestos, entre otros.  
-          Puedes cambiar entre ellos con un solo clic.
-        </p>
-        <p>
-          En la parte superior podrás activar <strong>pantalla completa</strong>, ver tu nombre, usuario y foto de perfil, y cerrar sesión de forma segura.
-        </p>
-
-        <h4>👥 Roles de Usuario</h4>
-        <p>
-          Cada usuario tiene permisos específicos según su rol:  
-          - <strong>Administrador:</strong> Puede crear, editar, eliminar y ver todos los registros.  
-          - <strong>Empleado:</strong> Puede ver y registrar información según su área.  
-          - <strong>Invitado:</strong> Solo puede consultar información.  
-        </p>
-
-        <h4>📋 Listado de Registros</h4>
-        <p>
-          En cada módulo, los datos se muestran en una tabla interactiva.  
-          Puedes:
-        </p>
-        <ul>
-          <li>Usar el cuadro de <strong>búsqueda</strong> para encontrar registros.</li>
-          <li>Seleccionar cuántos registros deseas mostrar.</li>
-          <li>Filtrar información desde los encabezados de cada columna.</li>
-          <li>Editar o eliminar usando los botones de acción.</li>
-        </ul>
-        <p>
-          En modo responsivo (pantalla pequeña), algunos filtros y columnas se ocultan automáticamente para mejorar la visualización.
-        </p>
-
-        <h4>➕ Creación de Registros</h4>
-        <p>
-          Al hacer clic en el botón <strong>“Agregar”</strong>, se abre un formulario donde puedes registrar nuevos datos.  
-          Los campos de fecha y hora usan selectores para facilitar la entrada.  
-          Si necesitas agregar una información relacionada (por ejemplo, un nuevo repuesto o proveedor), puedes hacerlo directamente desde el <strong>modal</strong> y se guardará de inmediato.
-        </p>
-
-        <h4>⚙️ Accesibilidad</h4>
-        <p>
-          El sistema incluye un <strong>módulo de accesibilidad</strong> con herramientas para adaptar la interfaz:
-        </p>
-        <ul>
-          <li>Modo claro / oscuro</li>
-          <li>Ajuste de tamaño de fuente</li>
-          <li>Resaltado de texto, enlaces y títulos</li>
-          <li>Alta o baja saturación, monocromo</li>
-          <li>Guía de lectura, cursor grande y detener animaciones</li>
-        </ul>
-
-        <h4>👨‍💻 Gestión de Usuarios</h4>
-        <p>
-          Desde el módulo <strong>Usuarios</strong> puedes consultar la lista del sistema, editar nombres de usuario o restablecer contraseñas según permisos.
-        </p>
-
-        <h4>💡 Recomendaciones Generales</h4>
-        <ul>
-          <li>Guarda tus cambios antes de salir del formulario.</li>
-          <li>No cierres el navegador mientras se esté enviando información.</li>
-          <li>Revisa tus permisos antes de intentar editar o eliminar registros.</li>
-        </ul>
 
         <div class="alert alert-info mt-4">
-          <strong>¿Problemas o dudas?</strong> Contacta al administrador del sistema para asistencia técnica.
-        </div>
-        <div class="card-body">
-            <h5>¿Necesitas ayuda?</h5>
-            <p>Si tienes alguna duda o problema, no dudes en contactarnos a través de los siguientes medios:</p>
-            <ul>
-                <li>Email:  soportecnico.t.i.m@gmail.com</li>
-            </ul>
+          <h5 class="alert-heading"><i class="fas fa-envelope"></i> ¿Necesitas soporte técnico?</h5>
+          <p class="mb-0">Email: <strong>soportecnico.t.i.m@gmail.com</strong></p>
         </div>
       </div>
     </div>
@@ -107,4 +561,28 @@
 <!-- JS de Sienna Accessibility -->
 <script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
 <script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
+
+<style>
+  .btn-link {
+    color: #202124;
+    /* Color de texto de Google */
+    font-weight: 500;
+    text-decoration: none !important;
+  }
+
+  .btn-link:hover {
+    background-color: #f8f9fa;
+    color: #1a73e8;
+    /* Azul Google */
+  }
+
+  .card-header {
+    padding: 0.5rem 1rem;
+  }
+
+  .accordion .card {
+    border-radius: 8px !important;
+    overflow: hidden;
+  }
+</style>
 {% endblock %}

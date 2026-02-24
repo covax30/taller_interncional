@@ -20,7 +20,7 @@ class PagoServiciosListView(PermisoRequeridoMixin, ListView):
     template_name ='Pago_Servicios/listar_pagoservicios.html'
     
     # --- Configuración de Permisos ---
-    module_name = 'PagoServicios' 
+    module_name = 'PagoServicios'
     permission_required = 'view' 
     def get_queryset(self):
         return PagoServiciosPublicos.objects.filter(estado=True)
@@ -47,7 +47,7 @@ class PagoServiciosInactivosListView(PermisoRequeridoMixin, ListView):
     template_name ='Pago_Servicios/pagoservicios_inactivos.html'
     
     # --- Configuración de Permisos ---
-    module_name = 'PagoServicios' 
+    module_name = 'PagoServicios'
     permission_required = 'view' 
     
     def get_queryset(self):
@@ -130,7 +130,7 @@ class PagoServiciosDeleteView(PermisoRequeridoMixin, DeleteView):
         self.object.estado = False
         self.object.save()
         
-        messages.success(self.request,     f"Pago de servicios Publicos {PagoServiciosPublicos} desactivado correctamente")
+        messages.success(self.request, f"Servicio {self.object.servicio} desactivado correctamente")
         return HttpResponseRedirect(success_url)
     
     def form_valid(self, form):
@@ -153,13 +153,13 @@ class PagoServiciosActivateView(PermisoRequeridoMixin, UpdateView):
     
     # --- Configuración de Permisos ---
     module_name = 'PagoServicios'
-    permission_required = 'change'
+    permission_required = 'delete'
     
     def form_valid(self, form):
         # Activar el pago de servicio estableciendo estado a True
         self.object.estado = True
         self.object.save()
-        messages.success(self.request, "Pago de servicio activado correctamente")
+        messages.success(self.request, f"Pago de servicio {self.object.servicio} activado correctamente")
         return super().form_valid(form)
     
     def get_context_data(self, **kwargs):
@@ -169,11 +169,15 @@ class PagoServiciosActivateView(PermisoRequeridoMixin, UpdateView):
         context['listar_url'] = reverse_lazy('apy:pago_servicios_lista')
         return context    
       
-class PagoServiciosCreateModalView(CreateView):
+class PagoServiciosCreateModalView(PermisoRequeridoMixin, CreateView):
     model = PagoServiciosPublicos
     form_class = PagoServiciosForm
     template_name = "Pago_Servicios/modal_pago_servicios.html"
     success_url = reverse_lazy("apy:pago_servicios_lista")
+
+    # --- Configuración de Permisos ---
+    module_name = 'PagoServicios'
+    permission_required = 'add'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):

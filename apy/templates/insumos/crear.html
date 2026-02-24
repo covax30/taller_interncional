@@ -14,7 +14,7 @@
                 </button>
             </div>
         </div>
-    </div>
+    </div> 
 
     <!-- Costo -->
     <div class="form-group mb-3">
@@ -92,6 +92,9 @@
                     modal.find(".modal-body").html(data.html || data);
                 }
             });
+        });
+        $('#id_id_marca').select2({
+            theme: 'bootstrap-5',
         });
     </script>
 {% endblock %}

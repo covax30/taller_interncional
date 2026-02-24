@@ -18,7 +18,7 @@ class ProveedorListView(PermisoRequeridoMixin, ListView):
     template_name ='Proveedores/listar_proveedores.html'
     
     # --- Configuración de Permisos ---
-    module_name = 'Proveedores' 
+    module_name = 'Proveedor' 
     permission_required = 'view' 
     # --------------------------------
     def get_queryset(self):
@@ -45,7 +45,7 @@ class ProveedorInactivaListView(PermisoRequeridoMixin, ListView):
     template_name = 'Proveedores/proveedores_inactivos.html'
     
     # --- Configuración de Permisos ---
-    module_name = 'Proveedores' 
+    module_name = 'Proveedor' 
     permission_required = 'view'
     
     def get_queryset(self):
@@ -64,7 +64,7 @@ class ProveedorCreateView(PermisoRequeridoMixin, CreateView):
     success_url = reverse_lazy('apy:proveedor_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Proveedores'
+    module_name = 'Proveedor' 
     permission_required = 'add'
         
     
@@ -87,10 +87,12 @@ class ProveedorUpdateView(PermisoRequeridoMixin, UpdateView):
     success_url = reverse_lazy('apy:proveedor_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Proveedores'
+    module_name = 'Proveedor' 
     permission_required = 'change'
     
     def form_valid(self, form):
+        
+        form.instance.estado = True 
         messages.success(self.request, "Proveedor actualizado correctamente")
         return super().form_valid(form)
     
@@ -107,7 +109,7 @@ class ProveedorDeleteView(PermisoRequeridoMixin, DeleteView):
     success_url = reverse_lazy('apy:proveedor_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Proveedores'
+    module_name = 'Proveedor' 
     permission_required = 'delete'
     
     def post(self, request, *args, **kwargs):
@@ -118,7 +120,7 @@ class ProveedorDeleteView(PermisoRequeridoMixin, DeleteView):
         self.object.estado = False
         self.object.save()
         
-        messages.success(self.request,f"Proveedor {Proveedores} desactivado correctamente")
+        messages.success(self.request, f"Proveedor {self.object.nombre} desactivado correctamente")
         return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):
@@ -135,8 +137,8 @@ class ProveedorActivateView(PermisoRequeridoMixin, DeleteView):
     success_url = reverse_lazy('apy:proveedor_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Proveedores'
-    permission_required = 'change'
+    module_name = 'Proveedor' 
+    permission_required = 'delete'
     
     def post(self, request, *args, **kwargs):
         
@@ -146,7 +148,7 @@ class ProveedorActivateView(PermisoRequeridoMixin, DeleteView):
         self.object.estado = True
         self.object.save()
         
-        messages.success(self.request,f"Proveedor {Proveedores} activado correctamente")
+        messages.success(self.request, f"Proveedor {self.object.nombre} activado correctamente")
         return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):
@@ -156,11 +158,16 @@ class ProveedorActivateView(PermisoRequeridoMixin, DeleteView):
         context['listar_url'] = reverse_lazy('apy:proveedor_lista')
         return context    
     
-class ProveedorCreateModalView(CreateView):
+class ProveedorCreateModalView(PermisoRequeridoMixin, CreateView):
     model = Proveedores
     form_class = ProveedorForm
     template_name = "Proveedores/modal_proveedores.html"
     success_url = reverse_lazy("apy:proveedor_lista")
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Proveedor' 
+    permission_required = 'add'
+    
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):

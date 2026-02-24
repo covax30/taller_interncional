@@ -48,3 +48,43 @@
   {% endfor %}
 
 {% endblock %}
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Buscamos la tabla. AdminLTE suele poner la clase 'table' 
+        // o puedes usar el selector 'table' si es la única en la página.
+        var table = $('table').DataTable({
+            "retrieve": true, // Importante para no duplicar si ya existe
+            "dom": '<"d-flex justify-content-between align-items-center mb-3"Bf>rtip',
+            "buttons": [
+                {
+                    extend: 'excelHtml5',
+                    text: '<i class="fas fa-file-excel"></i> Descargar Excel',
+                    className: 'btn btn-success btn-sm',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5] // Exporta todo menos la columna "Acciones"
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    text: '<i class="fas fa-file-pdf"></i> Generar PDF',
+                    className: 'btn btn-danger btn-sm',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5]
+                    },
+                    customize: function (doc) {
+                        doc.content[1].table.widths = ['10%', '20%', '15%', '20%', '20%', '15%'];
+                        doc.styles.tableHeader.fillColor = '#343a40'; // Encabezado oscuro como tu tema
+                    }
+                }
+            ],
+            "language": {
+                "url": "https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json"
+            }
+        });
+
+        // Mueve los botones al contenedor de "Agregar Vehículo" si quieres que estén arriba
+        table.buttons().container().appendTo('#block-agregar-container'); 
+    });
+</script>
+{% endblock %}

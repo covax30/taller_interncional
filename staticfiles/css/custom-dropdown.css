@@ -1,0 +1,59 @@
+/* Estilos base del dropdown */
+.custom-user-dropdown {
+    width: 280px !important; /* Ancho fijo para que no se deforme */
+    border-radius: 16px !important;
+    overflow: hidden !important; /* Crucial para que nada se salga */
+    padding: 0 !important;
+}
+
+.user-header-main {
+    padding: 1.5rem 1rem;
+    text-align: center;
+    width: 100%;
+}
+
+.user-header-main img {
+    width: 90px !important;  /* Limita el ancho */
+    height: 90px !important; /* Limita el alto */
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 10px;
+}
+/* --- Versión para el Administrador --- */
+.header-admin {
+    background: linear-gradient(135deg, #2c3e50 0%, #000000 100%);
+}
+.header-admin .role-badge {
+    background: #ffc107;
+    color: #000;
+}
+
+/* --- Versión para el Empleado --- */
+.header-staff {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+}
+.header-staff .role-badge {
+    background: #ffffff;
+    color: #0d6efd;
+}
+
+/* Elementos comunes */
+.user-header-main img {
+    width: 95px;
+    height: 95px;
+    object-fit: cover;
+    border: 4px solid rgba(255, 255, 255, 0.15);
+}
+
+.role-badge {
+    position: absolute;
+    bottom: 0;
+    right: 35%; /* Ajusta según el centro */
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 10px;
+    border: 2px solid white;
+}

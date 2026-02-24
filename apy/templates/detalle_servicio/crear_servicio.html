@@ -6,39 +6,69 @@
 {% block title %}Crear Servicio{% endblock %}
 
 {% block content %}
-{% csrf_token %}
 <div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-right text-body">
-            <i class="fas fa-plus me-2"></i>Crear Nuevo Servicio
-        </h2>
-        <a href="/apy/servicios/" class="btn btn-secondary">
-            <i class="fas fa-arrow-left me-1"></i>Volver a la Lista
-        </a>
-    </div>
-
-
-
-    <form method="post" id="servicio-form">
-        {% csrf_token %}
+    <div class="mx-auto" style="max-width: 1000px; float: none;">
         
-        <!-- Información del Vehículo -->
-        <div class="card shadow mb-4">
-            <div class="card-header bg-primary text-white py-3">
-                <h5 class="mb-0"><i class="fas fa-car me-2"></i>Información del Vehículo</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="{{ form.id_vehiculo.id_for_label }}">Vehículo:</label>
-                            <div class="input-group">
-                                {{ form.id_vehiculo }}
-                                <div class="input-group-append">
-                                    <button type="button" 
-                                    class="btn btn-secondary" 
-                                    data-toggle="modal" 
-                                    data-target="#modal-id_vehiculo">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="text-body mb-0">
+                <i class="fas fa-file-invoice text-primary me-2"></i> Crear Nuevo Servicio
+            </h2>
+            <a href="/apy/servicios/" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Volver a la Lista
+            </a>
+    
+
+        </div>
+
+        <form method="post" id="servicio-form">
+            {% csrf_token %}
+            
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-body py-3">
+                    <h5 class="mb-0 text-primary"> 
+                        <i class="fas fa-clipboard-list me-2"></i>Información General de Entrada
+                    </h5>
+                </div>
+                
+                <div class="card-body p-4">
+                    <div class="row">
+                        
+
+                        <div class="col-md-6 ps-md-4 border-end">
+                            <h6 class="text-muted fw-bold mb-3"><i class="fas fa-car me-2"></i>DATOS DEL VEHÍCULO</h6>
+                            <div class="form-group mb-0">
+                                <label class="form-label">Registro de Ingreso:</label>
+                                <div class="input-group" style="display: flex; flex-wrap: nowrap;">
+                                    <div style="flex-grow: 1;">
+                                    {{ form.id_entrada|add_class:"form-control" }}
+                                    </div>
+                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-id_entrada">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="form-label">Vehículo Asociado:</label>
+                                <div class="input-group" style="display: flex; flex-wrap: nowrap;">
+                            <div style="flex-grow: 1;">
+                                 {{ form.id_vehiculo|add_class:"form-control" }}
+                            </div>
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-id_vehiculo">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                            </div>
+                            
+                        </div>
+                        <div class="col-md-6 ">
+                            <h6 class="text-muted fw-bold mb-3"><i class="fas fa-user me-2"></i>DATOS DEL CLIENTE</h6>
+                            <div class="form-group mb-4">
+                                <label class="form-label">Seleccionar Cliente:</label>
+                                <div class="input-group" style="display: flex; flex-wrap: nowrap;">
+                                    <div style="flex-grow: 1;">
+                                        {{ form.cliente|add_class:"form-control" }}
+                                    </div>
+                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-id_cliente">
                                         <i class="fas fa-plus"></i>
                                     </button>
                                 </div>
@@ -47,273 +77,266 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Repuestos -->
-        <div class="card shadow mb-4">
-            <div class="card-header bg-success text-white py-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fas fa-cog me-2"></i>Repuestos</h5>
-                <button type="button" class="btn btn-light btn-sm" id="add-repuesto">
-                    <i class="fas fa-plus me-1"></i>Agregar Repuesto
-                </button>
-            </div>
-            <div class="card-body">
-                {{ repuesto_formset.management_form }}
-                <div id="repuestos-formset">
-                    {% for form in repuesto_formset %}
-                    <div class="repuesto-form row mb-3 border-bottom pb-3">
-                        {{ form.id }}
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <div class="form-group">
-                                    <label for="{{ form.id_repuesto.id_for_label }}">Repuesto:</label>
-                                    <div class="input-group">
-                                        {{ form.id_repuesto|add_class:'form-control' }}
-                                        <div class="input-group-append">
-                                            <button 
-                                                type="button" 
-                                                class="btn btn-secondary btn-add-repuesto"
-                                                data-toggle="modal" 
-                                                data-target="#modal-id_repuesto"
-                                                data-select="#{{ form.id_repuesto.id_for_label }}"
-                                            >
-                                                <i class="fas fa-plus"></i>
-                                            </button>
-
-                                        </div>
-                                    </div>
-                                    {% if form.id_repuesto.errors %}
-                                        <div class="invalid-feedback d-block">
-                                            {% for error in form.id_repuesto.errors %}
-                                                <small>{{ error }}</small><br>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
+            <!--<informacion de remitente-->
+             <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-body py-3">
+                    <h5 class="mb-0 text-primary"> 
+                        <i class="fas fa-clipboard-list me-2"></i>Información General del remitente
+                    </h5>
+                </div>
+                
+                <div class="card-body p-4">
+                    <div class="row">
+                        <div class="col-md-6 border-end">
+                            <h6 class="text-muted fw-bold mb-3"><i class="fas fa-user me-2"></i>DATOS DEl REMITENTE</h6>
+                            <div class="form-group mb-4">
+                                <label class="form-label">Seleccionar remitente:</label>
+                                <div class="input-group">
+                                    {{ form.empresa|add_class:"form-control" }}
+                                   
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-2">
-                            <div class="mb-3">
-                                {{ form.cantidad.label_tag }}
+
+                        <div class="col-md-6 ps-md-4">
+                            <h6 class="text-muted fw-bold mb-3"><i class="fas fa-car me-2"></i>DATOS DEL EMPLEADO A CARGO </h6>
+                            <div class="form-group mb-3">
+                                <label class="form-label">Empleado:</label>
+                                <div class="input-group" style="display: flex; flex-wrap: nowrap;">
+                                    <div style="flex-grow: 1;">
+                                    {{ form.empleado|add_class:"form-control" }}
+                                    </div>
+                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-empleado">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+<!--- Repuestos, mantenimientos e insumos -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-body py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-primary"><i class="fas fa-cog me-2"></i>Repuestos</h5>
+                    <button type="button" class="btn btn-primary btn-sm" id="add-repuesto">
+                        <i class="fas fa-plus me-1"></i>Agregar Repuesto
+                    </button>
+                </div>
+                <div class="card-body">
+                    {{ repuesto_formset.management_form }}
+                    <div id="repuestos-formset">
+                        {% for form in repuesto_formset %}
+                        <div class="repuesto-form row mb-3 border-bottom pb-3 align-items-end">
+                            {{ form.id }}
+                            <div class="col-md-4">
+                                <label class="small fw-bold">Repuesto:</label>
+                                <div class="input-group"style="display: flex; flex-wrap: nowrap;">
+                                    {{ form.id_repuesto|add_class:'form-control' }}
+                                    <div style="flex-grow: 1;">
+                                    <button type="button" class="btn btn-outline-secondary btn-add-repuesto" data-toggle="modal" data-target="#modal-id_repuesto" data-select="#{{ form.id_repuesto.id_for_label }}">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="small fw-bold">Cant.</label>
                                 {{ form.cantidad|add_class:"form-control cantidad-repuestos" }}
-                                {% if form.cantidad.errors %}
-                                    <div class="text-danger small">
-                                        {{ form.cantidad.errors }}
-                                    </div>
-                                {% endif %}
                             </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="mb-3">
-                                {{ form.precio_unitario.label_tag }}
+                            <div class="col-md-3">
+                                <label class="small fw-bold">Precio Unit.</label>
                                 {{ form.precio_unitario|add_class:"form-control precio-repuestos"}}
-                                {% if form.precio_unitario.errors %}
-                                    <div class="text-danger small">
-                                        {{ form.precio_unitario.errors }}
-                                    </div>
-                                {% endif %}
                             </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="mb-3">
-                                <label class="form-label">Subtotal</label>
+                            <div class="col-md-2">
+                                <label class="small fw-bold">Subtotal</label>
                                 <input type="text" class="form-control subtotal-repuesto" readonly value="$0">
                             </div>
-                        </div>
-                        <div class="col-md-1">
-                            <div class="mb-3">
-                                <label class="form-label">&nbsp;</label>
-                                <button type="button" class="btn btn-danger btn-sm remove-form" {% if forloop.first and repuesto_formset.total_form_count == 1 %}disabled{% endif %}>
-                                    <i class="fas fa-times"></i>
+                            <div class="col-md-1 text-center">
+                                <button type="button" class="btn btn-outline-danger btn-sm remove-form" {% if forloop.first and repuesto_formset.total_form_count == 1 %}disabled{% endif %}>
+                                    <i class="fas fa-trash-alt"></i>
                                 </button>
                             </div>
                         </div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
-                </div>
-                <div class="text-end mt-3">
-                    <strong>Total Repuestos: <span id="total-repuestos">$0.00</span></strong>
+                    <div class="text-end mt-2">
+                        <span class="text-muted">Total Repuestos:</span>
+                        <h5 class="d-inline-block ms-2 mb-0" id="total-repuestos">$0.00</h5>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Tipos de Mantenimiento -->
-        <div class="card shadow mb-4">
-            <div class="card-header bg-warning text-dark py-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fas fa-tools me-2"></i>Tipos de Mantenimiento</h5>
-                <button type="button" class="btn btn-light btn-sm" id="add-mantenimiento">
-                    <i class="fas fa-plus me-1"></i>Agregar Mantenimiento
-                </button>
-            </div>
-            <div class="card-body">
-                {{ mantenimiento_formset.management_form }}
-                <div id="mantenimientos-formset">
-                    {% for form in mantenimiento_formset %}
-                    <div class="mantenimiento-form row mb-3 border-bottom pb-3">
-                        {{ form.id }}
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <div class="form-group">
-                                <label for="{{ form.id_tipo_mantenimiento.id_for_label }}">Id tipo mantenimiento:</label>
-                                <div class="input-group">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-body py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-primary"><i class="fas fa-tools me-2"></i>Mantenimientos</h5>
+                    <button type="button" class="btn btn-primary btn-sm" id="add-mantenimiento">
+                        <i class="fas fa-plus me-1"></i>Agregar Mantenimiento
+                    </button>
+                </div>
+                <div class="card-body">
+                    {{ mantenimiento_formset.management_form }}
+                    <div id="mantenimientos-formset">
+                        {% for form in mantenimiento_formset %}
+                        <div class="mantenimiento-form row mb-3 border-bottom pb-3 align-items-end">
+                            {{ form.id }}
+                            <div class="col-md-4">
+                                <label class="small fw-bold">Tipo Mantenimiento:</label>
+                                <div class="input-group" style="display: flex; flex-wrap: nowrap;">
                                     {{ form.id_tipo_mantenimiento|add_class:'form-control' }}
-                                    <div class="input-group-append">
-                                        <button 
-                                            type="button" 
-                                            class="btn btn-secondary btn-add-mantenimiento"
-                                            data-toggle="modal" 
-                                            data-target="#modal-id_tipo_mantenimiento"
-                                            data-select="#{{ form.id_tipo_mantenimiento.id_for_label }}"
-                                        >
-                                            <i class="fas fa-plus"></i>
-                                        </button>
-
+                                    <div style="flex-grow: 1;">
+                                    <button type="button" class="btn btn-outline-secondary btn-add-mantenimiento" data-toggle="modal" data-target="#modal-id_tipo_mantenimiento" data-select="#{{ form.id_tipo_mantenimiento.id_for_label }}">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
                                     </div>
-                                </div>
-                                {% if form.id_tipo_mantenimiento.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {% for error in form.id_tipo_mantenimiento.errors %}
-                                            <small>{{ error }}</small><br>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="mb-3">
-                                {{ form.cantidad.label_tag }}
+                            <div class="col-md-2">
+                                <label class="small fw-bold">Cant.</label>
                                 {{ form.cantidad|add_class:"form-control cantidad-mantenimientos" }}
-                                {% if form.cantidad.errors %}
-                                    <div class="text-danger small">
-                                        {{ form.cantidad.errors }}
-                                    </div>
-                                {% endif %}
                             </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="mb-3">
-                                {{ form.precio_unitario.label_tag }}
+                            <div class="col-md-3">
+                                <label class="small fw-bold">Precio Unit.</label>
                                 {{ form.precio_unitario|add_class:"form-control precio-mantenimientos" }}
-                                {% if form.precio_unitario.errors %}
-                                    <div class="text-danger small">
-                                        {{ form.precio_unitario.errors }}
-                                    </div>
-                                {% endif %}
                             </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="mb-3">
-                                <label class="form-label">Subtotal</label>
+                            <div class="col-md-2">
+                                <label class="small fw-bold">Subtotal</label>
                                 <input type="text" class="form-control subtotal-mantenimiento" readonly value="$0">
                             </div>
-                        </div>
-                        <div class="col-md-1">
-                            <div class="mb-3">
-                                <label class="form-label">&nbsp;</label>
-                                <button type="button" class="btn btn-danger btn-sm remove-form" {% if forloop.first and mantenimiento_formset.total_form_count == 1 %}disabled{% endif %}>
-                                    <i class="fas fa-times"></i>
+                            <div class="col-md-1 text-center">
+                                <button type="button" class="btn btn-outline-danger btn-sm remove-form">
+                                    <i class="fas fa-trash-alt"></i>
                                 </button>
                             </div>
                         </div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
-                </div>
-                <div class="text-end mt-3">
-                    <strong>Total Mantenimientos: <span id="total-mantenimientos">$0.00</span></strong>
+                    <div class="text-end mt-2">
+    <span class="text-muted">Total Mantenimientos:</span>
+    <h5 class="d-inline-block ms-2 mb-0" id="total-mantenimientos">$0</h5>
+</div>
                 </div>
             </div>
-        </div>
 
-        <!-- Insumos -->
-        <div class="card shadow mb-4">
-            <div class="card-header bg-info text-white py-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fas fa-flask me-2"></i>Insumos</h5>
-                <button type="button" class="btn btn-light btn-sm" id="add-insumo">
-                    <i class="fas fa-plus me-1"></i>Agregar Insumo
-                </button>
-            </div>
-            <div class="card-body">
-                {{ insumo_formset.management_form }}
-                <div id="insumos-formset">
-                    {% for form in insumo_formset %}
-                    <div class="insumo-form row mb-3 border-bottom pb-3">
-                        {{ form.id }}
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <div class="form-group">
-                                <label for="{{ form.id_insumos.id_for_label }}">Insumo:</label>
-                                <div class="input-group">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-body py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-primary"><i class="fas fa-flask me-2"></i>Insumos</h5>
+                    <button type="button" class="btn btn-primary btn-sm" id="add-insumo">
+                        <i class="fas fa-plus me-1"></i>Agregar Insumo
+                    </button>
+                </div>
+                <div class="card-body">
+                    {{ insumo_formset.management_form }}
+                    <div id="insumos-formset">
+                        {% for form in insumo_formset %}
+                        <div class="insumo-form row mb-3 border-bottom pb-3 align-items-end">
+                            {{ form.id }}
+                            <div class="col-md-4">
+                                <label class="small fw-bold">Insumo:</label>
+                                <div class="input-group" style="display: flex; flex-wrap: nowrap;">
                                     {{ form.id_insumos|add_class:'form-control' }}
-                                    <div class="input-group-append">
-                                        <button 
-                                            type="button" 
-                                            class="btn btn-secondary btn-add-insumo"
-                                            data-toggle="modal" 
-                                            data-target="#modal-id_insumos"
-                                            data-select="#{{ form.id_insumos.id_for_label }}"
-                                        >
-                                            <i class="fas fa-plus"></i>
-                                        </button>
+                                    <div style="flex-grow: 1;">
+                                    <button type="button" class="btn btn-outline-secondary btn-add-insumo" data-toggle="modal" data-target="#modal-id_insumos" data-select="#{{ form.id_insumos.id_for_label }}">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
                                     </div>
                                 </div>
-                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="mb-3">
-                                {{ form.cantidad.label_tag }}
+                            <div class="col-md-2">
+                                <label class="small fw-bold">Cant.</label>
                                 {{ form.cantidad|add_class:"form-control cantidad-insumo" }}
-                                {% if form.cantidad.errors %}
-                                    <div class="text-danger small">
-                                        {{ form.cantidad.errors }}
-                                    </div>
-                                {% endif %}
                             </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="mb-3">
-                                {{ form.precio_unitario.label_tag }}
+                            <div class="col-md-3">
+                                <label class="small fw-bold">Precio Unit.</label>
                                 {{ form.precio_unitario|add_class:"form-control precio-insumo" }}
-                                {% if form.precio_unitario.errors %}
-                                    <div class="text-danger small">
-                                        {{ form.precio_unitario.errors }}
-                                    </div>
-                                {% endif %}
                             </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="mb-3">
-                                <label class="form-label">Subtotal</label>
-                                <input type="text" class="form-control subtotal-insumo" readonly value="$0">
+                            <div class="col-md-2">
+                                <label class="small fw-bold">Subtotal</label>
+                                <input type="text" class="form-control subtotal-insumos" readonly value="$0">
                             </div>
-                        </div>
-                        <div class="col-md-1">
-                            <div class="mb-3">
-                                <label class="form-label">&nbsp;</label>
-                                <button type="button" class="btn btn-danger btn-sm remove-form" {% if forloop.first and insumo_formset.total_form_count == 1 %}disabled{% endif %}>
-                                    <i class="fas fa-times"></i>
+                            <div class="col-md-1 text-center">
+                                <button type="button" class="btn btn-outline-danger btn-sm remove-form">
+                                    <i class="fas fa-trash-alt"></i>
                                 </button>
                             </div>
                         </div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
+
+                    <div class="text-end mt-2">
+    <span class="text-muted">Total Insumos:</span>
+    <h5 class="d-inline-block ms-2 mb-0" id="total-insumos">$0</h5>
+</div>
                 </div>
-                <div class="text-end mt-3">
-                    <strong>Total Insumos: <span id="total-insumos">$0.00</span></strong>
+            </div>
+<!--- Salida del vehiculo-->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-body py-3">
+        <h5 class="mb-0 text-primary"> 
+            <i class="fas fa-sign-out-alt me-2"></i>Información General de salida
+        </h5>
+    </div>
+    <div class="card-body p-4">
+        <div class="row">
+            <div class="col-md-6">
+                <h6 class="text-muted fw-bold mb-3"><i class="fas fa-car me-2"></i>DATOS DEL VEHÍCULO</h6>
+                <div class="form-group mb-0">
+
+                    <label class="form-label">Registro de Salida:</label>
+                    <div class="input-group" style="display: flex; flex-wrap: nowrap;">
+                        {{ form.id_salida|add_class:"form-control" }}
+                        <button type="button" class="btn btn-primary">
+                            <i class="fas fa-history"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6"></div>
+        </div>
+    </div>
+</div>
+<div class="card shadow-sm border-0 mb-4 bg-body">
+    <div class="card-body py-3 px-4">
+        <div class="row align-items-center">
+            <div class="col-md-5">
+                <label class="form-label fw-bold text-secondary mb-1" style="font-size: 0.85rem;">
+                    <i class="fas fa-tasks me-2"></i>ESTADO DEL SERVICIO
+                </label>
+                <div class="input-group input-group-sm">
+                    {{ form.proceso }}
+                </div>
+            </div>
+
+            <div class="col-md-1 d-none d-md-block text-center">
+                <div class="vr h-100" style="width: 1px; opacity: 0.1;"></div>
+            </div>
+
+            <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                <span class="text-uppercase text-muted fw-semibold" style="font-size: 0.75rem; letter-spacing: 1px;">Total a Cobrar</span>
+                <div class="d-flex align-items-baseline justify-content-md-end">
+                    <h2 class="fw-bold text-primary mb-0" id="gran-total-servicio" style="font-size: 2.2rem;">$ 0</h2>
                 </div>
             </div>
         </div>
+    </div>
+</div>
 
-        <div class="d-flex justify-content-between">
-            <a href="/apy/servicios/" class="btn btn-secondary">
-                <i class="fas fa-arrow-left me-1"></i>Cancelar
-            </a>
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save me-1"></i>Guardar Servicio
-            </button>
-        </div>
-    </form>
+<div class="d-flex justify-content-end gap-2 mb-5">
+    <a href="/apy/servicios/" class="btn btn-outline-danger border px-4 py-2">
+        <i class="fas fa-times me-2"></i>Cancelar
+    </a>
+    <button type="submit" id="btn-guardar" class="btn btn-success px-5 py-2 shadow-sm fw-bold">
+        <i class="fas fa-save me-2"></i>Guardar Servicio
+    </button>
+</div>
+</form>
+    </div> 
 </div>
 
 <!-- Modal Vehiculo -->
@@ -322,6 +345,66 @@
             <div class="modal-content">
             <div class="modal-header d-flex justify-content-between align-items-center">
                 <h5 class="modal-title mb-0">Crear Vehículo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                        style="background-color: #dc3545; color: white; border: none; 
+                                border-radius: 50%; width: 35px; height: 35px;
+                                font-size: 1.5rem; line-height: 1; 
+                                display: flex; justify-content: center; align-items: center;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+<!-- Modal Cliente -->
+    <div class="modal fade" id="modal-cliente" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Cliente</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                        style="background-color: #dc3545; color: white; border: none; 
+                                border-radius: 50%; width: 35px; height: 35px;
+                                font-size: 1.5rem; line-height: 1; 
+                                display: flex; justify-content: center; align-items: center;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Entrada -->
+    <div class="modal fade" id="modal-id_entrada" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Entrada de Vehículo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                        style="background-color: #dc3545; color: white; border: none; 
+                                border-radius: 50%; width: 35px; height: 35px;
+                                font-size: 1.5rem; line-height: 1; 
+                                display: flex; justify-content: center; align-items: center;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+<!--modal salida -->
+    <div class="modal fade" id="modal-id_salida" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Salida de Vehículo</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
                         style="background-color: #dc3545; color: white; border: none; 
                                 border-radius: 50%; width: 35px; height: 35px;
@@ -380,540 +463,167 @@
     </div>
 
 <!-- Script Vehiculo. -->
-    <script>
-        $("#modal-id_vehiculo").on("show.bs.modal", function(){
-            var modal = $(this);
-            $.ajax({
-                url: "{% url 'apy:vehiculo_modal_crear' %}",
-                success: function(data){
-                    modal.find(".modal-body").html(data.html || data);
-                }
-            });
-        });
-    </script>
+ <!-- Modal Vehiculo -->
+    <div class="modal fade" id="modal-id_vehiculo" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Vehículo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                        style="background-color: #dc3545; color: white; border: none; 
+                                border-radius: 50%; width: 35px; height: 35px;
+                                font-size: 1.5rem; line-height: 1; 
+                                display: flex; justify-content: center; align-items: center;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+<script>
+    window.DjangoConfig = {
+        indices: {
+            repuestos: {{ repuesto_formset.total_form_count|default:0 }},
+            mantenimientos: {{ mantenimiento_formset.total_form_count|default:0 }},
+            insumos: {{ insumo_formset.total_form_count|default:0 }}
+        },
+        urls: {
+            id_vehiculo: "{% url 'apy:vehiculo_modal_crear' %}",
+            cliente: "{% url 'apy:cliente_modal_crear' %}",
+            entrada: "{% url 'apy:entrada_vehiculo_modal_crear' %}",
+            empresa: "{% url 'apy:empresa_modal_crear' %}",
+            id_tipo_mantenimiento: "{% url 'apy:tipo_mantenimiento_modal_crear' %}",
+            salida: "{% url 'apy:salida_vehiculo_modal_crear' %}",
+             
+            insumos: "{% url 'apy:insumos_modal_crear' %}",
+            repuesto: "{% url 'apy:repuesto_modal_crear' %}"
+        }
+    };
+</script>
 
-    <script>
-        $("#modal-id_insumos").on("show.bs.modal", function(){
-            var modal = $(this);
-            $.ajax({
-                url: "{% url 'apy:insumos_modal_crear' %}",
-                success: function(data){
-                    modal.find(".modal-body").html(data.html || data);
-                }
-            });
-        });
-    </script>
+<script src="{% static 'js/servicios.js' %}"></script>
 
-    <script>
-    $("#modal-id_repuesto").on("show.bs.modal", function(){
-        var modal = $(this);
-        $.ajax({
-            url: "{% url 'apy:repuesto_modal_crear' %}",
-            success: function(data){
-                modal.find(".modal-body").html(data.html || data);
+<script>
+    $(document).ready(function() {
+        // Función para inicializar Select2 en cualquier elemento
+        function aplicarSelect2(selector) {
+            $(selector).select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: 'Seleccione una opción',
+                allowClear: true
+            });
+        }
+
+        // Inicializar todos los select actuales al cargar la página
+        aplicarSelect2('select.form-control');
+
+        // Lógica de Modales AJAX
+        $(document).on('click', '[data-toggle="modal"]', function() {
+            var target = $(this).data('target');
+            var urlKey = target.replace('#modal-', '').replace('id_', '');
+            var url = window.DjangoConfig.urls[urlKey];
+
+            if (url) {
+                $.ajax({
+                    url: url,
+                    success: function(data) {
+                        $(target).find(".modal-body").html(data.html || data);
+                        // Inicializar Select2 dentro del modal si es necesario
+                        $(target).find('select').select2({
+                            theme: 'bootstrap-5',
+                            width: '100%',
+                            dropdownParent: $(target) // Evita que el buscador se bloquee
+                        });
+                    }
+                });
             }
         });
     });
 </script>
-
-<script>
-function recalcularRepuestos() {
-    let total = 0;
-
-    document.querySelectorAll('.repuesto-form').forEach(row => {
-        const cantidad = Number(
-            row.querySelector('.cantidad-repuestos')?.value || 0
-        );
-        const precio = Number(
-            row.querySelector('.precio-repuestos')?.value || 0
-        );
-
-        const subtotal = cantidad * precio;
-        total += subtotal;
-
-        const subtotalInput = row.querySelector('.subtotal-repuesto');
-        if (subtotalInput) {
-            subtotalInput.value = subtotal.toLocaleString('es-CO');
-        }
-    });
-
-    document.getElementById('total-repuestos').innerText =
-        total.toLocaleString('es-CO');
-}
-
-// EVENT DELEGATION 🔥
-document.addEventListener('input', function (e) {
-    if (
-        e.target.classList.contains('cantidad-repuestos') ||
-        e.target.classList.contains('precio-repuestos')
-    ) {
-        recalcularRepuestos();
-    }
-});
-
-// Cuando agregas un nuevo formulario
-document.getElementById('add-repuesto')?.addEventListener('click', function () {
-    setTimeout(recalcularRepuestos, 50);
-});
-</script>
-
-<!-- Script Ecuacion insumos -->
-
-<script>
-function recalcularInsumos() {
-    let total = 0;
-
-    document.querySelectorAll('.insumo-form').forEach(row => {
-        const cantidad = Number(
-            row.querySelector('.cantidad-insumo')?.value || 0
-        );
-        const precio = Number(
-            row.querySelector('.precio-insumo')?.value || 0
-        );
-
-        const subtotal = cantidad * precio;
-        total += subtotal;
-
-        const subtotalInput = row.querySelector('.subtotal-insumo');
-        if (subtotalInput) {
-            subtotalInput.value = subtotal.toLocaleString('es-CO');
-        }
-    });
-
-    document.getElementById('total-insumos').innerText =
-        total.toLocaleString('es-CO');
-}
-
-// EVENT DELEGATION 🔥
-document.addEventListener('input', function (e) {
-    if (
-        e.target.classList.contains('cantidad-insumo') ||
-        e.target.classList.contains('precio-insumo')
-    ) {
-        recalcularInsumos();
-    }
-});
-
-// Cuando agregas un nuevo formulario
-document.getElementById('add-insumo')?.addEventListener('click', function () {
-    setTimeout(recalcularInsumos, 50);
-});
-</script>
-
-<!-- Script Ecuacion mantenimientos -->
-
-<script>
-function recalcularMantenimientos() {
-    let total = 0;
-
-    document.querySelectorAll('.mantenimiento-form').forEach(row => {
-        const cantidad = Number(
-            row.querySelector('.cantidad-mantenimientos')?.value || 0
-        );
-        const precio = Number(
-            row.querySelector('.precio-mantenimientos')?.value || 0
-        );
-
-        const subtotal = cantidad * precio;
-        total += subtotal;
-
-        const subtotalInput = row.querySelector('.subtotal-mantenimiento');
-        if (subtotalInput) {
-            subtotalInput.value = subtotal.toLocaleString('es-CO');
-        }
-    });
-
-    document.getElementById('total-mantenimientos').innerText =
-        total.toLocaleString('es-CO');
-}
-
-// EVENT DELEGATION 🔥
-document.addEventListener('input', function (e) {
-    if (
-        e.target.classList.contains('cantidad-mantenimientos') ||
-        e.target.classList.contains('precio-mantenimientos')
-    ) {
-        recalcularMantenimientos();
-    }
-});
-
-// Cuando agregas un nuevo formulario
-document.getElementById('add-mantenimiento')?.addEventListener('click', function () {
-    setTimeout(recalcularMantenimientos, 50);
-});
-</script>
-
-<script>
-// Declaramos la variable UNA SOLA VEZ
-if (typeof $selectActivo === 'undefined') {
-    var $selectActivo = null; 
-}
-
-// Manejo para Repuestos
-$(document).on('click', '.btn-add-repuesto', function() {
-    const selector = $(this).data('select');
-    $selectActivo = $(selector); 
-    console.log("Modo Repuesto - Select objetivo:", selector);
-});
-
-// Manejo para tipo mantenimiento
-$(document).on('click', '.btn-add-mantenimiento', function() {
-    const selector = $(this).data('select');
-    $selectActivo = $(selector); 
-    console.log("Modo Mantenimiento - Select objetivo:", selector);
-});
-
-// Manejo para Insumos
-$(document).on('click', '.btn-add-insumo', function() {
-    const selector = $(this).data('select');
-    $selectActivo = $(selector); 
-    console.log("Modo Insumo - Select objetivo:", selector);
-});
-</script>  
-
-<script> 
-$(document).ready(function() {
-    // Función para calcular subtotales al cargar
-    function calcularTotalesAlInicio() {
-        
-        // --- SECCIÓN DE REPUESTOS ---
-        $('.repuesto-form').each(function() {
-            let cant = $(this).find('.cantidad-repuestos').val() || 0;
-            let precio = $(this).find('.precio-repuestos').val() || 0;
-            let subtotal = parseFloat(cant) * parseFloat(precio);
-            $(this).find('.subtotal-repuesto').val('$' + subtotal.toFixed(2));
-        });
-        
-        // --- SECCIÓN DE MANTENIMIENTOS (Basada en la anterior) ---
-        $('.mantenimiento-form').each(function() {
-            let cant = $(this).find('.cantidad-mantenimientos').val() || 0;
-            let precio = $(this).find('.precio-mantenimientos').val() || 0;
-            let subtotal = parseFloat(cant) * parseFloat(precio);
-            $(this).find('.subtotal-mantenimiento').val('$' + subtotal.toFixed(2));
-        });
-        
-        // --- SECCIÓN DE INSUMOS ---
-        $('.insumo-form').each(function() {
-            let cant = $(this).find('.cantidad-insumo').val() || 0;
-            let precio = $(this).find('.precio-insumo').val() || 0;
-            let subtotal = parseFloat(cant) * parseFloat(precio);
-            $(this).find('.subtotal-insumo').val('$' + subtotal.toFixed(2));
-        });
-        
-        
-        // --- LLAMADA A LOS TOTALES GENERALES ---
-        // Suma todos los subtotales de repuestos
-        if (typeof actualizarGranTotalRepuestos === "function") {
-            actualizarGranTotalRepuestos(); 
-        }
-
-        // Suma todos los subtotales de mantenimientos
-        if (typeof actualizarGranTotalMantenimientos === "function") {
-            actualizarGranTotalMantenimientos();
-        }
-
-        // Suma todos los subtotales de insumos
-        if (typeof actualizarGranTotalInsumos === "function") {
-            actualizarGranTotalInsumos();
-        }
-    }
-
-    // Ejecutar al iniciar
-    calcularTotalesAlInicio();
-});
-
-// Esta función debe existir para que el Gran Total de mantenimientos se pinte
-function actualizarGranTotalMantenimientos() {
-    let total = 0;
-    $('.subtotal-mantenimiento').each(function() {
-        // Limpiamos el "$" y convertimos a número para sumar
-        let valor = parseFloat($(this).val().replace('$', '')) || 0;
-        total += valor;
-    });
-    // Pintamos el resultado en el span correspondiente
-    $('#total-mantenimientos').text('$' + total.toFixed(2));
-}
-function actualizarGranTotalRepuestos() {
-    let total = 0;
-    $('.subtotal-repuesto').each(function() {
-        // Limpiamos el "$" y convertimos a número para sumar
-        let valor = parseFloat($(this).val().replace('$', '')) || 0;
-        total += valor;
-    });
-    // Pintamos el resultado en el span correspondiente
-    $('#total-repuestos').text('$' + total.toFixed(2));
-}
-function actualizarGranTotalInsumos() {
-    let total = 0;
-    $('.subtotal-insumo').each(function() {
-        // Limpiamos el "$" y convertimos a número para sumar
-        let valor = parseFloat($(this).val().replace('$', '')) || 0;
-        total += valor;
-    });
-    // Pintamos el resultado en el span correspondiente
-    $('#total-insumos').text('$' + total.toFixed(2));
-}
-</script>
-    
-<!-- ✅ JAVASCRIPT INLINE - FUNCIONA CON BOOTSTRAP 5 -->
-<script>
-// DEBUG: Verificar que el script se ejecuta
-console.log('✅ Script de servicios CARGADO - Bootstrap 5');
-
-// Contadores para los formsets
-let repuestoIndex = {{ repuesto_formset.total_form_count }};
-let mantenimientoIndex = {{ mantenimiento_formset.total_form_count }};
-let insumoIndex = {{ insumo_formset.total_form_count }};
-
-console.log('Índices iniciales:', { repuestoIndex, mantenimientoIndex, insumoIndex });
-
-// Templates para nuevos formularios
-const repuestoTemplate = `
-<div class="repuesto-form row mb-3 border-bottom pb-3">
-    <div class="col-md-4">
-        <div class="mb-3">
-            <label class="form-label">Repuesto</label>
-            <select name="repuestos-__prefix__-id_repuesto" class="form-control select-repuesto">
-                <option value="">Seleccione un repuesto</option>
-                {% for repuesto in repuestos %}
-                    <option value="{{ repuesto.pk }}" data-precio="{{ repuesto.precio|default:0 }}">
-                        {{ repuesto.nombre }}
-                    </option>
-                {% endfor %}
-            </select>
+<template id="repuesto-template">
+    <div class="repuesto-form row mb-3 border-bottom pb-3">
+        <div class="col-md-4">
+            <label>Repuesto:</label>
+            <div class="input-group">
+                <select name="repuestos-__prefix__-id_repuesto" class="form-control">
+                    <option value="">Seleccione un repuesto</option>
+                    {% for r in repuestos %}<option value="{{ r.pk }}">{{ r.nombre }}</option>{% endfor %}
+                </select>
+            </div>
         </div>
-    </div>
-    <div class="col-md-2">
-        <div class="mb-3">
-            <label class="form-label">Cantidad</label>
-            <input type="number" name="repuestos-__prefix__-cantidad" class="form-control cantidad-repuestos" min="1" value="1" step="1">
+        <div class="col-md-2">
+            <label>Cant.</label>
+            <input type="number" name="repuestos-__prefix__-cantidad" class="form-control cantidad-repuestos" min="1" value="1">
         </div>
-    </div>
-    <div class="col-md-3">
-        <div class="mb-3">
-            <label class="form-label">Precio unitario</label>
-            <input type="number" name="repuestos-__prefix__-precio_unitario" class="form-control precio-repuestos" step="0.01" min="0" value="0">
+        <div class="col-md-3">
+            <label>Precio Unit.</label>
+            <input type="number" name="repuestos-__prefix__-precio_unitario" class="form-control precio-repuestos" step="0.01" value="0">
         </div>
-    </div>
-    <div class="col-md-2">
-        <div class="mb-3">
-            <label class="form-label">Subtotal</label>
-            <input type="text" class="form-control subtotal-repuesto" readonly value="$0.00">
+        <div class="col-md-2">
+            <label>Subtotal</label>
+            <input type="text" class="form-control subtotal-repuesto" readonly value="$0">
         </div>
+        <div class="col-md-1"><label>&nbsp;</label><button type="button" class="btn btn-danger btn-sm remove-form"><i class="fas fa-times"></i></button></div>
     </div>
-    <div class="col-md-1">
-        <div class="mb-3">
-            <label class="form-label">&nbsp;</label>
-            <button type="button" class="btn btn-danger btn-sm remove-form">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    </div>
-</div>`;
+</template>
 
-const mantenimientoTemplate = `
-<div class="mantenimiento-form row mb-3 border-bottom pb-3">
-    <div class="col-md-4">
-        <div class="mb-3">
-            <label class="form-label">Tipo de Mantenimiento</label>
-            <select name="mantenimientos-__prefix__-id_tipo_mantenimiento" class="form-control select-mantenimiento">
-                <option value="">Seleccione un tipo</option>
-                {% for tipo in tipos_mantenimiento %}
-                    <option value="{{ tipo.pk }}" data-precio="{{ tipo.precio|default:0 }}">
-                        {{ tipo.nombre }} 
-                    </option>
-                {% endfor %}
-            </select>
+<template id="mantenimiento-template">
+    <div class="mantenimiento-form row mb-3 border-bottom pb-3">
+        <div class="col-md-4">
+            <label>Tipo Mantenimiento:</label>
+            <div class="input-group">
+                <select name="mantenimientos-__prefix__-id_tipo_mantenimiento" class="form-control">
+                    <option value="">Seleccione un tipo</option>
+                    {% for t in tipos_mantenimiento %}<option value="{{ t.pk }}">{{ t.nombre }}</option>{% endfor %}
+                </select>
+            </div>
         </div>
-    </div>
-    <div class="col-md-2">
-        <div class="mb-3">
-            <label class="form-label">Cantidad</label>
-            <input type="number" name="mantenimientos-__prefix__-cantidad" class="form-control cantidad-mantenimientos" min="1" value="1" step="1">
+        <div class="col-md-2">
+            <label>Cant.</label>
+            <input type="number" name="mantenimientos-__prefix__-cantidad" class="form-control cantidad-mantenimientos" min="1" value="1">
         </div>
-    </div>
-    <div class="col-md-3">
-        <div class="mb-3">
-            <label class="form-label">Precio unitario</label>
-            <input type="number" name="mantenimientos-__prefix__-precio_unitario" class="form-control precio-mantenimientos" step="0.01" min="0" value="0">
+        <div class="col-md-3">
+            <label>Precio Unit.</label>
+            <input type="number" name="mantenimientos-__prefix__-precio_unitario" class="form-control precio-mantenimientos" step="0.01" value="0">
         </div>
-    </div>
-    <div class="col-md-2">
-        <div class="mb-3">
-            <label class="form-label">Subtotal</label>
-            <input type="text" class="form-control subtotal-mantenimiento" readonly value="$0.00">
+        <div class="col-md-2">
+            <label>Subtotal</label>
+            <input type="text" class="form-control subtotal-mantenimiento" readonly value="$0">
         </div>
+        <div class="col-md-1"><label>&nbsp;</label><button type="button" class="btn btn-danger btn-sm remove-form"><i class="fas fa-times"></i></button></div>
     </div>
-    <div class="col-md-1">
-        <div class="mb-3">
-            <label class="form-label">&nbsp;</label>
-            <button type="button" class="btn btn-danger btn-sm remove-form">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    </div>
-</div>`;
+</template>
 
-const insumoTemplate = `
-<div class="insumo-form row mb-3 border-bottom pb-3">
-    <div class="col-md-4">
-        <div class="mb-3">
-            <label class="form-label">Insumo</label>
-            <select name="insumos-__prefix__-id_insumos" class="form-control select-insumo">
-                <option value="">Seleccione un insumo</option>
-                {% for insumo in insumos %}
-                    <option value="{{ insumo.pk }}" data-precio="{{ insumo.costo|default:0 }}">
-                        {{ insumo.id_marca.nombre }} 
-                    </option>
-                {% endfor %}
-            </select>
+<template id="insumo-template">
+    <div class="insumo-form row mb-3 border-bottom pb-3">
+        <div class="col-md-4">
+            <label>Insumo:</label>
+            <div class="input-group">
+                <select name="insumos-__prefix__-id_insumos" class="form-control">
+                    <option value="">Seleccione un insumo</option>
+                    {% for i in insumos %}<option value="{{ i.pk }}">{{ i}}</option>{% endfor %}
+                </select>
+            </div>
         </div>
-    </div>
-    <div class="col-md-2">
-        <div class="mb-3">
-            <label class="form-label">Cantidad</label>
-            <input type="number" name="insumos-__prefix__-cantidad" class="form-control cantidad-insumo" min="1" value="1" step="1">
+        <div class="col-md-2">
+            <label>Cant.</label>
+            <input type="number" name="insumos-__prefix__-cantidad" class="form-control cantidad-insumo" min="1" value="1">
         </div>
-    </div>
-    <div class="col-md-3">
-        <div class="mb-3">
-            <label class="form-label">Precio unitario</label>
-            <input type="number" name="insumos-__prefix__-precio_unitario" class="form-control precio-insumo" step="0.01" min="0" value="0">
+        <div class="col-md-3">
+            <label>Precio Unit.</label>
+            <input type="number" name="insumos-__prefix__-precio_unitario" class="form-control precio-insumo" step="0.01" value="0">
         </div>
-    </div>
-    <div class="col-md-2">
-        <div class="mb-3">
-            <label class="form-label">Subtotal</label>
-            <input type="text" class="form-control subtotal-insumo" readonly value="$0.00">
+        <div class="col-md-2">
+            <label>Subtotal</label>
+            <input type="text" class="form-control subtotal-insumo" readonly value="$0">
         </div>
+        <div class="col-md-1"><label>&nbsp;</label><button type="button" class="btn btn-danger btn-sm remove-form"><i class="fas fa-times"></i></button></div>
     </div>
-    <div class="col-md-1">
-        <div class="mb-3">
-            <label class="form-label">&nbsp;</label>
-            <button type="button" class="btn btn-danger btn-sm remove-form">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    </div>
-</div>`;
+</template>
 
-// Función para agregar nuevo formulario
-function addForm(type) {
-    console.log('🟡 Agregando formulario:', type);
-    
-    const formsetDiv = document.getElementById(`${type}-formset`);
-    const totalForms = document.getElementById(`id_${type}-TOTAL_FORMS`);
-    
-    if (!formsetDiv || !totalForms) {
-        console.error('❌ Elementos no encontrados');
-        return;
-    }
-    
-    let template, index;
-    
-    if (type === 'repuestos') {
-        template = repuestoTemplate;
-        index = repuestoIndex;
-        repuestoIndex++;
-    } else if (type === 'mantenimientos') {
-        template = mantenimientoTemplate;
-        index = mantenimientoIndex;
-        mantenimientoIndex++;
-    } else if (type === 'insumos') {
-        template = insumoTemplate;
-        index = insumoIndex;
-        insumoIndex++;
-    }
-    
-    const newForm = template.replace(/__prefix__/g, index);
-    formsetDiv.insertAdjacentHTML('beforeend', newForm);
-    totalForms.value = parseInt(totalForms.value) + 1;
-    
-    console.log('✅ Formulario agregado. Total:', totalForms.value);
-}
 
-// Función para eliminar formulario
-function removeForm(button) {
-    console.log('Eliminando formulario');
-    const form = button.closest('.row');
-    if (form) {
-        form.remove();
-    }
-}
-
-// INICIALIZACIÓN cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('✅ DOM completamente cargado - Bootstrap 5');
-    
-    // Botones agregar
-    document.getElementById('add-repuesto').addEventListener('click', function() {
-        console.log('🎯 Click en agregar repuesto');
-        addForm('repuestos');
-    });
-    
-    document.getElementById('add-mantenimiento').addEventListener('click', function() {
-        console.log('🎯 Click en agregar mantenimiento');
-        addForm('mantenimientos');
-    });
-    
-    document.getElementById('add-insumo').addEventListener('click', function() {
-        console.log('🎯 Click en agregar insumo');
-        addForm('insumos');
-    });
-    
-    // Delegación de eventos para botones eliminar
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('remove-form') || e.target.closest('.remove-form')) {
-            console.log('🎯 Click en eliminar formulario');
-            const button = e.target.classList.contains('remove-form') ? e.target : e.target.closest('.remove-form');
-            removeForm(button);
-        }
-    });
-    
-    console.log('✅ Todos los event listeners configurados');
-});
-</script>
-<style>
-    /* VARIABLES DE COLOR: Aquí definimos la paleta para cada modo */
-    :root {
-        --card-header-bg: #007bff; /* Azul fuerte para modo claro */
-        --card-header-text: #ffffff;
-        --input-bg: #ffffff;
-        --input-border: #ced4da;
-        --input-text: #495057;
-    }
-
-    /* Colores automáticos cuando se activa el Dark Mode */
-    .dark-mode {
-        --card-header-bg: transparent; 
-        --card-header-text: #5b99c2; /* Azul pastel para modo oscuro */
-        --input-bg: #2b2b36;
-        --input-border: #3f3f4d;
-        --input-text: #e0e0e0;
-    }
-
-    /* APLICACIÓN DE COLORES A TUS ELEMENTOS */
-    
-    /* 1. Encabezados de tarjetas (Headers) */
-    .card-header.bg-primary { 
-        background-color: var(--card-header-bg) !important; 
-        color: var(--card-header-text) !important;
-        border-top: 4px solid #5b99c2; /* Línea de acento */
-    }
-
-    .dark-mode .card-header.bg-success { border-top: 4px solid #6db47b !important; color: #6db47b !important; background: transparent !important; }
-    .dark-mode .card-header.bg-warning { border-top: 4px solid #d4b46c !important; color: #d4b46c !important; background: transparent !important; }
-
-    /* 2. Inputs y campos de texto */
-    .form-control, .input-group-text, .select2-selection {
-        background-color: var(--input-bg) !important;
-        border: 1px solid var(--input-border) !important;
-        color: var(--input-text) !important;
-    }
-
-    /* 3. Ajuste de sombras para que no se vean raras en claro */
-    .card.shadow {
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
-    }
-</style>
 {% endblock %}

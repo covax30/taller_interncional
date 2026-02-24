@@ -1,0 +1,691 @@
+{% extends "body.html" %}
+{% load humanize %}
+{% load static %}
+{% block content %}
+<main class="app-main">
+    <div class="app-content-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h3 class="mb-0">Resultados de Búsqueda</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-content">
+        <div class="container-fluid">
+            <div class="card card-outline card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">Buscando: "<strong>{{ query }}</strong>"</h3>
+                </div>
+                <div class="card-body">
+                    {% if not clientes and not vehiculos and not informes and not facturas and not marca and not repuestos and not herramienta and not insumos and not pago_servicios and not entrada_vehiculo and not salida_vehiculo and not proveedores and not mantenimiento and not caja %}
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i> No se encontraron coincidencias para su búsqueda: "<strong>{{ query }}</strong>"
+                        </div>
+                    {% endif %}
+
+                    {# SECCIÓN CLIENTES #}
+                    {% if clientes %}
+                    <div class="card card-outline card-primary shadow-sm mt-4">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-users me-2"></i> Clientes Encontrados</h3>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped mb-0">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Teléfono</th>
+                                            <th>Correo</th>
+                                            <th>Documento</th>
+                                            <th>Dirección</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for c in clientes %}
+                                        <tr>
+                                            <td>{{ c.nombre }}</td>
+                                            <td>{{ c.telefono }}</td>
+                                            <td>{{ c.correo }}</td>
+                                            <td>{{ c.identificacion }}</td>
+                                            <td>{{ c.direccion }}</td>
+                                            <td class="text-center">
+                                                <a href="{% url 'apy:cliente_editar' c.id %}"
+                                                    class="btn btn-primary btn-sm" title="Editar cliente">
+                                                    <i class="fas fa-eye"></i> Ver
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {# SECCIÓN FACTURA #}
+                    {% if factura %}
+                    <div class="card card-outline card-primary shadow-sm mt-4">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-users me-2"></i> Facturas Encontradas</h3>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped mb-0">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Fecha</th>
+                                            <th>Empresa</th>
+                                            <th>Detalle Servicio</th>
+                                            <th>Empleado</th>
+                                            <th>Cliente</th>
+                                            <th>Subtotal</th>
+                                            <th>Método de Pago</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for c in factura %}
+                                        <tr>
+                                            <td>{{ c.id }}</td>
+                                            <td>{{ c.fecha }}</td>
+                                            <td>{{ c.empresa.nombre }}</td>
+                                            <td>{{ c.detalle_servicio }}</td>
+                                            <td>{{ c.empleado.nombre }}</td>
+                                            <td>{{ c.cliente.nombre }}</td>
+                                            <td>{{ c.subtotal|intcomma }}</td>
+                                            <td>{{ c.metodo_pago }}</td>
+                                            <td class="text-center">
+                                                <a href="{% url 'apy:factura_editar' c.id %}"
+                                                    class="btn btn-primary btn-sm">
+                                                    <i class="fas fa-eye"></i> Ver
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {# SECCIÓN COMPRAS #}
+                    {% if marca %}
+                    <div class="card card-outline card-primary shadow-sm mt-4">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa-solid fa-star"></i> Marcas Encontradas</h3>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped mb-0">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Id Marca</th>
+                                            <th>Nombre</th>
+                                            <th>Tipo</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for c in marca %}
+                                        <tr>
+                                            <td>{{ c.id }}</td>
+                                            <td>{{ c.nombre }}</td>
+                                            <td>{{ c.tipo }}</td>
+                                            <td class="text-center">
+                                                <a href="{% url 'apy:marca_editar' c.id %}"
+                                                    class="btn btn-primary btn-sm" title="Editar marca">
+                                                    <i class="fas fa-eye"></i> Ver
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {# SECCIÓN VEHÍCULOS #}
+                    {% if vehiculos %}
+                    <div class="card card-outline card-primary shadow-sm mt-4">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-car me-2"></i> Vehículos Encontrados</h3>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped mb-0">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Id Vehículo</th>
+                                            <th>Id Cliente</th>
+                                            <th>Placa</th>
+                                            <th>Modelo</th>
+                                            <th>Marca</th>
+                                            <th>Color</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for v in vehiculos %}
+                                        <tr>
+                                            <td>{{ v.id_vehiculo }}</td>
+                                            <td>{{ v.id_cliente }}</td>
+                                            <td>{{ v.placa }}</td>
+                                            <td>{{ v.modelo_vehiculo }}</td>
+                                            <td>{{ v.marca_vehiculo }}</td>
+                                            <td>{{ v.color }}</td>
+                                            <td class="text-center">
+                                                <a href="{% url 'apy:vehiculo_editar' v.id_vehiculo %}"
+                                                    class="btn btn-primary btn-sm">
+                                                    <i class="fas fa-eye"></i> Ver
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {# SECCIÓN INFORMES #}
+                    {% if informes %}
+                    <div class="card card-outline card-info shadow-sm mt-4">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-file-alt me-2"></i> Informes Encontrados</h3>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped mb-0">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Id</th>
+                                            <th>Fecha/Hora</th>
+                                            <th>Vehículo (Placa)</th>
+                                            <th>Mecánico</th>
+                                            <th>Tipo</th>
+                                            <th>Mano de Obra</th>
+                                            <th>Repuestos</th>
+                                            <th>Insumos</th>
+                                            <th>Total General</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for i in informes %}
+                                        <tr>
+                                            <td>{{ i.id_informe }}</td>
+                                            <td>{{ i.fecha|date:"d/m/Y" }} - {{ i.hora|time:"H:i" }}</td>
+                                            <td>
+                                                <span>{{ i.detalle_servicio.id_vehiculo.placa}}</span>
+                                            </td>
+                                            <td>{{ i.id_empleado.nombre }}</td>
+                                            <td>
+                                                {% if i.tipo_informe == 'Preventivo' %}
+                                                <span>{{ i.tipo_informe }}</span>
+                                                {% else %}
+                                                <span>{{ i.tipo_informe }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>${{ i.costo_mano_obra|intcomma }}</td>
+                                            <td>${{ i.detalle_servicio.total_repuestos|intcomma }}</td>
+                                            <td>${{ i.detalle_servicio.total_insumos|intcomma }}</td>
+                                            <td class="font-weight-bold text-primary">
+                                                ${% with servicio_total=i.detalle_servicio.subtotal %}
+                                                {{ servicio_total|add:i.costo_mano_obra|intcomma }}
+                                                {% endwith %}
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'apy:informes_editar' i.id_informe %}"
+                                                    class="btn btn-primary btn-sm" title="Editar informe">
+                                                    <i class="fas fa-eye"></i> Ver
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {# SECCIÓN REPUESTOS #}
+                    {% if repuestos %}
+                    <div class="card card-outline card-info shadow-sm mt-4">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa-solid fa-hammer"></i> Repuestos Encontrados</h3>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped mb-0">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Id Marca</th>
+                                            <th>Nombre</th>
+                                            <th>Categoría</th>
+                                            <th>Fabricante</th>
+                                            <th>Stock</th>
+                                            <th>Ubicación</th>
+                                            <th>Precio</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for r in repuestos    %}
+                                        <tr>
+                                            <td>{{ r.id_marca }}</td>
+                                            <td>{{ r.nombre }}</td>
+                                            <td>{{ r.categoria }}</td>
+                                            <td>{{ r.fabricante }}</td>
+                                            <td>{{ r.stock }}</td>
+                                            <td>{{ r.ubicacion }}</td>
+                                            <td>${{ r.precio|intcomma }}</td>
+                                            <td>
+                                                <a href="{% url 'apy:repuesto_editar' r.id %}"
+                                                    class="btn btn-primary btn-sm" title="Editar repuesto">
+                                                    <i class="fas fa-eye"></i> Ver
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {# SECCIÓN HERRAMIENTAS #}
+                    {% if herramienta %}
+                    <div class="card card-outline card-info shadow-sm mt-4">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa-solid fa-wrench"></i> Herramientas Encontradas</h3>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped mb-0">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Color</th>
+                                            <th>Tipo</th>
+                                            <th>Material</th>
+                                            <th>Id marca</th>
+                                            <th>Stock</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for h in herramienta    %}
+                                        <tr>
+                                            <td>{{ h.nombre }}</td>
+                                            <td>{{ h.color }}</td>
+                                            <td>{{ h.tipo }}</td>
+                                            <td>{{ h.material }}</td>
+                                            <td>{{ h.id_marca }}</td>
+                                            <td>{{ h.stock }}</td>
+                                            <td>
+                                                <a href="{% url 'apy:herramienta_editar' h.id %}"
+                                                    class="btn btn-primary btn-sm" title="Editar herramienta">
+                                                    <i class="fas fa-eye"></i> Ver
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {# SECCIÓN INSUMOS #}
+                    {% if insumos %}
+                    <div class="card card-outline card-info shadow-sm mt-4">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa-solid fa-hammer"></i> Insumos Encontrados</h3>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped mb-0">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Id Marca</th>
+                                            <th>Costo</th>
+                                            <th>Stock</th>
+                                            <th>Cantidad</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for i in insumos %}
+                                        <tr>
+                                            <td>{{ i.id_marca }}</td>
+                                            <td>{{ i.costo|intcomma }}</td>
+                                            <td>{{ i.stock }}</td>
+                                            <td>{{ i.cantidad }}</td>
+                                            <td>
+                                                <a href="{% url 'apy:insumo_editar' i.id %}"
+                                                    class="btn btn-primary btn-sm" title="Editar insumo">
+                                                    <i class="fas fa-eye"></i> Ver
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {# SECCIÓN ENTRADA VEHICULO #}
+                    {% if entrada_vehiculo %}
+                    <div class="card card-outline card-info shadow-sm mt-4">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa-solid fa-car"></i> Entrada Vehículo Encontrados</h3>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped mb-0">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Id Entrada</th>
+                                            <th>Id Cliente</th>
+                                            <th>Id Vehículo</th>
+                                            <th>Fecha de Entrada</th>
+                                            <th>Hora de Entrada</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for e in entrada_vehiculo %}
+                                        <tr>
+                                            <td>{{ e.id_entrada }}</td>
+                                            <td>{{ e.id_cliente.nombre }}</td>
+                                            <td>{{ e.id_vehiculo.placa }}</td>
+                                            <td>{{ e.fecha_ingreso }}</td>
+                                            <td>{{ e.hora_ingreso }}</td>
+                                            <td>
+                                                <a href="{% url 'apy:entrada_vehiculo_editar' e.id_entrada %}"
+                                                    class="btn btn-primary btn-sm" title="Editar entrada vehículo">
+                                                    <i class="fas fa-eye"></i> Ver
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {# SECCIÓN PAGO SERVICIOS #}
+                    {% if pago_servicios %}
+                    <div class="card card-outline card-info shadow-sm mt-4">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa-solid fa-car"></i> Pago Servicios Encontrados</h3>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped mb-0">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Id Servicio</th>
+                                            <th>Tipo de Servicio</th>
+                                            <th>Monto</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for s in pago_servicios %}
+                                        <tr>
+                                            <td>{{ s.id_servicio }}</td>
+                                            <td>{{ s.get_servicio_display }}</td>
+                                            <td>{{ s.monto|intcomma }}</td>
+                                            <td>
+                                                <a href="{% url 'apy:pago_servicios_editar' s.id_servicio %}"
+                                                    class="btn btn-primary btn-sm" title="Editar pago servicio">
+                                                    <i class="fas fa-eye"></i> Ver
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {# SECCIÓN SALIDA VEHICULO #}
+                    {% if salida_vehiculo %}
+                    <div class="card card-outline card-info shadow-sm mt-4">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa-solid fa-car"></i> Salida Vehículo Encontrados</h3>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped mb-0">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Id Salida</th>
+                                            <th>Id Cliente</th>
+                                            <th>Id Vehículo</th>
+                                            <th>Fecha de Salida</th>
+                                            <th>Hora de Salida</th>
+                                            <th>Diagnóstico</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for s in salida_vehiculo %}
+                                        <tr>
+                                            <td>{{ s.id_salida }}</td>
+                                            <td>{{ s.id_cliente.nombre }}</td>
+                                            <td>{{ s.id_vehiculo.placa }}</td>
+                                            <td>{{ s.fecha_salida }}</td>
+                                            <td>{{ s.hora_salida }}</td>
+                                            <td>{{ s.diagnostico }}</td>
+                                            <td>
+                                                <a href="{% url 'apy:salida_vehiculo_editar' s.id_salida %}"
+                                                    class="btn btn-primary btn-sm" title="Editar salida vehículo">
+                                                    <i class="fas fa-eye"></i> Ver
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {# SECCIÓN PROVEEDORES #}
+                    {% if proveedores %}
+                    <div class="card card-outline card-info shadow-sm mt-4">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa-regular fa-user"></i> Proveedores Encontrados</h3>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped mb-0">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Id Proveedor</th>
+                                            <th>Nombre</th>
+                                            <th>Teléfono</th>
+                                            <th>Correo</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for p in proveedores %}
+                                        <tr>
+                                            <td>{{ p.id_proveedor }}</td>
+                                            <td>{{ p.nombre }}</td>
+                                            <td>{{ p.telefono }}</td>
+                                            <td>{{ p.correo }}</td>
+                                            <td>
+                                                <a href="{% url 'apy:proveedor_editar' p.id_proveedor %}"
+                                                    class="btn btn-primary btn-sm" title="Editar proveedor">
+                                                    <i class="fas fa-eye"></i> Ver
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {# SECCIÓN EMPLEADO.... #}
+                    {% if proveedores %}
+                    <div class="card card-outline card-info shadow-sm mt-4">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa-regular fa-user"></i> Proveedores Encontrados</h3>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped mb-0">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Id Proveedor</th>
+                                            <th>Nombre</th>
+                                            <th>Teléfono</th>
+                                            <th>Correo</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for p in proveedores %}
+                                        <tr>
+                                            <td>{{ p.id_proveedor }}</td>
+                                            <td>{{ p.nombre }}</td>
+                                            <td>{{ p.telefono }}</td>
+                                            <td>{{ p.correo }}</td>
+                                            <td>
+                                                <a href="{% url 'apy:proveedor_editar' p.id_proveedor %}"
+                                                    class="btn btn-primary btn-sm" title="Editar proveedor">
+                                                    <i class="fas fa-eye"></i> Ver
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {# SECCIÓN MANTENIMIENTO #}
+                    {% if mantenimiento %}
+                    <div class="card card-outline card-info shadow-sm mt-4">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa-solid fa-gears"></i> Mantenimientos Encontrados</h3>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped mb-0">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Id Mantenimiento</th>
+                                            <th>Fallas</th>
+                                            <th>Procesos</th>
+                                            <th>Id Vehículo</th>
+                                            <th>Id Empleado</th>
+                                            <th>Id Tipo Mantenimiento</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for m in mantenimiento %}
+                                        <tr>
+                                            <td>{{ m.id }}</td>
+                                            <td>{{ m.fallas }}</td>
+                                            <td>{{ m.procesos }}</td>
+                                            <td>{{ m.id_vehiculo.placa }}</td>
+                                            <td>{{ m.id_empleado.nombre }}</td>
+                                            <td>{{ m.id_tipo_mantenimiento }}</td>
+                                            <td>
+                                                <a href="{% url 'apy:mantenimiento_editar' m.id %}"
+                                                    class="btn btn-primary btn-sm" title="Editar mantenimiento">
+                                                    <i class="fas fa-eye"></i> Ver
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {# SECCIÓN CAJA #}
+                    {% if caja %}
+                    <div class="card card-outline card-info shadow-sm mt-4">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa-solid fa-cash-register"></i> Cajas Encontrada</h3>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped mb-0">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Id</th>
+                                            <th>Tipo de Movimiento</th>
+                                            <th>Monto</th>
+                                            <th>Fecha</th>
+                                            <th>Hora</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for c in caja %}
+                                        <tr>
+                                            <td>{{ c.id }}</td>
+                                            <td>{{ c.tipo_movimiento }}</td>
+                                            <td>{{ c.monto|intcomma }}</td>
+                                            <td>{{ c.fecha }}</td>
+                                            <td>{{ c.hora }}</td>
+                                            <td>
+                                                <a href="{% url 'apy:caja_editar' c.id %}"
+                                                    class="btn btn-primary btn-sm" title="Editar caja">
+                                                    <i class="fas fa-eye"></i> Ver
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                </div>
+                <div class="card-footer">
+                    <a href="javascript:history.back()" class="btn btn-secondary btn-sm">Volver atrás</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

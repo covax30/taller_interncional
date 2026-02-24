@@ -1,12 +1,20 @@
 from django.views.generic import CreateView, UpdateView, ListView, DeleteView, DetailView
 from django.urls import reverse_lazy
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404, render
 from django.db import transaction
 from django.contrib import messages
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.template.loader import render_to_string
+from apy.decorators import PermisoRequeridoMixin
+
+# Librería para el PDF
+from xhtml2pdf import pisa
+
+# Modelos y Formularios (Asegúrate de que estos nombres coincidan con los tuyos)
+from apy.models import DetalleServicio, Repuesto, TipoMantenimiento, Insumos
+from apy.forms import DetalleServicioForm, DetalleRepuestoFormSet, DetalleTipoMantenimientoFormSet, DetalleInsumosFormSet
 
 
 from apy.models import (
@@ -24,7 +32,11 @@ from apy.forms import (
     DetalleInsumosFormSet
 )
 
-class ListServicioView(ListView):
+class ListServicioView(PermisoRequeridoMixin, ListView):
+    
+    module_name = 'Factura'
+    permission_required = 'view'
+    
     model = DetalleServicio
     template_name = 'detalle_servicio/lista_servicios.html'
     context_object_name = 'servicios'
@@ -43,7 +55,11 @@ class ListServicioView(ListView):
         return context
     
 #---- vista para listar servicios inactivos -----
-class ServicioInactivosListView(ListView):
+class ServicioInactivosListView(PermisoRequeridoMixin, ListView):  
+    
+    module_name = 'Factura'
+    permission_required = 'view'
+    
     model = DetalleServicio
     template_name = 'detalle_servicio/modal_inactivos.html'
     context_object_name = 'servicios_inactivos'
@@ -58,7 +74,11 @@ class ServicioInactivosListView(ListView):
 
         return context    
 
-class CreateServicioView(CreateView):
+class CreateServicioView(PermisoRequeridoMixin, CreateView):
+    
+    module_name = 'Factura'
+    permission_required = 'add'
+    
     model = DetalleServicio
     form_class = DetalleServicioForm
     template_name = 'detalle_servicio/crear_servicio.html'
@@ -114,7 +134,11 @@ class CreateServicioView(CreateView):
             messages.error(self.request, 'Por favor corrige los errores en el formulario.')
             return self.render_to_response(self.get_context_data(form=form))
 
-class UpdateServicioView(UpdateView):
+class UpdateServicioView(PermisoRequeridoMixin, UpdateView):
+    
+    module_name = 'Factura'
+    permission_required = 'change'
+    
     model = DetalleServicio
     form_class = DetalleServicioForm
     template_name = 'detalle_servicio/crear_servicio.html'
@@ -194,8 +218,11 @@ class UpdateServicioView(UpdateView):
         print("ERRORES FORM:", form.errors)
         return super().form_invalid(form)
 
-
-class DeleteServicioView(DeleteView):
+class DeleteServicioView(PermisoRequeridoMixin, DeleteView):
+    
+    module_name = 'Factura'
+    permission_required = 'delete'
+    
     model = DetalleServicio
     template_name = 'detalle_servicio/eliminar_servicio.html'
     success_url = reverse_lazy('apy:lista_servicios')  # cambia por tu URL real
@@ -209,7 +236,11 @@ class DeleteServicioView(DeleteView):
         return HttpResponseRedirect(self.get_success_url())
     
 #---- vista para activar servicio -----
-class ServicioActivateView(DeleteView):
+class ServicioActivateView(PermisoRequeridoMixin, DeleteView):
+    
+    module_name = 'Factura'
+    permission_required = 'delete'
+    
     model = DetalleServicio
     template_name = 'detalle_servicio/activar_servicio.html'
     success_url = reverse_lazy('apy:lista_servicios')  # cambia por tu URL real
@@ -222,7 +253,11 @@ class ServicioActivateView(DeleteView):
 
         return HttpResponseRedirect(self.get_success_url())    
 
-class DetalleServicioView(DetailView):
+class DetalleServicioView(PermisoRequeridoMixin, DetailView):
+    
+    module_name = 'Factura'
+    permission_required = 'view'
+    
     model = DetalleServicio
     template_name = 'detalle_servicio/detalle_servicio.html'
     context_object_name = 'servicio'
@@ -247,8 +282,12 @@ class DetalleServicioView(DetailView):
         })
         
         return context
+
+class DetalleCreateModalView(PermisoRequeridoMixin, CreateView):
     
-class DetalleCreateModalView(CreateView):
+    module_name = 'Factura'
+    permission_required = 'add'
+    
     model = DetalleServicio
     form_class = DetalleServicioForm
     template_name = 'detalle_servicio/modal_detalle.html'
@@ -281,3 +320,34 @@ class DetalleCreateModalView(CreateView):
             "html": html,
             "message": "Por favor, corrige los errores en el formulario ❌"
         })
+        
+def imprimir_servicio_factura(request, pk):
+    # Buscamos el servicio directamente
+    servicio = get_object_or_404(DetalleServicio, pk=pk)
+    
+    # Obtenemos sus detalles
+    context = {
+        'servicio': servicio,
+        'vehiculo': servicio.id_vehiculo,
+        'cliente': servicio.id_vehiculo.id_cliente,
+        'repuestos': servicio.detallerepuesto_set.all(),
+        'mantenimientos': servicio.detalletipomantenimiento_set.all(),
+        'insumos': servicio.detalleinsumos_set.all(),
+        'total': sum(r.subtotal for r in servicio.detallerepuesto_set.all()) +
+                 sum(m.subtotal for m in servicio.detalletipomantenimiento_set.all()) +
+                 sum(i.subtotal for i in servicio.detalleinsumos_set.all()),
+    }
+
+    # LÓGICA DE PDF (xhtml2pdf)
+    html_string = render_to_string('detalle_servicio/factura_impresion.html', context)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="Factura_{pk}.pdf"'
+
+    # Convertimos el HTML a PDF
+    pisa_status = pisa.CreatePDF(html_string, dest=response)
+
+    # ESTE RETURN debe estar alineado con 'pisa_status'
+    if pisa_status.err:
+        return HttpResponse('Ocurrió un error al generar el PDF', status=500)
+       
+    return response 

@@ -81,7 +81,7 @@ class VehiculoCreateView(PermisoRequeridoMixin, CreateView):
     
     def form_valid(self, form):
         form.instance.estado = True 
-        messages.success(self.request, "Vehiculo creado correctamente")
+        messages.success(self.request, "Vehículo creado correctamente")
         response = super().form_valid(form)
         
         # Si la request es AJAX, devolver JSON con el nuevo contador
@@ -90,7 +90,7 @@ class VehiculoCreateView(PermisoRequeridoMixin, CreateView):
             return JsonResponse({
                 'success': True, 
                 'total_vehiculos': total_vehiculos,
-                'message': 'Vehiculo creado correctamente'
+                'message': 'Vehículo creado correctamente'
             })
         
         return response
@@ -107,6 +107,8 @@ class VehiculoUpdateView(PermisoRequeridoMixin, UpdateView):
     permission_required = 'change'
     
     def form_valid(self, form):
+        
+        form.instance.estado = True 
         messages.success(self.request, "Vehiculo actualizado correctamente")
         return super().form_valid(form)
 
@@ -166,7 +168,7 @@ class VehiculoDeleteView(PermisoRequeridoMixin, DeleteView):
         self.object.estado = False
         self.object.save()
         
-        messages.success(self.request,     f"Vehículo con placa {Vehiculo.placa} eliminado correctamente")
+        messages.success(self.request, f"Vehículo con placa {self.object.placa} eliminado correctamente")
         return HttpResponseRedirect(success_url)
     
     def form_valid(self, form):
@@ -229,11 +231,15 @@ def api_contador_vehiculos(request):
     total_vehiculos = Vehiculo.objects.count()
     return JsonResponse({'total_vehiculos': total_vehiculos})
 
-class VehiculoCreateModalView(CreateView):
+class VehiculoCreateModalView(PermisoRequeridoMixin, CreateView):
     model = Vehiculo
     form_class = VehiculoForm
     template_name = "vehiculos/modal_vehiculo.html"
     success_url = reverse_lazy("apy:vehiculo_lista")
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Vehiculos'
+    permission_required = 'add'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):

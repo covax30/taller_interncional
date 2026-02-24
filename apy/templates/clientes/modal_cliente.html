@@ -1,7 +1,9 @@
 {% load widget_tweaks %}
 {% block form %}
 
-    <div id="msg-cliente"></div>  {# Aquí se mostrarán los mensajes #}
+    <div id="msg-cliente"></div>  
+
+     <!-- Id Cliente con modal -->
 
     <form id="clienteForm" method="post" action="{% url 'apy:cliente_modal_crear' %}">
         {% csrf_token %}

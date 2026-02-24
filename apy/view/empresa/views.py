@@ -10,7 +10,7 @@ from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.urls import reverse_lazy
 from apy.forms import EmpresaForm  # Importa explícitamente
 from django.contrib.auth.mixins import AccessMixin
-from apy.decorators import PermisoRequeridoMixin
+from apy.decorators import PermisoRequeridoMixin, permiso_requerido_fbv
 
 
 ## VISTAS BASADAS EN CLASES (CBVs)
@@ -119,6 +119,8 @@ class EmpresaUpdateView(PermisoRequeridoMixin, UpdateView):
     permission_required = 'change'
     
     def form_valid(self, form):
+        
+        form.instance.estado = True 
         messages.success(self.request, "Empresa actualizada correctamente")
         return super().form_valid(form)
     
@@ -136,6 +138,10 @@ class EmpresaDeleteView(PermisoRequeridoMixin, DeleteView):
     model = Empresa
     template_name = 'empresa/eliminar_empresa.html'
     success_url = reverse_lazy('apy:empresa_lista')
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Empresa'
+    permission_required = 'delete'
     
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -181,6 +187,7 @@ class   EmpresaInactivaDeleteView(PermisoRequeridoMixin, DeleteView):
     
 
 # Vista para mostrar estadísticas de empresas
+@permiso_requerido_fbv(module_name='Estadísticas Generales', permission_required='view')
 def estadisticas_empresas_view(request):
     # Contar total de empresas
     total_empresas = Empresa.objects.count()
@@ -199,11 +206,14 @@ def api_contador_empresas(request):
     total_empresas = Empresa.objects.count()
     return JsonResponse({'total_empresas': total_empresas})
 
-class EmpresaCreateModalView(CreateView):
+class EmpresaCreateModalView(PermisoRequeridoMixin, CreateView):
     model = Empresa
     form_class = EmpresaForm
     template_name = "empresa/modal_empresa.html"
     success_url = reverse_lazy("apy:empresa_lista")
+    
+    module_name = 'Empresa'
+    permission_required = 'add'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):

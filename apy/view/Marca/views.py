@@ -98,6 +98,8 @@ class MarcaUpdateView(PermisoRequeridoMixin, UpdateView):
     permission_required = 'change'
     
     def form_valid(self, form):
+        
+        form.instance.estado = True 
         messages.success(self.request, "Marca actualizada correctamente")
         return super().form_valid(form)
     
@@ -125,7 +127,7 @@ class MarcaDeleteView(PermisoRequeridoMixin, DeleteView):
         self.object.estado = False
         self.object.save()
         
-        messages.success(self.request,     f"Pago de servicios Publicos {PagoServiciosPublicos} desactivado correctamente")
+        messages.success(self.request,     f"Marca {self.object.nombre} desactivada correctamente")
         return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):
@@ -144,7 +146,7 @@ class MarcaActivateView(PermisoRequeridoMixin, DeleteView):
     
     # --- Configuración de Permisos ---
     module_name = 'Marca'
-    permission_required = 'change'
+    permission_required = 'delete'
     
     def post(self, request, *args, **kwargs):
         
@@ -154,7 +156,7 @@ class MarcaActivateView(PermisoRequeridoMixin, DeleteView):
         self.object.estado = True
         self.object.save()
         
-        messages.success(self.request,f"Marca {self.object} activada correctamente")
+        messages.success(self.request, f"Marca {self.object.nombre} activada correctamente")
         return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):
@@ -165,11 +167,15 @@ class MarcaActivateView(PermisoRequeridoMixin, DeleteView):
         
         return context
 
-class MarcaCreateModalView(CreateView):
+class MarcaCreateModalView(PermisoRequeridoMixin, CreateView):
     model = Marca
     form_class = MarcaForm
     template_name = "Marca/modal_marca.html"
     success_url = reverse_lazy("apy:marca_lista")
+    
+    # --- Configuración de Permisos AGREGADA ---
+    module_name = 'Marca'
+    permission_required = 'add'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):

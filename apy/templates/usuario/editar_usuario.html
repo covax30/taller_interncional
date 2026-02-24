@@ -7,242 +7,236 @@
 <style>
     /* Oculta los inputs de archivo */
     #id_profile_imagen, #id_profile_imagen_solo {
-        width: 0.1px;
-        height: 0.1px;
-        opacity: 0;
-        overflow: hidden;
-        position: absolute;
-        z-index: -1;
+        width: 0.1px; height: 0.1px; opacity: 0; overflow: hidden; position: absolute; z-index: -1;
     }
-
+    .profile-card-info {
+        background-color: var(--bs-tertiary-bg); 
+        border-radius: 12px;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+    /* Mejora de responsividad para el borde lateral */
+    @media (max-width: 767.98px) {
+        .border-end {
+            border-right: none !important;
+            border-bottom: 1px solid var(--bs-border-color);
+            margin-bottom: 2rem;
+        }
+    }
+    /* Elimina el ojo nativo en navegadores Chromium */
+    input::-ms-reveal,
+    input::-ms-clear {
+        display: none;
+    }
+    input::-webkit-contacts-auto-fill-button,
+    input::-webkit-credentials-auto-fill-button {
+        visibility: hidden;
+        position: absolute;
+        right: 0;
+    }
 </style>
 
 {% with user.is_superuser as is_admin %}
     
-    {# LÓGICA DEL AVATAR #}
-    {% if user.profile.imagen.url and user.profile.imagen.url|length > 0 and 'default.png' not in user.profile.imagen.url %}
-        {% with user.profile.imagen.url as user_avatar_url %}{% endwith %}
-    {% else %}
-        {% if is_admin %}
-            {% static 'img/gerente.png' as user_avatar_url %} 
-        {% else %}
-            {% static 'img/empleado.png' as user_avatar_url %}
-        {% endif %}
-    {% endif %}
+{# 1. Definición de Avatar por defecto según Rol #}
+{% if user.is_superuser %}
+    {% static 'img/gerente.png' as avatar_defecto %}
+{% else %}
+    {% static 'img/empleado.png' as avatar_defecto %}
+{% endif %}
 
-{# Contenedor principal: usa 'bg-body' para adaptarse al modo oscuro/claro #}
-<div class="container rounded mt-5 mb-5 shadow-sm p-4 bg-body"> 
+<div class="container rounded mt-5 mb-5 shadow-sm p-4 bg-body border"> 
     <div class="row">
         
-        {# COLUMNA IZQUIERDA (col-md-4) #}
-        <div class="col-md-4 border-right d-flex align-items-start pt-5">
-            <div class="d-flex flex-column align-items-center text-center p-3 py-3 w-100"> 
+        {# COLUMNA IZQUIERDA #}
+        <div class="col-md-4 border-end">
+            <div class="d-flex flex-column align-items-center text-center p-3 py-md-5 w-100"> 
                 
-                {# IMAGEN DE PERFIL #}
-                <img src="{% if user.profile.imagen %}{{ user.profile.imagen.url }}{% else %}{{ user_avatar_url }}{% endif %}"
-                    id="user-avatar-img" 
-                    data-default-src="{{ user_avatar_url }}"
-                    class="rounded-circle shadow-sm mb-3"
-                    style="width:230px;height:230px;object-fit:cover; border: 5px solid rgba(0,0,0,0.05);">
+                <div class="position-relative">
+                    {# 2. Lógica Segura para evitar ValueError #}
+                    <img src="{% if user.profile.imagen and user.profile.imagen.name %}{{ user.profile.imagen.url }}{% else %}{{ avatar_defecto }}{% endif %}"
+                        id="user-avatar-img" 
+                        data-default-src="{{ avatar_defecto }}"
+                        class="rounded-circle shadow mb-3 img-fluid"
+                        style="width:210px; height:210px; object-fit:cover; border: 6px solid var(--bs-tertiary-bg);">
+                </div>
 
-                <span class="font-weight-bold h4 text-primary mb-0">
-                    {{ user.username }}
-                </span>
-                <span class="text-muted small mb-2">
-                    {{ user.email }}
-                </span>
-                <span class="badge bg-{{ user.is_superuser|yesno:'danger,success' }} p-2 mb-4">
-                    {{ user.is_superuser|yesno:'Gerente (Admin),Empleado' }}
+                <span class="font-weight-bold h4 text-body mb-0 text-truncate w-100 d-block">{{ user.username }}</span>
+                <span class="text-muted mb-2 small text-truncate w-100 d-block"><i class="fas fa-envelope me-1"></i>{{ user.email }}</span>
+                
+                <span class="badge rounded-pill bg-{{ user.is_superuser|yesno:'danger,success' }} px-3 py-2 mb-4">
+                    <i class="fas {% if user.is_superuser %}fa-user-tie{% else %}fa-tools{% endif %} me-1"></i>
+                    {{ user.is_superuser|yesno:'Gerente,Empleado' }}
                 </span>
 
-                <hr class="w-100">
-
-                {# SUBIDA DE IMAGEN (FORMULARIO INDEPENDIENTE) #}
-                <h5 class="mt-2 mb-3 text-body">Gestionar Imagen</h5>
+                <div class="d-flex align-items-center w-100 mb-3">
+                    <h6 class="text-uppercase fw-bold text-muted small mb-0">Imagen de Perfil</h6>
+                    <hr class="flex-grow-1 ms-2 opacity-25">
+                </div>
                 
                 <form method="POST" enctype="multipart/form-data" action="{% url 'login:actualizar_perfil_imagen' %}" id="image-upload-form" class="w-100">
                     {% csrf_token %}
-                    
                     <div class="d-none">
                         {{ profile_form.imagen|attr:"id:id_profile_imagen_solo" }}
-                        {{ profile_form.imagen_clear|attr:"id:id_imagen_clear_solo"|attr:"name:imagen_clear" }}
                     </div>
 
                     <div class="d-grid gap-2">
-                        {# BOTÓN 1: SELECCIONAR #}
-                        <button type="button" id="btn-seleccionar-archivo" class="btn btn-outline-secondary btn-sm">
-                            <i class="fas fa-file-image"></i> Seleccionar Imagen
+                        <button type="button" id="btn-seleccionar-archivo" class="btn btn-outline-primary btn-sm rounded-pill">
+                            <i class="fas fa-camera me-1"></i> Subir Nueva Foto
                         </button>
 
-                        {# BOTÓN 2: SUBIR #}
-                        <button type="submit" id="btn-guardar-imagen-unica" class="btn btn-success btn-sm" disabled>
-                            <i class="fas fa-upload"></i> Subir Imagen Ahora
+                        <button type="submit" id="btn-guardar-imagen-unica" class="btn btn-success btn-sm rounded-pill" disabled>
+                            <i class="fas fa-check me-1"></i> Confirmar Cambio
                         </button>
 
-                        {# BOTÓN 3: ELIMINAR (Solo si existe imagen) #}
-                        {% if user.profile.imagen and 'default.png' not in user.profile.imagen.url %}
-                            <button type="button" id="btn-eliminar-imagen" class="btn btn-danger btn-sm">
-                                <i class="fas fa-trash-alt"></i> Eliminar Actual
+                        {# 3. Botón eliminar solo si hay algo que eliminar en la DB #}
+                        {% if user.profile.imagen and user.profile.imagen.name %}
+                            <button type="button" id="btn-eliminar-imagen" class="btn btn-link text-danger btn-sm text-decoration-none">
+                                <i class="fas fa-trash-alt me-1"></i> Eliminar mi foto
                             </button>
                         {% endif %}
                     </div>
 
-                    <div class="mt-3">
-                        <small class="text-muted d-block" id="file-name-display" style="font-size: 0.8rem;">
-                            {% if user.profile.imagen and 'default.png' not in user.profile.imagen.url %}
-                                <i class="fas fa-check-circle text-success"></i> {{ user.profile.imagen.name|truncatechars:20 }}
+                    <div class="mt-3 p-2 bg-body-tertiary rounded border">
+                        <small class="text-muted d-block text-truncate" id="file-name-display" style="font-size: 0.75rem;">
+                            {% if user.profile.imagen and user.profile.imagen.name %}
+                                <i class="fas fa-image text-primary"></i> {{ user.profile.imagen.name }}
                             {% else %}
-                                No hay archivo seleccionado
+                                <i class="fas fa-info-circle"></i> No has subido una foto aún
                             {% endif %}
                         </small>
-                        
-                        <p class="text-info mt-2 small" style="line-height: 1.2; font-size: 0.75rem;">
-                            <i class="fas fa-info-circle"></i> "Subir Imagen Ahora" solo actualiza tu foto de perfil.
-                        </p>
                     </div>
-
-                    {% if profile_form.imagen.errors %}
-                        <div class="alert alert-danger mt-2 small p-1">{{ profile_form.imagen.errors }}</div>
-                    {% endif %}
                 </form>
             </div>
         </div>
         
-        {# COLUMNA DERECHA (col-md-8): Formularios de Edición #}
+        {# COLUMNA DERECHA #}
         <div class="col-md-8">
-            <div class="p-3 py-5">
+            <div class="px-md-3 py-4">
                 
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h4 class="text-right text-body">Ajustes de Perfil</h4>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="fw-bold text-body mb-0">Mi Perfil</h3>
+                    <i class="fas fa-cog fa-spin text-body opacity-50" style="--fa-animation-duration: 10s;"></i>
                 </div>
-                
-                {# Información de la Cuenta #}
-                <h5 class="mt-2 mb-3 text-body">Información de la Cuenta</h5>
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6"><h6>Cuenta Creada:</h6></div>
-                            <div class="col-md-6 text-end"><h6>{{ user.date_joined|date:"d/m/Y" }}</h6></div>
-                            
-                            <div class="col-md-6"><h6>Último inicio de sesión:</h6></div>
-                            <div class="col-md-6 text-end">
-                                <h6 class="">
-                                    {{ user.last_login|default:"Nunca"|localtime|date:"d/m/Y H:i" }}
-                                </h6>
-                            </div>
+
+                <div class="profile-card-info p-3 mb-4 rounded border">
+                    <div class="row text-center text-md-start g-2">
+                        <div class="col-6 col-md-6 border-md-end">
+                            <small class="text-muted text-uppercase d-block fw-bold" style="font-size: 0.7rem;">Miembro desde</small>
+                            <span class="h6 mb-0 text-body d-block text-truncate"><i class="far fa-calendar-alt me-2"></i>{{ user.date_joined|date:"d M, Y" }}</span>
+                        </div>
+                        <div class="col-6 col-md-6">
+                            <small class="text-muted text-uppercase d-block fw-bold" style="font-size: 0.7rem;">Último Acceso</small>
+                            <span class="h6 mb-0 text-body d-block text-truncate"><i class="far fa-clock me-2"></i>{{ user.last_login|default:"Hoy"|localtime|date:"d/m/Y H:i" }}</span>
                         </div>
                     </div>
                 </div>
 
-                {# FORMULARIO PRINCIPAL (Datos Personales y Perfil) #}
                 <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %} 
-                    
-                    {# Campos ocultos de Imagen del FORMULARIO PRINCIPAL (Necesarios para el botón "Guardar Cambios") #}
-                   <div class="d-none">
-                        {# Formulario principal #}
+                    <div class="d-none">
                         {{ profile_form.imagen|attr:"id:id_profile_imagen" }}
                         {{ profile_form.imagen_clear|attr:"id:id_imagen_clear"|attr:"name:imagen_clear" }}
                     </div>
                     
-                    {# Datos Personales #}
-                    <h5 class="mt-4 mb-3 text-body">Datos Personales y Contacto</h5>
-                    
-                    <div class="row mt-3">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-4">
-                                {{ form.first_name|add_class:"form-control" }} 
-                                <label for="{{ form.first_name.id_for_label }}">Primer Nombre</label>
-                                {% if form.first_name.errors %}<small class="text-danger">{{ form.first_name.errors }}</small>{% endif %}
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-4">
-                                {{ form.last_name|add_class:"form-control" }} 
-                                <label for="{{ form.last_name.id_for_label }}">Primer Apellido</label>
-                                {% if form.last_name.errors %}<small class="text-danger">{{ form.last_name.errors }}</small>{% endif %}
-                            </div>
-                        </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <h6 class="text-uppercase fw-bold text-muted small mb-0">Datos Personales</h6>
+                        <hr class="flex-grow-1 ms-3 opacity-25">
                     </div>
                     
-                    <div class="row mt-3">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-4">
-                                {{ form.email|add_class:"form-control" }} 
-                                <label for="{{ form.email.id_for_label }}">Email</label>
-                                {% if form.email.errors %}<small class="text-danger">{{ form.email.errors }}</small>{% endif %}
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="form-floating mb-1">
+                                {{ form.first_name|add_class:"form-control bg-body text-body" }} 
+                                <label class="text-body"><i class="fas fa-user-circle me-2 text-muted"></i>Nombres</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-4">
-                                {{ form.username|add_class:"form-control" }} 
-                                <label for="{{ form.username.id_for_label }}">Nombre de Usuario</label>
-                                {% if form.username.errors %}<small class="text-danger">{{ form.username.errors }}</small>{% endif %}
+                        <div class="col-sm-6">
+                            <div class="form-floating mb-1">
+                                {{ form.last_name|add_class:"form-control bg-body text-body" }} 
+                                <label class="text-body"><i class="fas fa-user-circle me-2 text-muted"></i>Apellidos</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-floating mb-1">
+                                {{ form.email|add_class:"form-control bg-body text-body text-truncate" }} 
+                                <label class="text-body"><i class="fas fa-at me-2 text-muted"></i>Email</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-floating mb-1">
+                                {{ form.username|add_class:"form-control bg-body text-body text-truncate" }} 
+                                <label class="text-body"><i class="fas fa-user-tag me-2 text-muted"></i>Usuario</label>
                             </div>
                         </div> 
-                    </div>
-
-                    <div class="row mt-3">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-4">
-                                {{ profile_form.telefono|add_class:"form-control" }} 
-                                <label for="{{ profile_form.telefono.id_for_label }}">Número de Teléfono</label>
-                                {% if profile_form.telefono.errors %}<small class="text-danger">{{ profile_form.telefono.errors }}</small>{% endif %}
+                        <div class="col-sm-6">
+                            <div class="form-floating mb-1">
+                                {{ profile_form.telefono|add_class:"form-control bg-body text-body" }} 
+                                <label class="text-body"><i class="fas fa-phone me-2 text-muted"></i>Teléfono</label>
                             </div>
                         </div> 
+                        <div class="col-sm-6">
+                            <div class="form-floating mb-1">
+                                {{ profile_form.identificacion|add_class:"form-control bg-body text-body" }}
+                                <label class="text-body"><i class="fas fa-id-card me-2 text-muted"></i>Cédula</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating mb-1">
+                                {{ profile_form.direccion|add_class:"form-control bg-body text-body" }}
+                                <label class="text-body"><i class="fas fa-map-marker-alt me-2 text-muted"></i>Dirección</label>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div class="mt-5 text-center">
-                        <a href="{% url 'apy:perfil_usuario' %}" class="btn btn-secondary me-2">
-                            <i class="fas fa-arrow-left"></i> Volver
+                    <div class="mt-4 d-flex flex-column flex-sm-row justify-content-end gap-2">
+                        <a href="{% url 'apy:perfil_usuario' %}" class="btn btn-outline-secondary px-4 rounded-pill bg-body">
+                            <i class="fas fa-arrow-left me-1"></i> Volver
                         </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Guardar Cambios
+                        <button type="submit" class="btn btn-primary px-5 rounded-pill shadow-sm">
+                            <i class="fas fa-save me-2"></i>Guardar Cambios
                         </button>
                     </div>
                 </form>
 
-                <hr class="mt-5 mb-4">
-
-                {# FORMULARIO DE CAMBIO DE CONTRASEÑA #}
-                <h4 class="text-right text-body mt-4 mb-3">Cambiar Contraseña</h4>
+                <div class="d-flex align-items-center mt-5 mb-3">
+                    <h6 class="text-uppercase fw-bold text-muted small mb-0 text-danger">Seguridad de la Cuenta</h6>
+                    <hr class="flex-grow-1 ms-3 opacity-25">
+                </div>
 
                 <form method="POST" action="{% url 'password_change' %}">
                     {% csrf_token %}
-                    
-                    {% if password_form.non_field_errors %}
-                    <div class="alert alert-danger">
-                        {{ password_form.non_field_errors }}
+                    <div class="form-floating mb-3 position-relative">
+                        {{ password_form.old_password|add_class:"form-control border-danger-subtle bg-body text-body pe-5" }}
+                        <label class="text-body"><i class="fas fa-key me-2 text-muted"></i>Contraseña Actual</label>
+                        <button type="button" class="btn position-absolute top-50 end-0 translate-middle-y border-0 text-muted toggle-password">
+                            <i class="fas fa-eye"></i>
+                        </button>
                     </div>
-                    {% endif %}
-                    
-                    <div class="row mt-3">
-                        <div class="col-md-12">
-                            <div class="form-floating mb-4">
-                                {{ password_form.old_password|add_class:"form-control" }}
-                                <label>Contraseña Antigua</label>
-                                {% if password_form.old_password.errors %}<small class="text-danger">{{ password_form.old_password.errors }}</small>{% endif %}
+
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="form-floating mb-1 position-relative">
+                                {{ password_form.new_password1|add_class:"form-control bg-body text-body pe-5" }}
+                                <label class="text-body"><i class="fas fa-lock me-2 text-muted"></i>Nueva Contraseña</label>
+                                <button type="button" class="btn position-absolute top-50 end-0 translate-middle-y border-0 text-muted toggle-password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-4">
-                                {{ password_form.new_password1|add_class:"form-control" }}
-                                <label>Nueva Contraseña</label>
-                                {% if password_form.new_password1.errors %}<small class="text-danger">{{ password_form.new_password1.errors }}</small>{% endif %}
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-4">
-                                {{ password_form.new_password2|add_class:"form-control" }}
-                                <label>Confirmar Nueva Contraseña</label>
-                                {% if password_form.new_password2.errors %}<small class="text-danger">{{ password_form.new_password2.errors }}</small>{% endif %}
+                        <div class="col-sm-6">
+                            <div class="form-floating mb-1 position-relative">
+                                {{ password_form.new_password2|add_class:"form-control bg-body text-body pe-5" }}
+                                <label class="text-body"><i class="fas fa-check-double me-2 text-muted"></i>Confirmar Nueva</label>
+                                <button type="button" class="btn position-absolute top-50 end-0 translate-middle-y border-0 text-muted toggle-password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="mt-4">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-lock"></i> Actualizar Contraseña
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-4">
+                            <i class="fas fa-sync-alt me-1"></i> Actualizar mi Contraseña
                         </button>
                     </div>
                 </form>
@@ -254,5 +248,6 @@
 <script src="{% static 'js/perfil_usuario.js' %}"></script>
 <script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
 <script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
+<script src="{% static 'js/password_eye.js' %}"></script>
 {% endwith %}
 {% endblock %}

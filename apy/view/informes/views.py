@@ -12,6 +12,10 @@ from apy.decorators import PermisoRequeridoMixin
 from openpyxl import Workbook
 from django.http import HttpResponse
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from django.views.generic import TemplateView
+from django.db.models import Sum, Count
+from django.utils import timezone
+from apy.models import DetalleServicio, Cliente, Vehiculo, Informes
 
 
 # --------------Vistas de informes---------------
@@ -47,7 +51,7 @@ class InformesCreateView(PermisoRequeridoMixin, CreateView):
     success_url = reverse_lazy('apy:informes_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Informes'
+    module_name = 'Informes' 
     permission_required = 'add'
     
     def form_valid(self, form):
@@ -97,10 +101,12 @@ class InformesUpdateView(PermisoRequeridoMixin, UpdateView):
     success_url = reverse_lazy('apy:informes_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Informes'
+    module_name = 'Informes' 
     permission_required = 'change'
     
     def form_valid(self, form):
+        
+        form.instance.estado = True 
         messages.success(self.request, "Informe actualizado correctamente")
         return super().form_valid(form)
     
@@ -118,7 +124,7 @@ class InformesDeleteView(PermisoRequeridoMixin, DeleteView):
     context_object_name = 'object'
     
     # --- Configuración de Permisos ---
-    module_name = 'Informes'
+    module_name = 'Informes' 
     permission_required = 'delete'
     
     @method_decorator(csrf_exempt)
@@ -133,7 +139,7 @@ class InformesDeleteView(PermisoRequeridoMixin, DeleteView):
         self.object.estado = False
         self.object.save()
         
-        messages.success(self.request,     f"Informe {Informes} desactivado correctamente")
+        messages.success(self.request, f"Informe {self.object.id_informe} desactivado correctamente")
         return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):
@@ -150,14 +156,15 @@ class InformesActivateView(PermisoRequeridoMixin, DeleteView):
     success_url = reverse_lazy('apy:informes_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Informes'
-    permission_required = 'change'
+    module_name = 'Informes' 
+    permission_required = 'delete'
     
-    def form_valid(self, form):
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
         self.object.estado = True
         self.object.save()
-        messages.success(self.request, "informe activado correctamente")
-        return super().form_valid(form)
+        messages.success(self.request, "Informe activado correctamente")
+        return HttpResponseRedirect(self.get_success_url())
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -166,6 +173,53 @@ class InformesActivateView(PermisoRequeridoMixin, DeleteView):
         context['listar_url'] = reverse_lazy('apy:informes_lista')
         
         return context
+    
+from django.http import JsonResponse
+from django.db.models import Sum
+
+def obtener_costos_mantenimiento(request):
+    if request.method == 'POST':
+        form = InformeForm(request.POST)
+        repuesto_formset = DetalleRepuestoFormSet(request.POST, prefix='repuestos')
+        insumo_formset = DetalleInsumosFormSet(request.POST, prefix='insumos')
+
+        if form.is_valid() and repuesto_formset.is_valid() and insumo_formset.is_valid():
+            # 1. Guardamos el informe base (sin commit para calcular totales)
+            informe = form.save(commit=False)
+            
+            # 2. Guardamos los formsets para que existan en la DB
+            repuestos = repuesto_formset.save(commit=False)
+            insumos = insumo_formset.save(commit=False)
+            
+            # 3. Calculamos totales antes de guardar definitivamente
+            total_rep = sum(r.cantidad * r.precio_unitario for r in repuestos)
+            total_ins = sum(i.cantidad * i.precio_unitario for i in insumos)
+            
+            informe.total_repuestos = total_rep
+            informe.total_insumos = total_ins
+            informe.total_final = total_rep + total_ins + informe.costo_mano_obra
+            
+            informe.save() # Guardar Informe
+            
+            # 4. Vincular y guardar los detalles
+            for r in repuestos:
+                r.id_informe = informe # O la relación que tengas definida
+                r.save()
+            for i in insumos:
+                i.id_informe = informe
+                i.save()
+                
+            return redirect('apy:informes_lista')
+    else:
+        form = InformeForm()
+        repuesto_formset = DetalleRepuestoFormSet(prefix='repuestos')
+        insumo_formset = DetalleInsumosFormSet(prefix='insumos')
+
+    return render(request, 'informes/informe_form.html', {
+        'form': form,
+        'repuesto_formset': repuesto_formset,
+        'insumo_formset': insumo_formset,
+    })
     
 def informe_excel(request, id):
     informe = Informes.objects.get(id_informe=id)
@@ -206,15 +260,6 @@ def informe_excel(request, id):
 
     # ===== DATOS =====
     data = [
-        ("ID Informe", informe.id_informe),
-        ("Repuestos Usados", informe.repuestos_usados),
-        ("Costo Mano de Obra", informe.costo_mano_obra),
-        ("Fecha", informe.fecha),
-        ("Hora", informe.hora),
-        ("Repuesto", str(informe.id_repuesto)),
-        ("Empleado", str(informe.id_empleado)),
-        ("Tipo Informe", informe.tipo_informe),
-        ("Mantenimiento", str(informe.id_mantenimiento)),
     ]
 
     row = 3
@@ -243,3 +288,5 @@ def informe_excel(request, id):
 
     wb.save(response)
     return response
+
+

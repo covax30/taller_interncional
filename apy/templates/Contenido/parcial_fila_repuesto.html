@@ -1,0 +1,26 @@
+{% load widget_tweaks %}
+<tr>
+    <td>
+        {% render_field form.orden_servicio_opciones class="form-select form-select-sm" %}
+    <td>
+        {% render_field form.id_repuesto class="form-select form-select-sm" %}
+    </td>
+    <td>
+        {% render_field form.cantidad class="form-control form-control-sm text-center" %}
+    </td>
+    <td>
+        <div class="input-group input-group-sm">
+            <span class="input-group-text">$</span>
+            {% render_field form.precio_unitario class="form-control text-end" %}
+        </div>
+    </td>
+    <td class="text-end fw-bold pt-2">
+        <span class="subtotal-fila">$ 0.00</span>
+    </td>
+    <td class="text-center">
+        <button type="button" class="btn btn-outline-danger btn-sm border-0" 
+                onclick="this.closest('tr').remove()">
+            <i class="fas fa-trash"></i>
+        </button>
+    </td>
+</tr>

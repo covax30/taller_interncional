@@ -71,7 +71,7 @@ class HerramientaCreateView(PermisoRequeridoMixin, CreateView):
     success_url = reverse_lazy('apy:herramienta_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Herramientas'
+    module_name = 'Herramientas' 
     permission_required = 'add'
     
     def form_valid(self, form):
@@ -93,10 +93,12 @@ class HerramientaUpdateView(PermisoRequeridoMixin, UpdateView):
     success_url = reverse_lazy('apy:herramienta_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Herramientas'
+    module_name = 'Herramientas' 
     permission_required = 'change'
     
     def form_valid(self, form):
+        
+        form.instance.estado = True 
         messages.success(self.request, "Herramienta actualizada correctamente")
         return super().form_valid(form)
     
@@ -113,7 +115,7 @@ class HerramientaDeleteView(PermisoRequeridoMixin, DeleteView):
     success_url = reverse_lazy('apy:herramienta_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Herramientas'
+    module_name = 'Herramientas' 
     permission_required = 'delete'
     
     def post(self, request, *args, **kwargs):
@@ -143,8 +145,8 @@ class HerramientaActivateView(PermisoRequeridoMixin, DeleteView):
     success_url = reverse_lazy('apy:herramienta_lista')
     
     # --- Configuración de Permisos ---
-    module_name = 'Herramientas'
-    permission_required = 'change'
+    module_name = 'Herramientas' 
+    permission_required = 'delete'
     
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -159,11 +161,15 @@ class HerramientaActivateView(PermisoRequeridoMixin, DeleteView):
         context['listar_url'] = reverse_lazy('apy:herramienta_lista')
         return context      
     
-class HerramientaCreateModalView(CreateView):
+class HerramientaCreateModalView(PermisoRequeridoMixin, CreateView):
     model = Herramienta
     form_class = HerramientaForm
     template_name = "herramienta/modal_herramienta.html"
     success_url = reverse_lazy("apy:herramienta_lista")
+    
+    # --- Configuración de Permisos ---
+    module_name = 'Herramientas'
+    permission_required = 'add'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):

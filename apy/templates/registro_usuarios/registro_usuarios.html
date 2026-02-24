@@ -1,101 +1,244 @@
 {% extends 'body.html' %}
 {% load static %}
+{% load static tz %} 
+{% load widget_tweaks %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="p-3 py-5 border">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="text-right text-body">{{ titulo }}</h4> 
+<style>
+    /* Oculta los inputs de archivo */
+    #id_profile_imagen, #id_profile_imagen_solo {
+        width: 0.1px;
+        height: 0.1px;
+        opacity: 0;
+        overflow: hidden;
+        position: absolute;
+        z-index: -1;
+    }
+    /* Efecto sutil al enfocar campos */
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
+    }
+
+    /* Mejora para el borde responsivo entre columnas */
+    @media (max-width: 767.98px) {
+        .border-end {
+            border-end: none !important;
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+        }
+        .container {
+            margin-top: 1.5rem !important;
+            padding: 1.5rem !important;
+        }
+    }
+
+    /* Elimina el ojo nativo en navegadores basados en Chromium (Edge, Chrome) */
+    input::-ms-reveal,
+    input::-ms-clear {
+        display: none;
+    }
+
+    /* Para otros navegadores que intenten meter iconos internos */
+    input::-webkit-contacts-auto-fill-button,
+    input::-webkit-credentials-auto-fill-button {
+        visibility: hidden;
+        position: absolute;
+        right: 0;
+    }
+</style>
+
+{% with user_to_edit=object %}
+<div class="container rounded mt-5 mb-5 shadow-sm p-4 bg-body border"> 
+    <div class="row">
+        
+        {# COLUMNA IZQUIERDA: Perfil Visual #}
+        <div class="col-md-4 border-end d-flex align-items-center justify-content-center">
+            <div class="d-flex flex-column align-items-center text-center p-3 w-100"> 
+                <div class="position-relative">
+                    <img src="{% if user_to_edit.profile.imagen %}{{ user_to_edit.profile.imagen.url }}{% else %}{% if user_to_edit.is_superuser %}{% static 'img/gerente.png' %}{% else %}{% static 'img/empleado.png' %}{% endif %}{% endif %}"
+                        id="user-avatar-img" 
+                        class="rounded-circle shadow mb-3 img-fluid"
+                        style="width:210px; height:210px; object-fit:cover; border: 6px solid var(--bs-border-color-translucent);">
                 </div>
 
-            {% if form.non_field_errors %}
-                <div class="alert alert-danger" role="alert">
-                    {% for error in form.non_field_errors %}
-                        {{ error }}
-                    {% endfor %}
-                </div>
-            {% endif %}
-
-            <form method="POST">
-                {% csrf_token %} 
+                <span class="font-weight-bold h4 text-body mb-0 text-break">
+                    {{ user_to_edit.username|default:"Nuevo Usuario" }}
+                </span>
+                <span class="text-muted mb-2 text-break">
+                    <i class="fas fa-envelope me-1 small"></i>{{ user_to_edit.email|default:"pendiente@correo.com" }}
+                </span>
                 
-                <div class="row mt-4">
-                    <div class="col-md-6">
-                        <div class="form-floating mb-4">
-                            {{ form.username }} 
-                            <label for="{{ form.username.id_for_label }}">Nombre de Usuario</label>
-                            {% if form.username.errors %}<small class="text-danger">{{ form.username.errors }}</small>{% endif %}
+                {# Adaptación de alerta para modo oscuro #}
+                <div class="alert bg-body-tertiary border small mt-3 w-75 text-body" style="font-size: 0.85rem;">
+                    <i class="fas fa-user-shield text-primary me-2"></i> 
+                    Panel de <strong>Administración</strong>
+                </div>
+            </div>
+        </div>
+        
+        {# COLUMNA DERECHA: Formulario #}
+        <div class="col-md-8">
+            <div class="px-md-3 py-4">
+                <div class="d-flex justify-content-between align-items-center mb-4 gap-2">
+                    <h3 class="fw-bold text-body mb-0">{{ titulo }}</h3>
+                    <i class="fas fa-user-edit fa-2x text-body opacity-50"></i>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %} 
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger shadow-sm border-start border-danger border-5" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            {% for error in form.non_field_errors %}
+                                <strong>{{ error }}</strong>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    {# --- SECCIÓN: DATOS DE CUENTA --- #}
+                    <div class="d-flex align-items-center mt-2 mb-3">
+                        <h6 class="text-uppercase fw-bold text-muted small mb-0">Datos de Cuenta</h6>
+                        <hr class="flex-grow-1 ms-3 opacity-25">
+                    </div>
+
+                    <div class="row g-3"> {# g-3 para espaciado uniforme responsivo #}
+                        <div class="col-sm-6">
+                            <div class="form-floating mb-1">
+                                {{ form.first_name|add_class:"form-control bg-body text-body" }} 
+                                <label class="text-body"><i class="fas fa-id-card-alt me-2 text-muted"></i>Nombres</label>
+                                {% if form.first_name.errors %}<small class="text-danger">{{ form.first_name.errors }}</small>{% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-6">
+                            <div class="form-floating mb-1">
+                                {{ form.last_name|add_class:"form-control bg-body text-body" }} 
+                                <label class="text-body"><i class="fas fa-id-card-alt me-2 text-muted"></i>Apellidos</label>
+                                {% if form.last_name.errors %}<small class="text-danger">{{ form.last_name.errors }}</small>{% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-floating mb-1">
+                                {{ form.username|add_class:"form-control bg-body text-body" }} 
+                                <label class="text-body"><i class="fas fa-user me-2 text-muted"></i>Nombre de Usuario</label>
+                                {% if form.username.errors %}<small class="text-danger">{{ form.username.errors }}</small>{% endif %}
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-floating mb-1">
+                                {{ form.email|add_class:"form-control bg-body text-body text-truncate" }} 
+                                <label class="text-body">
+                                    <i class="fas fa-at me-2 text-muted"></i>Correo Electrónico
+                                </label>
+                                {% if form.email.errors %}
+                                    <small class="text-danger">{{ form.email.errors }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-floating mb-1">
+                                {{ form.role|add_class:"form-select bg-body text-body" }}
+                                <label class="text-body"><i class="fas fa-id-badge me-2 text-muted"></i>Rol en el Sistema</label>
+                                {% if form.role.errors %}<small class="text-danger">{{ form.role.errors }}</small>{% endif %}
+                            </div>
                         </div>
                     </div>
 
-                    <div class="col-md-6">
-                        <div class="form-floating mb-4">
-                            {{ form.email }} 
-                            <label for="{{ form.email.id_for_label }}">Email</label>
-                            {% if form.email.errors %}<small class="text-danger">{{ form.email.errors }}</small>{% endif %}
-                        </div>
+                    {# --- SECCIÓN: SEGURIDAD --- #}
+                    <div class="d-flex align-items-center mt-4 mb-3">
+                        <h6 class="text-uppercase fw-bold text-muted small mb-0">Seguridad</h6>
+                        <hr class="flex-grow-1 ms-3 opacity-25">
                     </div>
-                </div>
 
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <div class="form-floating mb-4">
-                            {{ form.role }} 
-                            <label for="{{ form.role.id_for_label }}">Rol en el Sistema</label>
-                            {% if form.role.errors %}<small class="text-danger">{{ form.role.errors }}</small>{% endif %}
-                        </div>
+                    {% if user_to_edit %}
+                    <div class="alert bg-body-tertiary border-0 shadow-sm d-flex align-items-center p-2 px-3 mb-4" style="border-left: 4px solid #adb5bd !important;">
+                        <i class="fas fa-shield-alt text-muted me-2"></i>
+                        <span class="text-muted small">Para mantener la contraseña actual, deja estos campos en blanco.</span>
                     </div>
-                    
-                    <div class="col-md-6"></div>
-                </div>
 
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <div class="form-floating password-field mb-4">
-                            {{ form.password }} 
-                            <label for="{{ form.password.id_for_label }}">Contraseña</label>
-                            {% if form.password.errors %}<small class="text-danger">{{ form.password.errors }}</small>{% endif %}
+                    <div class="form-floating mb-3 position-relative">
+                        {{ form.old_password|add_class:"form-control border-warning-subtle bg-body text-body pe-5" }}
+                        <label class="text-body"><i class="fas fa-unlock me-2 text-muted"></i>Contraseña Actual</label>
+                        <button type="button" class="btn position-absolute top-50 end-0 translate-middle-y border-0 text-muted toggle-password" style="z-index: 10;">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        {% if form.old_password.errors %}<div class="text-danger small mt-1">{{ form.old_password.errors }}</div>{% endif %}
+                    </div>
+                    {% endif %}
+
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="form-floating mb-1 position-relative">
+                                {{ form.password|add_class:"form-control bg-body text-body pe-5" }} 
+                                <label class="text-body"><i class="fas fa-lock me-2 text-muted"></i>{% if user_to_edit %}Nueva Clave{% else %}Clave{% endif %}</label>
+                                <button type="button" class="btn position-absolute top-50 end-0 translate-middle-y border-0 text-muted toggle-password" style="z-index: 10;">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-floating mb-1 position-relative">
+                                {{ form.password2|add_class:"form-control bg-body text-body pe-5" }} 
+                                <label class="text-body"><i class="fas fa-check-double me-2 text-muted"></i>Confirmar</label>
+                                <button type="button" class="button btn position-absolute top-50 end-0 translate-middle-y border-0 text-muted toggle-password" style="z-index: 10;">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {# --- SECCIÓN: INFORMACIÓN PERSONAL --- #}
+                    <div class="d-flex align-items-center mt-4 mb-3">
+                        <h6 class="text-uppercase fw-bold text-muted small mb-0">Información de Perfil</h6>
+                        <hr class="flex-grow-1 ms-3 opacity-25">
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="form-floating mb-1">
+                                {{ form.identificacion|add_class:"form-control bg-body text-body" }}
+                                <label class="text-body"><i class="fas fa-id-card me-2 text-muted"></i>Identificación</label>
+                                {% if form.identificacion.errors %}<small class="text-danger">{{ form.identificacion.errors }}</small>{% endif %}
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-floating mb-1">
+                                {{ form.telefono|add_class:"form-control bg-body text-body" }}
+                                <label class="text-body"><i class="fas fa-phone me-2 text-muted"></i>Teléfono</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating mb-1">
+                                {{ form.direccion|add_class:"form-control bg-body text-body" }}
+                                <label class="text-body"><i class="fas fa-map-marker-alt me-2 text-muted"></i>Dirección</label>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="col-md-6">
-                        <div class="form-floating password-field mb-4">
-                            {{ form.password2 }} 
-                            <label for="{{ form.password2.id_for_label }}">Confirmar Contraseña</label>
-                            {% if form.password2.errors %}<small class="text-danger">{{ form.password2.errors }}</small>{% endif %}
-                        </div>
+                    {# --- ACCIONES --- #}
+                    <div class="mt-5 pt-3 border-top d-flex flex-column flex-sm-row justify-content-center gap-2">
+                        <a href="{{ listar_url }}" class="btn btn-outline-danger shadow-sm d-flex align-items-center justify-content-center px-4">
+                            <i class="fas fa-times me-2"></i> 
+                            <span>Cancelar</span>
+                        </a>
+                        <button type="submit" class="btn btn-primary px-5 shadow-sm d-flex align-items-center justify-content-center">
+                            <i class="fas fa-save me-2"></i> 
+                            <span>{% if user_to_edit %}Guardar Cambios{% else %}Registrar Usuario{% endif %}</span>
+                        </button>
                     </div>
-                </div>
-                
-                <div class="text-center mt-4">
-                    <a href="{{ listar_url }}" class="btn btn-secondary me-2">
-                        <i class="fas fa-undo"></i> Cancelar
-                    </a>
-                    
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Registrar Usuario
-                    </button>
-                </div>
-            </form>
+
+                </form>
+            </div>
         </div>
     </div>
 </div>
+{% endwith %}
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var formFields = document.querySelectorAll('.form-floating input, .form-floating select');
-        formFields.forEach(function(field) {
-            // Se asegura de que todos los campos del formulario (incluidos los renderizados por Django)
-            // tengan la clase form-control para que funcionen los estilos form-floating.
-            if (!field.classList.contains('form-control')) {
-                field.classList.add('form-control');
-            }
-        });
-    });
-</script>
-
-<!-- JS de Sienna Accessibility -->
 <script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
 <script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
+<script src="{% static 'js/password_eye.js' %}"></script>
 {% endblock %}

@@ -10,7 +10,7 @@
 {% block columnas %}
   <th>Id Salida</th>
   <th>Id Cliente</th>
-  <th>Id Vehículo</th>
+  <th>Id Vehículo</th> 
   <th>Fecha de Salida</th>
   <th>Hora de Salida</th>
   <th>Diagnóstico</th>
@@ -22,12 +22,19 @@
   {% for s in object_list %}
     <tr>
         <td>{{ s.id_salida }}</td>
-        <td>{{ s.id_cliente.id_cliente }}</td>
+        <td>{{ s.id_cliente }}</td>
         <td>{{ s.id_vehiculo.placa }}</td>
         <td>{{ s.fecha_salida }}</td>
         <td>{{ s.hora_salida }}</td>
         <td>{{ s.diagnostico }}</td>
         <td>
+          <div class="btn-group" role="group">
+            <a href="https://wa.me/{{ s.id_cliente.telefono }}?text=Hola%20{{ s.id_cliente.nombre }},%20te%20informamos%20que%20tu%20vehículo%20con%20placa%20{{ s.id_vehiculo.placa }}%20ya%20está%20listo%20para%20ser%20retirado%20del%20Taller%20Internacional%20de%20Motores." 
+                target="_blank" 
+                class="btn btn-success btn-xs" 
+                title="Notificar por WhatsApp">
+              <i class="fab fa-whatsapp"></i>
+            </a>
           <a href="{% url 'apy:salida_vehiculo_editar' s.id_salida %}" 
               class="btn btn-info btn-xs" 
               data-toggle="tooltip" 
@@ -42,6 +49,7 @@
               title="Eliminar salida de vehículo">
               <i class="fas fa-trash-alt"></i>
            </a>
+          </div>
         </td>
     </tr>
   {% endfor %}

@@ -1,0 +1,71 @@
+services:
+  web:
+    build: .
+    image: taller_internacional_web
+    container_name: taller_internacional_app
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+      - taller_internacional_static_data:/app/static
+      - taller_internacional_media_data:/app/media
+    ports:
+      - "8015:8000"
+    networks:
+      - taller_internacional_network
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=${DEBUG}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=db
+      - DB_PORT=${DB_PORT}
+      - EMAIL_HOST_USER=${EMAIL_HOST_USER}
+      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+
+
+  db:
+    image: mysql:8.0
+    container_name: taller_internacional_db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - taller_internacional_mysql_data:/var/lib/mysql
+    networks:
+      - taller_internacional_network
+    ports:
+      - "3315:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: taller_internacional_phpmyadmin
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    ports:
+      - "8080:80"
+    networks:
+      - taller_internacional_network
+    depends_on:
+      - db
+
+networks:
+  taller_internacional_network:
+    driver: bridge
+
+volumes:
+  taller_internacional_mysql_data:
+  taller_internacional_static_data:
+  taller_internacional_media_data:
