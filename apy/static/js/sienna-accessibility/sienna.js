@@ -63,8 +63,33 @@ document.addEventListener("DOMContentLoaded", function() {
         ], "asw-tools");
     var r = document.createElement("div");
     r.innerHTML = `
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons&text=${a.toString()}" rel="stylesheet">
     <style>
+        /* AQUÍ CONECTAMOS EL ARCHIVO QUE DESCARGASTE */
+        @font-face {
+            font-family: 'Material Icons';
+            font-style: normal;
+            font-weight: 400;
+            src: url('/static/fonts/MaterialIcons-Regular.ttf') format('truetype');
+        }
+
+        .material-icons {
+            font-family: 'Material Icons' !important;
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-smoothing: antialiased;
+            /* Esto oculta el texto técnico si la fuente falla */
+            overflow: hidden;
+            width: 24px;
+            height: 24px;
+        }
         .asw-menu, .asw-menu-btn { position: fixed; left: 20px; transition: .3s; z-index: 500000; }
         .asw-widget { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; font-weight: 400; -webkit-font-smoothing: antialiased; }
         .asw-widget * { box-sizing: border-box; }
@@ -98,7 +123,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     </style>
     <div class="asw-widget">
-        <div class="asw-menu-btn" title="Open Accessibility Menu" role="button" aria-expanded="false">
+        <div class="asw-menu-btn" title="abrir Menu Acesibilidad" role="button" aria-expanded="false">
             <svg xmlns="http://www.w3.org/2000/svg" style="width:34px;height:34px;min-height:34px;min-width:34px;max-width:34px;max-height:34px;" viewBox="0 0 24 24" width="34px" height="34px">
                 <path d="M0 0h24v24H0V0z" fill="none"/>
                 <path d="M20.5 6c-2.61.7-5.67 1-8.5 1s-5.89-.3-8.5-1L3 8c1.86.5 4 .83 6 1v13h2v-6h2v6h2V9c2-.17 4.14-.5 6-1l-.5-2zM12 6c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/>
@@ -107,10 +132,10 @@ document.addEventListener("DOMContentLoaded", function() {
         <div class="asw-menu">
             <div class="asw-menu-header">Accesibilidad
                 <div>
-                    <div role="button" class="asw-menu-reset" title="Reset Settings">
+                    <div role="button" class="asw-menu-reset" title="reiniciar ajustes">
                         <span class="material-icons">reiniciar</span>
                     </div>
-                    <div role="button" class="asw-menu-close" title="Close Accessibility Menu">
+                    <div role="button" class="asw-menu-close" title="cerrar menú">
                         <span class="material-icons">cerrar</span>
                     </div>
                 </div>
@@ -144,7 +169,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 </div>
             </div>
             <div class="asw-footer">
-                <a href="https://bennyluk.github.io/Sienna-Accessibility-Widget/">By: Sienna Free Accessibility Widget</a>
+                <a href="https://bennyluk.github.io/Sienna-Accessibility-Widget/">Por: Sienna Free Accessibility Widget</a>
             </div>
         </div>
         <div class="asw-overlay"></div>
@@ -214,7 +239,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 t.style["font-size"] = a + "px"
             }
         }));
-        let n = "Default";
+        let n = "Normal";
         1 !== s && (s > 1 ? n = "+" : s < 1 && (n = "-"), n += parseInt(100 * s) + "%"), a && (a.parentElement.querySelector(".asw-amount").innerHTML = n), t.states.fontSize = s
     };
     let m = r.querySelector(".asw-menu"), g = r.querySelector(".asw-overlay");
@@ -228,7 +253,7 @@ document.addEventListener("DOMContentLoaded", function() {
         t.states = {}, p(), u(), h(void 0, 1), document.querySelectorAll(".asw-btn").forEach(function(t) {
             t.classList.remove("asw-selected"), t.setAttribute("aria-pressed", "false")
         }), document.querySelectorAll(".asw-amount").forEach(function(t) {
-            t.innerHTML = "Default"
+            t.innerHTML = "Normal"
         }), e()
     }, !1), m.querySelectorAll(".asw-btn").forEach(function(t) {
         t.addEventListener("click", f, !1)

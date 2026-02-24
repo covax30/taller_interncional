@@ -48,6 +48,8 @@ urlpatterns = [
 
     path('inicio/index/', index.as_view(), name='index'),
     
+    path('buscar/', buscador_global, name='buscador_global'),
+    
     # ------Url modulo detalle servicio----------------
     path('servicios/', ListServicioView.as_view(), name='lista_servicios'),  
     path('servicios/crear/', CreateServicioView.as_view(), name='crear_servicio'),
@@ -133,6 +135,7 @@ urlpatterns = [
     path("informes/inactivos/", InformesInactivosListView.as_view(), name="informes_inactivos"),
     path('informes/activar/<int:pk>/', InformesActivateView.as_view(), name="informes_activar"),
     path('informes/excel/<int:id>/', informe_excel, name='informes_excel'),
+    path('obtener-totales/<int:id>/', obtener_totales_servicio, name='obtener_totales'),  
 
     
     #--------URL modulo pago de sercicios publicos----------------

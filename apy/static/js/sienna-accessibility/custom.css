@@ -1,46 +1,76 @@
 /* =======================================================
-   1. ESTILOS BASE (TEMA CLARO DE ADMINLTE) Y POSICIONAMIENTO
+   1. ESTILOS BASE Y POSICIONAMIENTO (DERECHA)
    ======================================================= */
 
-/* Botón de Menú Principal */
 .asw-menu-btn {
     background-color: #007bff !important; 
     box-shadow: 0 0 10px rgba(0, 123, 255, 0.5) !important;
-    
-    /* POSICIÓN A LA DERECHA */
     position: fixed !important;
     left: auto !important;       
     right: 20px !important;      
     bottom: 50px !important;     
+    z-index: 500001 !important;
+}
+.asw-menu-reset, 
+.asw-menu-close {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 30px !important;
+    height: 30px !important;
+    cursor: pointer !important;
+    font-family: sans-serif !important;
+    position: relative !important;
+    visibility: visible !important;
 }
 
-/* Fondo del Menú */
+/* Dibujamos la X de cerrar */
+.asw-menu-close::before {
+    content: "✕" !important; 
+    font-size: 18px !important;
+    color: #495057 !important;
+    font-weight: bold !important;
+}
+
+/* Dibujamos la flecha de reiniciar */
+.asw-menu-reset::before {
+    content: "↺" !important;
+    font-size: 22px !important;
+    color: #495057 !important;
+    font-weight: bold !important;
+}
 .asw-menu {
-    background: #ffffff !important; /* Base Blanca */
-    color: #212529 !important;      /* Texto Oscuro */
-    border: 1px solid #dee2e6;
-    
-    /* POSICIÓN: Mueve el menú a la derecha */
+    background: #ffffff !important; 
+    color: #212529 !important;      
+    border: 1px solid #dee2e6 !important;
     position: fixed !important;
     left: auto !important;
     right: 20px !important;
+    top: 20px !important;
+    border-radius: 8px !important;
+    box-shadow: -5px 5px 15px rgba(0,0,0,0.1) !important;
 }
 
-/* Encabezado y Pie de página del menú (BASE: Gris Claro y TEXTO OSCURO) */
+/* Encabezado y Pie de página */
 .asw-menu-header,
 .asw-footer {
-    background: #f8f9fa !important; /* Gris muy claro */
-    color: #212529 !important;      /* <-- TEXTO OSCURO POR DEFECTO */
-    border-bottom: 1px solid #dee2e6; 
+    background: #f8f9fa !important; 
+    color: #212529 !important;      
+    border-bottom: 1px solid #dee2e6 !important; 
 }
 
+/* VISIBILIDAD DE ICONOS (X y Reiniciar) */
+.asw-menu-header .material-icons {
+    color: #212529 !important; /* Color oscuro por defecto */
+    font-size: 20px !important;
+    display: inline-block !important;
+}
 
-/* Botones dentro del Menú (BASE: Claro) */
 .asw-btn {
     background: #ffffff !important; 
     color: #495057 !important;
     border: 1px solid #dee2e6 !important; 
-    transition: all 0.3s ease;
+    transition: all 0.3s ease !important;
 }
 
 .asw-btn:hover {
@@ -48,53 +78,83 @@
     border-color: #007bff !important;
 }
 
-/* Botones de ajuste de fuente (+ / -) y Seleccionados */
-.asw-adjust-font div[role=button] {
-    background: #007bff !important; 
-    color: #fff;
+/* =======================================================
+   2. RECUADRO DE AJUSTE DE FUENTE
+   ======================================================= */
+
+.asw-adjust-font {
+    background: #ecf3ff !important; 
+    color: #212529 !important;      
+    border: 1px solid #c2d7ff !important;
+    border-radius: 8px !important;
 }
 
-.asw-btn.asw-selected {
-    background: #20c997 !important; 
+.asw-adjust-font .asw-amount {
+    color: #212529 !important; 
+    font-weight: 700 !important;
+}
+
+.asw-adjust-font div[role=button] {
+    background: #007bff !important; 
     color: #fff !important;
-    border-color: #20c997 !important;
-    font-weight: bold;
 }
 
 /* =======================================================
-   2. ESTILOS CONDICIONALES (TEMA OSCURO - OVERRIDE)
+   3. CONFIGURACIÓN MODO OSCURO (OVERRIDE)
    ======================================================= */
 
-/* Selector que se activa cuando el tema Dark está ON (por tu script) */
-html[data-bs-theme="dark"] body.asw-dark-contrast .asw-menu,
-.asw-widget.asw-dark-contrast .asw-menu {
+html[data-bs-theme="dark"] .asw-menu,
+.asw-dark-contrast .asw-menu {
     background: #1f2d3d !important; 
     color: #c2c7d0 !important; 
 }
 
-/* APLICAMOS EL COLOR DE TEXTO BLANCO AL ENCABEZADO Y PIE DE PÁGINA */
-html[data-bs-theme="dark"] body.asw-dark-contrast .asw-menu-header,
-html[data-bs-theme="dark"] body.asw-dark-contrast .asw-footer {
-    background: #343a40 !important; 
-    color: #fff !important;             /* <-- ¡EL CAMBIO CRUCIAL! */
+/* Iconos X y Reiniciar en MODO OSCURO */
+html[data-bs-theme="dark"] .asw-menu-header .material-icons,
+.asw-dark-contrast .asw-menu-header .material-icons {
+    color: #ffffff !important; /* Forzamos blanco en modo oscuro */
 }
 
-html[data-bs-theme="dark"] body.asw-dark-contrast .asw-btn,
-.asw-widget.asw-dark-contrast .asw-btn {
+html[data-bs-theme="dark"] .asw-adjust-font,
+.asw-dark-contrast .asw-adjust-font {
+    background: #343a40 !important; 
+    color: #ffffff !important;
+    border: 1px solid #454d55 !important;
+}
+
+html[data-bs-theme="dark"] .asw-amount,
+html[data-bs-theme="dark"] .asw-adjust-font .label,
+.asw-dark-contrast .asw-amount {
+    color: #ffffff !important;
+}
+
+html[data-bs-theme="dark"] .asw-menu-header,
+html[data-bs-theme="dark"] .asw-footer,
+.asw-dark-contrast .asw-menu-header,
+.asw-dark-contrast .asw-footer {
+    background: #343a40 !important; 
+    color: #ffffff !important;
+}
+
+html[data-bs-theme="dark"] .asw-btn,
+.asw-dark-contrast .asw-btn {
     background: #343a40 !important; 
     color: #c2c7d0 !important;
     border-color: #454d55 !important;
 }
-/* REEMPLAZA el bloque de enlaces anterior con este. */
 
-/* Sobrescribe el color de TODOS los estados del enlace (<a>) dentro del menú en MODO OSCURO. */
-html[data-bs-theme="dark"] body.asw-dark-contrast .asw-menu a,
-html[data-bs-theme="dark"] body.asw-dark-contrast .asw-menu a:link,
-html[data-bs-theme="dark"] body.asw-dark-contrast .asw-menu a:visited,
-html[data-bs-theme="dark"] body.asw-dark-contrast .asw-menu a:hover,
-html[data-bs-theme="dark"] body.asw-dark-contrast .asw-menu a:active {
-    color: #c2c7d0 !important; /* Mantiene la consistencia con el texto claro de AdminLTE */
-    
-    /* Nota: Si #c2c7d0 sigue fallando, cámbialo a color: #ffffff !important; */
+/* =======================================================
+   4. PRIORIDAD DE SELECCIÓN (EL COLOR VERDE)
+   ======================================================= */
+
+.asw-btn.asw-selected,
+html[data-bs-theme="dark"] .asw-btn.asw-selected,
+.asw-dark-contrast .asw-btn.asw-selected {
+    background-color: #20c997 !important; 
+    color: #ffffff !important;           
+    border-color: #20c997 !important;
 }
-}
+
+/* Overlay y Enlaces */
+html[data-bs-theme="dark"] .asw-menu a { color: #c2c7d0 !important; }
+.asw-overlay { background: rgba(0,0,0,0.5) !important; }

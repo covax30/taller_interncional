@@ -6,54 +6,50 @@ from calendar import month_name
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied # <-- NUEVA IMPORTACIÓN PARA ERRORES 403
-from apy.models import Caja, Module, Permission 
-from apy.decorators import PermisoRequeridoMixin
-from django.urls import reverse_lazy
-
+from django.views.decorators.cache import never_cache  # Para evitar el "atrás" del navegador
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 
+# Importación de tus modelos
+from apy.models import Caja, Module, Permission 
 
-# LÓGICA DE PERMISOS PARA VISTAS BASADAS EN FUNCIÓN (Lanza 403)
+# --- LÓGICA DE PERMISOS PARA VISTAS BASADAS EN FUNCIÓN ---
 
 def check_custom_permission(user, module_name, permission_required):
     """
-    Verifica si un usuario tiene el permiso requerido para un módulo específico.
-    Si no lo tiene, lanza PermissionDenied (Error 403).
-    Si tiene permiso, retorna None.
+    Verifica si un usuario tiene el permiso requerido.
+    Lanza PermissionDenied (403) si no lo tiene.
     """
-    # 1. Permitir Superusuario
     if user.is_superuser:
-        return None # Permiso concedido
+        return None 
     
-    # 2. Lógica de Permisos Personalizados
     try:
         module = Module.objects.get(name=module_name)
         permission_obj = Permission.objects.filter(user=user, module=module).first()
         
         has_permission = False
         if permission_obj:
-            # Usa getattr para verificar el permiso (ej: permission_obj.view)
             has_permission = getattr(permission_obj, permission_required, False)
             
         if has_permission:
-            return None # Permiso concedido
+            return None 
         else:
-            # Lanza la excepción PermissionDenied, que Django maneja como 403
             raise PermissionDenied(
                 f"Acceso denegado. No tienes permiso de {permission_required.upper()} para el módulo '{module_name}'."
             )
             
     except Module.DoesNotExist:
-        # Lanza la excepción indicando un error de configuración
         raise PermissionDenied(
             f"Error de configuración: Módulo '{module_name}' no encontrado."
         )
 
-@login_required(login_url=reverse_lazy('apy:login'))
+# --- VISTA DE ESTADÍSTICAS ---
+
+@never_cache  # Capa de seguridad: prohíbe al navegador cachear esta página
+@login_required(login_url=reverse_lazy('login:login'))  # Corregido: apunta a tu app 'login'
 def estadisticas(request):
     
-    # --- 1. VERIFICACIÓN DE PERMISOS INDEPENDIENTE ---
+    # --- 1. VERIFICACIÓN DE PERMISOS ---
     try:
         check_custom_permission(
             request.user, 
