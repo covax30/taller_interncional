@@ -260,5 +260,61 @@
 <script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
 <script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
 <script src="{% static 'js/password_eye.js' %}"></script>
+
+<script type="application/javascript">
+    {% if form.errors %}
+    var errorList = [];
+    
+    {% for field in form %}
+        {% for error in field.errors %}
+            var rawMsg = "{{ error|escapejs }}";
+            var finalMsg = rawMsg;
+
+            // --- TRADUCCIONES DE SEGURIDAD PERSONALIZADA (Viene de validators.py) ---
+            if (rawMsg.includes("MAYÚSCULA")) {
+                finalMsg = "<b>¡Falta una mayúscula!</b><br>La contraseña debe tener al menos una letra en MAYÚSCULA. 🔠";
+            }
+            else if (rawMsg.includes("NÚMERO")) {
+                finalMsg = "<b>¡Falta un número!</b><br>Debes incluir al menos un número (0-9). 🔢";
+            }
+            else if (rawMsg.includes("ESPECIAL")) {
+                finalMsg = "<b>¡Falta un símbolo!</b><br>Usa un carácter especial (ej: @, #, $, *, !). ✨";
+            }
+
+            // --- TRADUCCIONES ESTÁNDAR DE DJANGO ---
+            else if (rawMsg.includes("too short") || rawMsg.includes("at least 8 characters")) {
+                finalMsg = "<b>Muy corta:</b> Mínimo 8 caracteres. 📏";
+            }
+            else if (rawMsg.includes("didn't match")) {
+                finalMsg = "<b>¡Error!</b> Las contraseñas no coinciden. ❌";
+            }
+            else if (rawMsg.includes("too common")) {
+                finalMsg = "<b>Muy común:</b> Intenta algo más difícil de adivinar. 🔒";
+            }
+            else if (rawMsg.includes("entirely numeric")) {
+                finalMsg = "<b>No solo números:</b> Mezcla letras y números. 🔡";
+            }
+            
+            errorList.push(finalMsg);
+        {% endfor %}
+    {% endfor %}
+
+    // Errores generales (del formulario completo)
+    {% for error in form.non_field_errors %}
+        errorList.push("{{ error|escapejs }}");
+    {% endfor %}
+
+    if (errorList.length > 0) {
+        Swal.fire({
+            title: '¡Contraseña no válida!',
+            html: '<div style="text-align: left; font-size: 0.9em;">' + errorList.join('<hr style="margin: 10px 0; border-top: 1px solid #eee;">') + '</div>',
+            icon: 'warning',
+            confirmButtonColor: '#007bff',
+            confirmButtonText: 'Reintentar'
+        });
+    }
+    {% endif %}
+</script>
+
 {% endwith %}
 {% endblock %}

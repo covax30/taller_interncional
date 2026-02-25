@@ -1,3 +1,4 @@
+from genericpath import exists
 from pyexpat.errors import messages
 from django import forms
 from django.forms import ModelForm, Select, NumberInput, DateInput, TimeInput, TextInput, EmailInput
@@ -485,6 +486,30 @@ class RegistroUsuarioForm(forms.ModelForm):
                 self.add_error('identificacion', e.message)
                 
         return cleaned_data
+    
+    def clean_first_name(self):
+        first_name = self.cleaned_data.get('first_name')
+        if any(char.isdigit() for char in first_name):
+            raise ValidationError("El nombre no puede contener números. ❌")
+        return first_name
+
+    def clean_last_name(self):
+        last_name = self.cleaned_data.get('last_name')
+        if any(char.isdigit() for char in last_name):
+            raise ValidationError("El apellido no puede contener números. ❌")
+        return last_name
+
+    def clean_identificacion(self):
+        identificacion = self.cleaned_data.get('identificacion')
+        # Buscamos si ya existe en la tabla Profile
+        # Excluimos al usuario actual si estamos editando (self.instance)
+        qs = Profile.objects.filter(identificacion=identificacion)
+        if self.instance and self.instance.pk:
+            qs = qs.exclude(user=self.instance)
+        
+        if qs.exists():
+            raise ValidationError("Esta identificación ya está registrada a otro usuario. 🆔")
+        return identificacion
     
 # 1. Formulario para editar el modelo User (SIN TELEFONO)
 class PerfilUsuarioForm(forms.ModelForm):
