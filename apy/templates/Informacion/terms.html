@@ -1,0 +1,290 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Terms - iConstruction Bootstrap Template</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  <!-- Favicons -->
+  <link href="{% static 'info/assets/img/favicon.png' %}" rel="icon">
+  <link href="{% static 'info/assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'info/assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'info/assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'info/assets/vendor/aos/aos.css' %}" rel="stylesheet">
+  <link href="{% static 'info/assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+  <link href="{% static 'info/assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{% static 'info/assets/css/main.css' %}" rel="stylesheet">
+
+  <!-- =======================================================
+  * Template Name: iConstruction
+  * Template URL: https://bootstrapmade.com/iconstruction-bootstrap-construction-template/
+  * Updated: Jul 27 2025 with Bootstrap v5.3.7
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
+</head>
+
+<body class="terms-page">
+
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center">
+
+      <a href="{% url 'apy:index_informacion' %}" class="logo d-flex align-items-center me-auto">
+        <!-- Uncomment the line below if you also wish to use an image logo -->
+        <!-- <img src="assets/img/logo.webp" alt=""> -->
+        <h1 class="sitename">T.I.M</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="{% url 'apy:index_informacion' %}" class="active">Inicio</a></li>
+          <li class="dropdown"><a href="#"><span>Nosotros</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+              <li><a href="{% url 'apy:about_informacion' %}#about">Historia</a></li>
+              <li><a href="{% url 'apy:about_informacion' %}#about2">Proposito</a></li>
+              <li><a href="{% url 'apy:about_informacion' %}#about3">¿Por qué nosotros?</a></li>
+            </ul>
+          </li>
+          <li><a href="{% url 'apy:service_informacion' %}">Servicios</a></li>
+          <li><a href="{% url 'apy:contact_informacion' %}">Contacto</a></li>
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+      <a class="btn-getstarted d-none d-sm-block" href="quote.html">Iniciar Sesión</a>
+
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- Page Title -->
+    <div class="page-title dark-background" data-aos="fade" style="background-image: url({% static 'info/assets/img/taller/img-header.jpg' %});">
+      <div class="container position-relative">
+        <h1>Terminos y Condiciones</h1>
+        <nav class="breadcrumbs">
+          <ol>
+            <li><a href="{% url 'apy:index_informacion' %}">Inicio</a></li>
+            <li class="current">Terminos</li>
+          </ol>
+        </nav>
+      </div>
+    </div><!-- End Page Title -->
+
+    <!-- Terms Of Service Section -->
+    <section id="terms-of-service" class="terms-of-service section">
+
+      <div class="container" data-aos="fade-up">
+        <!-- Page Header -->
+        <div class="tos-header text-center" data-aos="fade-up">
+          <span class="last-updated">Ultima actualización: 24 de febrero de 2026</span>
+          <h2>Terminos y Condiciones de Uso</h2>
+          <p>Por favor lea cuidadosamente estos términos y condiciones antes de usar nuestros servicios.</p>
+        </div>
+
+        <!-- Content -->
+        <div class="tos-content" data-aos="fade-up" data-aos-delay="200">
+          <!-- Agreement Section -->
+          <div id="agreement" class="content-section">
+            <h3>1. Objeto de la Plataforma </h3>
+            <p>La presente plataforma web tiene como único fin proporcionar información técnica sobre los servicios de mecánica diésel, 
+              reparación de motores y diagnóstico por scanner de Taller Internacional de Motores (T.I.M.). 
+              El acceso es libre y gratuito para todos los usuarios interesados en conocer nuestras capacidades técnicas.</p>
+            <div class="info-box">
+              <i class="bi bi-info-circle"></i>
+              <p>Esta plataforma no tiene fines comerciales ni de lucro. Los servicios ofrecidos son exclusivos del Taller Internacional de Motores (T.I.M.).</p>
+            </div>
+          </div>
+
+          <!-- Intellectual Property -->
+          <div id="intellectual-property" class="content-section">
+            <h3>2. Uso del Formulario de Contacto</h3>
+            <p>Al utilizar el formulario de "Contacto" o "Solicitar Cotización", el usuario acepta suministrar datos básicos de contacto (Nombre y Correo Electrónico) 
+              con el único propósito de recibir asesoría técnica o presupuestos.</p>
+            <ul class="list-items">
+              <li><strong>Veracidad: </strong>El usuario se compromete a proporcionar información real para garantizar una respuesta efectiva.</li>
+              <li><strong>Privacidad: </strong>T.I.M. no utilizará estos datos para fines distintos al servicio solicitado ni los compartirá con terceros sin autorización previa.</li>
+            </ul>
+          </div>
+
+          <!-- User Accounts -->
+          <div id="user-accounts" class="content-section">
+            <h3>3. Propiedad del Contenido</h3>
+            <p>Todos los elementos visuales, incluyendo fotografías de reparaciones de motores, logotipos de marcas aliadas y textos descriptivos de los servicios, 
+              son propiedad de T.I.M. o se utilizan con fines ilustrativos para demostrar la especialidad del taller. Queda prohibida la reproducción total 
+              o parcial de estos contenidos sin consentimiento expreso. </p>
+            <div class="alert-box">
+              <i class="bi bi-exclamation-triangle"></i>
+              <div class="alert-content">
+                <h5>Importante</h5>
+                <p>Los logotipos de marcas externas se presentan únicamente con fines de identificación de compatibilidad técnica y son propiedad de sus respectivos titulares.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Prohibited Activities -->
+          <div id="prohibited" class="content-section">
+            <h3>4. Exclusión de Responsabilidad</h3>
+            <p>La información mostrada en la web (beneficios de servicios, descripciones técnicas) tiene un carácter informativo general. 
+              T.I.M. se reserva el derecho de ajustar precios y especificaciones técnicas de acuerdo al diagnóstico físico que 
+              se realice a cada motor o vehículo en las instalaciones del taller.</p>
+          </div>
+
+          <!-- Disclaimers -->
+          <div id="disclaimer" class="content-section">
+            <h3>5. Contacto</h3>
+            <p>Para cualquier duda relacionada con el tratamiento de sus datos o el uso de este sitio web, 
+              el usuario puede comunicarse a través del botón oficial de WhatsApp o mediante el formulario de contacto presente en la página.</p>
+          </div>
+
+          <!-- Limitation of Liability -->
+          <div id="limitation" class="content-section">
+            <h3>6. Limitación de Responsabilidad Técnica</h3>
+            <p>La información técnica, beneficios de ahorro de combustible y durabilidad mencionados en el sitio son estimaciones 
+              basadas en condiciones óptimas de operación y el uso de repuestos de alta calidad. T.I.M. no garantiza resultados idénticos en todos los vehículos, 
+              ya que el rendimiento final depende del estado general de la máquina, los hábitos de conducción y el cumplimiento de los mantenimientos preventivos por parte del cliente.</p>
+          </div>
+
+          <!-- Indemnification -->
+          <div id="indemnification" class="content-section">
+            <h3>7. Vigencia de Cotizaciones</h3>
+            <p>Cualquier información sobre precios o presupuestos proporcionada a través del formulario de contacto o WhatsApp tiene una vigencia informativa de ocho (8) días calendario. 
+              Los valores definitivos serán establecidos únicamente tras la inspección física y el diagnóstico técnico realizado por nuestro personal experto en las instalaciones del taller.</p>
+          </div>
+
+          <!-- Termination -->
+          <div id="termination" class="content-section">
+            <h3>8. Enlaces a Terceros y Redes Sociales</h3>
+            <p>Nuestra plataforma puede contener enlaces a redes sociales oficiales o servicios de mapas. El usuario reconoce que, al hacer clic en dichos enlaces, 
+              se sujetará a las políticas de privacidad y términos de uso de dichas plataformas externas, sobre las cuales T.I.M. no tiene control ni responsabilidad legal.</p>
+          </div>
+
+        </div>
+
+        <!-- Contact Section -->
+        <div class="tos-contact" data-aos="fade-up" data-aos-delay="300">
+          <div class="contact-box">
+            <div class="contact-icon">
+              <i class="bi bi-envelope"></i>
+            </div>
+            <div class="contact-content">
+              <h4>Questions About Terms?</h4>
+              <p>If you have any questions about these Terms, please contact us.</p>
+              <a href="#" class="contact-link">Contact Support</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section><!-- /Terms Of Service Section -->
+
+  </main>
+
+  <footer id="footer" class="footer dark-background">
+
+    <div class="container footer-top-contact">
+      <div class="row text-center gy-4">
+
+        <div class="col-6 col-lg-3">
+          <div class="contact-item">
+            <i class="bi bi-geo-alt-fill"></i>
+            <h5>Ubicación</h5>
+            <p>Sogamoso, Boyacá<br>Colombia</p>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <div class="contact-item">
+            <i class="bi bi-telephone-fill"></i>
+            <h5>Teléfono</h5>
+            <p><a href="tel:+573126216800">+57 312 621 6800</a></p>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <div class="contact-item">
+            <i class="bi bi-envelope-at-fill"></i>
+            <h5>Correo</h5>
+            <p><a href="mailto:arturopatino@gmail.com">arturopatino@gmail.com</a></p>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <div class="contact-item">
+            <i class="bi bi-clock-fill"></i>
+            <h5>Horarios</h5>
+            <p>Lun - Sáb: 8 AM - 7 PM</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <div class="footer-bottom-content text-center">
+              <p class="disclaimer-text">
+                <strong>Aviso de Marcas:</strong> Todos los logotipos de terceros son propiedad de sus respectivos
+                dueños.
+                Su uso es informativo para indicar la especialidad técnica de nuestro taller.
+              </p>
+              <div class="legal-links">
+                <span>© 2026 <span class="sitename">T.I.M</span>. Todos los derechos reservados.</span>
+                <a href="{% url 'apy:terms_informacion' %}">Terminos y Condiciones</a>
+              </div>
+              <div class="credits">
+                <!-- All the links in the footer should remain intact. -->
+                <!-- You can delete the links only if you've purchased the pro version. -->
+                <!-- Licensing information: https://bootstrapmade.com/license/ -->
+                <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
+                Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </footer>
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="{% static 'info/assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'info/assets/vendor/php-email-form/validate.js' %}"></script>
+  <script src="{% static 'info/assets/vendor/aos/aos.js' %}"></script>
+  <script src="{% static 'info/assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
+  <script src="{% static 'info/assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
+  <script src="{% static 'info/assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
+
+  <!-- Main JS File -->
+  <script src="{% static 'info/assets/js/main.js' %}"></script>
+
+  <!-- WhatsApp -->
+  <a href="https://wa.me/573126216800?text=Hola%20T.I.M.,%20solicito%20información%20sobre..." class="whatsapp-float"
+    target="_blank" rel="noopener noreferrer">
+    <i class="bi bi-whatsapp"></i>
+  </a>
+
+</body>
+
+</html>
