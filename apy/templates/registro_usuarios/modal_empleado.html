@@ -1,0 +1,77 @@
+{% load widget_tweaks %}
+
+{% block form %}
+
+    <div id="msg-empleado"></div>  
+
+     <!-- Id Cliente con modal -->
+
+    <form id="empleadoForm" method="post" action="{% url 'apy:empleado_modal_crear' %}">
+        {% csrf_token %}
+   
+        {% for field in form.visible_fields %}
+    <div class="form-group mb-3">
+        <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
+        {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
+
+        {% if field.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in field.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    {% endfor %}
+    </form>
+
+{% endblock %}
+{% block Cancelar %}
+<div class="modal-footer border-top-0 d-flex justify-content-end">
+    <button type="button" class="btn btn-secondary btn-flat mr-2" data-dismiss="modal">
+        <i class="fas fa-times"></i> Cancelar
+    </button>
+    <button type="button" id="btnGuardarEmpleado" class="btn btn-success btn-flat">
+        <i class="fas fa-save"></i> Guardar Empleado
+    </button>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).on('click', '#btnGuardarEmpleado', function (e) {
+    e.preventDefault();
+    var form = document.getElementById('empleadoForm');
+    var formData = new FormData(form); // Permite enviar la imagen de perfil
+
+    $.ajax({
+        url: $(form).attr('action'),
+        type: 'POST',
+        data: formData,
+        processData: false, // Necesario para FormData
+        contentType: false, // Necesario para FormData
+        success: function (response) {
+            if (response.success) {
+                // 1. Cerrar el modal
+                $('#modal-empleado').modal('hide');
+
+                // 2. Actualizar el select 'empleado' en el formulario de servicio
+                var newOption = new Option(response.text, response.id, true, true);
+                $('select[name="empleado"]').append(newOption).trigger('change');
+
+                // 3. Notificación
+                alert(response.message);
+            } else {
+                // Si el backend devuelve error (por ejemplo, cédula duplicada)
+                // Reemplazamos el contenido del modal con el nuevo HTML que trae los errores
+                $('#modal-empleado .modal-body').html(response.html);
+            }
+        },
+        error: function (xhr) {
+            alert("Error en el servidor: " + xhr.statusText);
+        }
+    });
+});
+</script>
+{% endblock %}

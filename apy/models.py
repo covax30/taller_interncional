@@ -455,7 +455,7 @@ class DetalleServicio(models.Model):
     cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
     id_entrada = models.ForeignKey(EntradaVehiculo, on_delete=models.PROTECT, blank=True, null=True)
     empresa = models.ForeignKey('Empresa', on_delete=models.PROTECT, blank=True, null=True)
-    empleado = models.ForeignKey(Profile, on_delete=models.PROTECT, blank=True, null=True)
+    empleado = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     id_salida = models.ForeignKey(SalidaVehiculo, on_delete=models.PROTECT, blank=True, null=True)
     proceso = models.CharField(max_length=20, choices=PROCESO_OPCIONES, default='proceso')
@@ -562,34 +562,27 @@ class Empresa(models.Model):
     
 class Informes(models.Model):
     id_informe = models.AutoField(primary_key=True)
-    
-    # 1. CONEXIÓN PRINCIPAL
-    # Al conectarlo con Mantenimiento, ya tienes acceso al Vehículo y al Cliente.
-    detalle_servicio = models.OneToOneField(DetalleServicio,on_delete=models.PROTECT,verbose_name="Detalle de Servicio")
-    
-    # 2. QUIÉN Y CUÁNDO
+    detalle_servicio = models.OneToOneField(DetalleServicio, on_delete=models.PROTECT, verbose_name="Detalle de Servicio")
     id_empleado = models.ForeignKey(Profile, on_delete=models.PROTECT, verbose_name="Mecánico Responsable")
-    fecha = models.DateField(auto_now_add=True) # Se pone sola al crear
+    fecha = models.DateField(auto_now_add=True)
     hora = models.TimeField(auto_now_add=True)
-    
-    # 3. DATOS DE PRODUCTIVIDAD (Lo que quieres medir)
-    # Cambiamos "repuestos_usados" (Texto) por un cálculo de los modelos de repuestos
     tipo_informe = models.CharField(max_length=20, choices=[('Preventivo', 'Preventivo'), ('Correctivo', 'Correctivo')])
-    
-    costo_mano_obra = models.PositiveIntegerField(
-        validators=[validar_monto],
-        verbose_name="Costo Mano de Obra"
-    )
-    
-    # Añadimos estos campos para "congelar" el total al momento de crear el informe
+    costo_mano_obra = models.PositiveIntegerField(validators=[validar_monto], verbose_name="Costo Mano de Obra")
     total_repuestos = models.PositiveIntegerField(default=0, editable=False)
     total_insumos = models.PositiveIntegerField(default=0, editable=False)
     total_final = models.PositiveIntegerField(default=0, editable=False)
-    
-    # 4. OBSERVACIONES TÉCNICAS
     diagnostico_final = models.TextField(blank=True, null=True, verbose_name="Notas del Mecánico")
-    
     estado = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"Informe {self.id_informe} - {self.detalle_servicio.id_vehiculo.placa}"
+    
+    def save(self, *args, **kwargs):
+        if self.detalle_servicio:
+            self.total_repuestos = self.detalle_servicio.total_repuestos
+            self.total_insumos = self.detalle_servicio.total_insumos
+            self.total_final = self.total_repuestos + self.total_insumos + self.costo_mano_obra
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Informe {self.id_informe} - {self.id_mantenimiento.id_vehiculo}"

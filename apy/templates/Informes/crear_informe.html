@@ -1,198 +1,79 @@
-{% extends "form_generico.html" %}
+{% extends "body.html" %}
 {% load static %}
 {% load widget_tweaks %}
 
-{% block form %}
-    {% csrf_token %}
-
-    <div class="form-group mb-3">
-        <label for="{{ form.detalle_servicio.id_for_label }}">Detalles de servicios:</label>
-        <div class="input-group">
-            {{ form.detalle_servicio }}
-            <div class="input-group-append">
+{% block content %}
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Nuevo Informe Técnico</h1>
             </div>
         </div>
-    </div>  
-
-    <div class="form-group mb-3">
-        <label for="{{ form.id_empleado.id_for_label }}">Mecánico Responsable:</label>
-        <div class="input-group">
-            {{ form.id_empleado|add_class:'form-control' }}
-            <div class="input-group-append">
-                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-empleado">
-                    <i class="fas fa-plus"></i>
-                </button>
-            </div>
-        </div>
-        {% if form.id_empleado.errors %}
-            <div class="invalid-feedback d-block">
-                {% for error in form.id_empleado.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
-            </div>
-        {% endif %}
     </div>
+</div>
 
-    
-            <div class="form-group mb-3">
-                <label for="{{ form.tipo_informe.id_for_label }}">Tipo de Mantenimiento:</label>
-                {{ form.tipo_informe|add_class:'form-control' }}
-                {% if form.tipo_informe.errors %}
-                    <div class="invalid-feedback d-block">
-                        {% for error in form.tipo_informe.errors %}
-                            <small>{{ error }}</small>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
-        
-
-        <div class="col-md-12">
-            <div class="card card-outline card-primary">
-                <div class="card-header"><h3 class="card-title">Resumen Económico</h3></div>
-                <div class="card-body">
-                    <div class="form-group mb-3">
-                        <label>Mano de Obra ($):</label>
-                        {{ form.costo_mano_obra|add_class:'form-control'|attr:'id:id_mano_obra' }}
-                    </div>
-                    <hr>
-                    <p>Total Repuestos: <strong class="float-right" id="disp_repuestos">$ 0</strong></p>
-                    <p>Total Insumos: <strong class="float-right" id="disp_insumos">$ 0</strong></p>
-                    <hr>
-                    <h4 class="text-primary">Total General: <strong class="float-right" id="disp_total">$ 0</strong></h4>
-                </div>
-            </div>
-        </div>
-    
-    <div class="col-md-12">
+<section class="content">
+    <div class="container-fluid">
         <div class="card card-outline card-primary">
-            <div class="card-body">
-            <div class="form-group mb-3">
-                <label for="{{ form.diagnostico_final.id_for_label }}">Diagnóstico Técnico Final:</label>
-        {{ form.diagnostico_final|add_class:'form-control'|attr:'rows:3' }}
-        {% if form.diagnostico_final.errors %}
-            <div class="invalid-feedback d-block">
-                {% for error in form.diagnostico_final.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
-            </div>
-        {% endif %}
-    </div>
-    </div>
-    </div>
-    </div>
-
-    <div class="modal fade" id="modal-empleado" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header d-flex justify-content-between align-items-center">
-                    <h5 class="modal-title mb-0">Crear Empleado</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
-                            style="background-color: #dc3545; color: white; border: none; border-radius: 50%; width: 35px; height: 35px;">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Servicio Terminado</label>
+                                {{ form.detalle_servicio|add_class:"form-control select2" }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Mecánico Responsable</label>
+                                {{ form.id_empleado|add_class:"form-control" }}
+                            </div>
+                        </div>
                     </div>
-            </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Tipo de Informe</label>
+                                {{ form.tipo_informe|add_class:"form-control" }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Mano de Obra ($)</label>
+                                {{ form.costo_mano_obra|add_class:"form-control" }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <label>Diagnóstico Final</label>
+                        {{ form.diagnostico_final|add_class:"form-control"|attr:"rows:3" }}
+                    </div>
+
+                    <div class="callout callout-info">
+                        <p><i class="fas fa-info-circle"></i> Los totales de repuestos e insumos se calcularán automáticamente al guardar.</p>
+                    </div>
+                </div>
+
+                <div class="card-footer text-right">
+                    <a href="{% url 'apy:informe_lista' %}" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">Guardar Informe</button>
+                </div>
+            </form>
         </div>
     </div>
-
-    <script>
-
-        $("#modal-empleado").on("show.bs.modal", function(){
-            var modal = $(this);
-            $.ajax({
-                url: "{% url 'apy:empleado_modal_crear' %}",
-                success: function(data){
-                    modal.find(".modal-body").html(data.html || data);
-                }
-            });
-        });
-    </script>
-
-    <script>
-        $(document).ready(function() { 
-    // Función para calcular subtotales de cada fila
-    function calcularSubtotales() {
-        let totalRepuestos = 0;
-        let totalInsumos = 0;
-
-        // Calcular Repuestos
-        $('.repuesto-form').each(function() {
-            let cant = parseFloat($(this).find('.cantidad-repuestos').val()) || 0;
-            let precio = parseFloat($(this).find('.precio-repuestos').val()) || 0;
-            let subtotal = cant * precio;
-            $(this).find('.subtotal-repuesto').val('$' + subtotal.toLocaleString());
-            totalRepuestos += subtotal;
-        });
-
-        // Calcular Insumos
-        $('.insumo-form').each(function() {
-            let cant = parseFloat($(this).find('.cantidad-insumo').val()) || 0;
-            let precio = parseFloat($(this).find('.precio-insumo').val()) || 0;
-            let subtotal = cant * precio;
-            $(this).find('.subtotal-insumo').val('$' + subtotal.toLocaleString());
-            totalInsumos += subtotal;
-        });
-
-        // Actualizar etiquetas de totales
-        $('#total-repuestos').text('$' + totalRepuestos.toLocaleString());
-        $('#total-insumos').text('$' + totalInsumos.toLocaleString());
-        
-        // Actualizar Gran Total (Mano de obra + lo demás)
-        let manoObra = parseFloat($('#id_costo_mano_obra').val()) || 0;
-        let granTotal = totalRepuestos + totalInsumos + manoObra;
-        $('#gran-total-display').text('$' + granTotal.toLocaleString());
-    }
-
-    // Eventos para recalcular al escribir
-    $(document).on('input', '.cantidad-repuestos, .precio-repuestos, .cantidad-insumo, .precio-insumo, #id_costo_mano_obra', function() {
-        calcularSubtotales();
-    });
-});
-    </script>
+</section>
 
 <script>
-    const selectServicio = document.querySelector('select[name="detalle_servicio"]');
-    const inputManoObra = document.querySelector('#id_mano_obra');
-
-    if (selectServicio) {
-        selectServicio.addEventListener('change', function() {
-            const servicioId = this.value;
-            if (servicioId) {
-                // Probamos con la ruta absoluta de tu app
-                fetch('/apy/obtener-totales/' + servicioId + '/') 
-                    .then(response => {
-                        if (!response.ok) throw new Error('Error en la red');
-                        return response.json();
-                    })
-                    .then(data => {
-                        // IDs correctos según tu HTML
-                        document.getElementById('disp_repuestos').innerText = `$ ${data.total_repuestos.toLocaleString()}`;
-                        document.getElementById('disp_insumos').innerText = `$ ${data.total_insumos.toLocaleString()}`;
-                        
-                        const manoObra = parseFloat(inputManoObra.value) || 0;
-                        const totalGral = parseFloat(data.subtotal) + manoObra;
-                        
-                        document.getElementById('disp_total').innerText = `$ ${totalGral.toLocaleString()}`;
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert("No se pudieron cargar los totales. Verifica la consola.");
-                    });
-            }
+    $(document).ready(function() {
+        $('.select2').select2({
+            theme: 'bootstrap4',
+            width: '100%'
         });
-    }
+    });
 </script>
-
-{% endblock %}
-
-{% block Cancelar %}
-    <button type="submit" class="btn btn-primary btn-flat">
-        <i class="fas fa-save"></i> Generar Informe
-    </button>
-    <a href="{% url 'apy:informes_lista' %}" class="btn btn-danger btn-flat float-right">
-        <i class="fas fa-times"></i> Cancelar
-    </a>
 {% endblock %}
