@@ -241,3 +241,7 @@ STORAGES = {
 }
 
 # La duplicación de MEDIA_URL y MEDIA_ROOT ha sido eliminada de aquí
+
+# Captcha
+RECAPTCHA_SITE_KEY = '6Lc4fHcsAAAAAASuIuVN4D0ZDiFB1ZmeQfRF4XoM'
+RECAPTCHA_SECRET_KEY = '6Lc4fHcsAAAAAGWhgt4dHliXDIQOiEEdev3-nFCZ'

@@ -1,0 +1,559 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Taller Internacional de Motores</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  <!-- Favicons -->
+  <link href="{% static 'info/assets/img/favicon.png' %}" rel="icon">
+  <link href="{% static 'info/assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+    rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'info/assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'info/assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'info/assets/vendor/aos/aos.css' %}" rel="stylesheet">
+  <link href="{% static 'info/assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+  <link href="{% static 'info/assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{% static 'info/assets/css/main.css' %}" rel="stylesheet">
+
+  <!-- =======================================================
+  * Template Name: iConstruction
+  * Template URL: https://bootstrapmade.com/iconstruction-bootstrap-construction-template/
+  * Updated: Jul 27 2025 with Bootstrap v5.3.7
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
+</head>
+
+<body class="index-page">
+
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center">
+
+      <a href="{% url 'apy:index_informacion' %}" class="logo d-flex align-items-center me-auto">
+        <!-- Uncomment the line below if you also wish to use an image logo -->
+        <!-- <img src="assets/img/logo.webp" alt=""> -->
+        <h1 class="sitename">T.I.M</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="{% url 'apy:index_informacion' %}" class="active">Inicio</a></li>
+          <li class="dropdown"><a href="#"><span>Nosotros</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+              <li><a href="{% url 'apy:about_informacion' %}#about">Historia</a></li>
+              <li><a href="{% url 'apy:about_informacion' %}#about2">Proposito</a></li>
+              <li><a href="{% url 'apy:about_informacion' %}#about3">¿Por qué nosotros?</a></li>
+            </ul>
+          </li>
+          <li><a href="{% url 'apy:service_informacion' %}">Servicios</a></li>
+          <li><a href="{% url 'apy:contact_informacion' %}">Contacto</a></li>
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+      <a class="btn-getstarted d-none d-sm-block" href="quote.html">Iniciar Sesión</a>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero section dark-background">
+
+      <div class="hero-video-container">
+        <video autoplay="" muted="" loop="">
+          <source src="#" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+        <div class="hero-overlay"></div>
+      </div>
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="row justify-content-center text-center">
+          <div class="col-lg-8">
+            <div class="hero-content">
+              <h1 data-aos="fade-up" data-aos-delay="200">Taller Internacional de Motores</h1>
+              <p data-aos="fade-up" data-aos-delay="300">
+                Especialistas en motores diésel: devolvemos tu herramienta de trabajo a la vía en tiempo record.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section><!-- /Hero Section -->
+
+    <!-- About Section -->
+    <section id="about" class="about section">
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="row align-items-center">
+
+          <div class="col-lg-6 order-2 order-lg-1" data-aos="fade-right" data-aos-delay="200">
+            <div class="content">
+              <h2 class="section-heading mb-4">¿QUIÉNES SOMOS?</h2>
+              <p class="lead-text mb-4">Somos Taller Internacional de Motores, con más de 18 años de experiencia en la
+                reparación de motores diésel.
+                Utilizamos tecnología de vanguardia y repuestos originales para garantizar el máximo rendimiento de tu
+                vehículo.</p>
+              <p class="description-text mb-5"></p>
+
+              <div class="stats-grid">
+                <div class="stat-item" data-aos="fade-up" data-aos-delay="300">
+                  <div class="stat-number">18+</div>
+                  <div class="stat-label">Años de Experiencia</div>
+                </div>
+                <div class="stat-item" data-aos="fade-up" data-aos-delay="400">
+                  <div class="stat-number">90%</div>
+                  <div class="stat-label">Clientes Satisfechos</div>
+                </div>
+              </div>
+
+              <div class="cta-section" data-aos="fade-up" data-aos-delay="450">
+                <a href="#services" class="cta-link">
+                  Explora nuestros servicios
+                  <i class="bi bi-arrow-right ms-2"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6 order-1 order-lg-2" data-aos="fade-left" data-aos-delay="200">
+            <div class="image-motor">
+              <div class="main-motor">
+                <img src="{% static 'info/assets/img/taller/CAMION 1.jpg' %}"alt="Construction project showcase" class="img-fluid">
+              </div>
+              <div class="floating-badge" data-aos="zoom-in" data-aos-delay="500">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section><!-- /About Section -->
+
+    <!-- Services Section -->
+    <section id="services" class="services section light-background">
+
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Servicios</h2>
+        <p>Aqui podras encontrar algunos de los servicios que ofrecemos.</p>
+      </div><!-- End Section Title -->
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="services-grid">
+
+          <div class="service-item" data-aos="fade-up" data-aos-delay="150">
+            <div class="service-number">01</div>
+            <div class="service-icon">
+              <i class="bi bi-gear-wide-connected"></i>
+            </div>
+            <h3>Reparacion de Motores Diesel</h3>
+            <div class="col-lg-12 order-1 order-lg-2" data-aos="fade-left" data-aos-delay="200">
+              <div class="image-motor">
+                <div class="main-motor">
+                  <img src="{% static 'info/assets/img/taller/motor_diesel.jpg' %}" alt="Construction project showcase" class="img-fluid">
+                </div>
+                <div class="floating-badge" data-aos="zoom-in" data-aos-delay="500"></div>
+              </div>
+            </div>
+            <a href="{% url 'apy:service_informacion' %}#servicio1" class="service-cta">
+              <span>Especificaciones del Servicio</span>
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+
+          <div class="service-item" data-aos="fade-up" data-aos-delay="200">
+            <div class="service-number">02</div>
+            <div class="service-icon">
+              <i class="bi bi-cpu"></i>
+            </div>
+            <h3>Servicios de Scanner</h3>
+            <div class="col-lg-12 order-1 order-lg-2" data-aos="fade-left" data-aos-delay="200">
+              <div class="image-motor">
+                <div class="main-motor">
+                  <img src="{% static 'info/assets/img/taller/servicio_scanner.jpg' %}" alt="Construction project showcase"
+                    class="img-fluid">
+                </div>
+                <div class="floating-badge" data-aos="zoom-in" data-aos-delay="500"></div>
+              </div>
+            </div>
+            <a href="{% url 'apy:service_informacion' %}#servicio2" class="service-cta">
+              <span>Especificaciones del Servicio</span>
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+
+          <div class="service-item" data-aos="fade-up" data-aos-delay="200">
+            <div class="service-number">03</div>
+            <div class="service-icon">
+              <i class="bi bi-lightning-charge"></i>
+            </div>
+            <h3>Electrónica de Motores</h3>
+            <div class="col-lg-12 order-1 order-lg-2" data-aos="fade-left" data-aos-delay="200">
+              <div class="image-motor">
+                <div class="main-motor">
+                  <img src="{% static 'info/assets/img/taller/electronica_motores.jpg' %}" alt="Construction project showcase"
+                    class="img-fluid">
+                </div>
+                <div class="floating-badge" data-aos="zoom-in" data-aos-delay="500"></div>
+              </div>
+            </div>
+            <a href="{% url 'apy:service_informacion' %}#servicio3" class="service-cta">
+              <span>Especificaciones del Servicio</span>
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+
+          <div class="service-item" data-aos="fade-up" data-aos-delay="300">
+            <div class="service-number">04</div>
+            <div class="service-icon">
+              <i class="bi bi-clipboard2-pulse"></i>
+            </div>
+            <h3>Mantenimiento y Diagnóstico de Motores</h3>
+            <div class="col-lg-12 order-1 order-lg-2" data-aos="fade-left" data-aos-delay="200">
+              <div class="image-motor">
+                <div class="main-motor">
+                  <img src="{% static 'info/assets/img/taller/mantenimiento_motor.jpg' %}" alt="Construction project showcase"
+                    class="img-fluid">
+                </div>
+                <div class="floating-badge" data-aos="zoom-in" data-aos-delay="500"></div>
+              </div>
+            </div>
+            <a href="{% url 'apy:service_informacion' %}#servicio4" class="service-cta">
+              <span>Especificaciones del Servicio</span>
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+
+          <div class="service-item" data-aos="fade-up" data-aos-delay="350">
+            <div class="service-number">05</div>
+            <div class="service-icon">
+              <i class="bi bi-wind"></i>
+            </div>
+            <h3>Reparación de Compresores de Aire</h3>
+            <div class="col-lg-12 order-1 order-lg-2" data-aos="fade-left" data-aos-delay="200">
+              <div class="image-motor">
+                <div class="main-motor">
+                  <img src="{% static 'info/assets/img/taller/reparacion_compresor.jpg' %}" alt="Construction project showcase"
+                    class="img-fluid">
+                </div>
+                <div class="floating-badge" data-aos="zoom-in" data-aos-delay="500"></div>
+              </div>
+            </div>
+            <a href="{% url 'apy:service_informacion' %}#servicio5" class="service-cta">
+              <span>Especificaciones del Servicio</span>
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+
+          <div class="service-item" data-aos="fade-up" data-aos-delay="400">
+            <div class="service-number">06</div>
+            <div class="service-icon">
+              <i class="bi bi-fuel-pump"></i>
+            </div>
+            <h3>Calibración de Inyectores de Combustible</h3>
+            <div class="col-lg-12 order-1 order-lg-2" data-aos="fade-left" data-aos-delay="200">
+              <div class="image-motor">
+                <div class="main-motor">
+                  <img src="{% static 'info/assets/img/taller/inyectores.jpg' %}" alt="Construction project showcase" class="img-fluid">
+                </div>
+                <div class="floating-badge" data-aos="zoom-in" data-aos-delay="500"></div>
+              </div>
+            </div>
+            <a href="{% url 'apy:service_informacion' %}#servicio6" class="service-cta">
+              <span>Especificaciones del Servicio</span>
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section><!-- /Services Section -->
+
+    <!-- Services Alt Section -->
+    <section id="proceso-tim" class="section">
+      <div class="container" data-aos="fade-up">
+        <div class="cta-repair-box">
+          <div class="header-diseno">
+            <span class="sub-title">EFICIENCIA EN MOVIMIENTO</span>
+            <h4>Nuestra Ruta de Servicio</h4>
+            <div class="linea-naranja"></div>
+          </div>
+
+          <div class="steps-grid">
+            <div class="step-card">
+              <div class="step-number">01</div>
+              <i class="bi bi-headset"></i>
+              <h6>Recepción Técanica</h6>
+              <p>Contacto inicial y pre-diagnóstico vía remota.</p>
+            </div>
+            <div class="step-card">
+              <div class="step-number">02</div>
+              <i class="bi bi-clipboard-pulse"></i>
+              <h6>Escaneo y Valoración</h6>
+              <p>Ingreso al taller y diagnóstico computarizado.</p>
+            </div>
+            <div class="step-card">
+              <div class="step-number">03</div>
+              <i class="bi bi-wrench-adjustable"></i>
+              <h6>Intervención</h6>
+              <p>Ejecución de reparaciones con repuestos certificados.</p>
+            </div>
+            <div class="step-card">
+              <div class="step-number">04</div>
+              <i class="bi bi-check2-all"></i>
+              <h6>Control de Calidad</h6>
+              <p>Pruebas de rendimiento antes de la entrega final.</p>
+            </div>
+          </div>
+          <br>
+          <div class="nota-tecnica">
+            <i class="bi bi-info-circle"></i>
+            <span>Los tiempos de reparación dependen de la complejidad del sistema electrónico.</span>
+          </div>
+
+          <div class="cta-actions">
+            <a href="https://wa.me/3126216800" class="btn-tim-primary">Agendar Ahora</a>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /Services Alt Section -->
+
+    <!-- Certifications Section -->
+    <section id="certifications" class="certifications section light-background">
+
+      <!-- Section Title -->
+      <section id="marcas" class="marcas section">
+        <div class="container section-title" data-aos="fade-up">
+          <h2>Marcas Especializadas</h2>
+          <p>Contamos con tecnología de punta para el diagnóstico y reparación de las mejores marcas del mercado.</p>
+        </div>
+
+        <div class="container">
+          <div class="row g-4 justify-content-center">
+            <div class="col-6 col-md-4 col-lg-2" data-aos="zoom-in">
+              <div class="brand-item">
+                <img src="{% static 'info/assets/img/logos/Caterpillar.svg' %}" class="img-fluid" alt="Caterpillar">
+                <span>Caterpillar</span>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2" data-aos="zoom-in">
+              <div class="brand-item">
+                <img src="{% static 'info/assets/img/logos/Chevrolet.svg' %}" class="img-fluid" alt="Chevrolet">
+                <span>Chevrolet</span>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2" data-aos="zoom-in">
+              <div class="brand-item">
+                <img src="{% static 'info/assets/img/logos/cummins.svg' %}" class="img-fluid" alt="Cummins">
+                <span>Cummins</span>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2" data-aos="zoom-in">
+              <div class="brand-item">
+                <img src="{% static 'info/assets/img/logos/Detroit_Diesel.svg' %}" class="img-fluid" alt="Detroit Diesel">
+                <span>Detroit Diesel</span>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2" data-aos="zoom-in">
+              <div class="brand-item">
+                <img src="{% static 'info/assets/img/logos/Foton.svg' %}" class="img-fluid" alt="Foton">
+                <span>Foton</span>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2" data-aos="zoom-in">
+              <div class="brand-item">
+                <img src="{% static 'info/assets/img/logos/Freightliner.svg' %}" class="img-fluid" alt="Freightliner">
+                <span>Freightliner</span>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2" data-aos="zoom-in">
+              <div class="brand-item">
+                <img src="{% static 'info/assets/img/logos/Hino.svg' %}" class="img-fluid" alt="Hino">
+                <span>Hino</span>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2" data-aos="zoom-in">
+              <div class="brand-item">
+                <img src="{% static 'info/assets/img/logos/International.svg' %}" class="img-fluid" alt="International">
+                <span>International</span>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2" data-aos="zoom-in">
+              <div class="brand-item">
+                <img src="{% static 'info/assets/img/logos/Isuzu.svg' %}" class="img-fluid" alt="Isuzu">
+                <span>Isuzu</span>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2" data-aos="zoom-in">
+              <div class="brand-item">
+                <img src="{% static 'info/assets/img/logos/JAC.svg' %}" class="img-fluid" alt="JAC">
+                <span>JAC</span>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2" data-aos="zoom-in" data-aos-delay="100">
+              <div class="brand-item">
+                <img src="{% static 'info/assets/img/logos/Kenworth.svg' %}" class="img-fluid" alt="Kenworth">
+                <span>Kenworth</span>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2" data-aos="zoom-in">
+              <div class="brand-item">
+                <img src="{% static 'info/assets/img/logos/Mack.svg' %}" class="img-fluid" alt="Mack">
+                <span>Mack</span>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2" data-aos="zoom-in">
+              <div class="brand-item">
+                <img src="{% static 'info/assets/img/logos/Volkswagen.svg' %}" class="img-fluid" alt="Volkswagen">
+                <span>Volkswagen</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </section><!-- /Certifications Section -->
+
+    <!-- Call To Action Section -->
+    <section id="call-to-action" class="call-to-action section light-background">
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <div class="row justify-content-center">
+
+          <div class="col-lg-10">
+            <div class="cta-header text-center" data-aos="fade-up" data-aos-delay="200">
+              <h2>¿Buscas un servicio para tu vehículo semipesado?</h2>
+              <p>Brindamos servicios especializados de mantenimiento y reparación para vehículos semipesados,
+                incluyendo motores diésel, compresores de aire y sistemas de inyección</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section><!-- /Call To Action Section -->
+
+  </main>
+
+  <footer id="footer" class="footer dark-background">
+
+    <div class="container footer-top-contact">
+      <div class="row text-center gy-4">
+
+        <div class="col-6 col-lg-3">
+          <div class="contact-item">
+            <i class="bi bi-geo-alt-fill"></i>
+            <h5>Ubicación</h5>
+            <p>Sogamoso, Boyacá<br>Colombia</p>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <div class="contact-item">
+            <i class="bi bi-telephone-fill"></i>
+            <h5>Teléfono</h5>
+            <p><a href="tel:+573126216800">+57 312 621 6800</a></p>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <div class="contact-item">
+            <i class="bi bi-envelope-at-fill"></i>
+            <h5>Correo</h5>
+            <p><a href="mailto:arturopatino@gmail.com">arturopatino@gmail.com</a></p>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <div class="contact-item">
+            <i class="bi bi-clock-fill"></i>
+            <h5>Horarios</h5>
+            <p>Lun - Sáb: 8 AM - 7 PM</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <div class="footer-bottom-content text-center">
+              <p class="disclaimer-text">
+                <strong>Aviso de Marcas:</strong> Todos los logotipos de terceros son propiedad de sus respectivos
+                dueños.
+                Su uso es informativo para indicar la especialidad técnica de nuestro taller.
+              </p>
+              <div class="legal-links">
+                <span>© 2026 <span class="sitename">T.I.M</span>. Todos los derechos reservados.</span>
+                <a href="{% url 'apy:terms_informacion' %}">Terminos y Condiciones</a>
+              </div>
+              <div class="credits">
+                <!-- All the links in the footer should remain intact. -->
+                <!-- You can delete the links only if you've purchased the pro version. -->
+                <!-- Licensing information: https://bootstrapmade.com/license/ -->
+                <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
+                Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </footer>
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="{% static 'info/assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'info/assets/vendor/php-email-form/validate.js' %}"></script>
+  <script src="{% static 'info/assets/vendor/aos/aos.js' %}"></script>
+  <script src="{% static 'info/assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
+  <script src="{% static 'info/assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
+  <script src="{% static 'info/assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
+
+  <!-- Main JS File -->
+  <script src="{% static 'info/assets/js/main.js' %}"></script>
+
+  <!-- WhatsApp -->
+  <a href="https://wa.me/573126216800?text=Hola%20T.I.M.,%20solicito%20información%20sobre..." class="whatsapp-float"
+    target="_blank" rel="noopener noreferrer">
+    <i class="bi bi-whatsapp"></i>
+  </a>
+
+</body>
+
+</html>

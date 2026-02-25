@@ -37,14 +37,18 @@ from apy.view.registro_usuarios.views import *
 
 from apy.view.ayuda.views import *
 from apy.view.buscador.views import *
+from apy.view.informacion.views import *
 
 app_name = 'apy'
 
 urlpatterns = [
-    # --------------urls Karol---------------
-    #path('Modulo_Factura/',  factura, name = 'contenido.factura'),
-    #path('Contactanos/',  contacto, name = 'contenido.contacto'),
-    #--------URL modulo factura----------------
+    # ------Url pagina informacion----------------
+    path('bienvenido/', index_informacion, name='index_informacion'),
+    path('nosotros/', about_informacion, name='about_informacion'),
+    path('contacto/', contact_informacion, name='contact_informacion'),
+    path('servicios/', service_informacion, name='service_informacion'),
+    path('terminos/', terms_informacion, name='terms_informacion'),
+    path('contacto/formulario/', contacto_formulario, name='contacto_formulario'),
 
     path('inicio/index/', index.as_view(), name='index'),
     
