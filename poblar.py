@@ -45,37 +45,46 @@ def poblar_todo(n=10):
 
     # Clientes
     for _ in range(n):
-        Cliente.objects.create(
-            tipo=random.choice(['cliente particular', 'empresa']),
-            nombre=fake.name(),
-            identificacion=fake.unique.bothify(text='#########'), # 9 dígitos
-            telefono=fake.bothify(text='3#########'),
-            correo=fake.unique.email(),
-            direccion=fake.address()
-        )
+        try:
+            Cliente.objects.create(
+                tipo=random.choice(['cliente particular', 'empresa']),
+                nombre=fake.name(),
+                identificacion=fake.unique.bothify(text='#########'), # 9 dígitos
+                telefono=fake.bothify(text='3#########'),
+                correo=fake.unique.email(),
+                direccion=fake.address()
+            )
+        except Exception:
+            pass
     print("✅ Clientes creados")
 
     # Usuarios y Perfiles (Mecánicos/Empleados)
     for _ in range(n):
-        user = User.objects.create_user(username=fake.unique.user_name(), password='password123')
-        Profile.objects.create(
-            user=user,
-            identificacion=fake.bothify(text='#########'),
-            telefono=fake.bothify(text='3#########'),
-            direccion=fake.address()[:150]
-        )
+        try:
+            user = User.objects.create_user(username=fake.unique.user_name(), password='password123', last_login=fake.date_time())
+            Profile.objects.create(
+                user=user,
+                identificacion=fake.bothify(text='#########'),
+                telefono=fake.bothify(text='3#########'),
+                direccion=fake.address()[:150]
+            )
+        except Exception:
+            pass
     print("✅ Usuarios y Perfiles creados")
 
     # Tipos de Mantenimiento y Proveedores
     for i in range(n):
-        TipoMantenimiento.objects.get_or_create(nombre=f"Mantenimiento {fake.word()} {i}")
-        Proveedores.objects.create(
-            nombre=fake.company(),
-            telefono=fake.bothify(text='3#########'),
-            tipo_identificacion='NIT',
-            identificacion=fake.unique.bothify(text='#########-#'),
-            correo=fake.unique.email()
-        )
+        try:
+            TipoMantenimiento.objects.get_or_create(nombre=f"Mantenimiento {fake.word()} {i}")
+            Proveedores.objects.create(
+                nombre=fake.company(),
+                telefono=fake.bothify(text='3#########'),
+                tipo_identificacion='NIT',
+                identificacion=fake.unique.bothify(text='#########-#'),
+                correo=fake.unique.email()
+            )
+        except Exception:
+            pass
     print("✅ Tipos de Mantenimiento y Proveedores creados")
 
     # --- ENTIDADES CON DEPENDENCIAS ---
@@ -88,14 +97,17 @@ def poblar_todo(n=10):
 
     # Vehículos
     for _ in range(n):
-        Vehiculo.objects.create(
-            id_cliente=random.choice(clientes),
-            placa=fake.unique.bothify(text='???###').upper(),
-            modelo_vehiculo=str(random.randint(2010, 2025)),
-            marca_vehiculo=random.choice(marcas_v).nombre,
-            color="Blanco",
-            estado=True
-        )
+        try:
+            Vehiculo.objects.create(
+                id_cliente=random.choice(clientes),
+                placa=fake.unique.bothify(text='???###').upper(),
+                modelo_vehiculo=str(random.randint(2010, 2025)),
+                marca_vehiculo=random.choice(marcas_v).nombre,
+                color="Blanco",
+                estado=True
+            )
+        except Exception:
+            pass
     print("✅ Vehículos creados")
 
     # Repuestos, Insumos y Herramientas
@@ -128,19 +140,20 @@ def poblar_todo(n=10):
     for i in range(n):
         entrada = EntradaVehiculo.objects.create(fecha_ingreso=date.today(), hora_ingreso="08:00")
         vehi = random.choice(vehiculos)
+        pfe = random.choice(perfiles)
         
         detalle = DetalleServicio.objects.create(
             id_vehiculo=vehi,
             cliente=vehi.id_cliente,
             id_entrada=entrada,
             empresa=empresa_principal,
-            empleado=random.choice(perfiles),
+            empleado=pfe.user,
             proceso='terminado'
         )
 
         Informes.objects.create(
             detalle_servicio=detalle,
-            id_empleado=detalle.empleado,
+            id_empleado=pfe,
             tipo_informe=random.choice(['Preventivo', 'Correctivo']),
             costo_mano_obra=random.randint(100000, 500000),
             diagnostico_final=fake.text()
@@ -149,7 +162,7 @@ def poblar_todo(n=10):
         Factura.objects.create(
             empresa=empresa_principal,
             cliente=vehi.id_cliente,
-            empleado=detalle.empleado,
+            empleado=pfe,
             detalle_servicio=detalle,
             orden_servicio='mantenimiento',
             metodo_pago='efectivo'
@@ -178,7 +191,7 @@ def poblar_todo(n=10):
 
 if __name__ == '__main__':
     try:
-        poblar_todo(10)
+        poblar_todo(200)
         print("\n⭐ ¡PROCESO COMPLETADO! 10 registros creados por tabla.")
     except Exception as e:
         print(f"\n❌ Error durante el poblado: {e}")
