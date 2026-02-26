@@ -168,9 +168,19 @@
             </li>
             {% endif %}
             <!--end::User Menu Dropdown-->
-            <a class="nav-link" href="{% url 'login:login'%}">
-                    <i class="fas fa-power-off" aria-hidden="true"></i>
-            </a>
+<li class="nav-item">
+  <form action="{% url 'login:logout' %}" method="post" style="display: inline;" title="Cerrar sesión">
+    {% csrf_token %}
+    <button 
+      type="submit" 
+      class="nav-link btn btn-link" 
+      style="padding: 0; border: none;"
+      onclick="return confirm('¿Realmente quieres cerrar sesión?');"
+    >
+      <i class="fas fa-power-off text-danger" aria-hidden="true"></i>
+    </button>
+  </form>
+</li>
           </ul>
           
           <!--end::End Navbar Links-->
