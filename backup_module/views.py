@@ -44,31 +44,26 @@ except ImportError:
 def _lanzar_proceso_asincrono(command):
     """ 
     Función interna para manejar la lógica de Popen de forma segura. 
-    INCLUYE LA CORRECCIÓN CRÍTICA PARA WinError 2.
-    """
+    Lanza el proceso en segundo plano sin mostrar ventana en Windows.    """
     
     popen_kwargs = {
         'stdout': subprocess.DEVNULL,  
         'stderr': subprocess.DEVNULL,
-        'env': os.environ.copy() # Heredar el PATH del entorno virtual (crucial en Windows)
-    }
+        'env': os.environ.copy()    }
 
     if sys.platform == "win32":
-        flags = 0
-        try:
-            # Usar constantes de Windows para ejecutar el proceso en segundo plano
-            from subprocess import CREATE_NEW_PROCESS_GROUP, DETACHED_PROCESS, CREATE_NO_WINDOW
-            flags = CREATE_NEW_PROCESS_GROUP | DETACHED_PROCESS | CREATE_NO_WINDOW
-        except ImportError:
-            pass
+        # STARTUPINFO es la forma más robusta de ocultar la ventana en Windows
+        startupinfo = subprocess.STARTUPINFO()
+        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        startupinfo.wShowWindow = 0 # SW_HIDE
+
+        # CREATE_NO_WINDOW evita la creación de una consola para el proceso
+        creationflags = 0x08000000 # CREATE_NO_WINDOW
             
-        # 🚨 CORRECCIÓN CRÍTICA PARA WinError 2: 
-        # Juntar la lista 'command' en un solo string y usar shell=True.
-        command_string = " ".join(command) 
-        
-        subprocess.Popen(command_string, 
-                         creationflags=flags, 
-                         shell=True, # CLAVE
+        subprocess.Popen(command, 
+                         startupinfo=startupinfo,
+                         creationflags=creationflags, 
+                         shell=False,
                          **popen_kwargs)
     
     else:
@@ -83,18 +78,12 @@ def iniciar_respaldo_en_segundo_plano(user_pk):
     
     manage_py_path = os.path.join(settings.BASE_DIR, 'manage.py')
     
-    if sys.platform == "win32":
-        # Usar comillas es crucial en Windows si las rutas tienen espacios
-        python_exec = f'"{sys.executable}"'
-        manage_path = f'"{manage_py_path}"'
-    else:
-        python_exec = sys.executable
-        manage_path = manage_py_path
-    
+    python_exec = sys.executable
     # El comando llama al manejador de respaldo con el ID del usuario
+    
     command = [
         python_exec,
-        manage_path,
+        manage_py_path,
         'backup_db',
         f'--user_id={user_pk}', 
     ]
@@ -105,28 +94,16 @@ def iniciar_respaldo_en_segundo_plano(user_pk):
 def iniciar_restauracion_en_segundo_plano(ruta_archivo_sql, log_pk):
     """ 
     Lanza el Comando 'restore_db' de forma asíncrona. 
-    Ahora incluye log_pk para que el comando pueda actualizar el estado en BD.
     """
-    
     manage_py_path = os.path.join(settings.BASE_DIR, 'manage.py')
-    
-    if sys.platform == "win32":
-        python_exec = f'"{sys.executable}"'
-        manage_path = f'"{manage_py_path}"'
-        # Usamos comillas dobles para toda la ruta SQL para evitar errores de espacios
-        ruta_sql_arg = f'--path="{ruta_archivo_sql}"' 
-    else:
-        python_exec = sys.executable
-        manage_path = manage_py_path
-        ruta_sql_arg = f'--path={ruta_archivo_sql}'
-        
+    python_exec = sys.executable
     # El comando llama al manejador de restauración con la ruta del archivo SQL y el PK del log
     command = [
         python_exec,
-        manage_path,
+        manage_py_path,
         'restore_db',
-        ruta_sql_arg,
-        f'--log_pk={log_pk}', # Iportante para actualizar el estado y error
+        f'--path={ruta_archivo_sql}',
+        f'--log_pk={log_pk}',
     ]
     
     return _lanzar_proceso_asincrono(command)
@@ -361,45 +338,34 @@ class DescargarRespaldoView(SuperuserRequiredMixin, View):
 # ------------------------------------------------------------------------------
 # 5. VIEW PARA RESTAURAR EL SISTEMA DESDE UN RESPALDO
 # ------------------------------------------------------------------------------
-class RestaurarSistemaView(SuperuserRequiredMixin, View):
-    
-    @method_decorator(csrf_exempt) # Para aceptar POST
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
-    
-    def post(self, request, pk, *args, **kwargs):
-        """Maneja la solicitud POST para iniciar la restauración desde un BackupLog específico."""
+class RestaurarSistemaView(SuperuserRequiredMixin, View):  # Asumiendo que es esta clase
+    def post(self, request, pk):
+        log = get_object_or_404(BackupLog.objects.using('log_db'), pk=pk)
+        ruta_archivo = log.ruta_archivo
+        
+        if not ruta_archivo or not os.path.exists(ruta_archivo):
+            messages.error(request, "❌ El archivo no existe en el servidor.")
+            return redirect('backup_module:configuracion_respaldo')
+        
+        messages.info(request, "Iniciando restauración... (esto puede tardar unos segundos)")
         
         try:
-            # 1. Obtener el registro de la base de datos
-            log = get_object_or_404(BackupLog, pk=pk)
-            
-            # 2. Obtener la ruta física del archivo
-            ruta_completa_sql = log.obtener_ruta_archivo()
-            
-            if not os.path.exists(ruta_completa_sql):
-                messages.error(request, f'❌ Error: El archivo de respaldo SQL no fue encontrado en la ruta: {ruta_completa_sql}')
-                return redirect(reverse_lazy('backup_module:configuracion_respaldo')) 
-            
-            # 3. Lanzar el proceso de restauración en segundo plano (pasando el PK)
-            # Pasamos el PK para que el comando 'restore_db' pueda actualizar el log
-            lanzado = iniciar_restauracion_en_segundo_plano(ruta_completa_sql, log.pk)
-            
-            if lanzado:
-                # El proceso se está ejecutando en el proceso secundario (restore_db.py)
-                messages.warning(request, f'⚠️ **Restauración del sistema INICIADA** desde el respaldo #{pk}. El proceso se ejecuta en segundo plano y puede tardar unos minutos.')
-            else:
-                messages.error(request, '❌ Error crítico al lanzar el proceso de restauración.')
-            
-            return redirect(reverse_lazy('backup_module:configuracion_respaldo')) 
-            
-        except Http404:
-            messages.error(request, '❌ Error: El log de respaldo no se encuentra.')
-            return redirect(reverse_lazy('backup_module:configuracion_respaldo')) 
-            
+            # Ejecuta sincronamente para debug (NO asíncrono)
+            from django.core.management import call_command
+            call_command(
+                'restore_db',
+                '--path', ruta_archivo,
+                '--log_pk', str(pk)
+            )
+            messages.success(request, "✅ Restauración completada exitosamente.")
         except Exception as e:
-            messages.error(request, f'❌ Error inesperado durante la restauración: {e}')
-            return redirect(reverse_lazy('backup_module:configuracion_respaldo'))
+            messages.error(request, f"❌ Error durante la restauración: {str(e)}")
+            log.estado = 'Fallo'
+            log.mensaje_error = str(e)
+            log.fecha_fin = timezone.now()
+            log.save()
+        
+        return redirect('backup_module:configuracion_respaldo')
 # ------------------------------------------------------------------------------
 # 6. VIEW PARA SUBIR UN RESPALDO EXTERNO (SOLO SUBIDA)
 # ------------------------------------------------------------------------------

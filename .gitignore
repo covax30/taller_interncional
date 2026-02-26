@@ -21,3 +21,6 @@ ENV/
 db_backups/
 token.json
 staticfiles/
+db.sqlite3
+*.
+credentials.json
