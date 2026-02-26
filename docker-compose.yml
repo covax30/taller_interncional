@@ -3,10 +3,9 @@ services:
     build: .
     image: taller_internacional_web
     container_name: taller_internacional_app
-    command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app
-      - taller_internacional_static_data:/app/static
+      - taller_internacional_static_data:/app/staticfiles
       - taller_internacional_media_data:/app/media
     ports:
       - "8015:8000"
@@ -26,7 +25,6 @@ services:
       db:
         condition: service_healthy
 
-
   db:
     image: mysql:8.0
     container_name: taller_internacional_db
@@ -37,12 +35,13 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD}
     volumes:
       - taller_internacional_mysql_data:/var/lib/mysql
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     networks:
       - taller_internacional_network
     ports:
       - "3315:3306"
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 10s
       timeout: 5s
       retries: 5
