@@ -191,7 +191,7 @@ def poblar_todo(n=10):
 
 if __name__ == '__main__':
     try:
-        poblar_todo(200)
+        poblar_todo(300)
         print("\n⭐ ¡PROCESO COMPLETADO! 10 registros creados por tabla.")
     except Exception as e:
         print(f"\n❌ Error durante el poblado: {e}")
