@@ -4,6 +4,20 @@
  */
 document.addEventListener('DOMContentLoaded', function() {
     const toggleButtons = document.querySelectorAll('.toggle-password');
+    const pass1 = document.querySelector('input[name="new_password1"]');
+    const pass2 = document.querySelector('input[name="new_password2"]');
+    
+    if(pass1 && pass2) {
+        [pass1, pass2].forEach(input => {
+            input.addEventListener('keyup', () => {
+                if (pass1.value !== pass2.value && pass2.value !== "") {
+                    pass2.classList.add('is-invalid');
+                } else {
+                    pass2.classList.remove('is-invalid');
+                }
+            });
+        });
+    }
     
     toggleButtons.forEach(button => {
         button.addEventListener('click', function() {
@@ -21,4 +35,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    
 });

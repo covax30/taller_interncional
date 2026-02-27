@@ -125,18 +125,18 @@
 
             // --- TRADUCCIONES DE SEGURIDAD PERSONALIZADA (Viene de validators.py) ---
             if (rawMsg.includes("MAYÚSCULA")) {
-                finalMsg = "<b>¡Falta una mayúscula!</b><br>La contraseña debe tener al menos una letra en MAYÚSCULA. 🔠";
+                finalMsg = "<b>¡Falta una mayúscula!</b><br>La contraseña debe tener al menos una letra en MAYÚSCULA.";
             }
             else if (rawMsg.includes("NÚMERO")) {
-                finalMsg = "<b>¡Falta un número!</b><br>Debes incluir al menos un número (0-9). 🔢";
+                finalMsg = "<b>¡Falta un número!</b><br>Debes incluir al menos un número (0-9).";
             }
             else if (rawMsg.includes("ESPECIAL")) {
-                finalMsg = "<b>¡Falta un símbolo!</b><br>Usa un carácter especial (ej: @, #, $, *, !). ✨";
+                finalMsg = "<b>¡Falta un símbolo!</b><br>Usa un carácter especial (ej: @, #, $, *, !).";
             }
 
             // --- TRADUCCIONES ESTÁNDAR DE DJANGO ---
             else if (rawMsg.includes("too short") || rawMsg.includes("at least 8 characters")) {
-                finalMsg = "<b>Muy corta:</b> Mínimo 8 caracteres. 📏";
+                finalMsg = "<b>Muy corta:</b> Mínimo 8 caracteres.";
             }
             else if (rawMsg.includes("didn't match")) {
                 finalMsg = "<b>¡Error!</b> Las contraseñas no coinciden. ❌";
@@ -145,7 +145,7 @@
                 finalMsg = "<b>Muy común:</b> Intenta algo más difícil de adivinar. 🔒";
             }
             else if (rawMsg.includes("entirely numeric")) {
-                finalMsg = "<b>No solo números:</b> Mezcla letras y números. 🔡";
+                finalMsg = "<b>No solo números:</b> Mezcla letras y números.";
             }
             
             errorList.push(finalMsg);

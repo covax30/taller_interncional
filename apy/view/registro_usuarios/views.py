@@ -37,9 +37,8 @@ class RegistroUsuarioCreateView(SuperuserRequiredMixin, CreateView):
     permission_required = 'add'
 
     def form_valid(self, form):
-        response = super().form_valid(form)
-        messages.success(self.request, form.success_message) 
-        return response
+        messages.success(self.request, f"¡Éxito! El usuario '{form.cleaned_data.get('username')}' ha sido creado.")
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

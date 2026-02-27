@@ -146,6 +146,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'login.validators.ComplexPasswordValidator',
     },
+    {
+        'NAME': 'apy.validators.ComplexPasswordValidator',
+    },
 ]
 
 
