@@ -12,7 +12,7 @@ ENV/
 env/
 .env
 
-# Media and Static folders (handled by volumes but shouldn't be in context)
+# Media y Static folders (manehados por volúmenes)
 media/
 staticfiles/
 db_backups/
@@ -28,3 +28,16 @@ docker-compose.yml
 
 # Logs
 *.log
+
+# Windows basura
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Temporales de editores
+*.swp
+*.swo
+*.swn
+
+# No ignorar entrypoint.sh (importante!)
+!entrypoint.sh
