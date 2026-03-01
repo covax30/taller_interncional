@@ -39,14 +39,15 @@ def contacto_formulario(request):
             result = r.json()
 
             # 3. Si el captcha es exitoso (puntaje >= 0.5)
-            if result.get('success') and result.get('score', 0) >= 0.5:
+            # Cambia 0.5 por 0.1 temporalmente
+            if result.get('success') and result.get('score', 0) >= 0.1:
                 
-                # Enviamos el correo
+                # Enviamos el correo 
                 send_mail(
                     f"WEB T.I.M: {asunto_cliente}",
                     f"De: {nombre} ({correo_cliente})\n\nMensaje:\n{mensaje_cliente}",
                     settings.EMAIL_HOST_USER,
-                    ['karoltalerolopez@gmail.com'], # Tu correo donde recibes
+                    ['soportecnico.t.i.m@gmail.com'], # Tu correo donde recibes
                     fail_silently=False,
                 )
                 
