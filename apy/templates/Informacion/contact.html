@@ -151,7 +151,7 @@
                 o a través de nuestro formulario de contacto, donde podrás escribirnos tus dudas, inquietudes o
                 sugerencias, y nosotros te responderemos lo antes posible.
               </p>
-              <script src="https://www.google.com/recaptcha/api.js?render={{ RECAPTCHA_SITE_KEY }}"></script>
+              <script src="https://www.google.com/recaptcha/api.js?render=6Lc4fHcsAAAAAASuIuVN4D0ZDiFB1ZmeQfRF4XoM"></script>              
               <form action="{% url 'apy:contacto_formulario' %}" method="post" id="captchaForm" class="php-email-form">
                 {% csrf_token %}
                 <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
@@ -183,25 +183,28 @@
                 </div>
               </form>
               <script>
-                document.getElementById('captchaForm').addEventListener('submit', function (e) {
-                  e.preventDefault();
+document.getElementById('captchaForm').addEventListener('submit', function (e) {
+    // Esto evita que el script de la plantilla (el que pegaste) se active
+    e.preventDefault();
+    e.stopImmediatePropagation(); 
 
-                  // 1. Mostrar mensaje de carga
-                  const loading = document.querySelector('.loading');
-                  loading.classList.remove('d-none');
-                  loading.style.display = 'block';
+    // 1. Mostrar carga con los estilos de la plantilla
+    const loading = this.querySelector('.loading');
+    loading.style.display = 'block';
+    loading.classList.add('d-block');
 
-                  // 2. Ejecutar reCAPTCHA
-                  grecaptcha.ready(function () {
-                    grecaptcha.execute('{{ RECAPTCHA_SITE_KEY }}', { action: 'submit' }).then(function (token) {
-                      document.getElementById('g-recaptcha-response').value = token;
+    // 2. Ejecutar reCAPTCHA con tu llave manual
+    grecaptcha.ready(function () {
+        grecaptcha.execute('6Lc4fHcsAAAAAASuIuVN4D0ZDiFB1ZmeQfRF4XoM', { action: 'submit' }).then(function (token) {
+            // Guardamos el token en el input hidden
+            document.getElementById('g-recaptcha-response').value = token;
 
-                      // 3. Enviar el formulario a Django
-                      document.getElementById('captchaForm').submit();
-                    });
-                  });
-                });
-              </script>
+            // 3. Enviamos el formulario REALMENTE a Django
+            document.getElementById('captchaForm').submit();
+        });
+    });
+}, true); // El "true" es vital para ganar la prioridad
+</script>
             </div>
           </div>
         </div>
@@ -288,7 +291,6 @@
 
   <!-- Vendor JS Files -->
   <script src="{% static 'info/assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-  <!--<script src="{% static 'info/assets/vendor/php-email-form/validate.js' %}"></script>-->
   <script src="{% static 'info/assets/vendor/aos/aos.js' %}"></script>
   <script src="{% static 'info/assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
   <script src="{% static 'info/assets/vendor/glightbox/js/glightbox.min.js' %}"></script>

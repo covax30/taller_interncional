@@ -39,7 +39,6 @@ def contacto_formulario(request):
             result = r.json()
 
             # 3. Si el captcha es exitoso (puntaje >= 0.5)
-            # Cambia 0.5 por 0.1 temporalmente
             if result.get('success') and result.get('score', 0) >= 0.1:
                 
                 # Enviamos el correo 
@@ -63,5 +62,5 @@ def contacto_formulario(request):
 
     # Si la petición es GET (entrar a la página), enviamos la Site Key al HTML
     return render(request, 'informacion/contact.html', {
-        'RECAPTCHA_SITE_KEY': settings.RECAPTCHA_SITE_KEY
+        '6Lc4fHcsAAAAAASuIuVN4D0ZDiFB1ZmeQfRF4XoM': settings.RECAPTCHA_SITE_KEY
     })
