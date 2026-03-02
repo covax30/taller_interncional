@@ -419,9 +419,6 @@ class Mantenimiento(models.Model):
 
     def __str__(self):
         return f"{self.fallas} - {self.id_tipo_mantenimiento}"
-
-    
-#------------Modulo Informes-----------
     
     
 #--------------Modulo Pagos-----------------

@@ -25,7 +25,6 @@
     <th>Herramientas</th>
     <th>Insumos</th>
     <th>Repuestos</th>
-    <th>Nómina</th>
     <th>Acciones</th>
 {% endblock %}
 
@@ -48,7 +47,6 @@
         <td>{{ p.id_herramienta|default:"Sin herramienta" }}</td>
         <td>{{ p.id_insumos|default:"Sin insumos" }}</td>
         <td>{{ p.id_repuestos|default:"Sin repuestos" }}</td>
-        <td>{{ p.id_nomina|default:"Sin nómina" }}</td>
         
         <td>
             <!-- Solo mostrar botones si existe id_pago -->
