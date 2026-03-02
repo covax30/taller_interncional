@@ -1,5 +1,6 @@
 import requests
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib import messages
 from django.core.mail import send_mail
 from django.http import HttpResponse
 from django.conf import settings
@@ -39,9 +40,9 @@ def contacto_formulario(request):
             result = r.json()
 
             # 3. Si el captcha es exitoso (puntaje >= 0.5)
-            if result.get('success') and result.get('score', 0) >= 0.5:
+            if result.get('success') and result.get('score', 0) >= 0.1:
                 
-                # Enviamos el correo
+                # Enviamos el correo 
                 send_mail(
                     f"WEB T.I.M: {asunto_cliente}",
                     f"De: {nombre} ({correo_cliente})\n\nMensaje:\n{mensaje_cliente}",
@@ -51,7 +52,8 @@ def contacto_formulario(request):
                 )
                 
                 # Importante: Retornar OK para que la plantilla muestre el mensaje verde
-                return HttpResponse("OK")
+                messages.success(request, "Tu mensaje ha sido enviado. ¡Gracias!")
+                return redirect('apy:contact_informacion')
             
             else:
                 # Si Google dice que es un robot
