@@ -78,12 +78,17 @@ class Command(BaseCommand):
 
             # 5. Ejecutar mysqldump y redirigir la salida
             with open(backup_path, 'w', encoding='utf-8') as f:
+                # Opciones para ejecución silenciosa en Windows
+                run_kwargs = {}
+                if os.name == 'nt':
+                     run_kwargs['creationflags'] = 0x08000000 # CREATE_NO_WINDOW
+
                 process = subprocess.run(
                     command,
                     stdout=f, 
-                    stderr=subprocess.PIPE, 
-                    text=True,
-                    check=False 
+                    stderr=subprocess.PIPE,
+                    check=False,
+                    **run_kwargs
                 )
             
             # 6. Manejo del resultado

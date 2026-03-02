@@ -12,16 +12,17 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import logging
 import os
+from datetime import timedelta
 from pathlib import Path
 from dotenv import load_dotenv
 
 
-# Cargar variables del entorno ANTES de cualquier configuración
-load_dotenv()
-
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Cargar variables del entorno ANTES de cualquier configuración
+load_dotenv(os.path.join(BASE_DIR, ".env"))
+
 
 # --- Configuración del Módulo de Backup ---
 # Define la ruta donde se guardarán los backups, dentro del directorio base.
@@ -107,7 +108,7 @@ DATABASES = {
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASSWORD'),
         'HOST': os.getenv('DB_HOST', 'db'),
-        'PORT': os.getenv('DB_PORT'),
+        'PORT': os.getenv('DB_PORT', '3306'),
     },
     
     'log_db': {
@@ -166,8 +167,12 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 AXES_FAILURE_LIMIT = 5          # 5 intentos fallidos → bloqueo
-AXES_COOLOFF_TIME = 0.1          # 10 min de bloqueo
+AXES_COOLOFF_TIME = timedelta(minutes=1)
 AXES_LOCKOUT_PARAMETERS = ["ip_address", "username"]
+AXES_LOCKOUT_TEMPLATE = 'lock_out.html'
+AXES_LOCKOUT_CALLABLE = 'login.views.axes_lockout_view'
+AXES_RESET_COOL_OFF_ON_FAILURE_DURING_LOCKOUT = False
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
@@ -218,14 +223,13 @@ LOGOUT_REDIRECT_URL = ''
 # -----------------------------------------------------
 # ✅ CONFIGURACIÓN DE CORREO
 # -----------------------------------------------------
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' 
-# Si usas Gmail (lo más común):
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'soportecnico.t.i.m@gmail.com'
-EMAIL_HOST_PASSWORD = 'vwnifvdwehnmpodg'
-
+EMAIL_HOST_PASSWORD = 'aocumubtnqxvccbb'
 
 # -----------------------------------------------------
 # 📦 WhiteNoise y Almacenamiento
