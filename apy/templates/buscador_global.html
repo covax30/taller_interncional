@@ -21,9 +21,10 @@
                 </div>
                 <div class="card-body">
                     {% if not clientes and not vehiculos and not informes and not facturas and not marca and not repuestos and not herramienta and not insumos and not pago_servicios and not entrada_vehiculo and not salida_vehiculo and not proveedores and not mantenimiento and not caja %}
-                        <div class="alert alert-info">
-                            <i class="bi bi-info-circle me-2"></i> No se encontraron coincidencias para su búsqueda: "<strong>{{ query }}</strong>"
-                        </div>
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i> No se encontraron coincidencias para su búsqueda:
+                        "<strong>{{ query }}</strong>"
+                    </div>
                     {% endif %}
 
                     {# SECCIÓN CLIENTES #}
@@ -229,7 +230,7 @@
                                             <td>
                                                 <span>{{ i.detalle_servicio.id_vehiculo.placa}}</span>
                                             </td>
-                                            <td>{{ i.id_empleado.nombre }}</td>
+                                            <td>{{ i.id_empleado.user.get_full_name|default:i.id_empleado.user.username}}</td>
                                             <td>
                                                 {% if i.tipo_informe == 'Preventivo' %}
                                                 <span>{{ i.tipo_informe }}</span>
@@ -246,8 +247,8 @@
                                                 {% endwith %}
                                             </td>
                                             <td>
-                                                <a href="{% url 'apy:informes_editar' i.id_informe %}"
-                                                    class="btn btn-primary btn-sm" title="Editar informe">
+                                                <a href="{% url 'apy:informe_lista' %}" class="btn btn-primary btn-sm"
+                                                    title="Editar informe">
                                                     <i class="fas fa-eye"></i> Ver
                                                 </a>
                                             </td>
@@ -275,20 +276,16 @@
                                             <th>Nombre</th>
                                             <th>Categoría</th>
                                             <th>Fabricante</th>
-                                            <th>Ubicación</th>
-                                            <th>Precio</th>
                                             <th class="text-center">Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {% for r in repuestos    %}
+                                        {% for r in repuestos %}
                                         <tr>
                                             <td>{{ r.id_marca }}</td>
                                             <td>{{ r.nombre }}</td>
                                             <td>{{ r.categoria }}</td>
                                             <td>{{ r.fabricante }}</td>
-                                            <td>{{ r.ubicacion }}</td>
-                                            <td>${{ r.precio|intcomma }}</td>
                                             <td>
                                                 <a href="{% url 'apy:repuesto_editar' r.id %}"
                                                     class="btn btn-primary btn-sm" title="Editar repuesto">
@@ -318,18 +315,16 @@
                                             <th>Nombre</th>
                                             <th>Color</th>
                                             <th>Tipo</th>
-                                            <th>Material</th>
                                             <th>Id marca</th>
                                             <th class="text-center">Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {% for h in herramienta    %}
+                                        {% for h in herramienta %}
                                         <tr>
                                             <td>{{ h.nombre }}</td>
                                             <td>{{ h.color }}</td>
                                             <td>{{ h.tipo }}</td>
-                                            <td>{{ h.material }}</td>
                                             <td>{{ h.id_marca }}</td>
                                             <td>
                                                 <a href="{% url 'apy:herramienta_editar' h.id %}"
@@ -396,8 +391,6 @@
                                     <thead class="table-dark">
                                         <tr>
                                             <th>Id Entrada</th>
-                                            <th>Id Cliente</th>
-                                            <th>Id Vehículo</th>
                                             <th>Fecha de Entrada</th>
                                             <th>Hora de Entrada</th>
                                             <th class="text-center">Acciones</th>
@@ -407,8 +400,6 @@
                                         {% for e in entrada_vehiculo %}
                                         <tr>
                                             <td>{{ e.id_entrada }}</td>
-                                            <td>{{ e.id_cliente.nombre }}</td>
-                                            <td>{{ e.id_vehiculo.placa }}</td>
                                             <td>{{ e.fecha_ingreso }}</td>
                                             <td>{{ e.hora_ingreso }}</td>
                                             <td>
@@ -464,6 +455,56 @@
                     </div>
                     {% endif %}
 
+                    {# SECCIÓN PAGOS #}
+                    {% if pago %}
+                    <div class="card card-outline card-info shadow-sm mt-4">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa-solid fa-car"></i> Pagos Encontrados</h3>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped mb-0">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Id Pago</th>
+                                            <th>Tipo Pago</th>
+                                            <th>Fecha</th>
+                                            <th>Hora</th>
+                                            <th>Monto</th>
+                                            <th>Proveedor</th>
+                                            <th>Herramientas</th>
+                                            <th>Insumos</th>
+                                            <th>Repuestos</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for s_p in pago %}
+                                        <tr>
+                                            <td>{{ s_p.id_pago }}</td>
+                                            <td>{{ s_p.tipo_pago|default:"No especificado" }}</td>
+                                            <td>{{ s_p.fecha|date:"d/m/Y"|default:"No especificada" }}</td>
+                                            <td>{{ s_p.hora|default:"No especificada" }}</td>
+                                            <td>{{ s_p.monto|intcomma|default:"0" }}</td>
+                                            <td>{{ s_p.id_proveedor|default:"Sin proveedor" }}</td>
+                                            <td>{{ s_p.id_herramienta|default:"Sin herramienta" }}</td>
+                                            <td>{{ s_p.id_insumos|default:"Sin insumos" }}</td>
+                                            <td>{{ s_p.id_repuesto|default:"Sin repuestos" }}</td>
+                                            <td>
+                                                <a href="{% url 'apy:pagos_editar' s_p.id_pago %}"
+                                                    class="btn btn-primary btn-sm" title="Editar pago ">
+                                                    <i class="fas fa-eye"></i> Ver
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
                     {# SECCIÓN SALIDA VEHICULO #}
                     {% if salida_vehiculo %}
                     <div class="card card-outline card-info shadow-sm mt-4">
@@ -476,11 +517,8 @@
                                     <thead class="table-dark">
                                         <tr>
                                             <th>Id Salida</th>
-                                            <th>Id Cliente</th>
-                                            <th>Id Vehículo</th>
                                             <th>Fecha de Salida</th>
                                             <th>Hora de Salida</th>
-                                            <th>Diagnóstico</th>
                                             <th class="text-center">Acciones</th>
                                         </tr>
                                     </thead>
@@ -488,11 +526,8 @@
                                         {% for s in salida_vehiculo %}
                                         <tr>
                                             <td>{{ s.id_salida }}</td>
-                                            <td>{{ s.id_cliente.nombre }}</td>
-                                            <td>{{ s.id_vehiculo.placa }}</td>
                                             <td>{{ s.fecha_salida }}</td>
                                             <td>{{ s.hora_salida }}</td>
-                                            <td>{{ s.diagnostico }}</td>
                                             <td>
                                                 <a href="{% url 'apy:salida_vehiculo_editar' s.id_salida %}"
                                                     class="btn btn-primary btn-sm" title="Editar salida vehículo">
@@ -662,6 +697,54 @@
                                             <td>
                                                 <a href="{% url 'apy:caja_editar' c.id %}"
                                                     class="btn btn-primary btn-sm" title="Editar caja">
+                                                    <i class="fas fa-eye"></i> Ver
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {# SECCIÓN DETALLE SERVICIO #}
+                    {% if detalle %}
+                    <div class="card card-outline card-info shadow-sm mt-4">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa-solid fa-cash-register"></i> Detalles de Servicios Encontrados</h3>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped mb-0">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Id</th>
+                                            <th>Id Vehículo</th>
+                                            <th>Id Cliente</th>
+                                            <th>Id Entrada</th>
+                                            <th>Id Empleado</th>
+                                            <th>Fecha Creacion</th>
+                                            <th>Id Salida</th>
+                                            <th>Proceso</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for d_s in detalle %}
+                                        <tr>
+                                            <td>{{ d_s.id }}</td>
+                                            <td>{{ d_s.id_vehiculo.placa }}</td>
+                                            <td>{{ d_s.cliente.nombre }}</td>
+                                            <td>{{ d_s.id_entrada }}</td>
+                                            <td>{{ d_s.empleado.nombre }}</td>
+                                            <td>{{ d_s.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                                            <td>{{ d_s.id_salida }}</td>
+                                            <td>{{ d_s.proceso }}</td>
+                                            <td>
+                                                <a href="{% url 'apy:lista_servicios' %}"
+                                                    class="btn btn-primary btn-sm" title="Editar detalle servicio">
                                                     <i class="fas fa-eye"></i> Ver
                                                 </a>
                                             </td>

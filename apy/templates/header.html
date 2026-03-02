@@ -1,5 +1,5 @@
 {% load static %}
-<nav class="app-header navbar navbar-expand bg-dark" data-bs-theme="dark">
+<nav class="app-header navbar navbar-expand shadow-sm border-bottom">
   <div class="container-fluid">
 
     <!--begin::Start Navbar Links-->
@@ -73,20 +73,44 @@
       </li>
 
       <!-- Buscador -->
-      <li class="nav-item">
-        <form action="{% url 'apy:buscador_global' %}" method="GET"
-              class="d-flex align-items-center mt-1 ms-2">
-          <div class="input-group input-group-sm border rounded">
-            <input class="form-control bg-body text-body border-0"
-                   type="search" name="q"
-                   placeholder="Buscar placa, cliente..."
-                   aria-label="Search"
-                   style="width:150px; min-width:100px; max-width:100%;">
-            <button class="btn btn-link text-body border-0" type="submit">
-              <i class="bi bi-search"></i>
+      <li class="nav-item dropdown">
+        <a class="nav-link" data-bs-toggle="dropdown" href="#" role="button">
+          <i class="bi bi-search"></i>
+          <span class="ms-1 d-none d-md-inline">Buscar y Filtrar</span>
+        </a>
+
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-3 shadow-lg border-0">
+          <form action="{% url 'apy:buscador_global' %}" method="GET">
+            <h6 class="dropdown-header px-0 mb-2 fw-bold text-uppercase" style="font-size: 0.7rem;">Búsqueda General
+            </h6>
+
+            <div class="input-group input-group-sm mb-3">
+              <input type="text" name="q" class="form-control" placeholder="Placa, cliente..."
+                value="{{ query|default:'' }}">
+              <span class="input-group-text"><i class="bi bi-pencil"></i></span>
+            </div>
+
+            <h6 class="dropdown-header px-0 mb-2 fw-bold text-uppercase" style="font-size: 0.7rem;">Filtrar por Fecha
+            </h6>
+
+            <div class="row g-2">
+              <div class="col-6">
+                <label class="small text-muted mb-1">Desde:</label>
+                <input type="date" name="fecha_inicio" class="form-control form-control-sm" value="{{ fecha_inicio }}">
+              </div>
+              <div class="col-6">
+                <label class="small text-muted mb-1">Hasta:</label>
+                <input type="date" name="fecha_fin" class="form-control form-control-sm" value="{{ fecha_fin }}">
+              </div>
+            </div>
+
+            <div class="dropdown-divider my-3"></div>
+
+            <button type="submit" class="btn btn-primary btn-sm w-100 shadow-sm">
+              <i class="bi bi-search me-1"></i> Aplicar Filtros
             </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </li>
 
       {% if user.is_authenticated %}
