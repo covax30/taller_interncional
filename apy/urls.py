@@ -46,8 +46,8 @@ urlpatterns = [
     path('bienvenido/', index_informacion, name='index_informacion'),
     path('nosotros/', about_informacion, name='about_informacion'),
     path('contacto/', contact_informacion, name='contact_informacion'),
-    path('servicios/', service_informacion, name='service_informacion'),
-    path('terminos/', terms_informacion, name='terms_informacion'),
+    path('servicios_informacion/', service_informacion, name='service_informacion'),
+    path('terminos/', terms_informacion, name='terms_informacion'), 
     path('contacto/formulario/', contacto_formulario, name='contacto_formulario'),
 
     path('inicio/index/', index.as_view(), name='index'),
