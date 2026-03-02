@@ -26,6 +26,8 @@ urlpatterns = [
         PerfilPasswordChangeDoneView.as_view(), 
         name='password_change_done'
     ),
+    
+    path('ia/', include('ia_assistant.urls')),
 ]
 
 if settings.DEBUG:

@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'backup_module',
     'axes',
+    'ia_assistant',
 ]
 
 MIDDLEWARE = [
