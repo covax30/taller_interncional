@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'backup_module',
     'axes',
+    'ia_assistant',
 ]
 
 MIDDLEWARE = [
@@ -146,6 +147,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'login.validators.ComplexPasswordValidator',
+    },
+    {
+        'NAME': 'apy.validators.ComplexPasswordValidator',
     },
 ]
 

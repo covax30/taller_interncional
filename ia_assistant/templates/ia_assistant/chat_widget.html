@@ -1,0 +1,248 @@
+{% load static %}
+<div id="ai-container">
+    <div id="ai-chat-window" class="ai-hidden">
+        <div class="ai-header">
+            <span><i class="fas fa-robot"></i> Asistente T.I.M.</span>
+            <button onclick="toggleAIChat()" class="close-btn">&times;</button>
+        </div>
+        <div id="ai-messages">
+            <div class="msg-bot">¡Hola! Soy T.I.M., tu asistente virtual. ¿Que dato de la base de datos necesitas?</div>
+        </div>
+        <div id="ai-typing" class="ai-hidden">Escribiendo...</div>
+        <div class="ai-footer">
+            <input type="text" id="ai-input" placeholder="Pregunta algo..." onkeypress="handleKeyPress(event)">
+            <button onclick="enviarAPython()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+    <button id="ai-open-btn" onclick="toggleAIChat()">
+        <i class="fas fa-brain"></i>
+    </button>
+</div>
+
+<style>
+/* Contenedor principal */
+#ai-container {
+    position: fixed;
+    bottom: 110px;
+    right: 18px; /* Separado del botón de accesibilidad */
+    z-index: 9999;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Botón flotante */
+#ai-open-btn {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+    font-size: 24px;
+    transition: transform 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#ai-open-btn:hover { transform: scale(1.1); }
+
+/* Ventana de Chat — se abre hacia arriba y hacia la IZQUIERDA 
+   para no salirse de la pantalla */
+#ai-chat-window {
+    width: 320px;
+    height: 450px;
+    background: #1a1d20;
+    border: 1px solid #343a40;
+    border-radius: 15px;
+    position: absolute;
+    bottom: 75px;   /* justo encima del botón */
+    right: 0;       /* alineado al borde derecho del contenedor */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    transition: all 0.3s ease;
+    /* Evita que se salga por la derecha en pantallas pequeñas */
+    max-width: calc(100vw - 110px);
+}
+
+.ai-hidden { display: none !important; }
+
+/* Cabecera */
+.ai-header {
+    background: #212529;
+    padding: 15px;
+    color: #007bff;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #343a40;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: #adb5bd;
+    font-size: 20px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 4px;
+}
+.close-btn:hover { color: white; }
+
+/* Cuerpo del chat */
+#ai-messages {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    color: #e9ecef;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.msg-bot, .msg-user {
+    padding: 8px 12px;
+    border-radius: 10px;
+    max-width: 85%;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.msg-bot {
+    background: #2b3035;
+    align-self: flex-start;
+    border-left: 3px solid #007bff;
+}
+.msg-user {
+    background: #007bff;
+    color: white;
+    align-self: flex-end;
+}
+
+/* Indicador de escritura */
+#ai-typing {
+    padding: 6px 15px;
+    font-size: 12px;
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* Footer e Input */
+.ai-footer {
+    padding: 10px;
+    display: flex;
+    gap: 5px;
+    background: #212529;
+    border-top: 1px solid #343a40;
+}
+
+#ai-input {
+    flex: 1;
+    background: #2b3035;
+    border: 1px solid #495057;
+    color: white;
+    padding: 8px 10px;
+    border-radius: 5px;
+    outline: none;
+    font-size: 14px;
+}
+#ai-input:focus {
+    border-color: #007bff;
+}
+#ai-input::placeholder {
+    color: #6c757d;
+}
+
+.ai-footer button {
+    background: #007bff;
+    border: none;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.ai-footer button:hover {
+    background: #0056b3;
+}
+
+/* Responsive: en móviles ocupa casi toda la pantalla */
+@media (max-width: 480px) {
+    #ai-container {
+        right: 15px;
+        bottom: 15px;
+    }
+    #ai-chat-window {
+        width: calc(100vw - 30px);
+        right: 0;
+        max-width: none;
+    }
+}
+/* ============================================================
+   CORRECCIÓN PARA MÓVILES (Responsivo)
+   ============================================================ */
+@media (max-width: 480px) {
+    #ai-container {
+        /* Subimos el contenedor completo para que el cerebro 
+           quede por encima del botón de accesibilidad azul */
+        bottom: 110px !important; 
+        right: 18px !important;
+    }
+
+    #ai-chat-window {
+        /* La ventana de chat ahora debe ser más grande en móvil 
+           pero respetando el espacio del botón */
+        width: calc(100vw - 30px);
+        height: 60vh; /* 60% de la altura de la pantalla */
+        bottom: 70px; 
+        right: 0;
+        max-width: none;
+    }
+
+    #ai-open-btn {
+        width: 53px;
+        height: 53px;
+        font-size: 20px;
+    }
+}
+</style>
+
+<script>
+function toggleAIChat() {
+    const chatWindow = document.getElementById('ai-chat-window');
+    chatWindow.classList.toggle('ai-hidden');
+}
+
+function handleKeyPress(e) {
+    if (e.key === 'Enter') enviarAPython();
+}
+
+async function enviarAPython() {
+    const input = document.getElementById('ai-input');
+    const messages = document.getElementById('ai-messages');
+    const typing = document.getElementById('ai-typing');
+    const texto = input.value.trim();
+
+    if (!texto) return;
+
+    messages.innerHTML += `<div class="msg-user">${texto}</div>`;
+    input.value = "";
+    typing.classList.remove('ai-hidden');
+    messages.scrollTop = messages.scrollHeight;
+
+    try {
+        const response = await fetch(`/ia/consultar/?pregunta=${encodeURIComponent(texto)}`);
+        const data = await response.json();
+        typing.classList.add('ai-hidden');
+        messages.innerHTML += `<div class="msg-bot">${data.respuesta}</div>`;
+    } catch (error) {
+        typing.classList.add('ai-hidden');
+        messages.innerHTML += `<div class="msg-bot">Error: No pude conectar con el cerebro del taller.</div>`;
+    }
+    messages.scrollTop = messages.scrollHeight;
+}
+</script>

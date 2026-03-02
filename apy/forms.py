@@ -1,3 +1,4 @@
+from genericpath import exists
 from pyexpat.errors import messages
 from django import forms
 from django.forms import ModelForm, Select, NumberInput, DateInput, TimeInput, TextInput, EmailInput
@@ -9,6 +10,8 @@ from django import forms  # Asegúrate de usar la importación estándar de form
 from django.contrib.auth.models import User, Permission  # Importación de modelos de Django
 from django.core.exceptions import ValidationError
 from .models import Profile,DetalleServicio
+from .validators import solo_letras_validator, ComplexPasswordValidator, telefono_validator
+from django.contrib.auth.password_validation import validate_password
 
 from apy.models import *
         
@@ -341,62 +344,59 @@ class ProveedorForm(ModelForm):
                 'unique': 'Ya existe un cliente con ese correo',
             }
         }
-# ------------------- FORMS STEVEN -------------------    
- 
+# ------------------- FORMS STEVEN -------------------     
 class RegistroUsuarioForm(forms.ModelForm):
-    
+    # --- CAMPOS EXTRA QUE NO ESTÁN EN EL MODELO USER ---
     old_password = forms.CharField(
         label='Contraseña Antigua',
-        widget=forms.PasswordInput(attrs={'placeholder': 'Contraseña actual', 'class': 'form-control'}),
+        widget=forms.PasswordInput(attrs={'placeholder': 'Contraseña actual'}),
         required=False
     )
     
-    # Campos de Contraseña
     password = forms.CharField(
         label='Contraseña',
-        widget=forms.PasswordInput(attrs={'placeholder': 'Contraseña', 'class': 'form-control'}),
+        widget=forms.PasswordInput(attrs={'placeholder': 'Contraseña'}),
         strip=False,
-        required=True  # Se ajusta en el __init__ si es edición
-    )
-    password2 = forms.CharField(
-        label='Confirmar Contraseña',
-        widget=forms.PasswordInput(attrs={'placeholder': 'Repita la contraseña', 'class': 'form-control'}),
-        strip=False,
-        required=True  # Se ajusta en el __init__ si es edición
+        required=True
     )
     
-    # Campo de Rol
+    password2 = forms.CharField(
+        label='Confirmar Contraseña',
+        widget=forms.PasswordInput(attrs={'placeholder': 'Repita la contraseña'}),
+        strip=False,
+        required=True
+    )
+    
     role = forms.ChoiceField(
         label='Rol',
         choices=[('normal', 'Empleado'), ('admin', 'Gerente')],
-        widget=forms.Select(attrs={'class': 'form-control'}),
+        widget=forms.Select(),
         required=True
     )
     
     tipo_identificacion = forms.ChoiceField(
         label='Tipo de Documento',
-        choices=Profile.TIPO_DOC_CHOICES,
-        widget=forms.Select(attrs={'class': 'form-control'})
+        choices=Profile.TIPO_DOC_CHOICES, # Asegúrate que existan en el modelo Profile
+        widget=forms.Select()
     )
 
-    # Campos adicionales del Perfil (Centralizando lo que era de Empleado)
     identificacion = forms.CharField(
         label='Identificación', 
-        required=True, # Obligatorio para evitar el IntegrityError
-        widget=forms.TextInput(attrs={'class': 'form-control'})
+        required=True,
+        widget=forms.TextInput()
     )
+    
     direccion = forms.CharField(
         label='Dirección', 
         required=False, 
-        widget=forms.TextInput(attrs={'class': 'form-control'})
+        widget=forms.TextInput()
     )
+    
     telefono = forms.CharField(
         label='Teléfono', 
         required=False, 
-        widget=forms.TextInput(attrs={'class': 'form-control'})
+        widget=forms.TextInput()
     )
-
-    success_message = 'Usuario registrado con éxito.' 
 
     class Meta:
         model = User
@@ -404,51 +404,135 @@ class RegistroUsuarioForm(forms.ModelForm):
         
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # CAMBIO CLAVE 1: Hacer contraseña opcional al editar
+        
+        # 1. Ajuste de obligatoriedad si es edición
         if self.instance and self.instance.pk:
             self.fields['password'].required = False
             self.fields['password2'].required = False
             
-        if self.instance and self.instance.pk:
-            # --- ESTO ES LO QUE FALTA ---
-            # Sincronizamos el campo 'role' con la realidad de la DB
+            # 2. Sincronizar Rol con is_superuser
             if self.instance.is_superuser:
                 self.initial['role'] = 'admin'
             else:
                 self.initial['role'] = 'normal'
             
-            # Cargar datos de perfil
+            # 3. Cargar datos del Perfil relacionados
             try:
                 perfil = self.instance.profile
-                self.initial['tipo_identificacion'] = perfil.tipo_identificacion
-                self.initial['identificacion'] = perfil.identificacion
-                self.initial['direccion'] = perfil.direccion
-                self.initial['telefono'] = perfil.telefono
-            except Profile.DoesNotExist:    
+                self.initial.update({
+                    'tipo_identificacion': perfil.tipo_identificacion,
+                    'identificacion': perfil.identificacion,
+                    'direccion': perfil.direccion,
+                    'telefono': perfil.telefono,
+                })
+            except (Profile.DoesNotExist, AttributeError):
                 pass
+
+    def clean_first_name(self):
+        first_name = self.cleaned_data.get('first_name')
+        if first_name:
+            try:
+                solo_letras_validator(first_name)
+            except ValidationError:
+                raise forms.ValidationError("El nombre solo debe contener letras.")
+        return first_name
+
+    def clean_last_name(self):
+        last_name = self.cleaned_data.get('last_name')
+        if last_name:
+            try:
+                solo_letras_validator(last_name)
+            except ValidationError:
+                raise forms.ValidationError("El apellido solo debe contener letras.")
+        return last_name
+
+    def clean_identificacion(self):
+        identificacion = self.cleaned_data.get('identificacion')
+        tipo = self.cleaned_data.get('tipo_identificacion')
+        
+        # Validar duplicados excluyendo al propio usuario
+        qs = Profile.objects.filter(identificacion=identificacion)
+        if self.instance and self.instance.pk:
+            qs = qs.exclude(user=self.instance)
+        
+        if qs.exists():
+            raise ValidationError("Este número de identificación ya está registrado.")
+            
+        # Ejecutar validación lógica de negocio (formato según tipo)
+        if tipo and identificacion:
+            try:
+                validar_por_tipo(identificacion, tipo)
+            except ValidationError as e:
+                raise ValidationError(e.message)
+                
+        return identificacion
+    
+    def clean_telefono(self):
+        telefono = self.cleaned_data.get('telefono')
+        if telefono:
+            try:
+                # Llamamos al validador que creamos arriba
+                telefono_validator(telefono)
+            except ValidationError as e:
+                raise forms.ValidationError(e.message)
+        return telefono
+
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+        # Si es edición y está vacío, no se cambia
+        if not password and self.instance and self.instance.pk:
+            return None # Importante devolver None para saber que no cambia
+        
+        # Validadores de Django (Complexity, length, etc)
+        if password:
+            validate_password(password, self.instance)
+        return password
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get("password")
+        password2 = cleaned_data.get("password2")
+        old_password = cleaned_data.get("old_password")
+        role = cleaned_data.get('role')
+
+        # VALIDACIÓN: Contraseña Antigua
+        if self.instance and self.instance.pk and old_password:
+            if not self.instance.check_password(old_password):
+                self.add_error('old_password', "La contraseña actual no es correcta.")
+
+        # VALIDACIÓN: Nueva contraseña coincidente
+        if password and password != password2:
+            self.add_error('password2', "Las nuevas contraseñas no coinciden.")
+
+        # VALIDACIÓN: Protección último Administrador
+        if self.instance and self.instance.pk and self.instance.is_superuser:
+            if role == 'normal':
+                admins_activos = User.objects.filter(is_superuser=True).count()
+                if admins_activos <= 1:
+                    raise forms.ValidationError("Error: No puedes quitarte el rol de Admin porque eres el único en el sistema.")
+        
+        return cleaned_data
 
     def save(self, commit=True):
         user = super().save(commit=False)
         
-        # CAMBIO CLAVE 2: Guardar contraseña correctamente
-        # Si hay algo escrito en el campo password, se encripta
+        # Guardar nueva contraseña si se proporcionó
         password = self.cleaned_data.get('password')
         if password:
-            user.set_password(password) # set_password es OBLIGATORIO para que funcione el login
+            user.set_password(password)
         
-        # CAMBIO CLAVE 3: Gestión de Roles (Diferencia Gerente de Empleado)
+        # Asignación de permisos según Rol
         role = self.cleaned_data.get('role')
         if role == 'admin':
             user.is_superuser = True
             user.is_staff = True
         else:
-            # Aquí es donde se asegura que sea Empleado
             user.is_superuser = False 
-            user.is_staff = True # Importante para que pueda entrar al sistema
+            user.is_staff = True # Permitir login al sistema como empleado
         
         if commit:
             user.save()
-            # Guardar Perfil
+            # Guardar o actualizar datos de Perfil
             Profile.objects.update_or_create(
                 user=user,
                 defaults={
@@ -459,41 +543,13 @@ class RegistroUsuarioForm(forms.ModelForm):
                 }
             )
         return user
-    
-    def clean(self):
-        cleaned_data = super().clean()
-        password = cleaned_data.get("password")
-        password2 = cleaned_data.get("password2")
-        role = cleaned_data.get('role')
-        
-        tipo = cleaned_data.get('tipo_identificacion')
-        identificacion = cleaned_data.get('identificacion')
 
-        # VALIDACIÓN 1: Coincidencia de contraseñas nuevas
-        if password or password2:
-            if password != password2:
-                raise forms.ValidationError("Las nuevas contraseñas no coinciden.")
 
-        # VALIDACIÓN 2: Protección del último Admin
-        if self.instance and self.instance.pk and self.instance.is_superuser:
-            if role == 'normal':
-                admins_activos = User.objects.filter(is_superuser=True).count()
-                if admins_activos <= 1:
-                    raise forms.ValidationError(
-                        "Error: Debe existir al menos un administrador en el sistema."
-                    )
-        
-        # VALIDACIÓN 3: Validar identificación según tipo
-        if tipo and identificacion:
-            try:
-                validar_por_tipo(identificacion, tipo)
-            except ValidationError as e:
-                self.add_error('identificacion', e.message)
-                
-        return cleaned_data
-    
-# 1. Formulario para editar el modelo User (SIN TELEFONO)
+# 1. Formulario para editar el modelo User 
 class PerfilUsuarioForm(forms.ModelForm):
+    first_name = forms.CharField(required=True, label="Nombres")
+    last_name = forms.CharField(required=True, label="Apellidos")
+    email = forms.EmailField(required=True, label="Correo Electrónico")
     class Meta:
         model = User
         # Solo campos nativos de User
@@ -501,6 +557,8 @@ class PerfilUsuarioForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['first_name'].widget.attrs.update({'required': 'required'})
+        self.fields['last_name'].widget.attrs.update({'required': 'required'})
         placeholder_map = {
             'first_name': 'Tu nombre',
             'last_name': 'Tu apellido',
@@ -513,19 +571,36 @@ class PerfilUsuarioForm(forms.ModelForm):
                 'placeholder': placeholder_map.get(name, field.label) 
             })
             
+    def clean_first_name(self):
+        first_name = self.cleaned_data.get('first_name')
+        if not first_name:
+            raise forms.ValidationError("El nombre no puede estar vacío.")
+        solo_letras_validator(first_name)
+        return first_name
+
+    def clean_last_name(self):
+        last_name = self.cleaned_data.get('last_name')
+        if not last_name:
+            raise forms.ValidationError("El apellido no puede estar vacío.")
+        solo_letras_validator(last_name)
+        return last_name
+            
     # Lógica de limpieza para email...
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if User.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
             raise forms.ValidationError("Este correo electrónico ya está registrado.")
         return email
-    
-# 2. Formulario para editar el modelo Profile (CON TODO LO QUE FALTA)
+
+# 2. Formulario para editar el modelo Profile
 class ProfileForm(forms.ModelForm):
+    telefono = forms.CharField(required=True, label='Número de Teléfono')
+    direccion = forms.CharField(required=True, label='Dirección de Residencia')
+    imagen_clear = forms.BooleanField(required=False, widget=forms.CheckboxInput())
+    
     class Meta:
         model = Profile
-        # Añadimos identificacion y direccion que faltaban
-        fields = ['tipo_identificacion', 'identificacion', 'direccion', 'telefono', 'imagen'] 
+        fields = ['tipo_identificacion', 'identificacion', 'direccion', 'telefono', 'imagen']      
         labels = {
             'identificacion': 'Número de Identificación',
             'direccion': 'Dirección de Residencia',
@@ -535,7 +610,6 @@ class ProfileForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Aplicamos estilos Bootstrap a todos los campos de forma dinámica
         placeholder_map = {
             'identificacion': 'Ingrese su documento de identidad',
             'direccion': 'Calle, Carrera, Ciudad...',
@@ -543,11 +617,43 @@ class ProfileForm(forms.ModelForm):
         }
         
         for name, field in self.fields.items():
-            if name != 'imagen': # La imagen suele llevar otra clase o manejo
+            if name != 'imagen':
                 field.widget.attrs.update({
                     'class': 'form-control',
                     'placeholder': placeholder_map.get(name, '')
                 })
+    
+    def clean_telefono(self):
+        telefono = self.cleaned_data.get('telefono')
+        if telefono:
+            telefono_validator(telefono) # Usamos tu validador externo
+        return telefono
+
+    def clean_direccion(self):
+        direccion = self.cleaned_data.get('direccion')
+        if not direccion or len(direccion.strip()) < 5:
+            raise forms.ValidationError("Por favor, ingresa una dirección válida y completa.")
+        return direccion
+    
+    def clean_identificacion(self):
+        identificacion = self.cleaned_data.get('identificacion')
+        tipo = self.cleaned_data.get('tipo_identificacion')
+        
+        if not identificacion:
+            raise ValidationError("El número de identificación es obligatorio.")
+             
+        # Validar duplicados
+        qs = Profile.objects.filter(identificacion=identificacion)
+        if self.instance and self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        
+        if qs.exists():
+            raise ValidationError("Este número de identificación ya está registrado.")
+            
+        if tipo and identificacion:
+            validar_por_tipo(identificacion, tipo) # Tu validador externo
+                
+        return identificacion
     
 class ClienteForm(ModelForm):
     def __init__(self, *args, **kwargs):
