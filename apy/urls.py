@@ -1,6 +1,8 @@
 from django.urls import path
+from apy.context_processors import api_stock_bajo
 from apy.view.Nomina.views import NominaCreateModalView, NominaCreateView, NominaDeleteView, NominaListView, NominaUpdateView
 from apy.view.empresa.views import *
+from apy.view.usuario.datos.views import ActualizarPerfilImagenView, PerfilEditarView
 from apy.views import *
 from apy.view.proveedor.view import *
 from apy.view.Gastos.views import *
@@ -136,7 +138,6 @@ urlpatterns = [
   
     
         #--------URL modulo informes----------------
-    path('informes/dashboard/', InformeDashboardView, name='dashboard_informes'),
     path('informes/lista/', InformeListView.as_view(), name='informe_lista'),
     path('informes/nuevo/', CreateInformeView.as_view(), name='informe_nuevo'),
     path('informes/detalle/<int:pk>/', InformeDetailView.as_view(), name='informe_detalle'),

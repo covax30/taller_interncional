@@ -7,16 +7,107 @@
 <link rel="stylesheet" href="{% static 'css/apexcharts.css' %}">
 <link rel="stylesheet" href="{% static 'css/jsvectormap.min.css' %}">
 <style>
-    .stat-card { border-radius: 12px; transition: transform .2s; }
-    .stat-card:hover { transform: translateY(-3px); }
-    .metric-box { border-left: 4px solid; border-radius: 8px; padding: 1rem 1.2rem; }
-    .metric-box.azul   { border-color: #0d6efd; background: rgba(13,110,253,.08); }
-    .metric-box.verde  { border-color: #198754; background: rgba(25,135,84,.08); }
-    .metric-box.naranja{ border-color: #fd7e14; background: rgba(253,126,20,.08); }
-    .metric-box.rojo   { border-color: #dc3545; background: rgba(220,53,69,.08); }
-    .badge-proceso { font-size: .7rem; }
-    .top-bar { height: 8px; border-radius: 4px; background: #0d6efd; transition: width .6s; }
-    .top-bar.verde  { background: #198754; }
+    .stat-card {
+        border-radius: 12px;
+        transition: transform .2s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-3px);
+    }
+
+    .metric-box {
+        border-left: 4px solid;
+        border-radius: 8px;
+        padding: 1rem 1.2rem;
+    }
+
+    .metric-box.azul {
+        border-color: #0d6efd;
+        background: rgba(13, 110, 253, .08);
+    }
+
+    .metric-box.verde {
+        border-color: #198754;
+        background: rgba(25, 135, 84, .08);
+    }
+
+    .metric-box.naranja {
+        border-color: #fd7e14;
+        background: rgba(253, 126, 20, .08);
+    }
+
+    .metric-box.rojo {
+        border-color: #dc3545;
+        background: rgba(220, 53, 69, .08);
+    }
+
+    .badge-proceso {
+        font-size: .7rem;
+    }
+
+    .top-bar {
+        height: 8px;
+        border-radius: 4px;
+        background: #0d6efd;
+        transition: width .6s;
+    }
+
+    .top-bar.verde {
+        background: #198754;
+    }
+
+    /* Estilos Informes */
+    .filtro-btn {
+        border-radius: 20px;
+        padding: .35rem 1rem;
+        font-size: .85rem;
+        transition: all .2s;
+    }
+
+    .filtro-btn.active {
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, .3);
+    }
+
+    .metric-card {
+        border-radius: 12px;
+        border-left: 4px solid;
+        transition: transform .2s;
+        background-color: #fff;
+    }
+
+    .metric-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .metric-card.azul {
+        border-color: #0d6efd;
+    }
+
+    .metric-card.verde {
+        border-color: #198754;
+    }
+
+    .metric-card.naranja {
+        border-color: #fd7e14;
+    }
+
+    .metric-card.rojo {
+        border-color: #dc3545;
+    }
+
+    .tab-section {
+        display: none;
+    }
+
+    .tab-section.active {
+        display: block;
+    }
+
+    .nav-tabs .nav-link {
+        border-radius: 8px 8px 0 0;
+        font-size: .9rem;
+    }
 </style>
 {% endblock %}
 
@@ -44,6 +135,65 @@
         <div class="container-fluid">
 
             <!-- ══════════════════════════════════════════════
+                 PANEL DE FILTROS (MÓDULO INFORMES)
+            ══════════════════════════════════════════════ -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body py-3 px-4">
+                    <form method="get" id="filtro-form" class="row g-3 align-items-end">
+
+                        <!-- Botones rápidos -->
+                        <div class="col-12 col-md-auto">
+                            <label class="form-label small fw-bold text-muted mb-1">PERÍODO RÁPIDO</label>
+                            <div class="d-flex gap-2">
+                                <button type="submit" name="periodo" value="semana"
+                                    class="btn btn-sm btn-outline-primary filtro-btn {% if periodo_activo == 'semana' %}active{% endif %}">
+                                    Esta semana
+                                </button>
+                                <button type="submit" name="periodo" value="mes"
+                                    class="btn btn-sm btn-outline-primary filtro-btn {% if periodo_activo == 'mes' %}active{% endif %}">
+                                    Este mes
+                                </button>
+                                <button type="submit" name="periodo" value="anio"
+                                    class="btn btn-sm btn-outline-primary filtro-btn {% if periodo_activo == 'anio' %}active{% endif %}">
+                                    Este año
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Rango personalizado -->
+                        <div class="col-12 col-md-auto">
+                            <label class="form-label small fw-bold text-muted mb-1">RANGO PERSONALIZADO</label>
+                            <div class="d-flex gap-2 align-items-center">
+                                <input type="date" name="desde" value="{{ desde }}" class="form-control form-control-sm"
+                                    style="width:145px;">
+                                <span class="text-muted">→</span>
+                                <input type="date" name="hasta" value="{{ hasta }}" class="form-control form-control-sm"
+                                    style="width:145px;">
+                                <button type="submit" class="btn btn-sm btn-primary filtro-btn
+                                    {% if periodo_activo == 'personalizado' %}active{% endif %}">
+                                    <i class="fas fa-search me-1"></i>Aplicar
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Filtro estado (servicios) -->
+                        <div class="col-12 col-md-auto">
+                            <label class="form-label small fw-bold text-muted mb-1">ESTADO (servicios)</label>
+                            <select name="estado" class="form-select form-select-sm" onchange="this.form.submit()"
+                                style="width: 160px;">
+                                <option value="todos" {% if estado_filtro == 'todos' %}selected{% endif %}>Todos</option>
+                                <option value="terminado" {% if estado_filtro == 'terminado' %}selected{% endif %}>
+                                    Terminados</option>
+                                <option value="proceso" {% if estado_filtro == 'proceso' %}selected{% endif %}>En proceso
+                                </option>
+                            </select>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+            <!-- ══════════════════════════════════════════════
                  FILA 1: Tarjetas de contadores (todos ven)
             ══════════════════════════════════════════════ -->
             <div class="row g-3 mb-4">
@@ -53,8 +203,12 @@
                             <h3 id="contador-insumos">{{ total_insumos|default:0 }}</h3>
                             <p>Insumos Registrados</p>
                         </div>
-                        <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M19.4 13.5a7.5 7.5 0 0 0 0-3l2-1.5-2-3.5-2.3.5a7.5 7.5 0 0 0-2.6-1.5l-.4-2.4h-4l-.4 2.4a7.5 7.5 0 0 0-2.6 1.5l-2.3-.5-2 3.5 2 1.5a7.5 7.5 0 0 0 0 3l-2 1.5 2 3.5 2.3-.5a7.5 7.5 0 0 0 2.6 1.5l.4 2.4h4l.4-2.4a7.5 7.5 0 0 0 2.6-1.5l2.3.5 2-3.5-2-1.5zM12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5z"/></svg>
-                        <a href="{% url 'apy:insumo_lista' %}" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+                        <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M19.4 13.5a7.5 7.5 0 0 0 0-3l2-1.5-2-3.5-2.3.5a7.5 7.5 0 0 0-2.6-1.5l-.4-2.4h-4l-.4 2.4a7.5 7.5 0 0 0-2.6 1.5l-2.3-.5-2 3.5 2 1.5a7.5 7.5 0 0 0 0 3l-2 1.5 2 3.5 2.3-.5a7.5 7.5 0 0 0 2.6 1.5l.4 2.4h4l.4-2.4a7.5 7.5 0 0 0 2.6-1.5l2.3.5 2-3.5-2-1.5zM12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5z" />
+                        </svg>
+                        <a href="{% url 'apy:insumo_lista' %}"
+                            class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
                             Ver insumos <i class="bi bi-link-45deg"></i>
                         </a>
                     </div>
@@ -65,8 +219,12 @@
                             <h3 id="contador-vehiculos">{{ total_vehiculos|default:0 }}</h3>
                             <p>Vehículos Registrados</p>
                         </div>
-                        <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M3 6a1 1 0 0 0-1 1v8a3 3 0 0 0 3 3h1a3 3 0 0 0 6 0h4a3 3 0 0 0 6 0h1a1 1 0 0 0 1-1v-4a1 1 0 0 0-.2-.6l-2.6-3.4A2 2 0 0 0 18.6 8H15V7a1 1 0 0 0-1-1H3zm12 4h3.6l2.4 3v1h-6v-4zM7 17a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm10 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>
-                        <a href="{% url 'apy:vehiculo_lista' %}" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+                        <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M3 6a1 1 0 0 0-1 1v8a3 3 0 0 0 3 3h1a3 3 0 0 0 6 0h4a3 3 0 0 0 6 0h1a1 1 0 0 0 1-1v-4a1 1 0 0 0-.2-.6l-2.6-3.4A2 2 0 0 0 18.6 8H15V7a1 1 0 0 0-1-1H3zm12 4h3.6l2.4 3v1h-6v-4zM7 17a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm10 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+                        </svg>
+                        <a href="{% url 'apy:vehiculo_lista' %}"
+                            class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
                             Ver vehículos <i class="bi bi-link-45deg"></i>
                         </a>
                     </div>
@@ -77,8 +235,12 @@
                             <h3 id="contador-clientes">{{ total_clientes|default:0 }}</h3>
                             <p>Clientes Registrados</p>
                         </div>
-                        <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z"/></svg>
-                        <a href="{% url 'apy:cliente_lista' %}" class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-50-hover">
+                        <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z" />
+                        </svg>
+                        <a href="{% url 'apy:cliente_lista' %}"
+                            class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-50-hover">
                             Ver clientes <i class="bi bi-link-45deg"></i>
                         </a>
                     </div>
@@ -89,8 +251,12 @@
                             <h3 id="contador-gastos">{{ total_gastos|default:0 }}</h3>
                             <p>Gastos Registrados</p>
                         </div>
-                        <svg class="small-box-icon" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M0 0h1v15h15v1H0V0zm14.5 10.5L10 6l-3 3-4-4-.5.5 4.5 4.5 3-3 4 4-.5.5z"/></svg>
-                        <a href="{% url 'apy:gasto_lista' %}" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+                        <svg class="small-box-icon" fill="currentColor" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M0 0h1v15h15v1H0V0zm14.5 10.5L10 6l-3 3-4-4-.5.5 4.5 4.5 3-3 4 4-.5.5z" />
+                        </svg>
+                        <a href="{% url 'apy:gasto_lista' %}"
+                            class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
                             Ver gastos <i class="bi bi-link-45deg"></i>
                         </a>
                     </div>
@@ -134,7 +300,8 @@
                 <div class="col-md-3 col-6">
                     <div class="metric-box {% if variacion_ingresos >= 0 %}verde{% else %}rojo{% endif %}">
                         <div class="text-muted small fw-semibold mb-1">Vs. Mes Anterior</div>
-                        <h3 class="fw-bold {% if variacion_ingresos >= 0 %}text-success{% else %}text-danger{% endif %} mb-0">
+                        <h3
+                            class="fw-bold {% if variacion_ingresos >= 0 %}text-success{% else %}text-danger{% endif %} mb-0">
                             {% if variacion_ingresos >= 0 %}+{% endif %}{{ variacion_ingresos }}%
                         </h3>
                         <div class="text-muted small mt-1">
@@ -174,21 +341,21 @@
                         </div>
                         <div class="card-body">
                             {% if top_repuestos %}
-                                {% for r in top_repuestos %}
-                                <div class="mb-3">
-                                    <div class="d-flex justify-content-between mb-1">
-                                        <span class="small fw-semibold">{{ r.id_repuesto__nombre }}</span>
-                                        <span class="small text-muted">{{ r.total_usado }} und.</span>
-                                    </div>
-                                    <div class="bg-secondary rounded" style="height:8px;">
-                                        <div class="top-bar rounded"
-                                             style="width:{% widthratio r.total_usado top_repuestos.0.total_usado 100 %}%">
-                                        </div>
+                            {% for r in top_repuestos %}
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="small fw-semibold">{{ r.id_repuesto__nombre }}</span>
+                                    <span class="small text-muted">{{ r.total_usado }} und.</span>
+                                </div>
+                                <div class="bg-secondary rounded" style="height:8px;">
+                                    <div class="top-bar rounded"
+                                        style="width:{% widthratio r.total_usado top_repuestos.0.total_usado 100 %}%">
                                     </div>
                                 </div>
-                                {% endfor %}
+                            </div>
+                            {% endfor %}
                             {% else %}
-                                <p class="text-muted small text-center pt-3">Sin datos aún</p>
+                            <p class="text-muted small text-center pt-3">Sin datos aún</p>
                             {% endif %}
                         </div>
                     </div>
@@ -204,21 +371,21 @@
                         </div>
                         <div class="card-body">
                             {% if top_insumos %}
-                                {% for i in top_insumos %}
-                                <div class="mb-3">
-                                    <div class="d-flex justify-content-between mb-1">
-                                        <span class="small fw-semibold">{{ i.id_insumos__nombre }}</span>
-                                        <span class="small text-muted">{{ i.total_usado }} und.</span>
-                                    </div>
-                                    <div class="bg-secondary rounded" style="height:8px;">
-                                        <div class="top-bar verde rounded"
-                                             style="width:{% widthratio i.total_usado top_insumos.0.total_usado 100 %}%">
-                                        </div>
+                            {% for i in top_insumos %}
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="small fw-semibold">{{ i.id_insumos__nombre }}</span>
+                                    <span class="small text-muted">{{ i.total_usado }} und.</span>
+                                </div>
+                                <div class="bg-secondary rounded" style="height:8px;">
+                                    <div class="top-bar verde rounded"
+                                        style="width:{% widthratio i.total_usado top_insumos.0.total_usado 100 %}%">
                                     </div>
                                 </div>
-                                {% endfor %}
+                            </div>
+                            {% endfor %}
                             {% else %}
-                                <p class="text-muted small text-center pt-3">Sin datos aún</p>
+                            <p class="text-muted small text-center pt-3">Sin datos aún</p>
                             {% endif %}
                         </div>
                     </div>
@@ -250,7 +417,8 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="small-box {% if utilidad_mes >= 0 %}bg-gradient-primary{% else %}bg-gradient-warning{% endif %} text-white stat-card">
+                    <div
+                        class="small-box {% if utilidad_mes >= 0 %}bg-gradient-primary{% else %}bg-gradient-warning{% endif %} text-white stat-card">
                         <div class="inner">
                             <h3>${{ utilidad_mes|intcomma }}</h3>
                             <p>Utilidad Estimada</p>
@@ -271,21 +439,21 @@
                         </div>
                         <div class="card-body">
                             {% if top_insumos %}
-                                {% for i in top_insumos %}
-                                <div class="mb-3">
-                                    <div class="d-flex justify-content-between mb-1">
-                                        <span class="small fw-semibold">{{ i.id_insumos__nombre }}</span>
-                                        <span class="small text-muted">{{ i.total_usado }} und.</span>
-                                    </div>
-                                    <div class="bg-secondary rounded" style="height:8px;">
-                                        <div class="top-bar verde rounded"
-                                             style="width:{% widthratio i.total_usado top_insumos.0.total_usado 100 %}%">
-                                        </div>
+                            {% for i in top_insumos %}
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="small fw-semibold">{{ i.id_insumos__nombre }}</span>
+                                    <span class="small text-muted">{{ i.total_usado }} und.</span>
+                                </div>
+                                <div class="bg-secondary rounded" style="height:8px;">
+                                    <div class="top-bar verde rounded"
+                                        style="width:{% widthratio i.total_usado top_insumos.0.total_usado 100 %}%">
                                     </div>
                                 </div>
-                                {% endfor %}
+                            </div>
+                            {% endfor %}
                             {% else %}
-                                <p class="text-muted small text-center pt-3">Sin datos aún</p>
+                            <p class="text-muted small text-center pt-3">Sin datos aún</p>
                             {% endif %}
                         </div>
                     </div>
@@ -299,9 +467,10 @@
                                 <i class="fas fa-trophy me-2 text-warning"></i>Empleado del Mes
                             </h5>
                         </div>
-                        <div class="card-body d-flex flex-column align-items-center justify-content-center text-center py-4">
+                        <div
+                            class="card-body d-flex flex-column align-items-center justify-content-center text-center py-4">
                             <div class="rounded-circle bg-warning d-flex align-items-center justify-content-center mb-3"
-                                 style="width:70px; height:70px; font-size:2rem;">
+                                style="width:70px; height:70px; font-size:2rem;">
                                 <i class="fas fa-user text-white"></i>
                             </div>
                             <h5 class="fw-bold mb-1">{{ empleado_top.empleado__nombre }}</h5>
@@ -356,11 +525,11 @@
                                             <td class="text-muted small">{{ s.fecha_creacion|date:"d/m/Y" }}</td>
                                             <td class="text-center">
                                                 {% if s.proceso == 'terminado' %}
-                                                    <span class="badge bg-success badge-proceso">Terminado</span>
+                                                <span class="badge bg-success badge-proceso">Terminado</span>
                                                 {% elif s.proceso == 'proceso' %}
-                                                    <span class="badge bg-primary badge-proceso">En Proceso</span>
+                                                <span class="badge bg-primary badge-proceso">En Proceso</span>
                                                 {% else %}
-                                                    <span class="badge bg-secondary badge-proceso">{{ s.proceso }}</span>
+                                                <span class="badge bg-secondary badge-proceso">{{ s.proceso }}</span>
                                                 {% endif %}
                                             </td>
                                             {% if es_gerente %}
@@ -385,6 +554,255 @@
                 </div>
             </div>
 
+            <!-- ══════════════════════════════════════════════════════
+                 TARJETAS RESUMEN INFORMES (Fila 6)
+            ══════════════════════════════════════════════════════ -->
+            <hr class="mt-4 mb-4">
+            <h5 class="text-primary mb-3"><i class="fas fa-chart-pie me-2"></i>Reportes Detallados del Período</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-3 col-6">
+                    <div class="card metric-card azul shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="text-muted small fw-semibold mb-1">Total Servicios</div>
+                            <h3 class="fw-bold text-primary mb-0">{{ total_servicios_informe }}</h3>
+                            <div class="small text-muted mt-1">
+                                <span class="text-success">{{ servicios_terminados_informe }} terminados</span> ·
+                                <span class="text-primary">{{ servicios_en_proceso_informe }} en proceso</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Mostrar financieros de informes solo a gerentes -->
+                {% if es_gerente %}
+                <div class="col-md-3 col-6">
+                    <div class="card metric-card verde shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="text-muted small fw-semibold mb-1">Ingresos Servicios</div>
+                            <h3 class="fw-bold text-success mb-0">${{ ingresos_servicios_informe|intcomma }}</h3>
+                            <div class="small text-muted mt-1">solo servicios terminados</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="card metric-card naranja shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="text-muted small fw-semibold mb-1">Pagos a Proveedores</div>
+                            <h3 class="fw-bold text-warning mb-0">${{ monto_pagos|intcomma }}</h3>
+                            <div class="small text-muted mt-1">{{ total_pagos }} pagos registrados</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="card metric-card rojo shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="text-muted small fw-semibold mb-1">Nómina Pagada</div>
+                            <h3 class="fw-bold text-danger mb-0">${{ monto_nomina|intcomma }}</h3>
+                            <div class="small text-muted mt-1">{{ total_nomina_registros }} pagos de nómina</div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- ══════════════════════════════════════════════════════
+                 TABS DE MÓDULOS INFORMES (Fila 7)
+            ══════════════════════════════════════════════════════ -->
+            <ul class="nav nav-tabs mb-0" id="informesTabs">
+                <li class="nav-item">
+                    <button class="nav-link active" onclick="mostrarTab('servicios', this)">
+                        <i class="fas fa-car me-1"></i>Servicios Período
+                    </button>
+                </li>
+                {% if es_gerente %}
+                <li class="nav-item">
+                    <button class="nav-link" onclick="mostrarTab('pagos', this)">
+                        <i class="fas fa-money-bill me-1"></i>Pagos Período
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" onclick="mostrarTab('nomina', this)">
+                        <i class="fas fa-users me-1"></i>Nómina Período
+                    </button>
+                </li>
+                {% endif %}
+            </ul>
+
+            <!-- ══ TAB: SERVICIOS ══════════════════════════════════ -->
+            <div class="tab-section active" id="tab-servicios">
+                <div class="card border-0 shadow-sm border-top-0 rounded-top-0 mb-4">
+                    <div class="card-body">
+
+                        <!-- Gráfica servicios -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary fw-bold mb-3">
+                                    <i class="fas fa-chart-line me-2"></i>Servicios por período
+                                </h6>
+                                <!-- Necesitamos asegurarnos que background sea oscuro si el tema es oscuro o manejarlo en JS -->
+                                <div id="chart-servicios" style="min-height: 220px; color: #fff;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Tabla servicios -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="fw-bold mb-0 text-light">Últimos 20 servicios del período</h6>
+                            <a href="{% url 'apy:exportar_excel' %}?modulo=servicios&desde={{ desde }}&hasta={{ hasta }}&estado={{ estado_filtro }}"
+                                class="btn btn-sm btn-success">
+                                <i class="fas fa-file-excel me-1"></i>Exportar Excel
+                            </a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-secondary">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Placa</th>
+                                        <th>Cliente</th>
+                                        <th>Empleado</th>
+                                        <th>Fecha</th>
+                                        <th class="text-center">Estado</th>
+                                        {% if es_gerente %}
+                                        <th class="text-end">Total</th>
+                                        {% endif %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for s in servicios_tabla %}
+                                    <tr>
+                                        <td class="text-muted small">{{ s.id }}</td>
+                                        <td><strong>{{ s.id_vehiculo.placa }}</strong></td>
+                                        <td>{{ s.cliente.nombre }}</td>
+                                        <td>{{ s.empleado.user.get_full_name|default:"—" }}</td>
+                                        <td>{{ s.fecha_creacion|date:"d/m/Y" }}</td>
+                                        <td class="text-center">
+                                            {% if s.proceso == 'terminado' %}
+                                            <span class="badge bg-success">Terminado</span>
+                                            {% else %}
+                                            <span class="badge bg-primary">En proceso</span>
+                                            {% endif %}
+                                        </td>
+                                        {% if es_gerente %}
+                                        <td class="text-end fw-semibold text-success">${{ s.subtotal|intcomma }}</td>
+                                        {% endif %}
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="{% if es_gerente %}7{% else %}6{% endif %}"
+                                            class="text-center text-muted py-4">Sin servicios en este período.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if es_gerente %}
+            <!-- ══ TAB: PAGOS ══════════════════════════════════════ -->
+            <div class="tab-section" id="tab-pagos">
+                <div class="card border-0 shadow-sm border-top-0 rounded-top-0 mb-4">
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary fw-bold mb-3">
+                                    <i class="fas fa-chart-bar me-2"></i>Pagos a proveedores por período
+                                </h6>
+                                <div id="chart-pagos" style="min-height: 220px; color: #fff;"></div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="fw-bold mb-0 text-light">Últimos 20 pagos del período</h6>
+                            <a href="{% url 'apy:exportar_excel' %}?modulo=pagos&desde={{ desde }}&hasta={{ hasta }}"
+                                class="btn btn-sm btn-success">
+                                <i class="fas fa-file-excel me-1"></i>Exportar Excel
+                            </a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-secondary">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Proveedor</th>
+                                        <th>Fecha</th>
+                                        <th>Tipo Pago</th>
+                                        <th class="text-end">Monto Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for p in pagos_tabla %}
+                                    <tr>
+                                        <td class="text-muted small">{{ p.id_pago }}</td>
+                                        <td><strong>{{ p.proveedor.nombre }}</strong></td>
+                                        <td>{{ p.fecha|date:"d/m/Y" }}</td>
+                                        <td><span class="badge bg-secondary">{{ p.tipo_pago }}</span></td>
+                                        <td class="text-end fw-semibold text-warning">${{ p.monto_total|intcomma }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-4">Sin pagos en este período.
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ TAB: NÓMINA ═════════════════════════════════════ -->
+            <div class="tab-section" id="tab-nomina">
+                <div class="card border-0 shadow-sm border-top-0 rounded-top-0 mb-4">
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary fw-bold mb-3">
+                                    <i class="fas fa-chart-bar me-2"></i>Nómina pagada por período
+                                </h6>
+                                <div id="chart-nomina" style="min-height: 220px; color: #fff;"></div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="fw-bold mb-0 text-light">Últimos 20 pagos de nómina</h6>
+                            <a href="{% url 'apy:exportar_excel' %}?modulo=nomina&desde={{ desde }}&hasta={{ hasta }}"
+                                class="btn btn-sm btn-success">
+                                <i class="fas fa-file-excel me-1"></i>Exportar Excel
+                            </a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-secondary">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Empleado</th>
+                                        <th>Fecha Pago</th>
+                                        <th class="text-end">Monto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for n in nomina_tabla %}
+                                    <tr>
+                                        <td class="text-muted small">{{ n.id }}</td>
+                                        <td><strong>{{ n.empleado.user.get_full_name|default:n.empleado.user.username
+                                                }}</strong></td>
+                                        <td>{{ n.fecha_pago|date:"d/m/Y" }}</td>
+                                        <td class="text-end fw-semibold text-danger">${{ n.monto|intcomma }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-4">Sin nómina en este período.
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
         </div>
     </div>
 </main>
@@ -399,55 +817,63 @@
 <script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function () {
 
-    // ── Gráfico ingresos vs gastos (solo existe si es gerente) ──
-    const barChartEl = document.getElementById('barChart');
-    if (barChartEl) {
-        const meses          = {{ meses|safe|default:"[]" }};
-        const datosIngresos  = {{ datos_ingresos|safe|default:"[]" }};
-        const datosGastos    = {{ datos_gastos|safe|default:"[]" }};
+        // ── Gráfico ingresos vs gastos (solo existe si es gerente) ──
+        const barChartEl = document.getElementById('barChart');
+        if (barChartEl) {
+            const meses = {{ meses| safe |default: "[]"
+        }
+    }
+    const datosIngresos = {{ datos_ingresos| safe |default: "[]" }}
+    const datosGastos = {{ datos_gastos| safe |default: "[]" }}
 
-        new Chart(barChartEl, {
-            type: 'bar',
-            data: {
-                labels: meses,
-                datasets: [
-                    {
-                        label: 'Ingresos',
-                        data: datosIngresos,
-                        backgroundColor: 'rgba(25,135,84,0.8)',
-                        borderRadius: 4,
-                    },
-                    {
-                        label: 'Gastos',
-                        data: datosGastos,
-                        backgroundColor: 'rgba(220,53,69,0.8)',
-                        borderRadius: 4,
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'top' },
-                    tooltip: {
-                        callbacks: {
-                            label: ctx => ' $' + ctx.raw.toLocaleString('es-CO')
-                        }
-                    }
+    new Chart(barChartEl, {
+        type: 'bar',
+        data: {
+            labels: meses,
+            datasets: [
+                {
+                    label: 'Ingresos',
+                    data: datosIngresos,
+                    backgroundColor: 'rgba(25,135,84,0.8)',
+                    borderRadius: 4,
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: v => '$' + v.toLocaleString('es-CO')
-                        }
+                {
+                    label: 'Gastos',
+                    data: datosGastos,
+                    backgroundColor: 'rgba(220,53,69,0.8)',
+                    borderRadius: 4,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top', labels: { color: '#e0e0e0' } },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ' $' + ctx.raw.toLocaleString('es-CO')
                     }
                 }
+            },
+            scales: {
+                x: {
+                    ticks: { color: '#e0e0e0' },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: '#e0e0e0',
+                        callback: v => '$' + v.toLocaleString('es-CO')
+                    },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                }
             }
-        });
+        }
+    });
     }
 
     // ── Contadores en tiempo real ──────────────────────────────
@@ -468,10 +894,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     const apis = [
-        { url: "{% url 'apy:api_contador_insumos' %}",   id: 'contador-insumos',   key: 'total_insumos' },
+        { url: "{% url 'apy:api_contador_insumos' %}", id: 'contador-insumos', key: 'total_insumos' },
         { url: "{% url 'apy:api_contador_vehiculos' %}", id: 'contador-vehiculos', key: 'total_vehiculos' },
-        { url: "{% url 'apy:api_contador_clientes' %}",  id: 'contador-clientes',  key: 'total_clientes' },
-        { url: "{% url 'apy:api_contador_gastos' %}",    id: 'contador-gastos',    key: 'total_gastos' }
+        { url: "{% url 'apy:api_contador_clientes' %}", id: 'contador-clientes', key: 'total_clientes' },
+        { url: "{% url 'apy:api_contador_gastos' %}", id: 'contador-gastos', key: 'total_gastos' }
     ];
 
     apis.forEach(api => {
@@ -489,6 +915,67 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
+    // ── Lógica de Integración de Informes ──────────────────────
+    var labelsServicios = {{ labels_servicios|safe|default:"[]" }}
+    var datosServicios = {{ datos_servicios|safe|default:"[]" }}
+    var labelsPagos = {{ labels_pagos|safe|default:"[]" }}
+    var datosPagos = {{ datos_pagos|safe|default:"[]" }}
+    var labelsNomina = {{ labels_nomina|safe|default:"[]" }}
+    var datosNomina = {{ datos_nomina|safe|default:"[]" }}
+
+    function crearGraficaInfo(selector, labels, datos, color, titulo, esMonto) {
+        if (!document.querySelector(selector)) return;
+        var options = {
+            series: [{ name: titulo, data: datos }],
+            chart: { type: 'area', height: 220, toolbar: { show: false }, sparkline: { enabled: false } },
+            colors: [color],
+            fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05 } },
+            stroke: { curve: 'smooth', width: 2 },
+            xaxis: {
+                categories: labels,
+                labels: { style: { colors: '#e0e0e0', fontSize: '11px' } }
+            },
+            yaxis: {
+                labels: {
+                    style: { colors: '#e0e0e0' },
+                    formatter: function (v) {
+                        return esMonto ? ('$' + Math.round(v).toLocaleString('es-CO')) : v;
+                    }
+                }
+            },
+            tooltip: {
+                theme: 'dark',
+                y: {
+                    formatter: function (v) {
+                        return esMonto ? ('$' + Math.round(v).toLocaleString('es-CO')) : v + ' servicios';
+                    }
+                }
+            },
+            dataLabels: { enabled: false },
+            grid: { strokeDashArray: 4, borderColor: 'rgba(255,255,255,0.1)' },
+        };
+        new ApexCharts(document.querySelector(selector), options).render();
+    }
+
+    // Renderizar solo si existen los contenedores
+    setTimeout(function () {
+        if (document.querySelector('#chart-servicios')) crearGraficaInfo('#chart-servicios', labelsServicios, datosServicios, '#0d6efd', 'Servicios', false);
+        if (document.querySelector('#chart-pagos')) crearGraficaInfo('#chart-pagos', labelsPagos, datosPagos, '#fd7e14', 'Pagos ($)', true);
+        if (document.querySelector('#chart-nomina')) crearGraficaInfo('#chart-nomina', labelsNomina, datosNomina, '#dc3545', 'Nómina ($)', true);
+    }, 100);
+
 });
+
+    // ── Tabs Function ─────────────────────────────────────────────
+    function mostrarTab(nombre, btn) {
+        document.querySelectorAll('.tab-section').forEach(function (el) {
+            el.classList.remove('active');
+        });
+        document.querySelectorAll('#informesTabs .nav-link').forEach(function (el) {
+            el.classList.remove('active');
+        });
+        document.getElementById('tab-' + nombre).classList.add('active');
+        btn.classList.add('active');
+    }
 </script>
 {% endblock %}

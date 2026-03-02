@@ -24,13 +24,12 @@ load_dotenv()
 
 print("EMAIL USER:", os.environ.get('EMAIL_HOST_USER', 'NO CARGADO'))
 print("ADMINS STOCK:", os.environ.get('ADMINS_CORREO_STOCK', 'NO CARGADO'))
+print(f"DEBUG: DB_NAME={os.getenv('DB_NAME')}")
+print(f"DEBUG: DB_HOST={os.getenv('DB_HOST')}")
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-# Cargar variables del entorno ANTES de cualquier configuración
-load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 
 # --- Configuración del Módulo de Backup ---
@@ -51,7 +50,7 @@ except OSError as e:
 # En settings.py:
 SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 't')
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'taller_internacional.artisandev.site']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'taller_internacional.artisandev.site', 'web', 'db']
 CSRF_TRUSTED_ORIGINS = ['https://taller_internacional.artisandev.site']
 WHITENOISE_MANIFEST_STRICT = False
 # TEMPORAL para debug — quítalo cuando funcione
