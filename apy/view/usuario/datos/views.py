@@ -7,13 +7,14 @@ from django.views.generic import View, TemplateView
 from django.contrib.auth.forms import PasswordChangeForm 
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
+from django.db import transaction
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Importar tus formularios y modelos
 from apy.forms import PerfilUsuarioForm, ProfileForm 
 from apy.models import Profile 
 
-@method_decorator(login_required, name='dispatch')
-class PerfilEditarView(View):
+class PerfilEditarView(LoginRequiredMixin, View):
     template_name = 'usuario/editar_usuario.html' 
     success_url = reverse_lazy('apy:editar_usuario') 
 
@@ -37,29 +38,43 @@ class PerfilEditarView(View):
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
-        user_form = self.get_user_form(request.POST)
-        profile_form = self.get_profile_form(request.POST, request.FILES) 
-    
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            profile_form.save()
+            # 1. Detectar si el POST es para cambiar CONTRASEÑA
+            if 'old_password' in request.POST:
+                password_form = PasswordChangeForm(user=request.user, data=request.POST)
+                if password_form.is_valid():
+                    user = password_form.save()
+                    update_session_auth_hash(request, user)
+                    messages.success(request, "¡Contraseña actualizada con éxito!")
+                    return redirect(self.success_url)
+                else:
+                    # Si falla el password, recargamos con errores
+                    return render(request, self.template_name, {
+                        'form': self.get_user_form(),
+                        'profile_form': self.get_profile_form(),
+                        'password_form': password_form,
+                    })
 
-            # Verificamos si se marcó la eliminación (el name debe ser 'imagen_clear')
-            if request.POST.get('imagen_clear') == 'on':
-                messages.success(request, "Datos actualizados e imagen de perfil eliminada (ahora ves la imagen por defecto).")
-            else:
-                messages.success(request, "Datos de perfil y foto actualizados con éxito.")
-        
-            return redirect(self.success_url)
-        
-        else:
-            context = {
+            # 2. Lógica para DATOS PERSONALES (No permitir vacíos)
+            user_form = self.get_user_form(request.POST)
+            profile_form = self.get_profile_form(request.POST, request.FILES)
+
+            if user_form.is_valid() and profile_form.is_valid():
+                try:
+                    with transaction.atomic():
+                        user_form.save()
+                        profile_form.save()
+                    messages.success(request, "Perfil actualizado correctamente.")
+                    return redirect(self.success_url)
+                except Exception as e:
+                    messages.error(request, f"Error al guardar: {e}")
+            
+            # 3. Si llega aquí es porque hubo errores de validación (campos vacíos, etc)
+            messages.error(request, "Por favor, corrige los errores en el formulario.")
+            return render(request, self.template_name, {
                 'form': user_form,
                 'profile_form': profile_form,
-                'password_form': self.get_password_form(), 
-            }
-            messages.error(request, "Error al guardar los datos. Revisa los campos marcados.")
-            return render(request, self.template_name, context)
+                'password_form': self.get_password_form(),
+            })
         
 @method_decorator(login_required, name='dispatch')
 class ActualizarPerfilImagenView(View):

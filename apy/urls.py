@@ -1,5 +1,6 @@
 from django.urls import path
 from apy.view.empresa.views import *
+from apy.view.usuario.datos.views import *
 from apy.views import *
 from apy.view.proveedor.view import *
 from apy.view.Gastos.views import *
@@ -117,8 +118,9 @@ urlpatterns = [
     
     # --------------urls Usuario y permisos-------------- 
     path('perfil/', datos_usuario ,name='perfil_usuario'),
-    path('perfil/editar', PerfilUsuarioUpdateView.as_view(), name='editar_usuario'),  
+    path('perfil/editar/', PerfilEditarView.as_view(), name='editar_usuario'),  
     path('auth/password_change/', PerfilPasswordChangeView.as_view(), name='password_change'),
+    path('perfil/foto/', ActualizarPerfilImagenView.as_view(), name='actualizar_perfil_imagen'),
 
     path('registro/lista/', RegistroUsuarioListView.as_view(), name='registro_usuario_lista'), 
     path('registro/crear/', RegistroUsuarioCreateView.as_view(), name='registro_usuario_crear'), 
