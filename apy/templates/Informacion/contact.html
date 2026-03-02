@@ -151,7 +151,8 @@
                 o a través de nuestro formulario de contacto, donde podrás escribirnos tus dudas, inquietudes o
                 sugerencias, y nosotros te responderemos lo antes posible.
               </p>
-              <script src="https://www.google.com/recaptcha/api.js?render=6Lc4fHcsAAAAAASuIuVN4D0ZDiFB1ZmeQfRF4XoM"></script>              
+              <script
+                src="https://www.google.com/recaptcha/api.js?render=6Lc4fHcsAAAAAASuIuVN4D0ZDiFB1ZmeQfRF4XoM"></script>
               <form action="{% url 'apy:contacto_formulario' %}" method="post" id="captchaForm" class="php-email-form">
                 {% csrf_token %}
                 <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
@@ -173,38 +174,45 @@
                 </div>
 
                 <div class="my-3">
-                  <div class="loading d-none">Cargando</div>
-                  <div class="error-message d-none"></div>
-                  <div class="sent-message d-none">Tu mensaje ha sido enviado. ¡Gracias!</div>
-                </div>
+  <div class="loading">Cargando</div>
+  <div class="error-message"></div>
+  
+  {% if messages %}
+    {% for message in messages %}
+      <div class="sent-message d-block">{{ message }}</div>
+    {% endfor %}
+  {% else %}
+    <div class="sent-message">Tu mensaje ha sido enviado. ¡Gracias!</div>
+  {% endif %}
+</div>
 
                 <div class="form-submit">
                   <button type="submit">Enviar Mensaje</button>
                 </div>
               </form>
               <script>
-document.getElementById('captchaForm').addEventListener('submit', function (e) {
-    // Esto evita que el script de la plantilla (el que pegaste) se active
-    e.preventDefault();
-    e.stopImmediatePropagation(); 
+                document.getElementById('captchaForm').addEventListener('submit', function (e) {
+                  // Esto evita que el script de la plantilla (el que pegaste) se active
+                  e.preventDefault();
+                  e.stopImmediatePropagation();
 
-    // 1. Mostrar carga con los estilos de la plantilla
-    const loading = this.querySelector('.loading');
-    loading.style.display = 'block';
-    loading.classList.add('d-block');
+                  // 1. Mostrar carga con los estilos de la plantilla
+                  const loading = this.querySelector('.loading');
+                  loading.style.display = 'block';
+                  loading.classList.add('d-block');
 
-    // 2. Ejecutar reCAPTCHA con tu llave manual
-    grecaptcha.ready(function () {
-        grecaptcha.execute('6Lc4fHcsAAAAAASuIuVN4D0ZDiFB1ZmeQfRF4XoM', { action: 'submit' }).then(function (token) {
-            // Guardamos el token en el input hidden
-            document.getElementById('g-recaptcha-response').value = token;
+                  // 2. Ejecutar reCAPTCHA con tu llave manual
+                  grecaptcha.ready(function () {
+                    grecaptcha.execute('6Lc4fHcsAAAAAASuIuVN4D0ZDiFB1ZmeQfRF4XoM', { action: 'submit' }).then(function (token) {
+                      // Guardamos el token en el input hidden
+                      document.getElementById('g-recaptcha-response').value = token;
 
-            // 3. Enviamos el formulario REALMENTE a Django
-            document.getElementById('captchaForm').submit();
-        });
-    });
-}, true); // El "true" es vital para ganar la prioridad
-</script>
+                      // 3. Enviamos el formulario REALMENTE a Django
+                      document.getElementById('captchaForm').submit();
+                    });
+                  });
+                }, true); // El "true" es vital para ganar la prioridad
+              </script>
             </div>
           </div>
         </div>

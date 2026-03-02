@@ -1,5 +1,6 @@
 import requests
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib import messages
 from django.core.mail import send_mail
 from django.http import HttpResponse
 from django.conf import settings
@@ -46,12 +47,13 @@ def contacto_formulario(request):
                     f"WEB T.I.M: {asunto_cliente}",
                     f"De: {nombre} ({correo_cliente})\n\nMensaje:\n{mensaje_cliente}",
                     settings.EMAIL_HOST_USER,
-                    ['soportecnico.t.i.m@gmail.com'], # Tu correo donde recibes
+                    ['karoltalerolopez@gmail.com'], # Tu correo donde recibes
                     fail_silently=False,
                 )
                 
                 # Importante: Retornar OK para que la plantilla muestre el mensaje verde
-                return HttpResponse("OK")
+                messages.success(request, "Tu mensaje ha sido enviado. ¡Gracias!")
+                return redirect('apy:contact_informacion')
             
             else:
                 # Si Google dice que es un robot
@@ -62,5 +64,5 @@ def contacto_formulario(request):
 
     # Si la petición es GET (entrar a la página), enviamos la Site Key al HTML
     return render(request, 'informacion/contact.html', {
-        '6Lc4fHcsAAAAAASuIuVN4D0ZDiFB1ZmeQfRF4XoM': settings.RECAPTCHA_SITE_KEY
+        'RECAPTCHA_SITE_KEY': settings.RECAPTCHA_SITE_KEY
     })
