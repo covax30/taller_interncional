@@ -1,3 +1,5 @@
+from django.utils import timezone
+
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
@@ -120,7 +122,7 @@ class Marca(models.Model):
 
     def __str__(self):
         return f"{self.nombre} "
-#------ ENTIDAD REPUESTOS --------3
+# ------ ENTIDAD REPUESTOS --------
 class Repuesto(models.Model):
     id_marca = models.ForeignKey(Marca, on_delete=models.PROTECT) 
     nombre = models.CharField(max_length=100)
@@ -130,16 +132,23 @@ class Repuesto(models.Model):
     ]
     categoria = models.CharField(max_length=100, choices=CATEGORIA_OPCIONES)
     fabricante = models.CharField(max_length=100)
-    
+    stock = models.PositiveIntegerField(default=0, verbose_name="Stock disponible")  # ← NUEVO
+    stock_minimo = models.PositiveIntegerField(default=1, verbose_name="Stock mínimo")  # ← NUEVO
     estado = models.BooleanField(default=True)
-    
+
     def __str__(self):
-        return f"{self.nombre} "   
+        return f"{self.nombre}"
+
+    @property
+    def stock_bajo(self):
+        """Retorna True si el stock está por debajo del mínimo."""
+        return self.stock <= self.stock_minimo  # ← NUEVO
+
+  
    
     
-#------ ENTIDAD HERRAMIENTAS --------4
+# ------ ENTIDAD HERRAMIENTAS --------
 class Herramienta(models.Model):
-
     nombre = models.CharField(max_length=100)
     color = models.CharField(max_length=100)
     TIPO_OPCIONES = [
@@ -150,18 +159,22 @@ class Herramienta(models.Model):
     ]
     tipo = models.CharField(max_length=100, choices=TIPO_OPCIONES)
     id_marca = models.ForeignKey(Marca, on_delete=models.PROTECT)
-    
+    stock = models.PositiveIntegerField(default=0, verbose_name="Stock disponible")  # ← NUEVO
+    stock_minimo = models.PositiveIntegerField(default=2, verbose_name="Stock mínimo")  # ← NUEVO
     estado = models.BooleanField(default=True)
 
     def __str__(self):
         return self.nombre
 
-#------ ENTIDAD INSUMOS --------
-class Insumos(models.Model):
+    @property
+    def stock_bajo(self):
+        return self.stock <= self.stock_minimo  # ← NUEVO
 
+# ------ ENTIDAD INSUMOS --------
+class Insumos(models.Model):
     id_marca = models.ForeignKey(Marca, on_delete=models.PROTECT)
     nombre = models.CharField(max_length=100)
-    costo = models.IntegerField(  
+    costo = models.IntegerField(
         error_messages={
             'invalid': 'Ingrese un número válido para el costo.',
             'required': 'El costo del insumo es obligatorio.'
@@ -173,13 +186,17 @@ class Insumos(models.Model):
         ('mililitro', 'Mililitro'),
         ('unidades', 'Unidades'),
     ]
-
     cantidad = models.CharField(max_length=20, choices=CANTIDAD_OPCIONES)
+    stock = models.PositiveIntegerField(default=0, verbose_name="Stock disponible")  # ← NUEVO
+    stock_minimo = models.PositiveIntegerField(default=5, verbose_name="Stock mínimo")  # ← NUEVO
     estado = models.BooleanField(default=True)
-    
-    def __str__(self):
 
+    def __str__(self):
         return f"{self.id_marca} ({self.cantidad})"
+
+    @property
+    def stock_bajo(self):
+        return self.stock <= self.stock_minimo 
 
 
 # MODULOS STEVEN
@@ -324,6 +341,20 @@ class PagoServiciosPublicos(models.Model):
     )
     estado = models.BooleanField(default=True)
     
+    def save(self, *args, **kwargs):
+        es_nuevo = self.pk is None
+        super().save(*args, **kwargs)
+        if es_nuevo:
+
+            from .models import Gastos 
+            Gastos.objects.create(
+                monto=self.monto,
+                descripcion=f"Pago de servicio: {self.get_servicio_display()}",
+                tipo_gastos='costo fijo', 
+                id_pagos_servicios=self,
+                fecha=timezone.now().date()
+            )
+    
     def __str__(self):
         return f"{self.id_servicio} - {self.servicio} -{self.monto}"
     
@@ -381,6 +412,93 @@ class Proveedores(models.Model):
 
     def __str__(self):
         return f"{self.nombre} - {self.identificacion}"
+    
+    
+#--------------Modulo Pagos-----------------
+class Pagos(models.Model):
+    TIPO_PAGO_OPCIONES = [
+        ('efectivo', 'Efectivo'),
+        ('transferencia', 'Transferencia'),
+        ('cheque', 'Cheque'),
+        ('credito', 'Crédito'),
+    ]
+
+    id_pago      = models.AutoField(primary_key=True)
+    proveedor    = models.ForeignKey(Proveedores, on_delete=models.PROTECT)
+    fecha        = models.DateField(default=timezone.now)
+    tipo_pago    = models.CharField(max_length=20, choices=TIPO_PAGO_OPCIONES, default='efectivo')  # ← NUEVO
+    monto_total  = models.IntegerField(default=0)
+    estado       = models.BooleanField(default=True)
+    def save(self, *args, **kwargs):
+        es_nuevo = self.pk is None
+        super().save(*args, **kwargs)
+        if es_nuevo:
+            from .models import Gastos 
+            Gastos.objects.create(
+                monto=self.monto_total,
+                descripcion=f"Pago a proveedores: {self.get_tipo_pago_display()}",
+                tipo_gastos='costo fijo', # O el que prefieras
+                id_pago=self,
+                fecha=timezone.now().date()
+            )
+
+    def recalcular_total(self):
+        """Recalcula el monto_total sumando todos los DetallePago hijos."""
+        total = sum(d.subtotal for d in self.detalles.all())
+        self.monto_total = total
+        self.save(update_fields=['monto_total'])
+
+    def __str__(self):
+        return f"Pago #{self.id_pago} - {self.proveedor.nombre}"
+    
+class DetallePago(models.Model):
+    TIPO_CHOICES = [
+        ('Repuesto',    'Repuesto'),
+        ('Insumo',      'Insumo'),
+        ('Herramienta', 'Herramienta'),
+    ]
+    pago            = models.ForeignKey(Pagos, related_name='detalles', on_delete=models.PROTECT)
+    tipo_item       = models.CharField(max_length=20, choices=TIPO_CHOICES)
+    repuesto        = models.ForeignKey(Repuesto,    null=True, blank=True, on_delete=models.PROTECT)
+    insumo          = models.ForeignKey(Insumos,     null=True, blank=True, on_delete=models.PROTECT)
+    herramienta     = models.ForeignKey(Herramienta, null=True, blank=True, on_delete=models.PROTECT)
+    cantidad        = models.PositiveIntegerField(default=1)
+    precio_unitario = models.IntegerField()
+
+    @property
+    def subtotal(self):
+        return self.cantidad * self.precio_unitario
+
+    def clean(self):
+        """Valida que el FK correcto esté lleno según el tipo seleccionado."""
+        super().clean()
+        if self.tipo_item == 'Repuesto' and not self.repuesto_id:
+            raise ValidationError({'repuesto': 'Debe seleccionar un repuesto.'})
+        if self.tipo_item == 'Insumo' and not self.insumo_id:
+            raise ValidationError({'insumo': 'Debe seleccionar un insumo.'})
+        if self.tipo_item == 'Herramienta' and not self.herramienta_id:
+            raise ValidationError({'herramienta': 'Debe seleccionar una herramienta.'})
+
+    def __str__(self):
+        return f"Detalle {self.tipo_item} - Pago #{self.pago_id}"    
+    
+class Nomina(models.Model): 
+    empleado = models.ForeignKey(Profile, on_delete=models.PROTECT)
+    monto = models.IntegerField(validators=[validar_monto])
+    fecha_pago = models.DateField(default=timezone.now)
+    estado = models.BooleanField(default=True)
+
+    def save(self, *args, **kwargs):
+        es_nuevo = self.pk is None
+        super().save(*args, **kwargs)
+        if es_nuevo:
+            Caja.objects.create(
+                tipo_movimiento='Nomina',
+                monto=self.monto,
+                fecha=self.fecha_pago,
+                descripcion=f"Sueldo: {self.empleado.user.username}"
+            )    
+#--------------Modulo Compra (STEVEN)-----------------
 
 
 class Gastos(models.Model):
@@ -398,8 +516,23 @@ class Gastos(models.Model):
         ('costo variable', 'Costo variable'),
     ]
     tipo_gastos=models.CharField(max_length=100, choices=TIPO_GASTOS_OPCIONES)
-    id_pagos_servicios = models.ForeignKey(PagoServiciosPublicos, on_delete=models.PROTECT)
+    id_pagos_servicios = models.ForeignKey(PagoServiciosPublicos, on_delete=models.PROTECT,blank=True, null=True)
+    id_pago = models.ForeignKey(Pagos, on_delete=models.PROTECT, null=True, blank=True)
+    nomina = models.ForeignKey(Nomina, on_delete=models.PROTECT, null=True, blank=True) 
+    fecha = models.DateField(default=timezone.now)
     estado = models.BooleanField(default=True)
+    
+    
+    def save(self, *args, **kwargs):
+        es_nuevo = self.pk is None
+        super().save(*args, **kwargs)
+        if es_nuevo:
+            Caja.objects.create(
+                tipo_movimiento='Gasto',
+                monto=self.monto,
+                fecha=self.fecha,
+                descripcion=f"Gasto: {self.tipo_gastos} - {self.descripcion[:30]}"
+            )
     
     def __str__(self):
         return f"{self.tipo_gastos} - ${self.monto}"
@@ -423,27 +556,7 @@ class Mantenimiento(models.Model):
     
 #------------Modulo Informes-----------
     
-    
-#--------------Modulo Pagos-----------------
-class Pagos(models.Model):
-    id_pago = models.AutoField(primary_key=True)
-    tipo_pago = models.CharField(max_length=100)
-    fecha = models.DateField()
-    hora = models.TimeField()
-    monto = models.IntegerField(  # 🔹 ENTEROS, sin decimales
-        error_messages={
-            'invalid': 'Ingrese un número válido para el monto.',
-            'required': 'El monto del pago es obligatorio.'
-        } , validators=[validar_monto]
-    )
-    id_proveedor = models.ForeignKey(Proveedores, on_delete=models.PROTECT)
-    id_herramienta = models.ForeignKey(Herramienta, on_delete=models.PROTECT)
-    id_insumos = models.ForeignKey(Insumos, on_delete=models.PROTECT)
-    id_repuesto = models.ForeignKey(Repuesto, on_delete=models.PROTECT)
-    estado = models.BooleanField(default=True)
-    
-    def __str__(self):
-        return f"{self.id_pago} {self.monto}"
+
 
 # ----- modulo detalle servicio  ---------
 class DetalleServicio(models.Model):
@@ -455,10 +568,11 @@ class DetalleServicio(models.Model):
     cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
     id_entrada = models.ForeignKey(EntradaVehiculo, on_delete=models.PROTECT, blank=True, null=True)
     empresa = models.ForeignKey('Empresa', on_delete=models.PROTECT, blank=True, null=True)
-    empleado = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True)
+    empleado = models.ForeignKey(Profile, on_delete=models.PROTECT, blank=True, null=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     id_salida = models.ForeignKey(SalidaVehiculo, on_delete=models.PROTECT, blank=True, null=True)
     proceso = models.CharField(max_length=20, choices=PROCESO_OPCIONES, default='proceso')
+    
     estado = models.BooleanField(default=True)
 
     #class Meta:
@@ -499,6 +613,39 @@ class DetalleServicio(models.Model):
             self.detalletipomantenimiento_set.count() +
             self.detalleinsumos_set.count()
         )
+        
+    def registrar_ingreso_en_caja(self):
+        """
+        Registra el total del servicio en Caja cuando se marca como terminado.
+        Usa refresh_from_db() para garantizar que la FK id_vehiculo esté cargada.
+        """
+        from .models import Caja
+
+        try:
+            # Recarga el objeto completo desde BD, incluyendo todas las FK
+            self.refresh_from_db()
+            placa = self.id_vehiculo.placa
+        except Exception:
+            # Si la FK no existe por alguna razón, no rompemos el flujo
+            return
+
+        descripcion_busqueda = f"Servicio #{self.id} - Placa: {placa}"
+
+        # Evita duplicar el registro si ya existe
+        if not Caja.objects.filter(descripcion=descripcion_busqueda).exists():
+            Caja.objects.create(
+                tipo_movimiento='Ingreso',
+                monto=int(self.subtotal),
+                fecha=timezone.now().date(),
+                descripcion=descripcion_busqueda,
+            )
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Verificamos con id_vehiculo_id (campo raw int) para no disparar
+        # una consulta extra ni lanzar RelatedObjectDoesNotExist
+        if self.proceso == 'terminado' and self.pk and self.id_vehiculo_id:
+            self.registrar_ingreso_en_caja()   
 
     def __str__(self):
         return f"Servicio #{self.id} - {self.id_vehiculo.placa}"
@@ -508,45 +655,53 @@ class DetalleRepuesto(models.Model):
     id_repuesto = models.ForeignKey(Repuesto, on_delete=models.PROTECT)
     cantidad = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
     precio_unitario = models.PositiveIntegerField(validators=[validar_monto])
+    # Asegúrate de que este campo NO tenga una @property con el mismo nombre abajo
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    
-    @property
-    def subtotal(self):
-        return self.cantidad * self.precio_unitario
-    
-    def __str__(self):
-        return f"Repuesto: {self.id_repuesto.nombre} - Cantidad: {self.cantidad}"
-    
 
-class DetalleTipoMantenimiento(models.Model):
-    detalle_servicio = models.ForeignKey(DetalleServicio, on_delete=models.PROTECT)
-    id_tipo_mantenimiento = models.ForeignKey(TipoMantenimiento, on_delete=models.PROTECT)
-    cantidad = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
-    precio_unitario = models.PositiveIntegerField(validators=[validar_monto])
-    subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    
     def save(self, *args, **kwargs):
         self.subtotal = self.cantidad * self.precio_unitario
         super().save(*args, **kwargs)
 
-    
+    def __str__(self):
+        return f"Repuesto: {self.id_repuesto.nombre} - Cantidad: {self.cantidad}"
+
+class DetalleTipoMantenimiento(models.Model):
+    detalle_servicio = models.ForeignKey(DetalleServicio, on_delete=models.PROTECT)
+    id_tipo_mantenimiento = models.ForeignKey(TipoMantenimiento, on_delete=models.PROTECT)
+    # ── NUEVO CAMPO ──────────────────────────────────────────
+    empleado = models.ForeignKey(
+        Profile,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        verbose_name="Mecánico Responsable",
+        related_name="mantenimientos_realizados"
+    )
+    # ─────────────────────────────────────────────────────────
+    cantidad = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
+    precio_unitario = models.PositiveIntegerField(validators=[validar_monto])
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    def save(self, *args, **kwargs):
+        self.subtotal = self.cantidad * self.precio_unitario
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Mantenimiento: {self.id_tipo_mantenimiento.nombre}"
+        empleado_str = f" - {self.empleado.user.get_full_name()}" if self.empleado else ""
+        return f"{self.id_tipo_mantenimiento.nombre}{empleado_str}"
+
 
 class DetalleInsumos(models.Model):
     detalle_servicio = models.ForeignKey(DetalleServicio, on_delete=models.PROTECT)
     id_insumos = models.ForeignKey(Insumos, on_delete=models.PROTECT)
     cantidad = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
     precio_unitario = models.PositiveIntegerField(validators=[validar_monto])
-    #subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    # Reactivamos el campo y usamos save()
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     
-    @property
-    def subtotal(self):
-        return self.cantidad * self.precio_unitario
-    
-    def __str__(self):
-        return f"Insumo: {self.id_insumos} - Cantidad: {self.cantidad}"
+    def save(self, *args, **kwargs):
+        self.subtotal = self.cantidad * self.precio_unitario
+        super().save(*args, **kwargs)
     
  #-----Empresa----------------------
 class Empresa(models.Model):
@@ -567,34 +722,34 @@ class Informes(models.Model):
     fecha = models.DateField(auto_now_add=True)
     hora = models.TimeField(auto_now_add=True)
     tipo_informe = models.CharField(max_length=20, choices=[('Preventivo', 'Preventivo'), ('Correctivo', 'Correctivo')])
-    costo_mano_obra = models.PositiveIntegerField(validators=[validar_monto], verbose_name="Costo Mano de Obra")
+    
+    # Este campo ahora puede ser opcional o informativo, ya que el valor real 
+    # viene del detalle de mantenimiento del servicio.
     total_repuestos = models.PositiveIntegerField(default=0, editable=False)
     total_insumos = models.PositiveIntegerField(default=0, editable=False)
+    total_mantenimiento = models.PositiveIntegerField(default=0, editable=False) # Agregamos este
     total_final = models.PositiveIntegerField(default=0, editable=False)
+    
     diagnostico_final = models.TextField(blank=True, null=True, verbose_name="Notas del Mecánico")
     estado = models.BooleanField(default=True)
 
-    def __str__(self):
-        return f"Informe {self.id_informe} - {self.detalle_servicio.id_vehiculo.placa}"
-    
     def save(self, *args, **kwargs):
         if self.detalle_servicio:
-            self.total_repuestos = self.detalle_servicio.total_repuestos
-            self.total_insumos = self.detalle_servicio.total_insumos
-            self.total_final = self.total_repuestos + self.total_insumos + self.costo_mano_obra
+            # Traemos los totales calculados en las @property de DetalleServicio
+            self.total_repuestos = int(self.detalle_servicio.total_repuestos)
+            self.total_insumos = int(self.detalle_servicio.total_insumos)
+            self.total_mantenimiento = int(self.detalle_servicio.total_mantenimientos)
+            
+            # El total final suma todo, incluyendo el mantenimiento que ya estaba en el detalle
+            self.total_final = (
+                self.total_repuestos + 
+                self.total_insumos + 
+                self.total_mantenimiento 
+            )
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Informe {self.id_informe} - {self.id_mantenimiento.id_vehiculo}"
-    
-    def save(self, *args, **kwargs):
-    # Esto asegura que antes de guardar, se traigan los totales reales
-        if self.detalle_servicio:
-            self.total_repuestos = self.detalle_servicio.total_repuestos
-            self.total_insumos = self.detalle_servicio.total_insumos
-            # Sumamos los totales de productos más la mano de obra manual
-            self.total_final = self.total_repuestos + self.total_insumos + self.costo_mano_obra
-        super().save(*args, **kwargs)
+        return f"Informe {self.id_informe} - {self.detalle_servicio.id_vehiculo.placa}"
 #-----------Factura-----------------
 class Factura(models.Model):
     METODO_PAGO = [
@@ -626,32 +781,57 @@ class Factura(models.Model):
 
 
 
-    
-#--------------Modulo Compra (STEVEN)-----------------
+
 #-----------Caja-----------------
 class Caja(models.Model):
     TIPO_OPCIONES = [
         ('Ingreso', 'Ingreso'),
         ('Gasto', 'Gasto'),
-        ('Venta', 'Venta'),
-        ('Compra', 'Compra'),
+        ('Nomina', 'Nomina'), # Agregamos este para mayor detalle
+    ]
+    tipo_movimiento = models.CharField(max_length=20, choices=TIPO_OPCIONES)
+    monto = models.IntegerField(validators=[validar_monto])
+    fecha = models.DateField(default=timezone.now)
+    hora = models.TimeField(auto_now_add=True)
+    descripcion = models.CharField(max_length=255, blank=True) # Para saber de dónde viene
+    estado = models.BooleanField(default=True)
+    
+    
+    
+    # ═══════════════════════════════════════════════════════════════
+# Agrega esta clase al FINAL de tu apy/models.py
+# ═══════════════════════════════════════════════════════════════
+
+class AlertaStock(models.Model):
+    """
+    Registro de alertas de stock bajo.
+    Se crea desde signals.py cada vez que un ítem baja del mínimo.
+    El context processor las inyecta en todos los templates.
+    """
+    TIPO_CHOICES = [
+        ('Repuesto',    'Repuesto'),
+        ('Insumo',      'Insumo'),
+        ('Herramienta', 'Herramienta'),
+    ]
+    NIVEL_CHOICES = [
+        ('sin_stock', 'Sin Stock'),
+        ('stock_bajo', 'Stock Bajo'),
     ]
 
-    tipo_movimiento = models.CharField(
-        max_length=20,
-        choices=TIPO_OPCIONES
-    )
-    monto = models.IntegerField(  # 🔹 ENTEROS, sin decimales
-        error_messages={
-            'invalid': 'Ingrese un número válido para el monto.',
-            'required': 'El monto de la caja es obligatorio.'
-        } , validators=[validar_monto]
-    )
-    fecha= models.DateField()
-    hora=models.TimeField()
-    estado = models.BooleanField(default=True)
+    tipo         = models.CharField(max_length=20, choices=TIPO_CHOICES)
+    nombre_item  = models.CharField(max_length=200)
+    stock_actual = models.IntegerField()
+    stock_minimo = models.IntegerField()
+    nivel        = models.CharField(max_length=20, choices=NIVEL_CHOICES)
+    fecha        = models.DateTimeField(auto_now_add=True)
+    leida        = models.BooleanField(default=False)   # True = el admin la descartó
+
+    class Meta:
+        ordering = ['-fecha']
+        verbose_name = 'Alerta de Stock'
+        verbose_name_plural = 'Alertas de Stock'
+
     def __str__(self):
-        return f"{self.tipo_movimiento} - {self.monto} en {self.fecha} {self.hora}"   
-    #class meta
-        #verbose_name = 'Caja'
-        #verbose_name_plural = 'Caja'")
+        return f"[{self.nivel}] {self.tipo}: {self.nombre_item} ({self.stock_actual} uds)"                                                      
+    
+    

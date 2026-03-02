@@ -1,0 +1,105 @@
+{% extends 'body.html' %}
+{% load humanize %} {% block content %}
+<div class="container-fluid pt-4">
+    <div class="card shadow-sm border-0" style="max-width: 900px; margin: auto;">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h3 class="mb-0"><i class="fas fa-file-alt"></i> Informe Técnico #{{ informe.id_informe }}</h3>
+            <span>Fecha: {{ informe.fecha|date:"d/m/Y" }} | {{ informe.hora|time:"H:i" }}</span>
+        </div>
+
+        <div class="card-body bg-white text-dark">
+            <div class="row mb-4">
+                <div class="col-sm-6">
+                    <h5 class="text-primary border-bottom pb-2">Información del Cliente</h5>
+                    <p class="mb-1"><strong>Nombre:</strong> {{ informe.detalle_servicio.cliente.nombre }}</p>
+                    <p class="mb-1"><strong>Documento:</strong> {{ informe.detalle_servicio.cliente.identificacion }}</p>
+                    <p class="mb-1"><strong>Teléfono:</strong> {{ informe.detalle_servicio.cliente.telefono }}</p>
+                </div>
+                <div class="col-sm-6">
+                    <h5 class="text-primary border-bottom pb-2">Datos del Vehículo</h5>
+                    <p class="mb-1"><strong>Placa:</strong> <span class="badge badge-warning text-dark">{{ informe.detalle_servicio.id_vehiculo.placa }}</span></p>
+                    <p class="mb-1"><strong>Marca/Modelo:</strong> {{ informe.detalle_servicio.id_vehiculo.marca_vehiculo }} - {{ informe.detalle_servicio.id_vehiculo.modelo_vehiculo }}</p>
+                    <p class="mb-1"><strong>Tipo de Informe:</strong> {{ informe.tipo_informe }}</p>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="p-3 border rounded bg-light">
+                        <h5 class="text-danger"><i class="fas fa-microscope"></i> Diagnóstico y Notas del Mecánico</h5>
+                        <hr>
+                        <p class="mb-0" style="white-space: pre-wrap;">{{ informe.diagnostico_final|default:"No se registraron observaciones técnicas." }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-12">
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Concepto</th>
+                                <th class="text-right">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Consolidado de Repuestos</td>
+                                <td class="text-right">${{ informe.total_repuestos|intcomma }}</td>
+                            </tr>
+                            <tr>
+                                <td>Consolidado de Insumos</td>
+                                <td class="text-right">${{ informe.total_insumos|intcomma }}</td>
+                            </tr>
+                            <tr>
+                                <td>Mano de Obra / Mantenimiento Realizado</td>
+                                <td class="text-right">${{ informe.total_mantenimiento|intcomma }}</td>
+                            </tr>
+                            {% if informe.costo_mano_obra > 0 %}
+                            <tr>
+                                <td>Mano de Obra Adicional</td>
+                                <td class="text-right">${{ informe.costo_mano_obra|intcomma }}</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                        <tfoot>
+                            <tr class="h4">
+                                <th class="text-right">TOTAL FINAL:</th>
+                                <th class="text-right text-primary">${{ informe.total_final|intcomma }}</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row mt-5">
+                <div class="col-sm-6 text-center">
+                    <div style="border-top: 1px solid #000; margin-top: 40px; padding-top: 5px;">
+                        <p class="mb-0"><strong>{{ informe.id_empleado.user.get_full_name }}</strong></p>
+                        <small>Mecánico Responsable</small>
+                    </div>
+                </div>
+                <div class="col-sm-6 text-center">
+                    <div style="border-top: 1px solid #000; margin-top: 40px; padding-top: 5px;">
+                        <p class="mb-0">Firma del Cliente</p>
+                        <small>Recibido conforme</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer no-print text-right">
+            <button onclick="window.print();" class="btn btn-secondary"><i class="fas fa-print"></i> Imprimir</button>
+            <a href="{% url 'apy:lista_servicios' %}" class="btn btn-primary">Volver a la Lista</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    @media print {
+        .no-print { display: none !important; }
+        .card { border: none !important; shadow: none !important; }
+        .card-header { background-color: #000 !important; color: #fff !important; }
+    }
+</style>
+{% endblock %}

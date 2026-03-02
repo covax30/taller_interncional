@@ -84,10 +84,21 @@ class GastosCreateView(PermisoRequeridoMixin, CreateView):
     permission_required = 'add'
     
     def form_valid(self, form):
+        # 1. Guardamos el gasto primero
         form.instance.estado = True 
-        messages.success(self.request, "Gasto creado correctamente")
-        return super().form_valid(form)
-    
+        response = super().form_valid(form)
+        
+        # 2. Lógica Financiera: Crear el movimiento en Caja
+        Caja.objects.create(
+            tipo_movimiento='Egreso',  # O el valor que uses en tu modelo
+            monto=form.instance.monto,
+            descripcion=f"Gasto: {form.instance.tipo_gastos} - {form.instance.descripcion}",
+            fecha=form.instance.fecha,
+            estado=True
+        )
+        
+        messages.success(self.request, "Gasto creado y descontado de caja")
+        return response
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context ['titulo'] = 'Crear Gasto'

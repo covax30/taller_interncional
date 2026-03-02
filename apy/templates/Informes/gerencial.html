@@ -1,0 +1,103 @@
+{% extends 'body.html' %}
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+            <div class="row align-items-center">
+                <div class="col-md-7 border-end">
+                    <h2 class="fw-bold text-primary mb-1">Taller Mecánica Diesel Internacional Arturo Patiño</h2>
+                    <p class="mb-2 text-muted small">Especialistas en Motores Diesel y Maquinaria Pesada</p>
+                    
+                    <div class="row mt-3">
+                        <div class="col-6">
+                            <small class="d-block text-uppercase fw-bold text-secondary">Identificación</small>
+                            <span class="d-block"><strong>NIT:</strong> 74.187366-2</span>
+                            <span class="d-block"><strong>Tel:</strong> 311 811 2714</span>
+                        </div>
+                        <div class="col-6">
+                            <small class="d-block text-uppercase fw-bold text-secondary">Ubicación y Contacto</small>
+                            <span class="d-block">Calle 9 #32-37 Barrio La Isla</span>
+                            <span class="d-block text-primary">dieselarturopatino@gmail.com</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-5 ps-md-4">
+                    <div class="d-flex flex-column gap-2">
+                        <div class="d-flex justify-content-between border-bottom pb-1">
+                            <span class="text-muted small">Tipo de Documento:</span>
+                            <span class="badge bg-dark">Informe Gerencial Mensual</span>
+                        </div>
+                        <div class="d-flex justify-content-between border-bottom pb-1">
+                            <span class="text-muted small">Estado del Balance:</span>
+                            {% if utilidad >= 0 %}
+                                <span class="badge bg-success">Operativo - Superávit</span>
+                            {% else %}
+                                <span class="badge bg-danger">En Revisión - Déficit</span>
+                            {% endif %}
+                        </div>
+                        <div class="d-flex justify-content-between border-bottom pb-1">
+                            <span class="text-muted small">Generado por:</span>
+                            <span class="fw-bold">{{ user.get_full_name|default:user.username }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted small">Fecha de Emisión:</span>
+                            <span>{% now "d F Y, H:i" %}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+<div class="container mt-4">
+    <h2>Informe de Rendimiento - {{ mes_nombre }}</h2>
+    <hr>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card bg-success text-white shadow">
+                <div class="card-body">
+                    <h5 class="card-title text-uppercase small">Ingresos Totales</h5>
+                    <h2 class="display-6">${{ ingresos|floatformat:2 }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-danger text-white shadow">
+                <div class="card-body">
+                    <h5 class="card-title text-uppercase small">Gastos + Servicios</h5>
+                    <h2 class="display-6">${{ egresos|floatformat:2 }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card {% if utilidad >= 0 %}bg-primary{% else %}bg-warning text-dark{% endif %} text-white shadow">
+                <div class="card-body">
+                    <h5 class="card-title text-uppercase small">Utilidad Neta</h5>
+                    <h2 class="display-6">${{ utilidad|floatformat:2 }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white">Eficiencia del Personal</div>
+                <div class="card-body text-center">
+                    {% if mecanico_top %}
+                        <h4>⭐ {{ mecanico_top.empleado__first_name }} {{ mecanico_top.empleado__last_name }}</h4>
+                        <p class="text-muted">Mecánico con más servicios completados: <strong>{{ mecanico_top.total_hecho }}</strong></p>
+                    {% else %}
+                        <p>No hay datos de servicios este mes.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

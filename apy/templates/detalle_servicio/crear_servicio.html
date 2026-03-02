@@ -16,8 +16,6 @@
             <a href="/apy/servicios/" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left me-1"></i>Volver a la Lista
             </a>
-    
-
         </div>
 
         <form method="post" id="servicio-form">
@@ -29,18 +27,15 @@
                         <i class="fas fa-clipboard-list me-2"></i>Información General de Entrada
                     </h5>
                 </div>
-                
                 <div class="card-body p-4">
                     <div class="row">
-                        
-
                         <div class="col-md-6 ps-md-4 border-end">
                             <h6 class="text-muted fw-bold mb-3"><i class="fas fa-car me-2"></i>DATOS DEL VEHÍCULO</h6>
                             <div class="form-group mb-0">
                                 <label class="form-label">Registro de Ingreso:</label>
                                 <div class="input-group" style="display: flex; flex-wrap: nowrap;">
                                     <div style="flex-grow: 1;">
-                                    {{ form.id_entrada|add_class:"form-control" }}
+                                        {{ form.id_entrada|add_class:"form-control" }}
                                     </div>
                                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-id_entrada">
                                         <i class="fas fa-plus"></i>
@@ -50,17 +45,16 @@
                             <div class="form-group mb-3">
                                 <label class="form-label">Vehículo Asociado:</label>
                                 <div class="input-group" style="display: flex; flex-wrap: nowrap;">
-                            <div style="flex-grow: 1;">
-                                 {{ form.id_vehiculo|add_class:"form-control" }}
+                                    <div style="flex-grow: 1;">
+                                        {{ form.id_vehiculo|add_class:"form-control" }}
+                                    </div>
+                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-id_vehiculo">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-id_vehiculo">
-                                <i class="fas fa-plus"></i>
-                            </button>
                         </div>
-                            </div>
-                            
-                        </div>
-                        <div class="col-md-6 ">
+                        <div class="col-md-6">
                             <h6 class="text-muted fw-bold mb-3"><i class="fas fa-user me-2"></i>DATOS DEL CLIENTE</h6>
                             <div class="form-group mb-4">
                                 <label class="form-label">Seleccionar Cliente:</label>
@@ -77,14 +71,13 @@
                     </div>
                 </div>
             </div>
-            <!--<informacion de remitente-->
-             <div class="card shadow-sm border-0 mb-4">
+
+            <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-body py-3">
                     <h5 class="mb-0 text-primary"> 
                         <i class="fas fa-clipboard-list me-2"></i>Información General del remitente
                     </h5>
                 </div>
-                
                 <div class="card-body p-4">
                     <div class="row">
                         <div class="col-md-6 border-end">
@@ -93,35 +86,28 @@
                                 <label class="form-label">Seleccionar remitente:</label>
                                 <div class="input-group">
                                     {{ form.empresa|add_class:"form-control" }}
-                                   
                                 </div>
                             </div>
                         </div>
-
                         <div class="col-md-6 ps-md-4">
                             <h6 class="text-muted fw-bold mb-3"><i class="fas fa-car me-2"></i>DATOS DEL EMPLEADO A CARGO </h6>
                             <div class="form-group mb-3">
                                 <label class="form-label">Empleado:</label>
                                 <div class="input-group" style="display: flex; flex-wrap: nowrap;">
                                     <div style="flex-grow: 1;">
-                                    {{ form.empleado|add_class:"form-control" }}
+                                        {{ form.empleado|add_class:"form-control" }}
                                     </div>
                                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-empleado">
                                         <i class="fas fa-plus"></i>
                                     </button>
                                 </div>
                             </div>
-                            
                         </div>
                     </div>
                 </div>
             </div>
 
-
-
-
-
-<!--- Repuestos, mantenimientos e insumos -->
+            <!-- Repuestos -->
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-body py-3 d-flex justify-content-between align-items-center">
                     <h5 class="mb-0 text-primary"><i class="fas fa-cog me-2"></i>Repuestos</h5>
@@ -137,12 +123,12 @@
                             {{ form.id }}
                             <div class="col-md-4">
                                 <label class="small fw-bold">Repuesto:</label>
-                                <div class="input-group"style="display: flex; flex-wrap: nowrap;">
+                                <div class="input-group" style="display: flex; flex-wrap: nowrap;">
                                     {{ form.id_repuesto|add_class:'form-control' }}
                                     <div style="flex-grow: 1;">
-                                    <button type="button" class="btn btn-outline-secondary btn-add-repuesto" data-toggle="modal" data-target="#modal-id_repuesto" data-select="#{{ form.id_repuesto.id_for_label }}">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
+                                        <button type="button" class="btn btn-outline-secondary btn-add-repuesto" data-toggle="modal" data-target="#modal-id_repuesto" data-select="#{{ form.id_repuesto.id_for_label }}">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -173,6 +159,7 @@
                 </div>
             </div>
 
+            <!-- ═══ MANTENIMIENTOS — con Mecánico por fila ═══ -->
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-body py-3 d-flex justify-content-between align-items-center">
                     <h5 class="mb-0 text-primary"><i class="fas fa-tools me-2"></i>Mantenimientos</h5>
@@ -184,46 +171,67 @@
                     {{ mantenimiento_formset.management_form }}
                     <div id="mantenimientos-formset">
                         {% for form in mantenimiento_formset %}
-                        <div class="mantenimiento-form row mb-3 border-bottom pb-3 align-items-end">
+                        <div class="mantenimiento-form border rounded p-3 mb-3">
                             {{ form.id }}
-                            <div class="col-md-4">
-                                <label class="small fw-bold">Tipo Mantenimiento:</label>
-                                <div class="input-group" style="display: flex; flex-wrap: nowrap;">
-                                    {{ form.id_tipo_mantenimiento|add_class:'form-control' }}
-                                    <div style="flex-grow: 1;">
-                                    <button type="button" class="btn btn-outline-secondary btn-add-mantenimiento" data-toggle="modal" data-target="#modal-id_tipo_mantenimiento" data-select="#{{ form.id_tipo_mantenimiento.id_for_label }}">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
+                            <!-- Fila 1: Tipo + Mecánico -->
+                            <div class="row mb-2 align-items-end">
+                                <div class="col-md-6">
+                                    <label class="small fw-bold">Tipo Mantenimiento:</label>
+                                    <div class="input-group" style="display: flex; flex-wrap: nowrap;">
+                                        {{ form.id_tipo_mantenimiento|add_class:'form-control' }}
+                                        <div style="flex-grow: 1;">
+                                            <button type="button" class="btn btn-outline-secondary btn-add-mantenimiento" data-toggle="modal" data-target="#modal-id_tipo_mantenimiento" data-select="#{{ form.id_tipo_mantenimiento.id_for_label }}">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
+                                <div class="col-md-6">
+                                    <label class="small fw-bold">
+                                        <i class="fas fa-user-cog me-1 text-primary"></i>Mecánico Responsable:
+                                    </label>
+                                    <select name="{{ form.empleado.html_name }}" class="form-control select-empleado-mant">
+                                        <option value="">— Sin asignar —</option>
+                                        {% for perfil in perfiles %}
+                                            <option value="{{ perfil.pk }}"
+                                                {% if form.instance.pk and form.instance.empleado_id == perfil.pk %}selected{% endif %}>
+                                                {{ perfil.user.get_full_name|default:perfil.user.username }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
                             </div>
-                            <div class="col-md-2">
-                                <label class="small fw-bold">Cant.</label>
-                                {{ form.cantidad|add_class:"form-control cantidad-mantenimientos" }}
-                            </div>
-                            <div class="col-md-3">
-                                <label class="small fw-bold">Precio Unit.</label>
-                                {{ form.precio_unitario|add_class:"form-control precio-mantenimientos" }}
-                            </div>
-                            <div class="col-md-2">
-                                <label class="small fw-bold">Subtotal</label>
-                                <input type="text" class="form-control subtotal-mantenimiento" readonly value="$0">
-                            </div>
-                            <div class="col-md-1 text-center">
-                                <button type="button" class="btn btn-outline-danger btn-sm remove-form">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
+                            <!-- Fila 2: Cant + Precio + Subtotal + Eliminar -->
+                            <div class="row align-items-end">
+                                <div class="col-md-3">
+                                    <label class="small fw-bold">Cant.</label>
+                                    {{ form.cantidad|add_class:"form-control cantidad-mantenimientos" }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="small fw-bold">Precio Unit.</label>
+                                    {{ form.precio_unitario|add_class:"form-control precio-mantenimientos" }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="small fw-bold">Subtotal</label>
+                                    <input type="text" class="form-control subtotal-mantenimiento" readonly value="$0">
+                                </div>
+                                <div class="col-md-1 text-center">
+                                    <button type="button" class="btn btn-outline-danger btn-sm remove-form">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         {% endfor %}
                     </div>
                     <div class="text-end mt-2">
-    <span class="text-muted">Total Mantenimientos:</span>
-    <h5 class="d-inline-block ms-2 mb-0" id="total-mantenimientos">$0</h5>
-</div>
+                        <span class="text-muted">Total Mantenimientos:</span>
+                        <h5 class="d-inline-block ms-2 mb-0" id="total-mantenimientos">$0</h5>
+                    </div>
                 </div>
             </div>
 
+            <!-- Insumos -->
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-body py-3 d-flex justify-content-between align-items-center">
                     <h5 class="mb-0 text-primary"><i class="fas fa-flask me-2"></i>Insumos</h5>
@@ -242,9 +250,9 @@
                                 <div class="input-group" style="display: flex; flex-wrap: nowrap;">
                                     {{ form.id_insumos|add_class:'form-control' }}
                                     <div style="flex-grow: 1;">
-                                    <button type="button" class="btn btn-outline-secondary btn-add-insumo" data-toggle="modal" data-target="#modal-id_insumos" data-select="#{{ form.id_insumos.id_for_label }}">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
+                                        <button type="button" class="btn btn-outline-secondary btn-add-insumo" data-toggle="modal" data-target="#modal-id_insumos" data-select="#{{ form.id_insumos.id_for_label }}">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -268,283 +276,214 @@
                         </div>
                         {% endfor %}
                     </div>
-
                     <div class="text-end mt-2">
-    <span class="text-muted">Total Insumos:</span>
-    <h5 class="d-inline-block ms-2 mb-0" id="total-insumos">$0</h5>
-</div>
-                </div>
-            </div>
-<!--- Salida del vehiculo-->
-<div class="card shadow-sm border-0 mb-4">
-    <div class="card-header bg-body py-3">
-        <h5 class="mb-0 text-primary"> 
-            <i class="fas fa-sign-out-alt me-2"></i>Información General de salida
-        </h5>
-    </div>
-    <div class="card-body p-4">
-        <div class="row">
-            <div class="col-md-6">
-                <h6 class="text-muted fw-bold mb-3"><i class="fas fa-car me-2"></i>DATOS DEL VEHÍCULO</h6>
-                <div class="form-group mb-0">
-
-                    <label class="form-label">Registro de Salida:</label>
-                    <div class="input-group" style="display: flex; flex-wrap: nowrap;">
-                        {{ form.id_salida|add_class:"form-control" }}
-                        <button type="button" class="btn btn-primary">
-                            <i class="fas fa-history"></i>
-                        </button>
+                        <span class="text-muted">Total Insumos:</span>
+                        <h5 class="d-inline-block ms-2 mb-0" id="total-insumos">$0</h5>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6"></div>
-        </div>
-    </div>
-</div>
-<div class="card shadow-sm border-0 mb-4 bg-body">
-    <div class="card-body py-3 px-4">
-        <div class="row align-items-center">
-            <div class="col-md-5">
-                <label class="form-label fw-bold text-secondary mb-1" style="font-size: 0.85rem;">
-                    <i class="fas fa-tasks me-2"></i>ESTADO DEL SERVICIO
-                </label>
-                <div class="input-group input-group-sm">
-                    {{ form.proceso }}
+
+            <!-- Salida del vehiculo -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-body py-3">
+                    <h5 class="mb-0 text-primary"> 
+                        <i class="fas fa-sign-out-alt me-2"></i>Información General de salida
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted fw-bold mb-3"><i class="fas fa-car me-2"></i>DATOS DEL VEHÍCULO</h6>
+                            <div class="form-group mb-0">
+                                <label class="form-label">Registro de Salida:</label>
+                                <div class="input-group" style="display: flex; flex-wrap: nowrap;">
+                                    {{ form.id_salida|add_class:"form-control" }}
+                                    <button type="button" class="btn btn-primary">
+                                        <i class="fas fa-history"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6"></div>
+                    </div>
                 </div>
             </div>
 
-            <div class="col-md-1 d-none d-md-block text-center">
-                <div class="vr h-100" style="width: 1px; opacity: 0.1;"></div>
-            </div>
-
-            <div class="col-md-6 text-md-end mt-3 mt-md-0">
-                <span class="text-uppercase text-muted fw-semibold" style="font-size: 0.75rem; letter-spacing: 1px;">Total a Cobrar</span>
-                <div class="d-flex align-items-baseline justify-content-md-end">
-                    <h2 class="fw-bold text-primary mb-0" id="gran-total-servicio" style="font-size: 2.2rem;">$ 0</h2>
+            <div class="card shadow-sm border-0 mb-4 bg-body">
+                <div class="card-body py-3 px-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-5">
+                            <label class="form-label fw-bold text-secondary mb-1" style="font-size: 0.85rem;">
+                                <i class="fas fa-tasks me-2"></i>ESTADO DEL SERVICIO
+                            </label>
+                            <div class="input-group input-group-sm">
+                                {{ form.proceso }}
+                            </div>
+                        </div>
+                        <div class="col-md-1 d-none d-md-block text-center">
+                            <div class="vr h-100" style="width: 1px; opacity: 0.1;"></div>
+                        </div>
+                        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                            <span class="text-uppercase text-muted fw-semibold" style="font-size: 0.75rem; letter-spacing: 1px;">Total a Cobrar</span>
+                            <div class="d-flex align-items-baseline justify-content-md-end">
+                                <h2 class="fw-bold text-primary mb-0" id="gran-total-servicio" style="font-size: 2.2rem;">$ 0</h2>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
 
-<div class="d-flex justify-content-end gap-2 mb-5">
-    <a href="/apy/servicios/" class="btn btn-outline-danger border px-4 py-2">
-        <i class="fas fa-times me-2"></i>Cancelar
-    </a>
-    <button type="submit" id="btn-guardar" class="btn btn-success px-5 py-2 shadow-sm fw-bold">
-        <i class="fas fa-save me-2"></i>Guardar Servicio
-    </button>
-</div>
-</form>
+            <div class="d-flex justify-content-end gap-2 mb-5">
+                <a href="/apy/servicios/" class="btn btn-outline-danger border px-4 py-2">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </a>
+                <button type="submit" id="btn-guardar" class="btn btn-success px-5 py-2 shadow-sm fw-bold">
+                    <i class="fas fa-save me-2"></i>Guardar Servicio
+                </button>
+            </div>
+        </form>
     </div> 
 </div>
 
-<!-- Modal Vehiculo -->
-    <div class="modal fade" id="modal-id_vehiculo" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-            <div class="modal-header d-flex justify-content-between align-items-center">
-                <h5 class="modal-title mb-0">Crear Vehículo</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
-                        style="background-color: #dc3545; color: white; border: none; 
-                                border-radius: 50%; width: 35px; height: 35px;
-                                font-size: 1.5rem; line-height: 1; 
-                                display: flex; justify-content: center; align-items: center;">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Aquí se cargará el form por AJAX -->
-            </div>
-            </div>
+<!-- Modales (igual que tu original) -->
+<div class="modal fade" id="modal-id_vehiculo" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document"><div class="modal-content">
+        <div class="modal-header d-flex justify-content-between align-items-center">
+            <h5 class="modal-title mb-0">Crear Vehículo</h5>
+            <button type="button" class="close" data-dismiss="modal" style="background-color:#dc3545;color:white;border:none;border-radius:50%;width:35px;height:35px;font-size:1.5rem;display:flex;justify-content:center;align-items:center;"><span>&times;</span></button>
         </div>
-    </div>
-<!-- Modal Cliente -->
-    <div class="modal fade" id="modal-cliente" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-            <div class="modal-header d-flex justify-content-between align-items-center">
-                <h5 class="modal-title mb-0">Crear Cliente</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
-                        style="background-color: #dc3545; color: white; border: none; 
-                                border-radius: 50%; width: 35px; height: 35px;
-                                font-size: 1.5rem; line-height: 1; 
-                                display: flex; justify-content: center; align-items: center;">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Aquí se cargará el form por AJAX -->
-            </div>
-            </div>
+        <div class="modal-body"></div>
+    </div></div>
+</div>
+<div class="modal fade" id="modal-cliente" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document"><div class="modal-content">
+        <div class="modal-header d-flex justify-content-between align-items-center">
+            <h5 class="modal-title mb-0">Crear Cliente</h5>
+            <button type="button" class="close" data-dismiss="modal" style="background-color:#dc3545;color:white;border:none;border-radius:50%;width:35px;height:35px;font-size:1.5rem;display:flex;justify-content:center;align-items:center;"><span>&times;</span></button>
         </div>
-    </div>
-    <!-- Modal Entrada -->
-    <div class="modal fade" id="modal-id_entrada" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-            <div class="modal-header d-flex justify-content-between align-items-center">
-                <h5 class="modal-title mb-0">Crear Entrada de Vehículo</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
-                        style="background-color: #dc3545; color: white; border: none; 
-                                border-radius: 50%; width: 35px; height: 35px;
-                                font-size: 1.5rem; line-height: 1; 
-                                display: flex; justify-content: center; align-items: center;">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Aquí se cargará el form por AJAX -->
-            </div>
-            </div>
+        <div class="modal-body"></div>
+    </div></div>
+</div>
+<div class="modal fade" id="modal-id_entrada" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document"><div class="modal-content">
+        <div class="modal-header d-flex justify-content-between align-items-center">
+            <h5 class="modal-title mb-0">Crear Entrada de Vehículo</h5>
+            <button type="button" class="close" data-dismiss="modal" style="background-color:#dc3545;color:white;border:none;border-radius:50%;width:35px;height:35px;font-size:1.5rem;display:flex;justify-content:center;align-items:center;"><span>&times;</span></button>
         </div>
-    </div>
-<!--modal salida -->
-    <div class="modal fade" id="modal-id_salida" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-            <div class="modal-header d-flex justify-content-between align-items-center">
-                <h5 class="modal-title mb-0">Crear Salida de Vehículo</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
-                        style="background-color: #dc3545; color: white; border: none; 
-                                border-radius: 50%; width: 35px; height: 35px;
-                                font-size: 1.5rem; line-height: 1; 
-                                display: flex; justify-content: center; align-items: center;">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Aquí se cargará el form por AJAX -->
-            </div>
-            </div>
+        <div class="modal-body"></div>
+    </div></div>
+</div>
+<div class="modal fade" id="modal-id_salida" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document"><div class="modal-content">
+        <div class="modal-header d-flex justify-content-between align-items-center">
+            <h5 class="modal-title mb-0">Crear Salida de Vehículo</h5>
+            <button type="button" class="close" data-dismiss="modal" style="background-color:#dc3545;color:white;border:none;border-radius:50%;width:35px;height:35px;font-size:1.5rem;display:flex;justify-content:center;align-items:center;"><span>&times;</span></button>
         </div>
-    </div>
+        <div class="modal-body"></div>
+    </div></div>
+</div>
+<div class="modal fade" id="modal-id_insumos" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document"><div class="modal-content">
+        <div class="modal-header d-flex justify-content-between align-items-center">
+            <h5 class="modal-title mb-0">Crear Insumo</h5>
+            <button type="button" class="close" data-dismiss="modal" style="background-color:#dc3545;color:white;border:none;border-radius:50%;width:35px;height:35px;font-size:1.5rem;display:flex;justify-content:center;align-items:center;"><span>&times;</span></button>
+        </div>
+        <div class="modal-body"></div>
+    </div></div>
+</div>
+<div class="modal fade" id="modal-id_repuesto" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document"><div class="modal-content">
+        <div class="modal-header d-flex justify-content-between align-items-center">
+            <h5 class="modal-title mb-0">Crear Repuesto</h5>
+            <button type="button" class="close" data-dismiss="modal" style="background-color:#dc3545;color:white;border:none;border-radius:50%;width:35px;height:35px;font-size:1.5rem;display:flex;justify-content:center;align-items:center;"><span>&times;</span></button>
+        </div>
+        <div class="modal-body"></div>
+    </div></div>
+</div>
+<div class="modal fade" id="modal-empleado" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document"><div class="modal-content">
+        <div class="modal-header d-flex justify-content-between align-items-center">
+            <h5 class="modal-title mb-0">Crear Empleado</h5>
+            <button type="button" class="close" data-dismiss="modal" style="background-color:#dc3545;color:white;border:none;border-radius:50%;width:35px;height:35px;font-size:1.5rem;display:flex;justify-content:center;align-items:center;"><span>&times;</span></button>
+        </div>
+        <div class="modal-body"></div>
+    </div></div>
+</div>
+<div class="modal fade" id="modal-id_tipo_mantenimiento" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document"><div class="modal-content">
+        <div class="modal-header d-flex justify-content-between align-items-center">
+            <h5 class="modal-title mb-0">Crear Tipo Mantenimiento</h5>
+            <button type="button" class="close" data-dismiss="modal" style="background-color:#dc3545;color:white;border:none;border-radius:50%;width:35px;height:35px;font-size:1.5rem;display:flex;justify-content:center;align-items:center;"><span>&times;</span></button>
+        </div>
+        <div class="modal-body"></div>
+    </div></div>
+</div>
 
-<!-- Modal Insumos -->
-    <div class="modal fade" id="modal-id_insumos" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-            <div class="modal-header d-flex justify-content-between align-items-center">
-                <h5 class="modal-title mb-0">Crear Insumo</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
-                        style="background-color: #dc3545; color: white; border: none; 
-                                border-radius: 50%; width: 35px; height: 35px;
-                                font-size: 1.5rem; line-height: 1; 
-                                display: flex; justify-content: center; align-items: center;">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Aquí se cargará el form por AJAX -->
-            </div>
-            </div>
-        </div>
-    </div>
-
-<!-- Modal Repuesto -->
-    <div class="modal fade" id="modal-id_repuesto" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-            <div class="modal-header d-flex justify-content-between align-items-center">
-                <h5 class="modal-title mb-0">Crear Repuesto</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
-                        style="background-color: #dc3545; color: white; border: none; 
-                                border-radius: 50%; width: 35px; height: 35px;
-                                font-size: 1.5rem; line-height: 1; 
-                                display: flex; justify-content: center; align-items: center;">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Aquí se cargará el form por AJAX -->
-            </div>
-            </div>
-        </div>
-    </div>
-
-<!-- Script Vehiculo. -->
- <!-- Modal empleado -->
-    <div class="modal fade" id="modal-empleado" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-            <div class="modal-header d-flex justify-content-between align-items-center">
-                <h5 class="modal-title mb-0">Crear Empleado</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
-                        style="background-color: #dc3545; color: white; border: none; 
-                                border-radius: 50%; width: 35px; height: 35px;
-                                font-size: 1.5rem; line-height: 1; 
-                                display: flex; justify-content: center; align-items: center;">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Aquí se cargará el form por AJAX -->
-            </div>
-            </div>
-        </div>
-    </div>
+<!-- Config JS -->
 <script>
-    window.DjangoConfig = {
-        indices: {
-            repuestos: {{ repuesto_formset.total_form_count|default:0 }},
-            mantenimientos: {{ mantenimiento_formset.total_form_count|default:0 }},
-            insumos: {{ insumo_formset.total_form_count|default:0 }}
-        },
-        urls: {
-            id_vehiculo: "{% url 'apy:vehiculo_modal_crear' %}",
-            cliente: "{% url 'apy:cliente_modal_crear' %}",
-            entrada: "{% url 'apy:entrada_vehiculo_modal_crear' %}",
-            empresa: "{% url 'apy:empresa_modal_crear' %}",
-            empleado: "{% url 'apy:empleado_modal_crear' %}",
-            id_tipo_mantenimiento: "{% url 'apy:tipo_mantenimiento_modal_crear' %}",
-            salida: "{% url 'apy:salida_vehiculo_modal_crear' %}",
-             
-            insumos: "{% url 'apy:insumos_modal_crear' %}",
-            repuesto: "{% url 'apy:repuesto_modal_crear' %}"
-        }
-    };
+window.DjangoConfig = {
+    indices: {
+        repuestos: {{ repuesto_formset.total_form_count|default:0 }},
+        mantenimientos: {{ mantenimiento_formset.total_form_count|default:0 }},
+        insumos: {{ insumo_formset.total_form_count|default:0 }}
+    },
+    urls: {
+        id_vehiculo: "{% url 'apy:vehiculo_modal_crear' %}",
+        cliente: "{% url 'apy:cliente_modal_crear' %}",
+        entrada: "{% url 'apy:entrada_vehiculo_modal_crear' %}",
+        empresa: "{% url 'apy:empresa_modal_crear' %}",
+        empleado: "{% url 'apy:empleado_modal_crear' %}",
+        id_tipo_mantenimiento: "{% url 'apy:tipo_mantenimiento_modal_crear' %}",
+        salida: "{% url 'apy:salida_vehiculo_modal_crear' %}",
+        insumos: "{% url 'apy:insumos_modal_crear' %}",
+        repuesto: "{% url 'apy:repuesto_modal_crear' %}"
+    }
+};
+
+/* Perfiles para select dinámico de mecánico en filas nuevas */
+window.perfilesData = [
+    {% for p in perfiles %}{ id: {{ p.pk }}, nombre: "{{ p.user.get_full_name|default:p.user.username }}" }{% if not forloop.last %},{% endif %}{% endfor %}
+];
 </script>
 
 <script src="{% static 'js/servicios.js' %}"></script>
 
 <script>
-    $(document).ready(function() {
-        // Función para inicializar Select2 en cualquier elemento
-        function aplicarSelect2(selector) {
-            $(selector).select2({
-                theme: 'bootstrap-5',
-                width: '100%',
-                placeholder: 'Seleccione una opción',
-                allowClear: true
+$(document).ready(function() {
+    /* Select2 — igual que tu original */
+    function aplicarSelect2(selector) {
+        $(selector).select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            placeholder: 'Seleccione una opción',
+            allowClear: true
+        });
+    }
+    aplicarSelect2('select.form-control');
+
+    /* Modales AJAX — igual que tu original */
+    $(document).on('click', '[data-toggle="modal"]', function() {
+        var target = $(this).data('target');
+        var urlKey = target.replace('#modal-', '').replace('id_', '');
+        var url = window.DjangoConfig.urls[urlKey];
+        if (url) {
+            $.ajax({
+                url: url,
+                success: function(data) {
+                    $(target).find(".modal-body").html(data.html || data);
+                    $(target).find('select').select2({
+                        theme: 'bootstrap-5',
+                        width: '100%',
+                        dropdownParent: $(target)
+                    });
+                }
             });
         }
-
-        // Inicializar todos los select actuales al cargar la página
-        aplicarSelect2('select.form-control');
-
-        // Lógica de Modales AJAX
-        $(document).on('click', '[data-toggle="modal"]', function() {
-            var target = $(this).data('target');
-            var urlKey = target.replace('#modal-', '').replace('id_', '');
-            var url = window.DjangoConfig.urls[urlKey];
-
-            if (url) {
-                $.ajax({
-                    url: url,
-                    success: function(data) {
-                        $(target).find(".modal-body").html(data.html || data);
-                        // Inicializar Select2 dentro del modal si es necesario
-                        $(target).find('select').select2({
-                            theme: 'bootstrap-5',
-                            width: '100%',
-                            dropdownParent: $(target) // Evita que el buscador se bloquee
-                        });
-                    }
-                });
-            }
-        });
     });
+});
 </script>
+
+<!-- Templates JS para filas dinámicas -->
 <template id="repuesto-template">
     <div class="repuesto-form row mb-3 border-bottom pb-3">
         <div class="col-md-4">
@@ -556,46 +495,42 @@
                 </select>
             </div>
         </div>
-        <div class="col-md-2">
-            <label>Cant.</label>
-            <input type="number" name="repuestos-__prefix__-cantidad" class="form-control cantidad-repuestos" min="1" value="1">
-        </div>
-        <div class="col-md-3">
-            <label>Precio Unit.</label>
-            <input type="number" name="repuestos-__prefix__-precio_unitario" class="form-control precio-repuestos" step="0.01" value="0">
-        </div>
-        <div class="col-md-2">
-            <label>Subtotal</label>
-            <input type="text" class="form-control subtotal-repuesto" readonly value="$0">
-        </div>
-        <div class="col-md-1"><label>&nbsp;</label><button type="button" class="btn btn-danger btn-sm remove-form"><i class="fas fa-times"></i></button></div>
+        <div class="col-md-2"><label>Cant.</label><input type="number" name="repuestos-__prefix__-cantidad" class="form-control cantidad-repuestos" min="1" value="1"></div>
+        <div class="col-md-3"><label>Precio Unit.</label><input type="number" name="repuestos-__prefix__-precio_unitario" class="form-control precio-repuestos" step="0.01" value="0"></div>
+        <div class="col-md-2"><label>Subtotal</label><input type="text" class="form-control subtotal-repuesto" readonly value="$0"></div>
+        <div class="col-md-1"><label>&nbsp;</label><button type="button" class="btn btn-outline-danger btn-sm remove-form"><i class="fas fa-trash-alt"></i></button></div>
     </div>
 </template>
 
 <template id="mantenimiento-template">
-    <div class="mantenimiento-form row mb-3 border-bottom pb-3">
-        <div class="col-md-4">
-            <label>Tipo Mantenimiento:</label>
-            <div class="input-group">
-                <select name="mantenimientos-__prefix__-id_tipo_mantenimiento" class="form-control">
-                    <option value="">Seleccione un tipo</option>
-                    {% for t in tipos_mantenimiento %}<option value="{{ t.pk }}">{{ t.nombre }}</option>{% endfor %}
+    <div class="mantenimiento-form border rounded p-3 mb-3">
+        <div class="row mb-2 align-items-end">
+            <div class="col-md-6">
+                <label class="small fw-bold">Tipo Mantenimiento:</label>
+                <div class="d-flex gap-2 align-items-center">
+                    <select name="mantenimientos-__prefix__-id_tipo_mantenimiento" class="form-control">
+                        <option value="">Seleccione un tipo</option>
+                        {% for t in tipos_mantenimiento %}<option value="{{ t.pk }}">{{ t.nombre }}</option>{% endfor %}
+                    </select>
+                    <button type="button" class="btn btn-outline-secondary"><i class="fas fa-plus"></i></button>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label class="small fw-bold"><i class="fas fa-user-cog me-1 text-primary"></i>Mecánico Responsable:</label>
+                <select name="mantenimientos-__prefix__-empleado" class="form-control select-empleado-mant">
+                    <option value="">— Sin asignar —</option>
+                    {% for p in perfiles %}
+                    <option value="{{ p.pk }}">{{ p.user.get_full_name|default:p.user.username }}</option>
+                    {% endfor %}
                 </select>
             </div>
         </div>
-        <div class="col-md-2">
-            <label>Cant.</label>
-            <input type="number" name="mantenimientos-__prefix__-cantidad" class="form-control cantidad-mantenimientos" min="1" value="1">
+        <div class="row align-items-end">
+            <div class="col-md-3"><label class="small fw-bold">Cant.</label><input type="number" name="mantenimientos-__prefix__-cantidad" class="form-control cantidad-mantenimientos" min="1" value="1"></div>
+            <div class="col-md-4"><label class="small fw-bold">Precio Unit.</label><input type="number" name="mantenimientos-__prefix__-precio_unitario" class="form-control precio-mantenimientos" step="0.01" value="0"></div>
+            <div class="col-md-4"><label class="small fw-bold">Subtotal</label><input type="text" class="form-control subtotal-mantenimiento" readonly value="$0"></div>
+            <div class="col-md-1 text-center"><label class="small fw-bold d-block">&nbsp;</label><button type="button" class="btn btn-danger btn-sm remove-form"><i class="fas fa-times"></i></button></div>
         </div>
-        <div class="col-md-3">
-            <label>Precio Unit.</label>
-            <input type="number" name="mantenimientos-__prefix__-precio_unitario" class="form-control precio-mantenimientos" step="0.01" value="0">
-        </div>
-        <div class="col-md-2">
-            <label>Subtotal</label>
-            <input type="text" class="form-control subtotal-mantenimiento" readonly value="$0">
-        </div>
-        <div class="col-md-1"><label>&nbsp;</label><button type="button" class="btn btn-danger btn-sm remove-form"><i class="fas fa-times"></i></button></div>
     </div>
 </template>
 
@@ -606,25 +541,15 @@
             <div class="input-group">
                 <select name="insumos-__prefix__-id_insumos" class="form-control">
                     <option value="">Seleccione un insumo</option>
-                    {% for i in insumos %}<option value="{{ i.pk }}">{{ i}}</option>{% endfor %}
+                    {% for i in insumos %}<option value="{{ i.pk }}">{{ i }}</option>{% endfor %}
                 </select>
             </div>
         </div>
-        <div class="col-md-2">
-            <label>Cant.</label>
-            <input type="number" name="insumos-__prefix__-cantidad" class="form-control cantidad-insumo" min="1" value="1">
-        </div>
-        <div class="col-md-3">
-            <label>Precio Unit.</label>
-            <input type="number" name="insumos-__prefix__-precio_unitario" class="form-control precio-insumo" step="0.01" value="0">
-        </div>
-        <div class="col-md-2">
-            <label>Subtotal</label>
-            <input type="text" class="form-control subtotal-insumo" readonly value="$0">
-        </div>
+        <div class="col-md-2"><label>Cant.</label><input type="number" name="insumos-__prefix__-cantidad" class="form-control cantidad-insumo" min="1" value="1"></div>
+        <div class="col-md-3"><label>Precio Unit.</label><input type="number" name="insumos-__prefix__-precio_unitario" class="form-control precio-insumo" step="0.01" value="0"></div>
+        <div class="col-md-2"><label>Subtotal</label><input type="text" class="form-control subtotal-insumos" readonly value="$0"></div>
         <div class="col-md-1"><label>&nbsp;</label><button type="button" class="btn btn-danger btn-sm remove-form"><i class="fas fa-times"></i></button></div>
     </div>
 </template>
-
 
 {% endblock %}
