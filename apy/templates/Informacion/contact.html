@@ -174,17 +174,17 @@
                 </div>
 
                 <div class="my-3">
-  <div class="loading">Cargando</div>
-  <div class="error-message"></div>
-  
-  {% if messages %}
-    {% for message in messages %}
-      <div class="sent-message d-block">{{ message }}</div>
-    {% endfor %}
-  {% else %}
-    <div class="sent-message">Tu mensaje ha sido enviado. ¡Gracias!</div>
-  {% endif %}
-</div>
+                  <div class="loading">Cargando</div>
+                  <div class="error-message"></div>
+
+                  {% if messages %}
+                  {% for message in messages %}
+                  <div class="sent-message d-block">{{ message }}</div>
+                  {% endfor %}
+                  {% else %}
+                  <div class="sent-message">Tu mensaje ha sido enviado. ¡Gracias!</div>
+                  {% endif %}
+                </div>
 
                 <div class="form-submit">
                   <button type="submit">Enviar Mensaje</button>
