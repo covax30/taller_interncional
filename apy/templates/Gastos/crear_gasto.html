@@ -2,7 +2,21 @@
 {% load widget_tweaks %}
 {% block form %} 
     {% csrf_token %}
-
+{% if form.errors %}
+    <div class="alert alert-danger">
+        <strong>Hay errores en el formulario:</strong>
+        <ul>
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <li>{{ field.label }}: {{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
     <!-- Descripcion -->
     <div class="form-group mb-3">
         <label for="{{ form.descripcion.id_for_label }}">Descripción:</label>
@@ -15,7 +29,7 @@
                     <small>{{ error }}</small><br>
                 {% endfor %}
             </div>
-        {% endif %}
+        {% endif %} 
     </div>
 
     <!-- Tipo gasto -->
@@ -61,6 +75,21 @@
         {% endif %}
     </div>
 
+    <!-- fecha -->
+    <div class="form-group mb-3">
+        <label for="{{ form.fecha.id_for_label }}">Fecha:</label>
+        <div class="input-group">
+            {{ form.fecha|add_class:'form-control' }}
+        </div>
+        {% if form.fecha.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.fecha.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
     <!-- Modal Pago Servicios -->
     <div class="modal fade" id="modal-id_pagos_servicios" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-lg" role="document">
@@ -98,10 +127,10 @@
 {% endblock %}
 
 {% block Cancelar %}
-                <button type="submit " class="btn btn-primary btn-flat" title="Agregar gasto">
-                    <i class="fas fa-save"></i>
-                    Agregar
-                </button>
+                <button type="submit" class="btn btn-primary btn-flat" title="Agregar gasto">
+        <i class="fas fa-save"></i>
+        Agregar
+    </button>
                 <a href="{% url 'apy:gasto_lista' %}" class="btn btn-danger btn-flat float-right" title="Cancelar registro de gasto">
                     <i class="fas fa-times"></i> Cancelar
                 </a>

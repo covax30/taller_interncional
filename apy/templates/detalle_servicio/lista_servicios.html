@@ -89,9 +89,9 @@
                 <a href="{% url 'apy:imprimir_servicio' servicio.id %}" target="_blank" class="btn btn-danger btn-sm" title="Generar PDF">
                     <i class="fas fa-file-pdf"></i>
                 </a>
-                <a href="{% url 'apy:crear_informe' %}?servicio_id={{ servicio.id }}" class="btn btn-success">
-   <i class="fas fa-file-signature"></i> Finalizar y Crear Informe
-</a>
+                <a href="{% url 'apy:informe_nuevo' %}?servicio_id={{ servicio.id }}" class="btn btn-success btn-sm" title="Crear Informe Técnico">
+                    <i class="fas fa-check-circle"></i> 
+                </a>
             </div>
         </td>
     </tr>

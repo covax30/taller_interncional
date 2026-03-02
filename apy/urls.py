@@ -1,6 +1,6 @@
 from django.urls import path
+from apy.view.Nomina.views import NominaCreateModalView, NominaCreateView, NominaDeleteView, NominaListView, NominaUpdateView
 from apy.view.empresa.views import *
-from apy.view.usuario.datos.views import *
 from apy.views import *
 from apy.view.proveedor.view import *
 from apy.view.Gastos.views import *
@@ -135,12 +135,13 @@ urlpatterns = [
   
   
     
-    #--------URL modulo informes----------------
-    path('informes/dashboard/', InformeDashboardView.as_view(), name='dashboard_informes'),
+        #--------URL modulo informes----------------
+    path('informes/dashboard/', InformeDashboardView, name='dashboard_informes'),
     path('informes/lista/', InformeListView.as_view(), name='informe_lista'),
-    path('informes/nuevo/', CreateInformeView.as_view(), name='crear_informe'),
+    path('informes/nuevo/', CreateInformeView.as_view(), name='informe_nuevo'),
+    path('informes/detalle/<int:pk>/', InformeDetailView.as_view(), name='informe_detalle'),
     path('informes/exportar/excel/', exportar_informe_excel, name='exportar_excel'),
-
+    path('informes/gerencial/', InformeGerencialView.as_view(), name='informe_gerencial'),
     
     #--------URL modulo pago de sercicios publicos----------------
     path('PagoServicios/listar/', PagoServiciosListView.as_view() , name='pago_servicios_lista'),
@@ -155,7 +156,6 @@ urlpatterns = [
     path('Pagos/agregar/', PagosCreateView.as_view() , name='pagos_crear'),
     path('Pagos/editar/<int:pk>/', PagosUpdateView.as_view() , name='pagos_editar'),
     path('Pagos/eliminar/<int:pk>/', PagosDeleteView.as_view() , name='pagos_eliminar'),
-    path("Pagos/inactivos/", PagosInactivosListView.as_view(), name="pagos_inactivos"),
     path('Pagos/activar/<int:pk>/', PagosActivateView.as_view(), name="pagos_activar"),
 
     #--------------urls Yury
@@ -214,6 +214,12 @@ urlpatterns = [
     path("detallemantenimiento/modal/crear/", DetalleTipoMantenimientoCreateModalView.as_view(), name="detallemantenimiento_modal_crear"),
     path("tipo_mantenimiento/inactivos/", TipoMantenimientoInactivosListView.as_view(), name="tipo_mantenimiento_inactivos"),
     path('tipo_mantenimiento/activar/<int:pk>/', TipoMantenimientoActivateView.as_view(), name="tipo_mantenimiento_activar"),
+    
+    path('nomina/listar/', NominaListView.as_view() , name='nomina_lista'),
+    path('nomina/agregar/', NominaCreateView.as_view(), name='nomina_crear'),
+    path('nomina/editar/<int:pk>/', NominaUpdateView.as_view(), name='nomina_editar'),
+    path('nomina/eliminar/<int:pk>/', NominaDeleteView.as_view(), name='nomina_eliminar'),  
+    path("nomina/modal/crear/", NominaCreateModalView.as_view(), name="nomina_modal_crear"),
 
     
     path('insumos/listar/', InsumoListView.as_view() , name='insumo_lista'),
@@ -234,7 +240,7 @@ urlpatterns = [
     path("repuestos/inactivos/", RepuestoInactivosListView.as_view(), name="repuestos_inactivos"),
     path('repuesto/activar/<int:pk>/', RepuestoActivateView.as_view (), name="repuesto_activar"),
 
-    
+    path('api/stock-bajo/', api_stock_bajo, name='api_stock_bajo'),
     path('main/', Main.as_view(), name='main'),
     path('estadisticas/', estadisticas, name='estadisticas'),
     path('api/clientes/count/', api_contador_clientes, name='api_contador_clientes'),
@@ -242,4 +248,6 @@ urlpatterns = [
     path('api/insumos/count/', api_contador_insumos, name='api_contador_insumos'),
     path('api/gastos/count/', api_contador_gastos, name='api_contador_gastos'),
     path('ayuda/', ayuda, name='ayuda'),
+    
+    
 ]

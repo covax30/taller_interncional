@@ -1,115 +1,147 @@
 $(document).ready(function () {
-    // ... (Mantén tu código de modales igual)
 
-    // FUNCIÓN DE CÁLCULO MEJORADA
-    window.recalcular = function(seccion) {
-        let totalSeccion = 0;
-        // Buscamos todas las filas de la sección
-        const filas = document.querySelectorAll(`.${seccion}-form`);
-        
-        filas.forEach(row => {
-            const inputCant = row.querySelector('input[name*="cantidad"]');
-            const inputPrecio = row.querySelector('input[name*="precio_unitario"]');
-            const inputSub = row.querySelector('input[class*="subtotal"]');
-
-            const cant = parseFloat(inputCant?.value) || 0;
-            const precio = parseFloat(inputPrecio?.value) || 0;
-            const subtotal = cant * precio;
-            
-            totalSeccion += subtotal;
-
-            if (inputSub) {
-                inputSub.value = "$" + subtotal.toLocaleString('es-CO', { maximumFractionDigits: 0 });
+    /* ═══════════════════════════════════════════════════════════════
+       SELECT2
+    ═══════════════════════════════════════════════════════════════ */
+    function initSelect2($ctx) {
+        $ctx.find('select.form-control').each(function () {
+            if (!$(this).hasClass('select2-hidden-accessible')) {
+                $(this).select2({
+                    theme: 'bootstrap-5',
+                    width: '100%',
+                    placeholder: 'Seleccione una opción',
+                    allowClear: true
+                });
             }
         });
+    }
 
-        // Actualizar el total de la sección (Asegúrate que el ID sea total-insumos, etc)
-        const labelTotal = document.getElementById(`total-${seccion}s`);
-        if (labelTotal) {
-            labelTotal.innerText = "$" + totalSeccion.toLocaleString('es-CO');
-        }
-        actualizarGranTotal();
+    initSelect2($(document.body));
+    $.fn.select2.defaults.set('selectionCssClass', ':all:');
+    $(document).on('select2:open', function() {
+        document.querySelector('.select2-search__field')?.removeAttribute('aria-hidden');
+    });
+
+    /* ═══════════════════════════════════════════════════════════════
+       UTILIDADES
+    ═══════════════════════════════════════════════════════════════ */
+    function formatCOP(valor) {
+        return '$' + Math.round(valor).toLocaleString('es-CO');
+    }
+    function limpiarMonto(texto) {
+        return parseInt(String(texto || '').replace(/\D/g, '')) || 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       TOTALES
+    ═══════════════════════════════════════════════════════════════ */
+    var SECCIONES = {
+        repuestos:      { clase: '.repuesto-form',      idTotal: 'total-repuestos',      clsSub: '.subtotal-repuesto'      },
+        mantenimientos: { clase: '.mantenimiento-form', idTotal: 'total-mantenimientos', clsSub: '.subtotal-mantenimiento' },
+        insumos:        { clase: '.insumo-form',        idTotal: 'total-insumos',        clsSub: '.subtotal-insumos'       }
     };
 
-    function limpiarMonto(texto) {
-        if (!texto) return 0;
-        return parseInt(texto.replace(/\D/g, "")) || 0;
+    function recalcularSeccion(prefijo) {
+        var cfg = SECCIONES[prefijo];
+        if (!cfg) return;
+        var total = 0;
+        $(cfg.clase).each(function () {
+            var cant   = parseFloat($(this).find('input[name*="cantidad"]').val())        || 0;
+            var precio = parseFloat($(this).find('input[name*="precio_unitario"]').val()) || 0;
+            var sub    = cant * precio;
+            total += sub;
+            $(this).find(cfg.clsSub).val(formatCOP(sub));
+        });
+        $('#' + cfg.idTotal).text(formatCOP(total));
+        actualizarGranTotal();
     }
 
     function actualizarGranTotal() {
-        let granTotal = 0;
-        ['insumos', 'repuestos', 'mantenimientos'].forEach(s => {
-            const elem = document.getElementById(`total-${s}`);
-            if (elem) granTotal += limpiarMonto(elem.innerText);
+        var gran = 0;
+        Object.values(SECCIONES).forEach(function (cfg) {
+            gran += limpiarMonto($('#' + cfg.idTotal).text());
         });
-
-        const granTotalElem = document.getElementById('gran-total-servicio');
-        if (granTotalElem) {
-            granTotalElem.innerText = "$" + granTotal.toLocaleString('es-CO');
-        }
+        $('#gran-total-servicio').text(formatCOP(gran));
     }
 
-    // EVENTO PARA DETECTAR CAMBIOS EN FILAS NUEVAS Y VIEJAS
-    $(document).on('input', 'input[name*="cantidad"], input[name*="precio_unitario"]', function() {
-        const name = $(this).attr('name');
-        if (name.includes('insumos')) recalcular('insumo');
-        if (name.includes('repuestos')) recalcular('repuesto');
-        if (name.includes('mantenimientos')) recalcular('mantenimiento');
+    window.recalcular = recalcularSeccion;
+
+    $(document).on('input change', 'input[name*="cantidad"], input[name*="precio_unitario"]', function () {
+        var name = $(this).attr('name') || '';
+        if      (name.startsWith('repuestos'))      recalcularSeccion('repuestos');
+        else if (name.startsWith('mantenimientos')) recalcularSeccion('mantenimientos');
+        else if (name.startsWith('insumos'))        recalcularSeccion('insumos');
     });
 
-    // BOTÓN ELIMINAR (Corregido para actualizar totales al borrar)
+    setTimeout(function () { Object.keys(SECCIONES).forEach(recalcularSeccion); }, 300);
+
+    /* ═══════════════════════════════════════════════════════════════
+       ELIMINAR FILA
+    ═══════════════════════════════════════════════════════════════ */
     $(document).on('click', '.remove-form', function () {
-        const row = $(this).closest('.row');
-        let seccion = '';
-        if (row.hasClass('insumo-form')) seccion = 'insumo';
-        else if (row.hasClass('repuesto-form')) seccion = 'repuesto';
-        else if (row.hasClass('mantenimiento-form')) seccion = 'mantenimiento';
-        
-        row.remove();
-        if (seccion) recalcular(seccion);
+        var $fila = $(this).closest('.repuesto-form, .mantenimiento-form, .insumo-form');
+        if (!$fila.length) return;
+        var prefijo = $fila.hasClass('repuesto-form')      ? 'repuestos'
+                    : $fila.hasClass('mantenimiento-form') ? 'mantenimientos'
+                    : 'insumos';
+        $fila.find('select.select2-hidden-accessible').each(function () {
+            $(this).select2('destroy');
+        });
+        $fila.remove();
+        recalcularSeccion(prefijo);
     });
 
-    // --- EJECUCIÓN INICIAL ---
-    // Esto calcula los valores apenas carga la página (importante tras el error de Guardar)
-    setTimeout(() => {
-        ['insumo', 'repuesto', 'mantenimiento'].forEach(s => recalcular(s));
-    }, 500);
-    // --- FUNCIÓN PARA AGREGAR NUEVAS FILAS (FORMSETS) ---
-window.addForm = function (type) {
-    // type recibe 'insumos', 'repuestos' o 'mantenimientos'
-    const container = document.getElementById(`${type}-formset`);
-    
-    // El template siempre es en singular: 'insumo-template'
-    const templateId = type.slice(0, -1) + "-template"; 
-    const template = document.getElementById(templateId);
-    
-    // El contador de Django: 'id_insumos-TOTAL_FORMS'
-    const totalForms = document.getElementById(`id_${type}-TOTAL_FORMS`);
+    /* ═══════════════════════════════════════════════════════════════
+       AGREGAR FILA
+       CLAVE: el <template> de mantenimiento ya tiene las opciones
+       de empleados renderizadas por Django → solo clonar + Select2
+    ═══════════════════════════════════════════════════════════════ */
+    window.addForm = function (type) {
+        var container  = document.getElementById(type + '-formset');
+        var template   = document.getElementById(type.slice(0, -1) + '-template');
+        var totalForms = document.getElementById('id_' + type + '-TOTAL_FORMS');
 
-    if (!container || !template || !totalForms) {
-        console.error("Error: No se encontraron los elementos necesarios para agregar " + type);
-        return;
-    }
+        if (!container || !template || !totalForms) {
+            console.error('[addForm] Elementos no encontrados para:', type);
+            return;
+        }
 
-    // 1. Obtener el índice actual (cuántos hay ahora)
-    let index = parseInt(totalForms.value);
-    
-    // 2. Tomar el HTML del template y reemplazar el prefijo por el número de índice
-    let html = template.innerHTML.replace(/__prefix__/g, index);
+        var index = parseInt(totalForms.value);
+        var html  = template.innerHTML.replace(/__prefix__/g, index);
 
-    // 3. Insertar el nuevo HTML al final del contenedor
-    container.insertAdjacentHTML('beforeend', html);
-    
-    // 4. Aumentar el contador para que Django sepa que hay una fila más
-    totalForms.value = index + 1;
-    
-    console.log("Nueva fila añadida en " + type + " con índice: " + index);
-};
+        $(container).append(html);
+        totalForms.value = index + 1;
 
-// --- VINCULAR LOS BOTONES CON LA FUNCIÓN ---
-$(document).ready(function() {
-    document.getElementById('add-insumo')?.addEventListener('click', () => window.addForm('insumos'));
-    document.getElementById('add-repuesto')?.addEventListener('click', () => window.addForm('repuestos'));
-    document.getElementById('add-mantenimiento')?.addEventListener('click', () => window.addForm('mantenimientos'));
-});
+        // initSelect2 aplica a select.form-control — que ahora incluye
+        // el select del mecánico (cambiado de form-select a form-control)
+        initSelect2($(container).children().last());
+    };
+
+    /* ═══════════════════════════════════════════════════════════════
+       BOTONES AGREGAR
+    ═══════════════════════════════════════════════════════════════ */
+    $('#add-repuesto')     .on('click', function () { window.addForm('repuestos'); });
+    $('#add-mantenimiento').on('click', function () { window.addForm('mantenimientos'); });
+    $('#add-insumo')       .on('click', function () { window.addForm('insumos'); });
+
+    /* ═══════════════════════════════════════════════════════════════
+       MODALES AJAX
+    ═══════════════════════════════════════════════════════════════ */
+    $(document).on('click', '[data-toggle="modal"]', function () {
+        var target = $(this).data('target');
+        var urlKey = target.replace('#modal-', '').replace(/^id_/, '');
+        var url    = window.DjangoConfig && window.DjangoConfig.urls[urlKey];
+        if (!url) return;
+        $.ajax({
+            url: url,
+            success: function (data) {
+                var $modal = $(target);
+                $modal.find('.modal-body').html(data.html || data);
+                initSelect2($modal);
+                $modal.modal('show');
+            },
+            error: function () { console.error('[Modal AJAX] Error:', url); }
+        });
+    });
+
 });
