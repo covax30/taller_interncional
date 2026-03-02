@@ -1,133 +1,58 @@
-{% load static %}
+{% extends "base_login.html" %}
 {% load widget_tweaks %}
-<!doctype html>
-<html lang="en">
-<head>
-    <title>Taller Internacional | Iniciar Sesión</title>
-    
-    <link rel="stylesheet" href="{% static 'fontawesome-free-7.0.1-web/css/all.min.css' %}" />
-    <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/adminlte.css' %}" />
-    <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/bootstrap.css' %}" />
+{% block title %}Taller Internacional | Iniciar Sesión{% endblock %}
 
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-    <meta name="color-scheme" content="light dark" />
-    <link rel="stylesheet" href="{% static 'login/css/custom.css' %}?v=5.0" />   
-
-    <style>
-        /* --- 2. CAJA DE LOGIN (CRISTAL OSCURO) --- */
-        .login-page .login-box .card {
-            background-color: rgba(0, 0, 0, 0.65) !important; /* MUY OSCURO PERO TRANSPARENTE */
-            backdrop-filter: blur(15px) !important;
-            -webkit-backdrop-filter: blur(15px) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            border-radius: 20px !important;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8) !important;
-        }
-
-        /* Quitamos el fondo blanco de AdminLTE */
-        .login-card-body, .card-body {
-            background: transparent !important;
-            color: white !important;
-        }
-
-        /* --- 3. INPUTS BLANCOS --- */
-        .form-control {
-            background-color: white !important;
-            color: #000 !important;
-            border: none !important;
-        }
-        .input-group-text {
-            background-color: white !important;
-            color: #007bff !important;
-            border: none !important;
-        }
-
-        /* --- 4. BOTONES Y TEXTOS --- */
-        .btn-primary {
-            background: #007bff !important;
-            border: none !important;
-            font-weight: bold !important;
-        }
-        .btn-volver {
-            background: rgba(255, 255, 255, 0.1) !important;
-            border: 1px solid white !important;
-            color: white !important;
-            margin-top: 10px;
-        }
-        .login-logo b, .login-box-msg {
-            color: white !important;
-            text-shadow: 2px 2px 5px rgba(0,0,0,1) !important;
-        }
-    </style>
-    <link rel="stylesheet" href="{% static 'css/material-icons.css' %}">
-
-</head>
-
-<body class="hold-transition login-page class="btn btn-outline-danger btn-sm remove-form">"> 
-    
-    <div id="slideshow-background"></div>
-
-    <div class="login-box">
-        
-
-        <div class="card shadow-lg">
-            <div class="card-body login-card-body">
-                <div class="login-logo">
-            <a href="#" class="text-white"><b>Taller Internacional</b> de Motores</a>
-        </div>
-                <p class="login-box-msg">Ingresa para iniciar sesión</p>
-
-                <form method="post" novalidate>
-                    {% csrf_token %}
-                    
-                    <div class="input-group mb-3">
-                        {{ form.username|add_class:'form-control'|attr:'autocomplete:off'|attr:'placeholder:Ingrese su Usuario' }}
-                        <div class="input-group-append">
-                            <div class="input-group-text">
-                                <span class="fas fa-user"></span> 
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="input-group mb-3">
-                        {{ form.password|add_class:'form-control'|attr:'autocomplete:off'|attr:'placeholder:Ingrese su Contraseña' }}
-                        <div class="input-group-append">
-                            <div class="input-group-text">
-                                <span class="fas fa-lock"></span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-primary btn-block" title="Iniciar sesión">
-                                <i class="fas fa-sign-in-alt"></i> Iniciar sesión
-                            </button>
-                        </div>
-                    </div>
-                </form>
-
-                <div class="mt-4">
-                    <a href="{% url 'login:password_reset' %}" class="btn btn-volver btn-block" title="Recuperar contraseña">
-                        <i class="fas fa-key"></i> Olvidé mi contraseña
-                        
-                    </a>
-                </div>
-                <a href="https://minciencias.gov.co/ciudadano/terminosycondiciones-datospersonales">Terminos y condiciones</a>
+{% block contenido_login %}
+    <div class="card shadow-lg">
+        <div class="card-body login-card-body">
+            <div class="login-logo">
+                <a href="#" class="text-white"><b>Taller Internacional</b> de Motores</a>
             </div>
+            <p class="login-box-msg">Ingresa para iniciar sesión</p>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                <div class="input-group mb-3">
+                    {{ form.username|add_class:'form-control'|attr:'autocomplete:off'|attr:'placeholder:Ingrese su Usuario' }}
+                    <div class="input-group-append">
+                        <div class="input-group-text"><span class="fas fa-user"></span></div>
+                    </div>
+                </div>
+                
+                <div class="input-group mb-3">
+                    {{ form.password|add_class:'form-control'|attr:'autocomplete:off'|attr:'placeholder:Ingrese su Contraseña' }}
+                    <div class="input-group-append">
+                        <div class="input-group-text"><span class="fas fa-lock"></span></div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary btn-block" title="Iniciar sesión">
+                            <i class="fas fa-sign-in-alt"></i> Iniciar sesión
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <div class="mt-4">
+                <a href="{% url 'login:password_reset' %}" class="btn btn-volver btn-block" title="Recuperar contraseña">
+                    <i class="fas fa-key"></i> Olvidé mi contraseña
+                </a>
+            </div>
+
+            <a href="https://minciencias.gov.co/ciudadano/terminosycondiciones-datospersonales" 
+               class="text-white small d-block mt-3 text-center">
+                Términos y condiciones
+            </a>
         </div>
     </div>
-    <script src="{% static 'lib/datatables-1.10.20/jquery-3.7.1.min.js' %}"></script>
-    <script src="{% static 'lib/sweetalert2/sweetalert2.all.min.js' %}"></script>
-    <script src="{% static 'AdminLTE/dist/js/popper.js' %}"></script>
-    <script src="{% static 'AdminLTE/dist/js/bootstrap.js' %}"></script>
-    <script src="{% static 'AdminLTE/dist/js/adminlte.js' %}"></script>
+{% endblock contenido_login %}
 
-    <script type="application/javascript">
-        {% if form.errors %}
+{% block scripts_extra %}
+    {% if form.errors %}
+    <script>
         var errors = '';
         {% for field in form %}
             {% for error in field.errors %}
@@ -143,9 +68,6 @@
             icon: 'error',
             confirmButtonColor: '#007bff'
         });
-        {% endif %}
     </script>
-    <script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
-<script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
-</body>
-</html>
+    {% endif %}
+{% endblock scripts_extra %}

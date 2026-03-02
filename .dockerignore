@@ -6,38 +6,49 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*.pyc
+*.pyo
+*.pyd
+
+# Entornos virtuales
 .venv/
 venv/
 ENV/
 env/
 .env
+.env.local
+.env.development
+.env.production
 
-# Media y Static folders (manehados por volúmenes)
+# Django / Media y Static (manehados por volúmenes)
 media/
 staticfiles/
 db_backups/
+*.sqlite3
+*.sqlite3-journal
 
 # Docker
-Dockerfile
-docker-compose.yml
+Dockerfile*
+docker-compose*
 .dockerignore
 
-# IDEs
+# IDEs y editores
 .vscode/
 .idea/
+*.swp
+*.swo
+*.swn
 
-# Logs
+# Logs y temporales
 *.log
+*.tmp
 
 # Windows basura
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+.DS_Store
 
-# Temporales de editores
-*.swp
-*.swo
-*.swn
-
-# No ignorar entrypoint.sh (importante!)
+# No ignorar scripts necesarios
 !entrypoint.sh
+!wait-for-it.sh    # si usas wait-for-it u otro script

@@ -1,91 +1,25 @@
+{% extends "base_login.html" %}
 {% load static %}
-<!doctype html>
-<html lang="en">
-  <head>
-    <title>Instrucciones Enviadas</title>
-     <link rel="icon" href="{% static 'img/favico.jpg' %}" type="image/png">
-    <link rel="stylesheet" href="{% static 'fontawesome-free-7.0.1-web/css/all.min.css' %}" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-    <meta name="color-scheme" content="light dark" />
-    <link rel="preload" href="{% static 'AdminLTE/dist/css/adminlte.css' %}" as="style" />
-    <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/adminlte.css' %}" />
-    <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/bootstrap.css' %}" />
 
-    <link rel="stylesheet" href="{% static 'login/css/custom.css' %}" />
-        <style>
-        /* --- 2. CAJA DE LOGIN (CRISTAL OSCURO) --- */
-        .login-page .login-box .card {
-            background-color: rgba(0, 0, 0, 0.65) !important; /* MUY OSCURO PERO TRANSPARENTE */
-            backdrop-filter: blur(15px) !important;
-            -webkit-backdrop-filter: blur(15px) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            border-radius: 20px !important;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8) !important;
-        }
+{% block title %}Instrucciones Enviadas - Taller Internacional{% endblock %}
 
-        /* Quitamos el fondo blanco de AdminLTE */
-        .login-card-body, .card-body {
-            background: transparent !important;
-            color: white !important;
-        }
-
-        /* --- 3. INPUTS BLANCOS --- */
-        .form-control {
-            background-color: white !important;
-            color: #000 !important;
-            border: none !important;
-        }
-        .input-group-text {
-            background-color: white !important;
-            color: #007bff !important;
-            border: none !important;
-        }
-
-        /* --- 4. BOTONES Y TEXTOS --- */
-        .btn-primary {
-            background: #007bff !important;
-            border: none !important;
-            font-weight: bold !important;
-        }
-        .btn-volver {
-            background: rgba(255, 255, 255, 0.1) !important;
-            border: 1px solid white !important;
-            color: white !important;
-            margin-top: 10px;
-        }
-        .login-logo b, .login-box-msg {
-            color: white !important;
-            text-shadow: 2px 2px 5px rgba(0,0,0,1) !important;
-        }
-    </style>
-    <link rel="stylesheet" href="{% static 'css/material-icons.css' %}">
-
-  </head>
-  <body class="login-page bg-dark">
-    <div id="slideshow-background">
-    </div>
-    <div class="login-box">
-      
-      <div class="card">
+{% block contenido_login %}
+<div class="card shadow-lg">
+    <div class="card-body login-card-body text-center">
         <div class="login-logo">
-        <a data-bs-theme="dark"><b>Correo Enviado</b>@</a>
-      </div>
-        <div class="card-body login-card-body text-center">
-          <h4 class="text-success mb-3">✅ ¡Instrucciones Enviadas!</h4>
-          <p class="login-box-msg">
+            <a data-bs-theme="dark"><b>Correo Enviado</b></a>
+        </div>
+        <h4 class="text-success mb-3">✅ ¡Instrucciones Enviadas!</h4>
+        <p class="login-box-msg">
             Hemos enviado por correo electrónico las instrucciones para establecer tu contraseña.
-          </p>
-          <p class="login-box-msg">
-            Si no lo recibes en unos minutos, por favor revisa tu carpeta de **Spam**.
-          </p>
+        </p>
+        <p class="login-box-msg">
+            Si no lo recibes en unos minutos, por favor revisa tu carpeta de <strong>Spam</strong>.
+        </p>
 
-          <a href="{% url 'login:login' %}" class="btn btn-volver btn-block" title="Volver al Login">
-                        <i class="fas fa-arrow-left"></i> Volver a Iniciar Sesión
-                    </a>
-        </div>
-        </div>
+        <a href="{% url 'login:login' %}" class="btn btn-volver btn-block" title="Volver al Login">
+            <i class="fas fa-arrow-left"></i> Volver a Iniciar Sesión
+        </a>
     </div>
-    <script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
-<script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
-    </body>
-</html>
+</div>
+{% endblock contenido_login %}

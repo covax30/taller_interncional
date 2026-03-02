@@ -24,7 +24,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-
   db:
     image: mysql:8.0
     container_name: taller_internacional_db
@@ -35,7 +34,7 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD}
     volumes:
       - taller_internacional_mysql_data:/var/lib/mysql
-      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+      - ./init-db.sql:/docker-entrypoint-initdb.d/
     networks:
       - taller_internacional_network
     ports:

@@ -1,0 +1,97 @@
+{% extends "base_login.html" %}
+
+{% block title %}Cuenta Bloqueada Temporalmente - Taller Internacional{% endblock %}
+
+{% block contenido_login %}
+<div class="card shadow-lg">
+    <div class="card-body login-card-body text-center py-5">
+
+        <div class="login-logo mb-4">
+            <a href="#" class="text-white">
+                <b>Taller Internacional</b> de Motores
+            </a>
+        </div>
+
+        <i class="fas fa-lock fa-5x text-danger mb-4"></i>
+
+        <h3 class="text-danger mb-3">¡Cuenta bloqueada temporalmente!</h3>
+
+        <p class="lead text-white mb-4">
+            Se han detectado demasiados intentos fallidos de inicio de sesión.
+        </p>
+
+        <div class="alert alert-warning mx-4">
+            
+            <strong>Por seguridad</strong>, tu cuenta está bloqueada.<br>
+            <span id="mensaje-tiempo">
+                Tiempo restante aproximado: <strong id="tiempo-restante">calculando...</strong>
+            </span>
+            <br><br>
+            Por favor espera o recupera tu contraseña.
+        </div>
+
+        <div class="mt-5 px-4">
+            <a href="{% url 'login:login' %}" class="btn btn-primary btn-block mb-3">
+                <i class="fas fa-arrow-left mr-2"></i> Volver al inicio de sesión
+            </a>
+
+            <a href="{% url 'login:password_reset' %}" class="btn btn-volver btn-block">
+                <i class="fas fa-key mr-2"></i> Recuperar mi contraseña
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<!-- Contador regresivo -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Obtenemos el valor directamente desde Django
+    const segundosInicial = parseInt('{{ segundos_bloqueo|default:"120" }}', 10);
+    
+    // Debug visible en consola del navegador (F12 → Console)
+    console.log('Segundos recibidos desde Django:', segundosInicial);
+    
+    let segundos = isNaN(segundosInicial) ? 120 : segundosInicial;
+
+    const tiempoRestanteEl = document.getElementById('tiempo-restante');
+    const mensajeTiempoEl  = document.getElementById('mensaje-tiempo');
+
+    if (!tiempoRestanteEl || !mensajeTiempoEl) {
+        console.error('No se encontraron los elementos #tiempo-restante o #mensaje-tiempo');
+        return;
+    }
+
+    // Si ya está en 0 o negativo
+    if (segundos <= 0) {
+        tiempoRestanteEl.textContent = '0 minutos y 0 segundos';
+        mensajeTiempoEl.innerHTML = '<strong>El bloqueo ha terminado. <a href="{% url "login:login" %}">Intenta de nuevo aquí</a>.</strong>';
+        return;
+    }
+
+    function actualizar() {
+        if (segundos <= 0) {
+            tiempoRestanteEl.textContent = '0 minutos y 0 segundos';
+            mensajeTiempoEl.innerHTML = '<strong>El bloqueo ha terminado. <a href="{% url "login:login" %}">Intenta de nuevo aquí</a>.</strong>';
+            clearInterval(intervalo);
+            return;
+        }
+
+        const minutos = Math.floor(segundos / 60);
+        const segRest = segundos % 60;
+
+        let texto = minutos + ' minuto' + (minutos !== 1 ? 's' : '') +
+                    ' y ' + segRest + ' segundo' + (segRest !== 1 ? 's' : '');
+
+        tiempoRestanteEl.textContent = texto;
+        segundos--;
+    }
+
+    // Primera ejecución inmediata
+    actualizar();
+    
+    // Luego cada segundo
+    const intervalo = setInterval(actualizar, 1000);
+});
+</script>
+{% endblock contenido_login %}

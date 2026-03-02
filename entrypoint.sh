@@ -4,11 +4,11 @@
 set -e
 
 # Wait for MySQL to be ready
-echo "Waiting for database..."
-while ! python manage.py shell -c "import django; django.setup(); from django.db import connections; connections['default'].ensure_connection()" > /dev/null 2>&1; do
+echo "Waiting for databases..."
+while ! python manage.py shell -c "import django; django.setup(); from django.db import connections; connections['default'].ensure_connection(); connections['log_db'].ensure_connection()" > /dev/null 2>&1; do
   sleep 1
 done
-echo "Database ready!"
+echo "Databases ready!"
 
 # Run migrations
 echo "Running migrations..."
