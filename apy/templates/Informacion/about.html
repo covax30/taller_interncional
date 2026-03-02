@@ -10,9 +10,7 @@
   <meta name="keywords" content="">
 
   <!-- Favicons -->
-  <link href="{% static 'info/assets/img/favicon.png' %}" rel="icon">
-  <link href="{% static 'info/assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
-
+    <link rel="icon" href="{% static 'img/favico.jpg' %}" type="image/png">
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
@@ -66,8 +64,7 @@
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
 
-      <a class="btn-getstarted d-none d-sm-block" href="quote.html">Iniciar Sesión</a>
-
+<a class="btn-getstarted d-none d-sm-block" href="{% url 'login:login' %}">Iniciar Sesión</a>
     </div>
   </header>
 
