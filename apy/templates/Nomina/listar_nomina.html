@@ -15,7 +15,6 @@
 {% block columnas %}
 
         <th>Id de la nómina</th>
-        <th>Rol</th>
         <th>Monto </th>
         <th>Fecha de Pago </th>
         <th>Id del Empleado  </th>
@@ -28,10 +27,9 @@
       {% for n in object_list %}
       <tr>
         <td>{{ n.id }}</td>
-        <td>{{ n.rol}}</td>
         <td>{{ n.monto|intcomma }}</td>
         <td>{{ n.fecha_pago}}</td>
-        <td>{{ n.id_empleado}}</td>
+        <td>{{ n.empleado}}</td>
         
         <form method="post">
 

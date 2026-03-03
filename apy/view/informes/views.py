@@ -82,7 +82,7 @@ class InformeListView(PermisoRequeridoMixin, View):
         informes = Informes.objects.filter(estado=True).select_related(
             'detalle_servicio__id_vehiculo', 'id_empleado__user'
         ).order_by('-fecha')
-        return render(request, 'informes/lista_informes.html', {'informes': informes})
+        return render(request, 'informes/listar_informe.html', {'informes': informes})
 
 
 class CreateInformeView(PermisoRequeridoMixin, View):
