@@ -56,23 +56,37 @@ class ListServicioView(PermisoRequeridoMixin, ListView):
 # LISTAR SERVICIOS INACTIVOS
 # ─────────────────────────────────────────────────────────────
 class ServicioInactivosListView(PermisoRequeridoMixin, ListView):
-
     module_name = 'Factura'
     permission_required = 'view'
-
+    
     model = DetalleServicio
-    template_name = 'detalle_servicio/modal_inactivos.html'
-    context_object_name = 'servicios_inactivos'
-
+    template_name = 'detalle_servicio/modal_inactivos.html'  # Nombre más descriptivo
+    context_object_name = 'servicios'
+    
     def get_queryset(self):
-        return DetalleServicio.objects.filter(estado=False)
-
+        """Filtrar solo servicios inactivos"""
+        return DetalleServicio.objects.filter(
+            estado=False
+        ).select_related(
+            'id_vehiculo', 
+            'cliente', 
+            'empleado__user'
+        ).order_by('-fecha_creacion')
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['total_servicios']   = DetalleServicio.objects.count()
+        
+        # Totales generales
+        context['total_servicios'] = DetalleServicio.objects.count()
         context['servicios_activos'] = DetalleServicio.objects.filter(estado=True).count()
+        context['servicios_inactivos'] = DetalleServicio.objects.filter(estado=False).count()
+        
+        # Para el template
+        context['titulo'] = 'Servicios Inactivos'
+        context['entidad'] = 'Servicios'
+        context['listar_url'] = reverse_lazy('apy:lista_servicios')  # URL para volver a activos
+        
         return context
-
 
 # ─────────────────────────────────────────────────────────────
 # CREAR SERVICIO
@@ -309,11 +323,26 @@ class DeleteServicioView(PermisoRequeridoMixin, DeleteView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        self.object.estado = False
-        self.object.save()
-        messages.success(self.request, f'Servicio #{self.object.id} desactivado correctamente.')
-        return HttpResponseRedirect(self.get_success_url())
 
+        # Si está en proceso → borrado físico
+        if self.object.proceso == 'proceso':
+            id_servicio = self.object.id
+            self.object.delete()
+            messages.success(
+                request,
+                f'Servicio #{id_servicio} eliminado permanentemente de la base de datos.'
+            )
+
+        # Si está terminado → borrado lógico
+        else:
+            self.object.estado = False
+            self.object.save()
+            messages.success(
+                request,
+                f'Servicio #{self.object.id} desactivado correctamente.'
+            )
+
+        return HttpResponseRedirect(self.get_success_url())
 
 # ─────────────────────────────────────────────────────────────
 # ACTIVAR SERVICIO
