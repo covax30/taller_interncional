@@ -17,12 +17,8 @@
     <th>ID Pago</th>
     <th>Tipo Pago</th>
     <th>Fecha</th>
-    <th>Hora</th>
     <th>Monto</th>
     <th>Proveedor</th>
-    <th>Herramientas</th>
-    <th>Insumos</th>
-    <th>Repuestos</th>
     <th>Acciones</th>
 {% endblock %}
 
@@ -39,12 +35,8 @@
         </td>
         <td>{{ p.tipo_pago|default:"No especificado" }}</td>
         <td>{{ p.fecha|date:"d/m/Y"|default:"No especificada" }}</td>
-        <td>{{ p.hora|default:"No especificada" }}</td>
         <td>{{ p.monto_total|intcomma|default:"0" }}</td>
         <td>{{ p.id_proveedor|default:"Sin proveedor" }}</td>
-        <td>{{ p.id_herramienta|default:"Sin herramienta" }}</td>
-        <td>{{ p.id_insumo  |default:"Sin insumos" }}</td>
-        <td>{{ p.id_repuesto|default:"Sin repuestos" }}</td>
         <td>
             <!-- Solo mostrar botones si existe id_pago -->
             {% if p.id_pago %}
