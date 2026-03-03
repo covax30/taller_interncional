@@ -812,46 +812,43 @@ class EntradaVehiculoForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['fecha_ingreso'].widget.attrs['autofocus'] = True
-        
+
+        # Label bonito para el select de vehículo
+        self.fields['id_vehiculo'].queryset = Vehiculo.objects.filter(estado=True)
+        self.fields['id_vehiculo'].label_from_instance = (
+            lambda v: f"{v.placa} — {v.marca_vehiculo} {v.modelo_vehiculo} ({v.color})"
+        )
+        self.fields['id_vehiculo'].empty_label = "Seleccione un vehículo"
+
+        self.fields['id_cliente'].queryset = Cliente.objects.filter(estado=True)
+        self.fields['id_cliente'].label_from_instance = (
+            lambda c: f"{c.nombre} — {c.identificacion}"
+        )
+        self.fields['id_cliente'].empty_label = "Seleccione un cliente"
+        self.fields['id_cliente'].required = False  
+
+        for field in self.fields.values():
+            field.widget.attrs.setdefault('class', 'form-control')
+
     class Meta:
         model = EntradaVehiculo
-        fields = '__all__'
+        fields = ['id_vehiculo', 'id_cliente', 'fecha_ingreso', 'hora_ingreso']
         widgets = {
-            'id_entrada':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-          
-            'fecha_ingreso':DateInput(
-                attrs={
-                    'type': 'date',
-                    'placeholder':'Ingrese la fecha de ingreso',
-                }
-            ),
-            'hora_ingreso':TimeInput(
-                attrs={
-                    'type': 'time',
-                    'placeholder':'Ingrese la hora de ingreso',
-                }
-            ),
+            'id_vehiculo': Select(attrs={'class': 'form-control', 'id': 'id_id_vehiculo'}),
+            'id_cliente':  Select(attrs={'class': 'form-control', 'id': 'id_id_cliente'}),
+            'fecha_ingreso': DateInput(attrs={
+                'type': 'date',
+                'class': 'form-control',
+            }),
+            'hora_ingreso': TimeInput(attrs={
+                'type': 'time',
+                'class': 'form-control',
+            }),
         }
         error_messages = {
-            'id_entrada': {
-                'required': 'El id de entrada es obligatorio',
-            },
-            'id_vehiculo': {
-                'required': 'El id del vehiculo es obligatorio',
-            },
-            'id_cliente': {
-                'required': 'El id del cliente es obligatorio',
-            },
-            'fecha_ingreso': {
-                'required': 'La fecha de ingreso del vehiculo es obligatoria',
-            },
-            'hora_ingreso': {
-                'required': 'La hora de ingreso del vehiculo es obligatoria',
-            },
+            'id_vehiculo':  {'required': 'El vehículo es obligatorio.'},
+            'fecha_ingreso': {'required': 'La fecha de ingreso es obligatoria.'},
+            'hora_ingreso':  {'required': 'La hora de ingreso es obligatoria.'},
         }
         
 class SalidaVehiculoForm(ModelForm):
@@ -995,15 +992,32 @@ class DetallePagoRepuestoForm(forms.ModelForm):
 
 
 class DetallePagoInsumoForm(forms.ModelForm):
-    """Solo muestra el campo insumo."""
+    """Muestra el campo insumo y la unidad de medida."""
+    
+    # Campo adicional para mostrar la unidad actual del insumo (solo lectura)
+    unidad_actual = forms.CharField(
+        required=False, 
+        widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly', 'style': 'background-color:#f8f9fa;'}),
+        label="Unidad del insumo"
+    )
+    
     class Meta:
         model  = DetallePago
-        fields = ['insumo', 'cantidad', 'precio_unitario']
+        fields = ['insumo', 'unidad', 'cantidad', 'precio_unitario']
         widgets = {
-            'insumo':          forms.Select(attrs={'class': 'form-control'}),
-            'cantidad':        forms.NumberInput(attrs={'class': 'form-control cantidad-insumo', 'min': '1'}),
+            'insumo':          forms.Select(attrs={'class': 'form-control insumo-select', 'data-placeholder': 'Seleccione un insumo'}),
+            'unidad':          forms.Select(attrs={'class': 'form-control unidad-select'}),
+            'cantidad':        forms.NumberInput(attrs={'class': 'form-control cantidad-insumo', 'min': '1', 'step': '0.01'}),
             'precio_unitario': forms.NumberInput(attrs={'class': 'form-control precio-insumo', 'min': '0'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Si estamos editando un detalle existente, mostrar la unidad guardada
+        if self.instance and self.instance.pk and self.instance.insumo:
+            self.fields['unidad_actual'].initial = self.instance.get_unidad_display()
+            # Pre-seleccionar la unidad guardada
+            self.fields['unidad'].initial = self.instance.unidad
 
     def save(self, commit=True):
         instance = super().save(commit=False)

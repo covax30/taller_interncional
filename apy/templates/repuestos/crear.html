@@ -63,18 +63,7 @@
         {% endif %}
     </div>
 
-    {# ── FABRICANTE ── #}
-    <div class="form-group mb-3">
-        <label for="{{ form.fabricante.id_for_label }}" class="font-weight-bold">
-            Fabricante <span class="text-danger">*</span>
-        </label>
-        {{ form.fabricante|add_class:'form-control'|attr:'placeholder:Ej: Bosch' }}
-        {% if form.fabricante.errors %}
-            <div class="invalid-feedback d-block">
-                {% for error in form.fabricante.errors %}<small>{{ error }}</small>{% endfor %}
-            </div>
-        {% endif %}
-    </div>
+    
 
     {# ── STOCK DISPONIBLE ── #}
     <div class="form-group mb-3">

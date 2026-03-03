@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: Helvetica, Arial, sans-serif; font-size:9.5px; color:#1a1a2e; }
+
+  .header { background:#1F4E79; color:#fff; padding:16px 20px; margin-bottom:14px; }
+  .header h1 { font-size:15px; font-weight:bold; margin-bottom:3px; }
+  .header p  { font-size:8.5px; opacity:.85; }
+
+  table { width:100%; border-collapse:collapse; margin-bottom:12px; }
+  thead th {
+    background:#1F4E79; color:#fff; padding:6px 7px;
+    text-align:left; font-size:8px; text-transform:uppercase; letter-spacing:.4px;
+  }
+  tbody tr:nth-child(even) { background:#f4f8fd; }
+  tbody td { padding:5px 7px; border-bottom:1px solid #e4ecf5; font-size:9px; }
+  tbody td.num { text-align:right; font-weight:bold; }
+
+  tfoot td {
+    background:#1F4E79; color:#fff; font-weight:bold;
+    padding:6px 7px; font-size:9.5px;
+  }
+  tfoot td.num { text-align:right; }
+
+  .badge-ok   { color:#198754; font-weight:bold; }
+  .badge-bajo { color:#dc3545; font-weight:bold; }
+
+  .footer {
+    position:fixed; bottom:0; left:0; right:0;
+    border-top:1px solid #ccc; padding:5px 20px;
+    font-size:7.5px; color:#999;
+  }
+</style>
+</head>
+<body>
+
+<div class="footer">
+  Taller Internacional de Motores &nbsp;|&nbsp; Generado: {{ fecha_gen }}
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  Reporte: {{ modulo_nombre }}
+</div>
+
+<div class="header">
+  <h1>Reporte — {{ modulo_nombre }}</h1>
+  <p>Período: {{ desde_display }} — {{ hasta_display }} &nbsp;|&nbsp; {{ total_filas }} registro{{ total_filas|pluralize:"s" }}</p>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      {% for h in headers %}
+      <th {% if forloop.last and tiene_monto %}style="text-align:right"{% endif %}>{{ h }}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+    <tr>
+      {% for cell in row %}
+      <td {% if forloop.last and tiene_monto %}class="num"{% endif %}>
+        {% if cell == 'Stock Bajo' %}<span class="badge-bajo">{{ cell }}</span>
+        {% elif cell == 'OK' %}<span class="badge-ok">{{ cell }}</span>
+        {% elif forloop.last and tiene_monto %}${{ cell|floatformat:0 }}
+        {% else %}{{ cell }}{% endif %}
+      </td>
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </tbody>
+  {% if total_monto is not None %}
+  <tfoot>
+    <tr>
+      <td colspan="{{ headers|length|add:"-1" }}">TOTAL</td>
+      <td class="num">${{ total_monto|floatformat:0 }}</td>
+    </tr>
+  </tfoot>
+  {% endif %}
+</table>
+
+</body>
+</html>

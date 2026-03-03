@@ -1,64 +1,122 @@
-{% extends "form_generico.html"%}
-{% load widget_tweaks%}
+{% extends "form_generico.html" %}
+{% load widget_tweaks %}
+
 {% block form %}
-    {% csrf_token %}
+{% csrf_token %}
 
-
-    <!-- Fecha -->
-    <div class="form-group mb-3">
-        <label for="{{ form.fecha_ingreso.id_for_label }}">Fecha:</label>
-        <div class="input-group">
-            {{ form.fecha_ingreso|add_class:'form-control' }}
+{# ── Vehículo ── #}
+<div class="form-group mb-3">
+    <label for="{{ form.id_vehiculo.id_for_label }}">
+        <i class="fas fa-car me-1 text-primary"></i>Vehículo:
+    </label>
+    <div class="input-group" style="display:flex; flex-wrap:nowrap;">
+        <div style="flex-grow:1;">
+            {{ form.id_vehiculo|add_class:'form-control' }}
         </div>
-        {% if form.fecha_ingreso.errors %}
-            <div class="invalid-feedback d-block">
-                {% for error in form.fecha_ingreso.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
-            </div>
-        {% endif %}
-    </div> 
-
-    <!-- Hora -->
-    <div class="form-group mb-3">
-        <label for="{{ form.hora_ingreso.id_for_label }}">Hora:</label>
-        <div class="input-group">
-            {{ form.hora_ingreso|add_class:'form-control' }}
-        </div>
-        {% if form.hora_ingreso.errors %}
-            <div class="invalid-feedback d-block">
-                {% for error in form.hora_ingreso.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
-            </div>
-        {% endif %}
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-id_vehiculo_entrada">
+            <i class="fas fa-plus"></i>
+        </button>
     </div>
+    {% if form.id_vehiculo.errors %}
+        <div class="invalid-feedback d-block">
+            {% for error in form.id_vehiculo.errors %}<small>{{ error }}</small><br>{% endfor %}
+        </div>
+    {% endif %}
+    <small class="text-muted">Al seleccionar el vehículo, el cliente se rellenará automáticamente.</small>
+</div>
 
+{# ── Cliente (se rellena automático) ── #}
+<div class="form-group mb-3">
+    <label for="{{ form.id_cliente.id_for_label }}">
+        <i class="fas fa-user me-1 text-primary"></i>Cliente:
+    </label>
+    {{ form.id_cliente|add_class:'form-control' }}
+    {% if form.id_cliente.errors %}
+        <div class="invalid-feedback d-block">
+            {% for error in form.id_cliente.errors %}<small>{{ error }}</small><br>{% endfor %}
+        </div>
+    {% endif %}
+</div>
 
+{# ── Fecha ── #}
+<div class="form-group mb-3">
+    <label for="{{ form.fecha_ingreso.id_for_label }}">
+        <i class="fas fa-calendar me-1 text-primary"></i>Fecha:
+    </label>
+    {{ form.fecha_ingreso|add_class:'form-control' }}
+    {% if form.fecha_ingreso.errors %}
+        <div class="invalid-feedback d-block">
+            {% for error in form.fecha_ingreso.errors %}<small>{{ error }}</small><br>{% endfor %}
+        </div>
+    {% endif %}
+</div>
 
+{# ── Hora ── #}
+<div class="form-group mb-3">
+    <label for="{{ form.hora_ingreso.id_for_label }}">
+        <i class="fas fa-clock me-1 text-primary"></i>Hora:
+    </label>
+    {{ form.hora_ingreso|add_class:'form-control' }}
+    {% if form.hora_ingreso.errors %}
+        <div class="invalid-feedback d-block">
+            {% for error in form.hora_ingreso.errors %}<small>{{ error }}</small><br>{% endfor %}
+        </div>
+    {% endif %}
+</div>
 
-    <!-- Script Cliente. -->
-    <script>
-        $("#modal-id_cliente").on("show.bs.modal", function(){
-            var modal = $(this);
-            $.ajax({
-                url: "{% url 'apy:cliente_modal_crear' %}",
-                success: function(data){
-                    modal.find(".modal-body").html(data.html || data);
-                }
-            });
+{# Modal para crear vehículo #}
+<div class="modal fade" id="modal-id_vehiculo_entrada" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Vehículo</h5>
+                <button type="button" class="close" data-dismiss="modal"
+                    style="background:#dc3545;color:#fff;border:none;border-radius:50%;width:35px;height:35px;font-size:1.5rem;display:flex;justify-content:center;align-items:center;">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body"></div>
+        </div>
+    </div>
+</div>
+
+{# Mapa vehiculo → cliente (JSON) #}
+{{ vehiculo_cliente_map|json_script:"vehiculo-cliente-map" }}
+
+<script>
+$(document).ready(function () {
+    var vehiculoClienteMap = JSON.parse(document.getElementById('vehiculo-cliente-map').textContent);
+
+    // Al cambiar el vehículo → autocompletar cliente
+    $('#id_id_vehiculo').on('change', function () {
+        var vidStr = $(this).val();
+        if (!vidStr) return;
+        var clienteId = vehiculoClienteMap[vidStr];
+        if (clienteId) {
+            $('#id_id_cliente').val(clienteId).trigger('change');
+        }
+    });
+
+    // Modal para crear vehículo nuevo
+    $('#modal-id_vehiculo_entrada').on('show.bs.modal', function () {
+        var modal = $(this);
+        $.ajax({
+            url: "{% url 'apy:vehiculo_modal_crear' %}",
+            success: function (data) {
+                modal.find('.modal-body').html(data.html || data);
+            }
         });
-    </script>
+    });
+});
+</script>
 
 {% endblock %}
 
-
 {% block Cancelar %}
-                <button type="submit" class="btn btn-primary btn-flat" title="Agregar ingreso de vehículo">
-                    <i class="fas fa-save"></i>
-                    Agregar
-                </button>
-                <a href="{% url 'apy:entrada_vehiculo_lista' %}" class="btn btn-danger btn-flat float-right" title="Cancelar ingreso de vehículo">
-                    <i class="fas fa-times"></i> Cancelar
-                </a>
+    <button type="submit" class="btn btn-primary btn-flat">
+        <i class="fas fa-save me-1"></i>Guardar
+    </button>
+    <a href="{% url 'apy:entrada_vehiculo_lista' %}" class="btn btn-danger btn-flat float-right">
+        <i class="fas fa-times me-1"></i>Cancelar
+    </a>
 {% endblock %}

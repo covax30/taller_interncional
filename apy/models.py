@@ -298,12 +298,23 @@ class Vehiculo(models.Model):
     
 
 class EntradaVehiculo(models.Model):
-    id_entrada = models.AutoField(primary_key=True)
-    fecha_ingreso = models.DateField()
-    hora_ingreso = models.TimeField()
+    id_entrada     = models.AutoField(primary_key=True)
+    id_vehiculo    = models.ForeignKey('Vehiculo',on_delete=models.PROTECT, verbose_name="Vehículo",related_name='entradas', blank=True, null=True)
+    id_cliente     = models.ForeignKey('Cliente',on_delete=models.PROTECT,verbose_name="Cliente",related_name='entradas',blank=True, null=True)
+    fecha_ingreso  = models.DateField()
+    hora_ingreso   = models.TimeField()
+    def save(self, *args, **kwargs):
+        # Auto-rellenar cliente desde el vehículo si no se especificó
+        if self.id_vehiculo and not self.id_cliente:
+            self.id_cliente = self.id_vehiculo.id_cliente
+        super().save(*args, **kwargs)
+
+    
 
     def __str__(self):
-        return f"{self.fecha_ingreso} - {self.hora_ingreso}"
+        placa = self.id_vehiculo.placa if self.id_vehiculo else "Sin vehículo"
+        return f"Entrada #{self.id_entrada} — {placa} — {self.fecha_ingreso} {self.hora_ingreso}"
+
     
 
 class SalidaVehiculo(models.Model):
@@ -437,7 +448,7 @@ class Pagos(models.Model):
             Gastos.objects.create(
                 monto=self.monto_total,
                 descripcion=f"Pago a proveedores: {self.get_tipo_pago_display()}",
-                tipo_gastos='costo fijo', # O el que prefieras
+                tipo_gastos='costo fijo', 
                 id_pago=self,
                 fecha=timezone.now().date()
             )
@@ -464,6 +475,14 @@ class DetallePago(models.Model):
     herramienta     = models.ForeignKey(Herramienta, null=True, blank=True, on_delete=models.PROTECT)
     cantidad        = models.PositiveIntegerField(default=1)
     precio_unitario = models.IntegerField()
+    UNIDAD_CHOICES = [
+        ('galon', 'Galón'),
+        ('litro', 'Litro'),
+        ('mililitro', 'Mililitro'),
+        ('unidades', 'Unidades'),
+    ]
+    unidad = models.CharField(max_length=20, choices=UNIDAD_CHOICES, null=True, blank=True, 
+                              verbose_name="Unidad de medida")
 
     @property
     def subtotal(self):
