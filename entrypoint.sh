@@ -5,8 +5,9 @@ set -e
 
 # Wait for MySQL to be ready
 echo "Waiting for databases..."
-while ! python manage.py shell -c "import django; django.setup(); from django.db import connections; connections['default'].ensure_connection(); connections['log_db'].ensure_connection()" > /dev/null 2>&1; do
-  sleep 1
+while ! python manage.py shell -c "import django; django.setup(); from django.db import connections; connections['default'].ensure_connection(); connections['log_db'].ensure_connection()"; do
+  echo "Still waiting... (check if error above)"
+  sleep 2
 done
 echo "Databases ready!"
 

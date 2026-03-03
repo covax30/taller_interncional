@@ -54,7 +54,7 @@ class PerfilEditarView(LoginRequiredMixin, View):
                         'password_form': password_form,
                     })
 
-            # 2. Lógica para DATOS PERSONALES (No permitir vacíos)
+            # 2. Lógica para DATOS PERSONALES
             user_form = self.get_user_form(request.POST)
             profile_form = self.get_profile_form(request.POST, request.FILES)
 
@@ -76,8 +76,8 @@ class PerfilEditarView(LoginRequiredMixin, View):
                 'password_form': self.get_password_form(),
             })
         
-@method_decorator(login_required, name='dispatch')
-class ActualizarPerfilImagenView(View):
+
+class ActualizarPerfilImagenView(LoginRequiredMixin, View):
     success_url = reverse_lazy('apy:editar_usuario') 
 
     def post(self, request, *args, **kwargs):
@@ -99,8 +99,6 @@ class ActualizarPerfilImagenView(View):
         if 'imagen' in request.FILES:
             profile_instance.imagen = request.FILES['imagen']
             
-            # EL TRUCO: update_fields=['imagen'] evita que Django valide 
-            # o intente guardar la identificación o el teléfono.
             try:
                 profile_instance.save(update_fields=['imagen'])
                 messages.success(request, "¡Imagen de perfil actualizada!")
@@ -113,8 +111,8 @@ class ActualizarPerfilImagenView(View):
         messages.warning(request, "No se seleccionó ninguna imagen.")
         return redirect(self.success_url)
     
-@method_decorator(login_required, name='dispatch')
-class PerfilPasswordChangeDoneView(TemplateView):
+
+class PerfilPasswordChangeDoneView(LoginRequiredMixin, TemplateView):
     def get(self, request, *args, **kwargs):
         messages.success(request, "¡Contraseña cambiada con éxito!")
         return redirect('apy:editar_usuario')
