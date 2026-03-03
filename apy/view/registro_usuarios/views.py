@@ -33,7 +33,6 @@ class SuperuserRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
 
 # 1. VISTA DE CREACIÓN (RegistroUsuarioCreateView) - PROTEGIDA
 
-# Ahora heredamos de la clase SuperuserRequiredMixin
 class RegistroUsuarioCreateView(SuperuserRequiredMixin, CreateView):
     model = User
     form_class = RegistroUsuarioForm
@@ -57,12 +56,12 @@ class RegistroUsuarioCreateView(SuperuserRequiredMixin, CreateView):
 
 # 2. VISTA DE ACTUALIZACIÓN (RegistroUpdateView) - PROTEGIDA
 
-# Ahora heredamos de la clase SuperuserRequiredMixin
 class RegistroUpdateView(SuperuserRequiredMixin, UpdateView):
     model = User
     form_class = RegistroUsuarioForm 
     template_name = 'registro_usuarios/registro_usuarios.html' 
     success_url = reverse_lazy('apy:registro_usuario_lista') 
+    context_object_name = 'user_to_edit'
     
     # --- Configuración de Permisos ---
     module_name = 'GestionUsuarios'
@@ -76,7 +75,6 @@ class RegistroUpdateView(SuperuserRequiredMixin, UpdateView):
         return context
 
     def form_valid(self, form):
-        # Al llamar a form.save(), se ejecuta nuestra lógica personalizada de roles y perfil
         self.object = form.save() 
         messages.success(self.request, f"Usuario {self.object.username} actualizado correctamente.")
         return super().form_valid(form)
@@ -84,11 +82,11 @@ class RegistroUpdateView(SuperuserRequiredMixin, UpdateView):
 
 # 3. VISTA DE ELIMINACIÓN (RegistroDeleteView) - PROTEGIDA
 
-# Ahora heredamos de la clase SuperuserRequiredMixin
 class RegistroDeleteView(SuperuserRequiredMixin, DeleteView):
     model = User
     template_name = 'registro_usuarios/eliminar_registro_usuarios.html'
     success_url = reverse_lazy('apy:registro_usuario_lista') 
+    context_object_name = 'user_to_delete'
     
     # --- Configuración de Permisos ---
     module_name = 'GestionUsuarios'
@@ -126,7 +124,6 @@ class RegistroDeleteView(SuperuserRequiredMixin, DeleteView):
 
 # 4. VISTA DE LISTADO (RegistroUsuarioListView) - PROTEGIDA
 
-# Ahora heredamos de la clase SuperuserRequiredMixin
 class RegistroUsuarioListView(SuperuserRequiredMixin, ListView):
     model = User 
     template_name = 'registro_usuarios/listar_registro_usuarios.html' 
@@ -152,16 +149,14 @@ class EmpleadoCreateModalView(CreateView):
         try:
             with transaction.atomic(): 
                 ident = form.cleaned_data['identificacion']
-                # OBTENEMOS LOS NOMBRES DEL FORMULARIO
                 nombre = form.cleaned_data['first_name']
                 apellido = form.cleaned_data['last_name']
                 
-                # 1. Creamos el usuario con los datos reales
                 user, created = User.objects.get_or_create(
                     username=ident,
                     defaults={
-                        'first_name': nombre, # <--- Ahora usa el nombre real
-                        'last_name': apellido, # <--- Ahora usa el apellido real
+                        'first_name': nombre,
+                        'last_name': apellido,
                         'is_active': True
                     }
                 )
@@ -174,9 +169,8 @@ class EmpleadoCreateModalView(CreateView):
                 return JsonResponse({
                     "success": True,
                     "id": self.object.id,
-                    # Retornamos el nombre completo para que se vea bien en el select del servicio
                     "text": f"{nombre} {apellido} ({ident})",
-                    "message": "Empleado registrado correctamente ✅"
+                    "message": "Empleado registrado correctamente"
                 })
         except Exception as e:
             print(f"Error en el servidor: {e}") 
