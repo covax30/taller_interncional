@@ -3,10 +3,9 @@ from django import forms
 from django.forms import ModelForm, Select, NumberInput, DateInput, TimeInput, TextInput, EmailInput
 from django.forms import inlineformset_factory
 from decimal import Decimal, InvalidOperation
-# apy/forms.py (Asegúrate de importar esto)
 from django.contrib.auth.hashers import make_password
-from django import forms  # Asegúrate de usar la importación estándar de forms
-from django.contrib.auth.models import User, Permission  # Importación de modelos de Django
+from django import forms
+from django.contrib.auth.models import User, Permission
 from django.core.exceptions import ValidationError
 from .models import Profile,DetalleServicio
 from .validators import solo_letras_validator, ComplexPasswordValidator, telefono_validator
@@ -357,315 +356,573 @@ class ProveedorForm(ModelForm):
             }
         }
 # ------------------- FORMS STEVEN -------------------     
+# ─────────────────────────────────────────────────────────────────────────────
+# CONSTANTES DE VALIDACIÓN
+# ─────────────────────────────────────────────────────────────────────────────
+SOLO_LETRAS_RE       = re.compile(r'^[A-Za-záéíóúÁÉÍÓÚüÜñÑ\s\-]+$')
+SOLO_NUMEROS_RE      = re.compile(r'^\d+$')
+TELEFONO_RE          = re.compile(r'^\+?[\d\s\-]{7,15}$')
+USERNAME_RE          = re.compile(r'^[\w.@+\-]+$')   # mismo patrón que Django, explicitado
+IDENTIFICACION_MIN   = 5
+IDENTIFICACION_MAX   = 20
+TELEFONO_MIN         = 7
+TELEFONO_MAX         = 15
+USERNAME_MIN         = 3
+USERNAME_MAX         = 150
+NOMBRE_MIN           = 2
+NOMBRE_MAX           = 50
+PASSWORD_MIN         = 8
+DIRECCION_MIN        = 5
+DIRECCION_MAX        = 200
+ROLES_VALIDOS        = {'normal', 'admin'}
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# HELPERS INTERNOS
+# ─────────────────────────────────────────────────────────────────────────────
+def _validar_solo_letras(valor: str, nombre_campo: str) -> str:
+    """Verifica que el valor solo contenga letras, espacios o guiones."""
+    valor = valor.strip()
+    if not valor:
+        raise forms.ValidationError(f"El {nombre_campo} no puede estar vacío.")
+    if len(valor) < NOMBRE_MIN:
+        raise forms.ValidationError(
+            f"El {nombre_campo} debe tener al menos {NOMBRE_MIN} caracteres."
+        )
+    if len(valor) > NOMBRE_MAX:
+        raise forms.ValidationError(
+            f"El {nombre_campo} no puede superar los {NOMBRE_MAX} caracteres."
+        )
+    if not SOLO_LETRAS_RE.match(valor):
+        raise forms.ValidationError(
+            f"El {nombre_campo} solo puede contener letras, espacios o guiones."
+        )
+    return valor
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# FORMULARIO PRINCIPAL: Registro / Edición de Usuario (por parte del Admin)
+# ─────────────────────────────────────────────────────────────────────────────
 class RegistroUsuarioForm(forms.ModelForm):
-    # --- CAMPOS EXTRA QUE NO ESTÁN EN EL MODELO USER ---
+
+    # ── Campos extra no presentes en el modelo User ──────────────────────────
     old_password = forms.CharField(
         label='Contraseña Antigua',
         widget=forms.PasswordInput(attrs={'placeholder': 'Contraseña actual'}),
-        required=False
+        required=False,
     )
-    
+
     password = forms.CharField(
         label='Contraseña',
         widget=forms.PasswordInput(attrs={'placeholder': 'Contraseña'}),
         strip=False,
-        required=True
+        required=True,
     )
-    
+
     password2 = forms.CharField(
         label='Confirmar Contraseña',
         widget=forms.PasswordInput(attrs={'placeholder': 'Repita la contraseña'}),
         strip=False,
-        required=True
+        required=True,
     )
-    
+
     role = forms.ChoiceField(
         label='Rol',
         choices=[('normal', 'Empleado'), ('admin', 'Gerente')],
         widget=forms.Select(),
-        required=True
+        required=True,
     )
-    
+
     tipo_identificacion = forms.ChoiceField(
         label='Tipo de Documento',
-        choices=Profile.TIPO_DOC_CHOICES, # Asegúrate que existan en el modelo Profile
-        widget=forms.Select()
+        choices=Profile.TIPO_DOC_CHOICES,
+        widget=forms.Select(),
     )
 
     identificacion = forms.CharField(
-        label='Identificación', 
+        label='Identificación',
         required=True,
-        widget=forms.TextInput()
+        widget=forms.TextInput(),
     )
-    
+
     direccion = forms.CharField(
-        label='Dirección', 
-        required=False, 
-        widget=forms.TextInput()
+        label='Dirección',
+        required=True,   # ← ahora obligatorio
+        widget=forms.TextInput(),
     )
-    
+
     telefono = forms.CharField(
-        label='Teléfono', 
-        required=False, 
-        widget=forms.TextInput()
+        label='Teléfono',
+        required=True,   # ← ahora obligatorio
+        widget=forms.TextInput(),
     )
 
     class Meta:
         model = User
         fields = ('username', 'email', 'first_name', 'last_name')
-        
+
+    # ── __init__ ──────────────────────────────────────────────────────────────
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
-        # 1. Ajuste de obligatoriedad si es edición
+
         if self.instance and self.instance.pk:
+            # En edición la contraseña es opcional
             self.fields['password'].required = False
             self.fields['password2'].required = False
-            
-            # 2. Sincronizar Rol con is_superuser
-            if self.instance.is_superuser:
-                self.initial['role'] = 'admin'
-            else:
-                self.initial['role'] = 'normal'
-            
-            # 3. Cargar datos del Perfil relacionados
+
+            # Sincronizar rol
+            self.initial['role'] = 'admin' if self.instance.is_superuser else 'normal'
+
+            # Cargar datos del perfil
             try:
                 perfil = self.instance.profile
                 self.initial.update({
                     'tipo_identificacion': perfil.tipo_identificacion,
-                    'identificacion': perfil.identificacion,
-                    'direccion': perfil.direccion,
-                    'telefono': perfil.telefono,
+                    'identificacion':      perfil.identificacion,
+                    'direccion':           perfil.direccion,
+                    'telefono':            perfil.telefono,
                 })
             except (Profile.DoesNotExist, AttributeError):
                 pass
 
+    # ── Validaciones de campo ─────────────────────────────────────────────────
+
     def clean_first_name(self):
-        first_name = self.cleaned_data.get('first_name')
-        if first_name:
-            try:
-                solo_letras_validator(first_name)
-            except ValidationError:
-                raise forms.ValidationError("El nombre solo debe contener letras.")
-        return first_name
+        valor = self.cleaned_data.get('first_name', '')
+        if not valor or not valor.strip():
+            raise forms.ValidationError("El nombre es obligatorio.")
+        return _validar_solo_letras(valor, 'nombre')
 
     def clean_last_name(self):
-        last_name = self.cleaned_data.get('last_name')
-        if last_name:
-            try:
-                solo_letras_validator(last_name)
-            except ValidationError:
-                raise forms.ValidationError("El apellido solo debe contener letras.")
-        return last_name
+        valor = self.cleaned_data.get('last_name', '')
+        if not valor or not valor.strip():
+            raise forms.ValidationError("El apellido es obligatorio.")
+        return _validar_solo_letras(valor, 'apellido')
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username', '').strip()
+
+        if not username:
+            raise forms.ValidationError("El nombre de usuario es obligatorio.")
+        if len(username) < USERNAME_MIN:
+            raise forms.ValidationError(
+                f"El nombre de usuario debe tener al menos {USERNAME_MIN} caracteres."
+            )
+        if len(username) > USERNAME_MAX:
+            raise forms.ValidationError(
+                f"El nombre de usuario no puede superar los {USERNAME_MAX} caracteres."
+            )
+        if not USERNAME_RE.match(username):
+            raise forms.ValidationError(
+                "Solo se permiten letras, números y los caracteres: . @ + - _"
+            )
+
+        qs = User.objects.filter(username=username)
+        if self.instance and self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise forms.ValidationError("Este nombre de usuario ya está en uso.")
+
+        return username
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email', '').strip()
+
+        if not email:
+            raise forms.ValidationError("El correo electrónico es obligatorio.")
+
+        # Validación básica de formato (Django ya la hace, pero la dejamos explícita)
+        if '@' not in email or '.' not in email.split('@')[-1]:
+            raise forms.ValidationError("Ingresa un correo electrónico válido.")
+
+        qs = User.objects.filter(email__iexact=email)
+        if self.instance and self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise forms.ValidationError("Este correo electrónico ya está registrado.")
+
+        return email.lower()
+
+    def clean_role(self):
+        role = self.cleaned_data.get('role', '')
+        if role not in ROLES_VALIDOS:
+            raise forms.ValidationError("Rol no válido. Selecciona Empleado o Gerente.")
+        return role
 
     def clean_identificacion(self):
-        identificacion = self.cleaned_data.get('identificacion')
-        tipo = self.cleaned_data.get('tipo_identificacion')
-        
-        # Validar duplicados excluyendo al propio usuario
+        identificacion = self.cleaned_data.get('identificacion', '').strip()
+        tipo = self.cleaned_data.get('tipo_identificacion', '')
+
+        if not identificacion:
+            raise forms.ValidationError("El número de identificación es obligatorio.")
+
+        # Solo dígitos en CC/TI/CE; pasaportes pueden contener letras
+        if tipo in ('CC', 'TI', 'CE'):
+            if not SOLO_NUMEROS_RE.match(identificacion):
+                raise forms.ValidationError(
+                    "Para este tipo de documento solo se permiten números."
+                )
+
+        if len(identificacion) < IDENTIFICACION_MIN:
+            raise forms.ValidationError(
+                f"La identificación debe tener al menos {IDENTIFICACION_MIN} dígitos."
+            )
+        if len(identificacion) > IDENTIFICACION_MAX:
+            raise forms.ValidationError(
+                f"La identificación no puede superar los {IDENTIFICACION_MAX} caracteres."
+            )
+
         qs = Profile.objects.filter(identificacion=identificacion)
         if self.instance and self.instance.pk:
             qs = qs.exclude(user=self.instance)
-        
         if qs.exists():
-            raise ValidationError("Este número de identificación ya está registrado.")
-            
-        # Ejecutar validación lógica de negocio (formato según tipo)
+            raise forms.ValidationError("Este número de identificación ya está registrado.")
+
         if tipo and identificacion:
             try:
                 validar_por_tipo(identificacion, tipo)
             except ValidationError as e:
-                raise ValidationError(e.message)
-                
-        return identificacion
-    
-    def clean_telefono(self):
-        telefono = self.cleaned_data.get('telefono')
-        if telefono:
-            try:
-                # Llamamos al validador que creamos arriba
-                telefono_validator(telefono)
-            except ValidationError as e:
                 raise forms.ValidationError(e.message)
+
+        return identificacion
+
+    def clean_telefono(self):
+        telefono = self.cleaned_data.get('telefono', '').strip()
+
+        if not telefono:
+            raise forms.ValidationError("El teléfono es obligatorio.")
+
+        # No debe contener letras
+        if re.search(r'[A-Za-z]', telefono):
+            raise forms.ValidationError("El teléfono no puede contener letras.")
+
+        # Solo dígitos, espacios, guiones y '+' inicial
+        if not TELEFONO_RE.match(telefono):
+            raise forms.ValidationError(
+                "Ingresa un teléfono válido (ej: 3001234567 o +57 300 123 4567)."
+            )
+
+        digitos = re.sub(r'\D', '', telefono)
+        if len(digitos) < TELEFONO_MIN:
+            raise forms.ValidationError(
+                f"El teléfono debe tener al menos {TELEFONO_MIN} dígitos."
+            )
+        if len(digitos) > TELEFONO_MAX:
+            raise forms.ValidationError(
+                f"El teléfono no puede tener más de {TELEFONO_MAX} dígitos."
+            )
+
+        try:
+            telefono_validator(telefono)
+        except ValidationError as e:
+            raise forms.ValidationError(e.message)
+
         return telefono
+
+    def clean_direccion(self):
+        direccion = self.cleaned_data.get('direccion', '').strip()
+
+        if not direccion:
+            raise forms.ValidationError("La dirección es obligatoria.")
+        if len(direccion) < DIRECCION_MIN:
+            raise forms.ValidationError(
+                f"La dirección debe tener al menos {DIRECCION_MIN} caracteres."
+            )
+        if len(direccion) > DIRECCION_MAX:
+            raise forms.ValidationError(
+                f"La dirección no puede superar los {DIRECCION_MAX} caracteres."
+            )
+        # Debe contener al menos un número (número de calle/carrera)
+        if not re.search(r'\d', direccion):
+            raise forms.ValidationError(
+                "La dirección debe incluir un número (ej: Calle 10 # 5-30)."
+            )
+        return direccion
 
     def clean_password(self):
         password = self.cleaned_data.get('password')
-        # Si es edición y está vacío, no se cambia
+
+        # En edición, campo vacío = no cambiar contraseña
         if not password and self.instance and self.instance.pk:
-            return None # Importante devolver None para saber que no cambia
-        
-        # Validadores de Django (Complexity, length, etc)
+            return None
+
         if password:
+            if password != password.strip():
+                raise forms.ValidationError(
+                    "La contraseña no puede comenzar ni terminar con espacios."
+                )
+            if len(password) < PASSWORD_MIN:
+                raise forms.ValidationError(
+                    f"La contraseña debe tener al menos {PASSWORD_MIN} caracteres."
+                )
             validate_password(password, self.instance)
+
         return password
 
+    # ── Validación cruzada (clean general) ───────────────────────────────────
     def clean(self):
         cleaned_data = super().clean()
-        password = cleaned_data.get("password")
-        password2 = cleaned_data.get("password2")
+        password    = cleaned_data.get("password")
+        password2   = cleaned_data.get("password2")
         old_password = cleaned_data.get("old_password")
-        role = cleaned_data.get('role')
+        role        = cleaned_data.get('role')
 
-        # VALIDACIÓN: Contraseña Antigua
+        # Contraseña antigua incorrecta
         if self.instance and self.instance.pk and old_password:
             if not self.instance.check_password(old_password):
                 self.add_error('old_password', "La contraseña actual no es correcta.")
 
-        # VALIDACIÓN: Nueva contraseña coincidente
+        # Nueva contraseña y confirmación no coinciden
         if password and password != password2:
             self.add_error('password2', "Las nuevas contraseñas no coinciden.")
 
-        # VALIDACIÓN: Protección último Administrador
+        # Protección: único administrador
         if self.instance and self.instance.pk and self.instance.is_superuser:
             if role == 'normal':
                 admins_activos = User.objects.filter(is_superuser=True).count()
                 if admins_activos <= 1:
-                    raise forms.ValidationError("Error: No puedes quitarte el rol de Admin porque eres el único en el sistema.")
-        
+                    raise forms.ValidationError(
+                        "No puedes quitarte el rol de Gerente porque eres el único en el sistema."
+                    )
+
         return cleaned_data
 
+    # ── save ─────────────────────────────────────────────────────────────────
     def save(self, commit=True):
         user = super().save(commit=False)
-        
-        # Guardar nueva contraseña si se proporcionó
+
         password = self.cleaned_data.get('password')
         if password:
             user.set_password(password)
-        
-        # Asignación de permisos según Rol
+
         role = self.cleaned_data.get('role')
         if role == 'admin':
             user.is_superuser = True
-            user.is_staff = True
+            user.is_staff     = True
         else:
-            user.is_superuser = False 
-            user.is_staff = True # Permitir login al sistema como empleado
-        
+            user.is_superuser = False
+            user.is_staff     = True
+
         if commit:
             user.save()
-            # Guardar o actualizar datos de Perfil
             Profile.objects.update_or_create(
                 user=user,
                 defaults={
                     'tipo_identificacion': self.cleaned_data.get('tipo_identificacion'),
-                    'identificacion': self.cleaned_data.get('identificacion'),
-                    'direccion': self.cleaned_data.get('direccion'),
-                    'telefono': self.cleaned_data.get('telefono'),
+                    'identificacion':      self.cleaned_data.get('identificacion'),
+                    'direccion':           self.cleaned_data.get('direccion'),
+                    'telefono':            self.cleaned_data.get('telefono'),
                 }
             )
         return user
 
 
-# 1. Formulario para editar el modelo User 
+# ─────────────────────────────────────────────────────────────────────────────
+# FORMULARIO DE PERFIL PROPIO: Edición de datos del usuario (vista de empleado)
+# ─────────────────────────────────────────────────────────────────────────────
 class PerfilUsuarioForm(forms.ModelForm):
     first_name = forms.CharField(required=True, label="Nombres")
-    last_name = forms.CharField(required=True, label="Apellidos")
-    email = forms.EmailField(required=True, label="Correo Electrónico")
+    last_name  = forms.CharField(required=True, label="Apellidos")
+    email      = forms.EmailField(required=True, label="Correo Electrónico")
+
     class Meta:
-        model = User
-        # Solo campos nativos de User
-        fields = ['first_name', 'last_name', 'email', 'username'] 
-    
+        model  = User
+        fields = ['first_name', 'last_name', 'email', 'username']
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['first_name'].widget.attrs.update({'required': 'required'})
         self.fields['last_name'].widget.attrs.update({'required': 'required'})
         placeholder_map = {
             'first_name': 'Tu nombre',
-            'last_name': 'Tu apellido',
-            'username': 'Nombre de Usuario',
-            'email': 'ejemplo@dominio.com',
+            'last_name':  'Tu apellido',
+            'username':   'Nombre de Usuario',
+            'email':      'ejemplo@dominio.com',
         }
         for name, field in self.fields.items():
             field.widget.attrs.update({
-                'class': 'form-control',
-                'placeholder': placeholder_map.get(name, field.label) 
+                'class':       'form-control',
+                'placeholder': placeholder_map.get(name, field.label),
             })
-            
+
     def clean_first_name(self):
-        first_name = self.cleaned_data.get('first_name')
-        if not first_name:
+        valor = self.cleaned_data.get('first_name', '')
+        if not valor or not valor.strip():
             raise forms.ValidationError("El nombre no puede estar vacío.")
-        solo_letras_validator(first_name)
-        return first_name
+        return _validar_solo_letras(valor, 'nombre')
 
     def clean_last_name(self):
-        last_name = self.cleaned_data.get('last_name')
-        if not last_name:
+        valor = self.cleaned_data.get('last_name', '')
+        if not valor or not valor.strip():
             raise forms.ValidationError("El apellido no puede estar vacío.")
-        solo_letras_validator(last_name)
-        return last_name
-            
-    # Lógica de limpieza para email...
-    def clean_email(self):
-        email = self.cleaned_data.get('email')
-        if User.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
-            raise forms.ValidationError("Este correo electrónico ya está registrado.")
-        return email
+        return _validar_solo_letras(valor, 'apellido')
 
-# 2. Formulario para editar el modelo Profile
+    def clean_username(self):
+        username = self.cleaned_data.get('username', '').strip()
+
+        if not username:
+            raise forms.ValidationError("El nombre de usuario es obligatorio.")
+        if len(username) < USERNAME_MIN:
+            raise forms.ValidationError(
+                f"El nombre de usuario debe tener al menos {USERNAME_MIN} caracteres."
+            )
+        if not USERNAME_RE.match(username):
+            raise forms.ValidationError(
+                "Solo se permiten letras, números y los caracteres: . @ + - _"
+            )
+
+        qs = User.objects.filter(username=username)
+        if self.instance and self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise forms.ValidationError("Este nombre de usuario ya está en uso.")
+
+        return username
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email', '').strip()
+
+        if not email:
+            raise forms.ValidationError("El correo electrónico es obligatorio.")
+        if '@' not in email or '.' not in email.split('@')[-1]:
+            raise forms.ValidationError("Ingresa un correo electrónico válido.")
+
+        if User.objects.filter(email__iexact=email).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError("Este correo electrónico ya está registrado.")
+
+        return email.lower()
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# FORMULARIO DE PERFIL EXTRA: Datos del modelo Profile
+# ─────────────────────────────────────────────────────────────────────────────
 class ProfileForm(forms.ModelForm):
     class Meta:
-        model = Profile
-        # Añadimos identificacion y direccion que faltaban
-        fields = ['tipo_identificacion', 'identificacion', 'direccion', 'telefono', 'imagen'] 
+        model  = Profile
+        fields = ['tipo_identificacion', 'identificacion', 'direccion', 'telefono', 'imagen']
         labels = {
-            'first_name': 'Nombre del empleado',
-            'last_name': 'Apellido del empleado',
             'tipo_identificacion': 'Tipo de Documento',
-            'identificacion': 'Número de Identificación',
-            'direccion': 'Dirección de Residencia',
-            'telefono': 'Número de Teléfono',
-            'imagen': 'Imagen de Perfil',
+            'identificacion':      'Número de Identificación',
+            'direccion':           'Dirección de Residencia',
+            'telefono':            'Número de Teléfono',
+            'imagen':              'Imagen de Perfil',
         }
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         placeholder_map = {
             'identificacion': 'Ingrese su documento de identidad',
-            'direccion': 'Calle, Carrera, Ciudad...',
-            'telefono': 'Número de Teléfono (Ej: 3000000000)',
+            'direccion':      'Calle, Carrera, Ciudad...',
+            'telefono':       'Número de Teléfono (Ej: 3000000000)',
         }
-        
         for name, field in self.fields.items():
             if name != 'imagen':
                 field.widget.attrs.update({
-                    'class': 'form-control',
-                    'placeholder': placeholder_map.get(name, '')
+                    'class':       'form-control',
+                    'placeholder': placeholder_map.get(name, ''),
                 })
-    
-    def clean_telefono(self):
-        telefono = self.cleaned_data.get('telefono')
-        if telefono:
-            telefono_validator(telefono) # Usamos tu validador externo
-        return telefono
 
-    def clean_direccion(self):
-        direccion = self.cleaned_data.get('direccion')
-        if not direccion or len(direccion.strip()) < 5:
-            raise forms.ValidationError("Por favor, ingresa una dirección válida y completa.")
-        return direccion
-    
+    def clean_tipo_identificacion(self):
+        tipo = self.cleaned_data.get('tipo_identificacion', '').strip()
+        if not tipo:
+            raise forms.ValidationError("Debes seleccionar un tipo de documento.")
+        return tipo
+
     def clean_identificacion(self):
-        identificacion = self.cleaned_data.get('identificacion')
-        tipo = self.cleaned_data.get('tipo_identificacion')
-        
+        identificacion = self.cleaned_data.get('identificacion', '').strip()
+        tipo           = self.cleaned_data.get('tipo_identificacion', '')
+
         if not identificacion:
-            raise ValidationError("El número de identificación es obligatorio.")
-             
-        # Validar duplicados
+            raise forms.ValidationError("El número de identificación es obligatorio.")
+
+        if tipo in ('CC', 'TI', 'CE'):
+            if not SOLO_NUMEROS_RE.match(identificacion):
+                raise forms.ValidationError(
+                    "Para este tipo de documento solo se permiten números."
+                )
+
+        if len(identificacion) < IDENTIFICACION_MIN:
+            raise forms.ValidationError(
+                f"La identificación debe tener al menos {IDENTIFICACION_MIN} dígitos."
+            )
+        if len(identificacion) > IDENTIFICACION_MAX:
+            raise forms.ValidationError(
+                f"La identificación no puede superar los {IDENTIFICACION_MAX} caracteres."
+            )
+
         qs = Profile.objects.filter(identificacion=identificacion)
         if self.instance and self.instance.pk:
             qs = qs.exclude(pk=self.instance.pk)
-        
         if qs.exists():
-            raise ValidationError("Este número de identificación ya está registrado.")
-            
+            raise forms.ValidationError("Este número de identificación ya está registrado.")
+
         if tipo and identificacion:
-            validar_por_tipo(identificacion, tipo) # Tu validador externo
-                
+            validar_por_tipo(identificacion, tipo)
+
         return identificacion
+
+    def clean_telefono(self):
+        telefono = self.cleaned_data.get('telefono', '').strip()
+
+        if not telefono:
+            raise forms.ValidationError("El teléfono es obligatorio.")
+        if re.search(r'[A-Za-z]', telefono):
+            raise forms.ValidationError("El teléfono no puede contener letras.")
+        if not TELEFONO_RE.match(telefono):
+            raise forms.ValidationError(
+                "Ingresa un teléfono válido (ej: 3001234567 o +57 300 123 4567)."
+            )
+
+        digitos = re.sub(r'\D', '', telefono)
+        if len(digitos) < TELEFONO_MIN:
+            raise forms.ValidationError(
+                f"El teléfono debe tener al menos {TELEFONO_MIN} dígitos."
+            )
+        if len(digitos) > TELEFONO_MAX:
+            raise forms.ValidationError(
+                f"El teléfono no puede tener más de {TELEFONO_MAX} dígitos."
+            )
+
+        try:
+            telefono_validator(telefono)
+        except ValidationError as e:
+            raise forms.ValidationError(e.message)
+
+        return telefono
+
+    def clean_direccion(self):
+        direccion = self.cleaned_data.get('direccion', '').strip()
+
+        if not direccion:
+            raise forms.ValidationError("La dirección es obligatoria.")
+        if len(direccion) < DIRECCION_MIN:
+            raise forms.ValidationError(
+                f"La dirección debe tener al menos {DIRECCION_MIN} caracteres."
+            )
+        if len(direccion) > DIRECCION_MAX:
+            raise forms.ValidationError(
+                f"La dirección no puede superar los {DIRECCION_MAX} caracteres."
+            )
+        if not re.search(r'\d', direccion):
+            raise forms.ValidationError(
+                "La dirección debe incluir un número (ej: Calle 10 # 5-30)."
+            )
+        return direccion
+
+    def clean_imagen(self):
+        imagen = self.cleaned_data.get('imagen')
+        if imagen and hasattr(imagen, 'content_type'):
+            tipos_permitidos = ('image/jpeg', 'image/png', 'image/webp', 'image/gif')
+            if imagen.content_type not in tipos_permitidos:
+                raise forms.ValidationError(
+                    "Formato de imagen no válido. Usa JPG, PNG, WEBP o GIF."
+                )
+            limite_mb = 2
+            if imagen.size > limite_mb * 1024 * 1024:
+                raise forms.ValidationError(
+                    f"La imagen no puede pesar más de {limite_mb} MB."
+                )
+        return imagen
     
 class ClienteForm(ModelForm):
     def __init__(self, *args, **kwargs):
