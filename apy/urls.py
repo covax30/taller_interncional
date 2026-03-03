@@ -111,6 +111,7 @@ urlpatterns = [
     path('entrada_vehiculo/editar/<int:pk>/', EntradaVehiculoUpdateView.as_view(), name='entrada_vehiculo_editar'),
     path('entrada_vehiculo/eliminar/<int:pk>/', EntradaVehiculoDeleteView.as_view(), name='entrada_vehiculo_eliminar'),
     path("entrada_vehiculo/modal/crear/", EntradaCreateModalView.as_view(), name="entrada_vehiculo_modal_crear"),
+    path('entrada_vehiculo/datos/<int:pk>/', api_entrada_datos, name='api_entrada_datos'),
     
     path('salida_vehiculo/listar/', SalidaVehiculoListView.as_view(), name='salida_vehiculo_lista'),
     path('salida_vehiculo/agregar/', SalidaVehiculoCreateView.as_view(), name='salida_vehiculo_crear'),
@@ -143,7 +144,7 @@ urlpatterns = [
     path('informes/detalle/<int:pk>/', InformeDetailView.as_view(), name='informe_detalle'),
     path('informes/exportar/excel/', exportar_informe_excel, name='exportar_excel'),
     path('informes/gerencial/', InformeGerencialView.as_view(), name='informe_gerencial'),
-    
+
     #--------URL modulo pago de sercicios publicos----------------
     path('PagoServicios/listar/', PagoServiciosListView.as_view() , name='pago_servicios_lista'),
     path('PagoServicios/agregar/', PagoServiciosCreateView.as_view() , name='pago_servicios_crear'),

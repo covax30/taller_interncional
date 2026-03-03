@@ -552,4 +552,66 @@ $(document).ready(function() {
     </div>
 </template>
 
+
+
+<script>
+$(document).ready(function () {
+
+    // Helper para setear un Select2 correctamente
+    function setSelect2(selector, value) {
+        var $sel = $(selector);
+        if (!$sel.length || !value) return;
+        $sel.val(value).trigger('change.select2');
+        // Si no funciona con select2, forzar con el select nativo
+        $sel[0].value = value;
+        $sel.trigger('change');
+    }
+
+    // ── Autoseleccionar Empresa ──
+    var empresaId = "{{ empresa_default_id }}";
+    if (empresaId && empresaId !== "None") {
+        setTimeout(function () {
+            setSelect2('#id_empresa', empresaId);
+        }, 300);
+    }
+
+    // ── Trazabilidad desde entrada ──
+    var params    = new URLSearchParams(window.location.search);
+    var entradaId = params.get('entrada');
+    if (!entradaId) return;
+
+    fetch("{% url 'apy:api_entrada_datos' 0 %}".replace('/0/', '/' + entradaId + '/'))
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+            if (!data.ok) {
+                console.warn('[Trazabilidad] API respondió error:', data);
+                return;
+            }
+
+            console.info('[Trazabilidad]', data);
+
+            // Esperar a que Select2 esté listo
+            setTimeout(function () {
+
+                // Entrada
+                setSelect2('#id_id_entrada', entradaId);
+
+                // Vehículo
+                if (data.vehiculo_id) {
+                    setSelect2('#id_id_vehiculo', data.vehiculo_id);
+                }
+
+                // Cliente
+                if (data.cliente_id) {
+                    setSelect2('#id_cliente', data.cliente_id);
+                }
+
+            }, 500);
+        })
+        .catch(function (err) {
+            console.warn('[Trazabilidad] Error fetch:', err);
+        });
+});
+</script>
+
 {% endblock %}
