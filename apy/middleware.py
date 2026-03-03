@@ -9,7 +9,6 @@ class DisableBrowserCacheMiddleware:
         
         # Si el usuario cerró sesión o está autenticado,
         # le prohibimos al navegador guardar copias en el historial.
-        if request.user.is_authenticated:
-            add_never_cache_headers(response)
+        add_never_cache_headers(response)
             
         return response

@@ -11,5 +11,5 @@ from django.contrib import messages
 
 class Main(LoginRequiredMixin,TemplateView):
     template_name = "main.html"
-    login_url = reverse_lazy('apy:login') # Redirige si no está logueado
+    login_url = reverse_lazy('login:login') # Redirige si no está logueado
     

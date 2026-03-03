@@ -20,7 +20,7 @@ from apy.models import Profile
 # Clase base que implementa la lógica para verificar si el usuario es superusuario
 class SuperuserRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     # Asegura que el usuario esté logueado
-    login_url = '/login/' 
+    login_url = reverse_lazy('login:login') 
     
     # URL a la que se redirige si el usuario no pasa la prueba (no es Superuser)
     raise_exception = False
@@ -100,8 +100,11 @@ class RegistroDeleteView(SuperuserRequiredMixin, DeleteView):
         return context
     
     def form_valid(self, form):
-        messages.success(self.request, f"Usuario '{self.object.username}' eliminado correctamente.")
-        return super().form_valid(form)
+        self.object = self.get_object()
+        self.object.is_active = False
+        self.object.save()
+        messages.success(self.request, f"Usuario '{self.object.username}' desactivado correctamente.")
+        return redirect(self.success_url)
     
     def dispatch(self, request, *args, **kwargs):
         # Obtenemos el usuario que se quiere eliminar
@@ -132,6 +135,9 @@ class RegistroUsuarioListView(SuperuserRequiredMixin, ListView):
     # --- Configuración de Permisos ---
     module_name = 'GestionUsuarios'
     permission_required = 'view'
+
+    def get_queryset(self):
+        return User.objects.filter(is_active=True)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
