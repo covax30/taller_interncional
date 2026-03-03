@@ -580,13 +580,13 @@ class DetalleServicio(models.Model):
         ('terminado', 'Terminado'),
         ('proceso', 'En proceso'),
     ]
-    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT,related_name="servicios")
-    cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
-    id_entrada = models.ForeignKey(EntradaVehiculo, on_delete=models.PROTECT, blank=True, null=True)
-    empresa = models.ForeignKey('Empresa', on_delete=models.PROTECT, blank=True, null=True)
-    empleado = models.ForeignKey(Profile, on_delete=models.PROTECT, blank=True, null=True)
+    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.SET_DEFAULT, default=None, related_name="servicios")
+    cliente = models.ForeignKey(Cliente,on_delete=models.SET_DEFAULT, default=None, related_name="servicios")
+    id_entrada = models.ForeignKey(EntradaVehiculo, on_delete=models.SET_DEFAULT, default=None, blank=True, null=True)
+    empresa = models.ForeignKey('Empresa', on_delete=models.SET_DEFAULT, default=None, blank=True, null=True)
+    empleado = models.ForeignKey(Profile, on_delete=models.SET_DEFAULT, default=None, blank=True, null=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    id_salida = models.ForeignKey(SalidaVehiculo, on_delete=models.PROTECT, blank=True, null=True)
+    id_salida = models.ForeignKey(SalidaVehiculo, on_delete=models.SET_DEFAULT, default=None, blank=True, null=True)
     proceso = models.CharField(max_length=20, choices=PROCESO_OPCIONES, default='proceso')
     
     estado = models.BooleanField(default=True)

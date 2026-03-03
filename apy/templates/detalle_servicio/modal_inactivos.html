@@ -53,9 +53,9 @@
     <th>ID</th>
     <th>Vehículo</th>
     <th>Cliente</th>
-    <th>Fecha</th>
+    <th>Fecha de emicion </th>
     
-    <th>Total</th>
+    <th>Estado</th>
     <th>Acciones</th>
 {% endblock %}
 
@@ -70,14 +70,23 @@
         <td>{{ servicio.id_vehiculo.id_cliente.nombre }}</td>
         <td>{{ servicio.fecha_creacion|date:"d/m/Y H:i" }}</td>
         
-        <td><strong>${{ servicio.subtotal|intcomma}}</strong></td>
+        <td><strong>{{ servicio.proceso}}</strong></td>
         <td>
             <div class="btn-group" role="group">
                 <a href="{% url 'apy:detalle_servicio' servicio.id %}" class="btn btn-info btn-sm" title="Ver detalles">
                     <i class="fas fa-eye"></i>
                 </a>
+                <a href="{% url 'apy:editar_servicio' servicio.id %}" class="btn btn-warning btn-sm" title="Editar">
+                    <i class="fas fa-edit"></i>
+                </a>
                 <a href="{% url 'apy:eliminar_servicio' servicio.id %}" class="btn btn-danger btn-sm" title="Eliminar">
                     <i class="fas fa-trash"></i>
+                </a>
+                <a href="{% url 'apy:imprimir_servicio' servicio.id %}" target="_blank" class="btn btn-danger btn-sm" title="Generar PDF">
+                    <i class="fas fa-file-pdf"></i>
+                </a>
+                <a href="{% url 'apy:informe_nuevo' %}?servicio_id={{ servicio.id }}" class="btn btn-success btn-sm" title="Crear Informe Técnico">
+                    <i class="fas fa-check-circle"></i> 
                 </a>
             </div>
         </td>
