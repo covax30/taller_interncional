@@ -1,298 +1,166 @@
 {% extends "form_generico.html" %}
 {% load widget_tweaks %}
+
 {% block form %}
     {% csrf_token %}
- 
-    <!-- id_marca con modal -->
+
+    {# ── Mensajes de error globales del formulario ── #}
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+                <p class="mb-0">{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {# ── MARCA con botón de modal ── #}
     <div class="form-group mb-3">
-        <label for="{{ form.id_marca.id_for_label }}">Marca:</label>
+        <label for="{{ form.id_marca.id_for_label }}" class="font-weight-bold">
+            Marca <span class="text-danger">*</span>
+        </label>
         <div class="input-group">
             {{ form.id_marca|add_class:'form-control' }}
             <div class="input-group-append">
-                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_marca">
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-toggle="modal"
+                        data-target="#modal-id_marca"
+                        title="Crear nueva marca">
                     <i class="fas fa-plus"></i>
                 </button>
             </div>
         </div>
+        {% if form.id_marca.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.id_marca.errors %}<small>{{ error }}</small>{% endfor %}
+            </div>
+        {% endif %}
     </div>
 
-    <!-- Nombre -->
+    {# ── NOMBRE ── #}
     <div class="form-group mb-3">
-        <label for="{{ form.nombre.id_for_label }}">Nombre:</label>
-        <div class="input-group">
-            {{ form.nombre|add_class:'form-control'|attr:'autocomplete:off' }}
-        </div>
+        <label for="{{ form.nombre.id_for_label }}" class="font-weight-bold">
+            Nombre <span class="text-danger">*</span>
+        </label>
+        {{ form.nombre|add_class:'form-control'|attr:'autocomplete:off'|attr:'placeholder:Ej: Filtro de aceite' }}
         {% if form.nombre.errors %}
             <div class="invalid-feedback d-block">
-                {% for error in form.nombre.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
+                {% for error in form.nombre.errors %}<small>{{ error }}</small>{% endfor %}
             </div>
         {% endif %}
     </div>
 
-    <!-- Categoría -->
+    {# ── CATEGORÍA ── #}
     <div class="form-group mb-3">
-        <label for="{{ form.categoria.id_for_label }}">Categoría:</label>
-        <div class="input-group">
-            {{ form.categoria|add_class:'form-control' }}
-        </div>
+        <label for="{{ form.categoria.id_for_label }}" class="font-weight-bold">
+            Categoría <span class="text-danger">*</span>
+        </label>
+        {{ form.categoria|add_class:'form-control' }}
         {% if form.categoria.errors %}
             <div class="invalid-feedback d-block">
-                {% for error in form.categoria.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
+                {% for error in form.categoria.errors %}<small>{{ error }}</small>{% endfor %}
             </div>
         {% endif %}
     </div>
 
-    <!-- Fabricante -->
-    <div class="form-group mb-3">
-        <label for="{{ form.fabricante.id_for_label }}">Fabricante:</label>
-        <div class="input-group">
-            {{ form.fabricante|add_class:'form-control' }}
-        </div>
-        {% if form.fabricante.errors %}
-            <div class="invalid-feedback d-block">
-                {% for error in form.fabricante.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
-            </div>
-        {% endif %}
-    </div>
+    
 
-    <!-- Stock -->
+    {# ── STOCK DISPONIBLE ── #}
     <div class="form-group mb-3">
-        <label for="{{ form.stock.id_for_label }}">Stock:</label>
-        <div class="input-group">
-            {{ form.stock|add_class:'form-control' }}
-        </div>
+        <label for="{{ form.stock.id_for_label }}" class="font-weight-bold">
+            Stock Disponible <span class="text-danger">*</span>
+        </label>
+        {{ form.stock|add_class:'form-control'|attr:'min:0'|attr:'placeholder:0' }}
         {% if form.stock.errors %}
             <div class="invalid-feedback d-block">
-                {% for error in form.stock.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
+                {% for error in form.stock.errors %}<small>{{ error }}</small>{% endfor %}
             </div>
         {% endif %}
     </div>
 
-    <!-- Ubicación -->
+    {# ── STOCK MÍNIMO ── #}
     <div class="form-group mb-3">
-        <label for="{{ form.ubicacion.id_for_label }}">Ubicación:</label>
-        <div class="input-group">
-            {{ form.ubicacion|add_class:'form-control' }}
-        </div>
-        {% if form.ubicacion.errors %}
+        <label for="{{ form.stock_minimo.id_for_label }}" class="font-weight-bold">
+            Stock Mínimo
+            <small class="text-muted font-weight-normal">(se usará para alertas de inventario)</small>
+        </label>
+        {{ form.stock_minimo|add_class:'form-control'|attr:'min:0'|attr:'placeholder:5' }}
+        {% if form.stock_minimo.errors %}
             <div class="invalid-feedback d-block">
-                {% for error in form.ubicacion.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
+                {% for error in form.stock_minimo.errors %}<small>{{ error }}</small>{% endfor %}
             </div>
         {% endif %}
     </div>
 
-    <!-- Precio -->
-    <div class="form-group mb-3">
-        <label for="{{ form.precio.id_for_label }}">Precio:</label>
-        <div class="input-group">
-            {{ form.precio|add_class:'form-control' }}
-        </div>
-        {% if form.precio.errors %}
-            <div class="invalid-feedback d-block">
-                {% for error in form.precio.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
-            </div>
-        {% endif %}
-    </div>
-
-    <!-- Modal Marca -->
-    <div class="modal fade" id="modal-id_marca" tabindex="-1" role="dialog">
+    {# ── Modal para crear Marca en línea ── #}
+    <div class="modal fade" id="modal-id_marca" tabindex="-1" role="dialog" aria-labelledby="modalMarcaLabel">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
-            <div class="modal-header d-flex justify-content-between align-items-center">
-                <h5 class="modal-title mb-0">Crear Marca</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
-                        style="background-color: #dc3545; color: white; border: none; 
-                                border-radius: 50%; width: 35px; height: 35px;
-                                font-size: 1.5rem; line-height: 1; 
-                                display: flex; justify-content: center; align-items: center;">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Aquí se cargará el form por AJAX -->
-            </div>
+                <div class="modal-header d-flex justify-content-between align-items-center">
+                    <h5 class="modal-title mb-0" id="modalMarcaLabel">
+                        <i class="fas fa-tag mr-1"></i> Crear Marca
+                    </h5>
+                    <button type="button"
+                            class="close"
+                            data-dismiss="modal"
+                            aria-label="Cerrar"
+                            style="background:#dc3545;color:#fff;border:none;border-radius:50%;
+                                   width:35px;height:35px;font-size:1.2rem;
+                                   display:flex;justify-content:center;align-items:center;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {# Contenido cargado por AJAX #}
+                    <div class="text-center py-3">
+                        <i class="fas fa-spinner fa-spin fa-2x text-secondary"></i>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Script marca. -->
-    <script>
-        $("#modal-id_marca").on("show.bs.modal", function(){
-            var modal = $(this);
-            $.ajax({
-                url: "{% url 'apy:marca_modal_crear' %}",  // <-- endpoint para crear Marca
-                success: function(data){
-                    modal.find(".modal-body").html(data.html || data);
-                }
-            });
-        });
-        $('#id_id_marca').select2({
-            theme: 'bootstrap-5',
-        });
-    </script>
 {% endblock %}
 
+{# ── Botones del formulario ── #}
 {% block Cancelar %}
-                <button type="submit " class="btn btn-primary btn-flat" title="Agregar repuesto">
-                    <i class="fas fa-save"></i>
-                    Agregar
-                </button>
-                <a href="{% url 'apy:repuesto_lista' %}" class="btn btn-danger btn-flat float-right" title="Cancelar registro de repuesto">
-                    <i class="fas fa-times"></i> Cancelar
-                </a>
+    <button type="submit" class="btn btn-primary btn-flat" title="Guardar repuesto">
+        <i class="fas fa-save mr-1"></i> Guardar
+    </button>
+    <a href="{% url 'apy:repuesto_lista' %}"
+       class="btn btn-danger btn-flat float-right"
+       title="Cancelar">
+        <i class="fas fa-times mr-1"></i> Cancelar
+    </a>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    const form = document.querySelector("form");
-    const categoriaSelect = document.getElementById("id_categoria");
-    const subcategoriaSelect = document.getElementById("id_subcategoria");
-    const subcategoriaDiv = document.getElementById("div_subcategoria");
-    
-    console.log("Categoria Select:", categoriaSelect);
-    console.log("Subcategoria Select:", subcategoriaSelect);
-    console.log("Subcategoria Div:", subcategoriaDiv);
-    
-    // ----- SUBCATEGORÍAS DEPENDIENTES -----
-    const subcategorias = {
-        'automotriz': [
-            {value: 'motor', text: 'Motor'},
-            {value: 'frenos', text: 'Frenos'},
-            {value: 'suspension', text: 'Suspensión'},
-            {value: 'direccion', text: 'Dirección'},
-            {value: 'transmision', text: 'Transmisión'},
-            {value: 'electrico', text: 'Sistema Eléctrico'}
-        ],
-        'industrial': [
-            {value: 'hidraulica', text: 'Hidráulica'},
-            {value: 'neumatica', text: 'Neumática'},
-            {value: 'electronica', text: 'Electrónica'},
-            {value: 'mecanica', text: 'Mecánica'},
-            {value: 'rodamientos', text: 'Rodamientos'},
-            {value: 'bandas', text: 'Bandas y Correas'}
-        ]
-    };
-    
-    // Guardar el valor original de subcategoría si existe (modo edición)
-    const subcategoriaOriginal = subcategoriaSelect ? subcategoriaSelect.value : '';
-    
-    // Ocultar subcategoría al inicio si no hay categoría seleccionada
-    if (subcategoriaDiv && categoriaSelect) {
-        if (!categoriaSelect.value || categoriaSelect.value === '') {
-            subcategoriaDiv.style.display = 'none';
-        }
-    }
-    
-    // Función para actualizar subcategorías
-    function actualizarSubcategorias(valorCategoria, mantenerValor = false) {
-        if (!subcategoriaSelect) {
-            console.error("No se encontró el select de subcategoría");
-            return;
-        }
-        
-        console.log("Actualizando subcategorías para:", valorCategoria);
-        
-        // Limpiar todas las opciones
-        subcategoriaSelect.innerHTML = "";
-        
-        // Agregar opción por defecto
-        const optionDefault = document.createElement("option");
-        optionDefault.value = "";
-        optionDefault.textContent = "Seleccione subcategoría";
-        subcategoriaSelect.appendChild(optionDefault);
-        
-        if (valorCategoria && subcategorias[valorCategoria]) {
-            // Mostrar el div de subcategoría
-            if (subcategoriaDiv) {
-                subcategoriaDiv.style.display = 'block';
+
+    // ── Cargar formulario de Marca dentro del modal via AJAX ──
+    $("#modal-id_marca").on("show.bs.modal", function () {
+        var $modal = $(this);
+        var $body  = $modal.find(".modal-body");
+
+        $body.html('<div class="text-center py-3"><i class="fas fa-spinner fa-spin fa-2x text-secondary"></i></div>');
+
+        $.ajax({
+            url: "{% url 'apy:marca_modal_crear' %}",
+            success: function (data) {
+                $body.html(data.html || data);
+            },
+            error: function () {
+                $body.html('<div class="alert alert-danger">Error al cargar el formulario de Marca.</div>');
             }
-            
-            // Agregar opciones correspondientes
-            subcategorias[valorCategoria].forEach(item => {
-                let option = document.createElement("option");
-                option.value = item.value;
-                option.textContent = item.text;
-                subcategoriaSelect.appendChild(option);
-            });
-            
-            console.log("Opciones agregadas:", subcategorias[valorCategoria].length);
-            
-            // Restaurar valor si se está editando
-            if (mantenerValor && subcategoriaOriginal) {
-                subcategoriaSelect.value = subcategoriaOriginal;
-            }
-        } else {
-            // Ocultar si no hay categoría o no es válida
-            if (subcategoriaDiv) {
-                subcategoriaDiv.style.display = 'none';
-            }
-            console.log("Categoría no válida o vacía");
-        }
-    }
-    
-    // Cargar subcategorías si ya hay una categoría seleccionada (modo edición)
-    if (categoriaSelect && categoriaSelect.value && categoriaSelect.value !== '') {
-        console.log("Cargando subcategorías para valor inicial:", categoriaSelect.value);
-        actualizarSubcategorias(categoriaSelect.value, true);
-    }
-    
-    // Listener para cambios en categoría
-    if (categoriaSelect) {
-        categoriaSelect.addEventListener("change", function () {
-            console.log("Cambio en categoría detectado:", this.value);
-            actualizarSubcategorias(this.value, false);
         });
-    } else {
-        console.error("No se encontró el select de categoría con id 'id_categoria'");
+    });
+
+    // ── Select2 para el campo Marca (si está disponible) ──
+    if (typeof $.fn.select2 !== 'undefined') {
+        $('#id_id_marca').select2({ theme: 'bootstrap-5', width: '100%' });
     }
 
-    form.addEventListener("submit", function (e) {
-        e.preventDefault(); // no recarga el iframe
-
-        const formData = new FormData(form);
-
-        fetch(form.action, {
-            method: "POST",
-            body: formData,
-            headers: {
-                "X-Requested-With": "XMLHttpRequest"
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Buscar el select en la página padre
-                const select = window.parent.document.getElementById("id_id_repuesto");
-
-                // Crear nueva opción
-                const option = new Option(data.nombre, data.id, true, true);
-
-                // Agregar al select y seleccionarla
-                select.add(option);
-                select.value = data.id;
-
-                // Cerrar modal
-                const modal = window.parent.$("#modal-id_repuesto");
-                modal.modal("hide");
-            } else {
-                alert("Error al guardar el repuesto.");
-            }
-        })
-        .catch(error => console.error("Error:", error));
-    });
 });
 </script>
 {% endblock %}

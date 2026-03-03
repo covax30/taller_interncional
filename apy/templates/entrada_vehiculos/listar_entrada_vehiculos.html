@@ -1,17 +1,22 @@
 {% extends "generic_listar.html"%}
+
 {% block titulo %}
     <i class="fa-solid fa-car"></i>
     <h1 class="text-center">Lista de Entrada de Vehículos</h1>
 {% endblock %}
+
 {% block agregar %}
-    <a href="{% url 'apy:entrada_vehiculo_crear' %}" class="btn btn-primary" title="Agregar entrada de vehículo">Agregar Entrada de Vehículo</a>
+    <a href="{% url 'apy:entrada_vehiculo_crear' %}" class="btn btn-primary" title="Agregar entrada de vehículo">
+        <i class="fas fa-plus me-1"></i>Agregar Entrada de Vehículo
+    </a>
 {% endblock %}
 
 {% block columnas %}
-  <th>Id Entrada</th>
-  <th>Fecha de Entrada</th>
-  <th>Hora de Entrada</th>
-
+  <th>ID</th>
+  <th>Vehículo</th>
+  <th>Cliente</th>
+  <th>Fecha Entrada</th>
+  <th>Hora Entrada</th>
   <th>Acciones</th>
 {% endblock %}
 
@@ -19,28 +24,60 @@
   {% for e in object_list %}
     <tr>
         <td>{{ e.id_entrada }}</td>
+
+        <td>
+            {% if e.id_vehiculo %}
+                <span class="fw-semibold">{{ e.id_vehiculo.placa }}</span>
+                <small class="text-muted d-block">{{ e.id_vehiculo.marca_vehiculo }} {{ e.id_vehiculo.modelo_vehiculo }}</small>
+            {% else %}
+                <span class="text-muted">—</span>
+            {% endif %}
+        </td>
+
+        <td>
+            {% if e.id_cliente %}
+                {{ e.id_cliente.nombre }}
+            {% elif e.id_vehiculo and e.id_vehiculo.id_cliente %}
+                {{ e.id_vehiculo.id_cliente.nombre }}
+            {% else %}
+                <span class="text-muted">—</span>
+            {% endif %}
+        </td>
+
         <td>{{ e.fecha_ingreso }}</td>
         <td>{{ e.hora_ingreso }}</td>
+
         <td>
-            <a href="{% url 'apy:entrada_vehiculo_editar' e.id_entrada %}" 
-              class="btn btn-info btn-xs" 
-              data-toggle="tooltip" 
-              data-placement="top" 
-              title="Editar entrada de vehículo">
-              <i class="fas fa-edit"></i>
+            {# ── Crear Servicio ── #}
+            <a href="{% url 'apy:crear_servicio' %}?entrada={{ e.id_entrada }}"
+               class="btn btn-success btn-xs"
+               data-toggle="tooltip"
+               data-placement="top"
+               title="Crear orden de servicio para esta entrada">
+               <i class="fas fa-file-invoice"></i>
             </a>
-            <a href="{% url 'apy:entrada_vehiculo_eliminar' e.id_entrada %}" 
-              class="btn btn-danger btn-xs" 
-              data-toggle="tooltip" 
-              data-placement="top" 
-              title="Eliminar entrada de vehículo">
-              <i class="fas fa-trash-alt"></i>
-           </a>
+
+            {# ── Editar ── #}
+            <a href="{% url 'apy:entrada_vehiculo_editar' e.id_entrada %}"
+               class="btn btn-info btn-xs"
+               data-toggle="tooltip"
+               data-placement="top"
+               title="Editar entrada de vehículo">
+               <i class="fas fa-edit"></i>
+            </a>
+
+            {# ── Eliminar ── #}
+            <a href="{% url 'apy:entrada_vehiculo_eliminar' e.id_entrada %}"
+               class="btn btn-danger btn-xs"
+               data-toggle="tooltip"
+               data-placement="top"
+               title="Eliminar entrada de vehículo">
+               <i class="fas fa-trash-alt"></i>
+            </a>
         </td>
     </tr>
   {% endfor %}
 
-  <!-- Mensajes con SweetAlert -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
   {% if messages %}

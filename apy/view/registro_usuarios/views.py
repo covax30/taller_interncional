@@ -11,7 +11,7 @@ from apy.decorators import PermisoRequeridoMixin
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
-
+from django.db import transaction
 # MIXINS DE PROTECCIÓN
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
@@ -150,37 +150,34 @@ class EmpleadoCreateModalView(CreateView):
 
     def form_valid(self, form):
         try:
-            with translation.atomic():
-                # 1. Creamos un usuario básico vinculado a la identificación
+            with transaction.atomic(): 
                 ident = form.cleaned_data['identificacion']
+                # OBTENEMOS LOS NOMBRES DEL FORMULARIO
+                nombre = form.cleaned_data['first_name']
+                apellido = form.cleaned_data['last_name']
+                
+                # 1. Creamos el usuario con los datos reales
                 user, created = User.objects.get_or_create(
                     username=ident,
                     defaults={
-                        'first_name': 'Empleado',
-                        'last_name': ident,
+                        'first_name': nombre, # <--- Ahora usa el nombre real
+                        'last_name': apellido, # <--- Ahora usa el apellido real
                         'is_active': True
                     }
                 )
                 
-                # 2. Vinculamos el usuario al perfil antes de guardar
+                # 2. Vinculamos y guardamos el perfil
                 self.object = form.save(commit=False)
                 self.object.user = user
                 self.object.save()
 
-            return JsonResponse({
-                "success": True,
-                "id": self.object.id,
-                "text": f"{self.object.identificacion} - {self.object.telefono}",
-                "message": "Empleado registrado correctamente ✅"
-            })
+                return JsonResponse({
+                    "success": True,
+                    "id": self.object.id,
+                    # Retornamos el nombre completo para que se vea bien en el select del servicio
+                    "text": f"{nombre} {apellido} ({ident})",
+                    "message": "Empleado registrado correctamente ✅"
+                })
         except Exception as e:
+            print(f"Error en el servidor: {e}") 
             return JsonResponse({"success": False, "message": str(e)}, status=500)
-
-    def form_invalid(self, form):
-        # Asegúrate de que render_to_string esté importado arriba
-        html = render_to_string(self.template_name, {"form": form}, request=self.request)
-        return JsonResponse({
-            "success": False,
-            "html": html,
-            "message": "Por favor, corrige los errores ❌"
-        })

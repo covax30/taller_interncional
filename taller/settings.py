@@ -14,14 +14,22 @@ import logging
 import os
 from datetime import timedelta
 from pathlib import Path
+from pyexpat.errors import messages
 from dotenv import load_dotenv
+from django.contrib.messages import constants as messages
+
+
+# Cargar variables del entorno ANTES de cualquier configuración
+load_dotenv()
+
+print("EMAIL USER:", os.environ.get('EMAIL_HOST_USER', 'NO CARGADO'))
+print("ADMINS STOCK:", os.environ.get('ADMINS_CORREO_STOCK', 'NO CARGADO'))
+print(f"DEBUG: DB_NAME={os.getenv('DB_NAME')}")
+print(f"DEBUG: DB_HOST={os.getenv('DB_HOST')}")
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-# Cargar variables del entorno ANTES de cualquier configuración
-load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 
 # --- Configuración del Módulo de Backup ---
@@ -42,9 +50,11 @@ except OSError as e:
 # En settings.py:
 SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 't')
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'taller_internacional.artisandev.site']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'taller_internacional.artisandev.site', 'web', 'db']
 CSRF_TRUSTED_ORIGINS = ['https://taller_internacional.artisandev.site']
 WHITENOISE_MANIFEST_STRICT = False
+# TEMPORAL para debug — quítalo cuando funcione
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -82,7 +92,9 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'taller.urls'
 
 TEMPLATES = [
+    
     {
+        
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(BASE_DIR / 'templates')],
         'APP_DIRS': True,
@@ -94,6 +106,8 @@ TEMPLATES = [
                 
                 # Nuestro context processor personalizado para permisos de usuario
                 'apy.context_processors.user_permissions',
+                
+                'apy.context_processors.alertas_stock',   
             ],
         },
     },
@@ -118,7 +132,6 @@ DATABASES = {
         'USER': os.getenv('DB_USER'), 
         'PASSWORD': os.getenv('DB_PASSWORD'),
         'HOST': os.getenv('DB_HOST', 'db'),
-        # 🚨 CORRECCIÓN: Usar el mismo puerto que la base de datos 'default'
         'PORT': os.getenv('DB_PORT', '3306'), 
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
@@ -193,7 +206,13 @@ USE_L10N = True
 # La línea USE_TZ = True ya está arriba, la dejamos
 # USE_TZ = True
 
-
+MESSAGE_TAGS = {
+    messages.DEBUG:   'secondary',
+    messages.INFO:    'info',
+    messages.SUCCESS: 'success',
+    messages.WARNING: 'warning',
+    messages.ERROR:   'danger',   # Bootstrap usa 'danger', no 'error'
+}
 # -----------------------------------------------------
 ## 📁 Configuración de Archivos Estáticos (STATIC)
 # -----------------------------------------------------
@@ -205,6 +224,11 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+]
 
 # -----------------------------------------------------
 ## 🖼️ Configuración de Archivos de Usuario (MEDIA)
@@ -234,6 +258,9 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'soportecnico.t.i.m@gmail.com'
 EMAIL_HOST_PASSWORD = 'aocumubtnqxvccbb'
+EMAIL_HOST_PASSWORD = 'vwnifvdwehnmpodg'
+DEFAULT_FROM_EMAIL  = EMAIL_HOST_USER                        
+ADMINS_CORREO_STOCK = 'yury45884@gmail.com'    
 
 # -----------------------------------------------------
 # 📦 WhiteNoise y Almacenamiento

@@ -158,24 +158,16 @@ class NominaCreateModalView(CreateView):
 
     def form_valid(self, form):
         form.instance.estado = True 
-        try:
-            self.object = form.save()
-            return JsonResponse({
-                "success": True,
-                "id": self.object.id,
-                "text": str(self.object),
-                "message": "Nomina registrada correctamente ✅"
-            })
-        except Exception as e:
-            return JsonResponse({
-                "success": False,
-                "message": f"Error al guardar: {str(e)}"
-            }, status=500)
-    
-    def form_invalid(self, form):
-        html = render_to_string(self.template_name, {"form": form}, request=self.request)
-        return JsonResponse({
-            "success": False,
-            "html": html,
-            "message": "Por favor, corrige los errores en el formulario ❌"
-        })
+        response = super().form_valid(form)
+        
+        # Registramos el egreso por nómina
+        Caja.objects.create(
+            tipo_movimiento='Egreso',
+            monto=form.instance.monto,
+            descripcion=f"Pago Nómina: {form.instance.empleado}",
+            fecha=form.instance.fecha_pago,
+            estado=True
+        )
+        
+        messages.success(self.request, "Nómina pagada y registrada en caja")
+        return response

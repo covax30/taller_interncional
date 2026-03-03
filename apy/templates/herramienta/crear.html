@@ -49,19 +49,7 @@
     </div>
 
     <!-- Material -->
-    <div class="form-group mb-3">
-        <label for="{{ form.material.id_for_label }}">Material:</label>
-        <div class="input-group">
-            {{ form.material|add_class:'form-control' }}
-        </div>
-        {% if form.material.errors %}
-            <div class="invalid-feedback d-block">
-                {% for error in form.material.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
-            </div>
-        {% endif %}
-    </div>
+    
 
     <!-- Id marca con modal --> 
     <div class="form-group mb-3">

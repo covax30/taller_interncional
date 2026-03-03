@@ -1,0 +1,281 @@
+{% extends 'body.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block extra_head %}
+<style>
+  .modulo-btn {
+    border-radius: 8px; padding: .4rem .9rem; font-size: .82rem;
+    transition: all .18s; border: 2px solid var(--bs-border-color);
+    text-decoration: none; color: var(--bs-body-color);
+    background: var(--bs-body-bg); display: inline-flex; align-items: center; gap: 5px;
+  }
+  .modulo-btn:hover  { border-color: #0d6efd; color: #0d6efd; transform: translateY(-1px); }
+  .modulo-btn.active { background:#0d6efd; color:#fff !important; border-color:#0d6efd;
+                       box-shadow: 0 4px 12px rgba(13,110,253,.25); }
+  .export-btn { font-size: .82rem; font-weight: 600; border-radius: 7px; }
+  .pill { display:inline-flex; align-items:center; gap:5px; border-radius:20px;
+          padding:3px 12px; font-size:.8rem; font-weight:600; }
+  .pill-blue   { background:rgba(13,110,253,.1);  color:#0d6efd; }
+  .pill-green  { background:rgba(25,135,84,.1);   color:#198754; }
+  .pill-orange { background:rgba(253,126,20,.1);  color:#fd7e14; }
+  .tabla th { font-size:.78rem; text-transform:uppercase; letter-spacing:.5px; white-space:nowrap; }
+  .tabla td { font-size:.875rem; vertical-align:middle; }
+  .badge-ok   { color:#198754; font-weight:700; }
+  .badge-bajo { color:#dc3545; font-weight:700; }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="app-main">
+
+{# ── Breadcrumb ── #}
+<div class="app-content-header">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-sm-6">
+        <h4 class="mb-0">
+          <i class="fas fa-chart-bar text-primary me-2"></i>
+          Reportes — <span class="text-primary">{{ modulo_nombre }}</span>
+        </h4>
+      </div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-end mb-0">
+          <li class="breadcrumb-item"><a href="#">Home</a></li>
+          <li class="breadcrumb-item active">Reportes</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="app-content">
+<div class="container-fluid">
+
+{# ══ SELECTOR DE MÓDULO ══ #}
+<div class="card border-0 shadow-sm mb-3">
+  <div class="card-body py-3">
+    <p class="text-muted small fw-semibold mb-2 text-uppercase" style="letter-spacing:.5px;">Módulo</p>
+    <div class="d-flex flex-wrap gap-2">
+      {% for key, nombre in modulos.items %}
+      <a href="?modulo={{ key }}&desde={{ desde }}&hasta={{ hasta }}"
+         class="modulo-btn {% if modulo_activo == key %}active{% endif %}">
+        {% if key == 'servicios' %}<i class="fas fa-car fa-sm"></i>
+        {% elif key == 'pagos' %}<i class="fas fa-money-bill-wave fa-sm"></i>
+        {% elif key == 'nomina' %}<i class="fas fa-users fa-sm"></i>
+        {% elif key == 'repuestos' %}<i class="fas fa-cogs fa-sm"></i>
+        {% elif key == 'insumos' %}<i class="fas fa-flask fa-sm"></i>
+        {% elif key == 'clientes' %}<i class="fas fa-user fa-sm"></i>
+        {% elif key == 'vehiculos' %}<i class="fas fa-car-side fa-sm"></i>
+        {% elif key == 'caja' %}<i class="fas fa-cash-register fa-sm"></i>
+        {% endif %}
+        {{ nombre }}
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{# ══ FILTROS ══ #}
+<div class="card border-0 shadow-sm mb-3">
+  <div class="card-header bg-body py-2 px-4">
+    <h6 class="mb-0 fw-bold text-primary">
+      <i class="fas fa-filter me-2"></i>Filtros
+    </h6>
+  </div>
+  <div class="card-body py-3 px-4">
+    <form method="get" id="form-filtros" class="row g-2 align-items-end">
+      <input type="hidden" name="modulo" value="{{ modulo_activo }}">
+
+      {# Día #}
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+        <label class="form-label small fw-semibold text-muted mb-1">DÍA ESPECÍFICO</label>
+        <input type="date" name="dia" value="{{ dia }}" class="form-control form-control-sm"
+               onchange="this.value && (document.querySelector('[name=mes]').value='', document.querySelector('[name=desde]').value='', document.querySelector('[name=hasta]').value='')">
+      </div>
+
+      {# Mes #}
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+        <label class="form-label small fw-semibold text-muted mb-1">MES</label>
+        <select name="mes" class="form-select form-select-sm">
+          <option value="">— Todos —</option>
+          {% for num, nombre in meses %}
+          <option value="{{ num }}" {% if mes == num|stringformat:"s" %}selected{% endif %}>{{ nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      {# Año #}
+      <div class="col-xl-1 col-lg-2 col-md-3 col-sm-4">
+        <label class="form-label small fw-semibold text-muted mb-1">AÑO</label>
+        <select name="anio" class="form-select form-select-sm">
+          {% for a in anios %}
+          <option value="{{ a }}" {% if anio == a|stringformat:"s" %}selected{% endif %}>{{ a }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      {# Desde #}
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+        <label class="form-label small fw-semibold text-muted mb-1">DESDE</label>
+        <input type="date" name="desde" value="{{ desde }}" class="form-control form-control-sm">
+      </div>
+
+      {# Hasta #}
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+        <label class="form-label small fw-semibold text-muted mb-1">HASTA</label>
+        <input type="date" name="hasta" value="{{ hasta }}" class="form-control form-control-sm">
+      </div>
+
+      {# Estado (condicional) #}
+      {% if estado_opciones %}
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+        <label class="form-label small fw-semibold text-muted mb-1">ESTADO</label>
+        <select name="estado" class="form-select form-select-sm">
+          <option value="">— Todos —</option>
+          {% for val, lbl in estado_opciones %}
+          <option value="{{ val }}" {% if estado == val %}selected{% endif %}>{{ lbl }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      {% endif %}
+
+      {# Empleado #}
+      {% if modulo_activo == 'servicios' or modulo_activo == 'nomina' %}
+      <div class="col-xl-3 col-lg-4 col-md-5 col-sm-6">
+        <label class="form-label small fw-semibold text-muted mb-1">EMPLEADO</label>
+        <select name="empleado" class="form-select form-select-sm">
+          <option value="">— Todos —</option>
+          {% for p in empleados %}
+          <option value="{{ p.id }}" {% if empleado_id == p.id|stringformat:"s" %}selected{% endif %}>
+            {{ p.user.get_full_name|default:p.user.username }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      {% endif %}
+
+      {# Cliente #}
+      {% if modulo_activo == 'servicios' or modulo_activo == 'clientes' or modulo_activo == 'vehiculos' %}
+      <div class="col-xl-3 col-lg-4 col-md-5 col-sm-6">
+        <label class="form-label small fw-semibold text-muted mb-1">CLIENTE</label>
+        <select name="cliente" class="form-select form-select-sm">
+          <option value="">— Todos —</option>
+          {% for c in clientes %}
+          <option value="{{ c.id }}" {% if cliente_id == c.id|stringformat:"s" %}selected{% endif %}>{{ c.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      {% endif %}
+
+      {# Botones filtro #}
+      <div class="col-auto d-flex gap-2 mt-1">
+        <button type="submit" class="btn btn-primary btn-sm">
+          <i class="fas fa-search me-1"></i>Filtrar
+        </button>
+        <a href="?modulo={{ modulo_activo }}" class="btn btn-outline-secondary btn-sm" title="Limpiar">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+{# ══ RESUMEN + EXPORTAR ══ #}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+  <div class="d-flex flex-wrap gap-2 align-items-center">
+    <span class="pill pill-blue">
+      <i class="fas fa-list-ol"></i>
+      {{ total_filas }} registro{{ total_filas|pluralize:"s" }}
+    </span>
+    {% if total_monto is not None %}
+    <span class="pill pill-green">
+      <i class="fas fa-dollar-sign"></i>
+      Total: ${{ total_monto|floatformat:0|intcomma }}
+    </span>
+    {% endif %}
+    <span class="text-muted small">
+      <i class="fas fa-calendar-alt me-1"></i>{{ desde_display }} — {{ hasta_display }}
+    </span>
+  </div>
+
+  <div class="d-flex gap-2">
+    <button class="btn btn-sm btn-outline-secondary export-btn" onclick="exportar('{% url "apy:reporte_csv" %}')">
+      <i class="fas fa-file-csv me-1 text-success"></i>CSV
+    </button>
+    <button class="btn btn-sm btn-outline-success export-btn" onclick="exportar('{% url "apy:reporte_excel" %}')">
+      <i class="fas fa-file-excel me-1"></i>Excel
+    </button>
+    <button class="btn btn-sm btn-outline-danger export-btn" onclick="exportar('{% url "apy:reporte_pdf" %}')">
+      <i class="fas fa-file-pdf me-1"></i>PDF
+    </button>
+  </div>
+</div>
+
+{# ══ TABLA ══ #}
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+    {% if rows %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0 tabla">
+        <thead class="table-dark">
+          <tr>
+            {% for h in headers %}
+            <th class="py-3
+                {% if forloop.first %}ps-3
+                {% elif forloop.last and tiene_monto %}text-end pe-3
+                {% endif %}">
+              {{ h }}
+            </th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in rows %}
+          <tr>
+            {% for cell in row %}
+            <td class="
+              {% if forloop.first %}ps-3 text-muted small
+              {% elif forloop.last and tiene_monto %}text-end pe-3 fw-semibold text-success
+              {% endif %}">
+              {% if cell == 'Stock Bajo' %}<span class="badge-bajo">{{ cell }}</span>
+              {% elif cell == 'OK' %}<span class="badge-ok">{{ cell }}</span>
+              {% elif forloop.last and tiene_monto %}${{ cell|floatformat:0|intcomma }}
+              {% else %}{{ cell }}
+              {% endif %}
+            </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+        {% if total_monto is not None %}
+        <tfoot class="table-secondary">
+          <tr>
+            <td colspan="{{ headers|length|add:"-1" }}" class="text-end fw-bold ps-3">TOTAL</td>
+            <td class="text-end pe-3 fw-bold text-primary">${{ total_monto|floatformat:0|intcomma }}</td>
+          </tr>
+        </tfoot>
+        {% endif %}
+      </table>
+    </div>
+    {% else %}
+    <div class="text-center py-5 text-muted">
+      <i class="fas fa-inbox fa-3x mb-3 d-block opacity-25"></i>
+      <p class="mb-1 fw-semibold">Sin resultados</p>
+      <small>Intenta cambiar el rango de fechas o los filtros.</small>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+</div></div></main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function exportar(baseUrl) {
+  const params = new URLSearchParams(new FormData(document.getElementById('form-filtros')));
+  window.location.href = baseUrl + '?' + params.toString();
+}
+</script>
+{% endblock %}
