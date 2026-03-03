@@ -98,7 +98,7 @@ var errorList = [];
             errorList.push(finalMsg);
         {% endfor %}
     {% endfor %}
-{% endfor %}
+
 
 {% for error in form.non_field_errors %}
     errorList.push("{{ error|escapejs }}");
