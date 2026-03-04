@@ -1,20 +1,75 @@
 {% load widget_tweaks %}
-{% block form %}
 
 <div id="msg-salida"></div>
 
 <form id="salidaForm" method="post" action="{% url 'apy:salida_vehiculo_modal_crear' %}">
     {% csrf_token %}
-
     <div class="form-group mb-3">
         <label>Fecha de salida:</label>
         {{ form.fecha_salida|add_class:'form-control' }}
     </div>
-
     <div class="form-group mb-3">
         <label>Hora de salida:</label>
         {{ form.hora_salida|add_class:'form-control' }}
     </div>
-
 </form>
-{% endblock %}
+
+<script>
+$(document).off('click', '#btnGuardarSalida').on('click', '#btnGuardarSalida', function(e) {
+    e.preventDefault();
+
+    const $btn    = $(this);
+    const $modal  = $('#modal-id_salida');
+    const $form   = $modal.find('form#salidaForm');
+    const url     = $form.attr('action');
+    const formData = new FormData($form[0]);
+
+    $btn.prop('disabled', true).text('Guardando...');
+
+    $.ajax({
+        url: url,
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        success: function(data) {
+            if (data.success) {
+                $modal.find('#msg-salida').html('<div class="alert alert-success">' + data.message + '</div>');
+
+                // Actualizar select de salida en la página principal
+                const $select = $('#id_id_salida');
+                if ($select.find('option[value="' + data.id + '"]').length === 0) {
+                    $select.append(new Option(data.text, data.id, true, true));
+                }
+                $select.val(data.id).trigger('change');
+
+                setTimeout(function() { $modal.modal('hide'); }, 800);
+            } else {
+                if (data.html) {
+                    $modal.find('.modal-body').html(data.html);
+                } else {
+                    $modal.find('#msg-salida').html('<div class="alert alert-danger">' + data.message + '</div>');
+                }
+            }
+        },
+        error: function() {
+            $modal.find('#msg-salida').html('<div class="alert alert-danger">Error en el servidor.</div>');
+        },
+        complete: function() {
+            $btn.prop('disabled', false).text('Agregar');
+        }
+    });
+});
+
+$('#modal-id_salida').on('hidden.bs.modal', function() {
+    const $form = $(this).find('form#salidaForm')[0];
+    if ($form) $form.reset();
+    $(this).find('#msg-salida').html('');
+    if (!$('.modal.show').length) {
+        $('body').removeClass('modal-open');
+        $('body').css('padding-right', '');
+        $('.modal-backdrop').remove();
+    }
+});
+</script>
