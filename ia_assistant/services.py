@@ -1,6 +1,6 @@
 import os
 from groq import Groq
-from apy.models import Vehiculo, Insumos, Cliente, Caja, Gastos, Repuesto, Mantenimiento
+from apy.models import Vehiculo, Insumos, Cliente, Caja, Gastos, Repuesto
 
 def consultar_ia_con_datos(prompt_usuario):
     client = Groq(api_key=os.getenv("GROQ_API_KEY"))
@@ -11,7 +11,6 @@ def consultar_ia_con_datos(prompt_usuario):
         "insumos": Insumos.objects.count(),
         "clientes": Cliente.objects.count(),
         "repuestos": Repuesto.objects.count(),
-        "mantenimientos_activos": Mantenimiento.objects.filter(estado=1).count(),
         "total_caja": sum(c.monto for c in Caja.objects.filter(tipo_movimiento='ingreso')) - sum(c.monto for c in Caja.objects.filter(tipo_movimiento='egreso')),
         "gastos_totales": sum(g.monto for g in Gastos.objects.all())
     }
@@ -23,7 +22,6 @@ def consultar_ia_con_datos(prompt_usuario):
     - Clientes en base de datos: {contexto_taller['clientes']}
     - Insumos en inventario: {contexto_taller['insumos']}
     - Repuestos disponibles: {contexto_taller['repuestos']}
-    - Mantenimientos en curso: {contexto_taller['mantenimientos_activos']}
     - Saldo estimado en Caja: ${contexto_taller['total_caja']}
     - Gastos totales registrados: ${contexto_taller['gastos_totales']}
 

@@ -19,7 +19,6 @@ from apy.view.informes.views import *
 from apy.view.pago_servicios.views import *
 from apy.view.pagos.views import *
 
-from apy.view.gestion_mantenimiento.views import *
 from apy.view.herramienta.views import *
 from apy.view.tipo_mantenimiento.views import *
 from apy.view.insumos.views import *
@@ -187,20 +186,6 @@ urlpatterns = [
     path('caja/eliminar/<int:pk>/', CajaDeleteView.as_view(), name='caja_eliminar'),
     path("caja/inactivos/", CajaInactivaListView.as_view(), name="caja_inactivos"),
     path('caja/activar/<int:pk>/', CajaActivateView.as_view(), name="caja_activar"),
-    
-    
-    
-
-        # --------------urls erick---------------
-    
-    path('mantenimiento/listar/', MantenimientoListView.as_view() , name='mantenimiento_lista'),
-    path('mantenimiento/agregar/', MantenimientoCreateView.as_view() , name='mantenimiento_crear'),
-    path('mantenimiento/editar/<int:pk>/', MantenimientoUpdateView.as_view() , name='mantenimiento_editar'),
-    path('mantenimiento/eliminar/<int:pk>/', MantenimientoDeleteView.as_view() , name='mantenimiento_eliminar'),
-    path("mantenimiento/modal/crear/", MantenimientoCreateModalView.as_view(), name="mantenimiento_modal_crear"),
-    path("mantenimiento/inactivos/", MantenimientoInactivosListView.as_view(), name="mantenimiento_inactivos"),
-    path('mantenimiento/activar/<int:pk>/', MantenimientoActivateView.as_view(), name="mantenimiento_activar"),
-    
 
     path('herramienta/listar/', HerramientaListView.as_view() , name='herramienta_lista'),
     path('herramienta/agregar/', HerramientaCreateView.as_view() , name='herramienta_crear'),

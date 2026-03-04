@@ -7,6 +7,7 @@ from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.urls import reverse_lazy
 from apy.forms import *
 from django.contrib import messages
+import json
 # Se elimina la importación local de AccessMixin
 # Importar modelos necesarios para el Mixin
 from apy.models import TipoMantenimiento, Module, Permission 

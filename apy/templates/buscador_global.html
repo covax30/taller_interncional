@@ -20,7 +20,7 @@
                     <h3 class="card-title">Buscando: "<strong>{{ query }}</strong>"</h3>
                 </div>
                 <div class="card-body">
-                    {% if not clientes and not vehiculos and not informes and not facturas and not marca and not repuestos and not herramienta and not insumos and not pago_servicios and not entrada_vehiculo and not salida_vehiculo and not proveedores and not mantenimiento and not caja %}
+                    {% if not clientes and not vehiculos and not informes and not facturas and not marca and not repuestos and not herramienta and not insumos and not pago_servicios and not entrada_vehiculo and not salida_vehiculo and not proveedores and not caja %}
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle me-2"></i> No se encontraron coincidencias para su búsqueda:
                         "<strong>{{ query }}</strong>"
@@ -660,37 +660,31 @@
                     {% endif %}
 
                     {# SECCIÓN MANTENIMIENTO #}
-                    {% if mantenimiento %}
+                    {% if tipo_mantenimiento %}
                     <div class="card card-outline card-info shadow-sm mt-4">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fa-solid fa-gears"></i> Mantenimientos Encontrados</h3>
+                            <h3 class="card-title"><i class="fa-solid fa-gears"></i> Tipos de Mantenimientos Encontrados</h3>
                         </div>
                         <div class="card-body p-0">
                             <div class="table-responsive">
                                 <table class="table table-hover table-striped mb-0">
                                     <thead class="table-dark">
                                         <tr>
-                                            <th>Id Mantenimiento</th>
-                                            <th>Fallas</th>
-                                            <th>Procesos</th>
-                                            <th>Id Vehículo</th>
-                                            <th>Id Empleado</th>
                                             <th>Id Tipo Mantenimiento</th>
+                                            <th>Nombre</th>
+                                            <th>Descripción</th>
                                             <th class="text-center">Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {% for m in mantenimiento %}
+                                        {% for m in tipo_mantenimiento %}
                                         <tr>
                                             <td>{{ m.id }}</td>
-                                            <td>{{ m.fallas }}</td>
-                                            <td>{{ m.procesos }}</td>
-                                            <td>{{ m.id_vehiculo.placa }}</td>
-                                            <td>{{ m.id_empleado.identificacion }}</td>
-                                            <td>{{ m.id_tipo_mantenimiento }}</td>
+                                            <td>{{ m.nombre }}</td>
+                                            <td>{{ m.descripcion }}</td>
                                             <td>
-                                                <a href="{% url 'apy:mantenimiento_editar' m.id %}"
-                                                    class="btn btn-primary btn-sm" title="Editar mantenimiento">
+                                                <a href="{% url 'apy:tipo_mantenimiento_editar' m.id %}"
+                                                    class="btn btn-primary btn-sm" title="Editar tipo de mantenimiento">
                                                     <i class="fas fa-eye"></i> Ver
                                                 </a>
                                             </td>
