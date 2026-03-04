@@ -51,7 +51,7 @@ urlpatterns = [
     path('contacto/', contact_informacion, name='contact_informacion'),
     path('servicios_informacion/', service_informacion, name='service_informacion'),
     path('terminos/', terms_informacion, name='terms_informacion'), 
-    path('contacto/formulario/', contacto_formulario, name='contacto_formulario'),
+    path('contacto/formulario/', contact_informacion, name='contacto_formulario'),
 
     path('inicio/index/', index.as_view(), name='index'),
     
