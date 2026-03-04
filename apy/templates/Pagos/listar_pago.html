@@ -36,7 +36,7 @@
         <td>{{ p.tipo_pago|default:"No especificado" }}</td>
         <td>{{ p.fecha|date:"d/m/Y"|default:"No especificada" }}</td>
         <td>{{ p.monto_total|intcomma|default:"0" }}</td>
-        <td>{{ p.id_proveedor|default:"Sin proveedor" }}</td>
+        <td>{{ p.proveedor|default:"Sin proveedor" }}</td>
         <td>
             <!-- Solo mostrar botones si existe id_pago -->
             {% if p.id_pago %}

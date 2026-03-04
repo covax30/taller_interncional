@@ -74,7 +74,7 @@
         <td>{{ servicio.id_vehiculo.id_cliente.nombre }}</td>
         <td>{{ servicio.fecha_creacion|date:"d/m/Y H:i" }}</td>
         
-        <td><strong>{{ servicio.proceso}}</strong></td>
+        <td><strong>{{ servicio.proceso }}</strong></td>
         <td>
             <div class="btn-group" role="group">
                 <a href="{% url 'apy:detalle_servicio' servicio.id %}" class="btn btn-info btn-sm" title="Ver detalles">
@@ -86,15 +86,15 @@
                 <a href="{% url 'apy:eliminar_servicio' servicio.id %}" class="btn btn-danger btn-sm" title="Eliminar">
                     <i class="fas fa-trash"></i>
                 </a>
-                <a href="{% url 'apy:imprimir_servicio' servicio.id %}" target="_blank" class="btn btn-outline-danger btn-sm" title="Generar PDF">
-                    <i class="fas fa-file-pdf"></i>
-                </a>
-                <a href="{% url 'apy:informe_nuevo' %}?servicio_id={{ servicio.id }}" class="btn btn-success btn-sm" title="Crear Informe Técnico">
-                    <i class="fas fa-check-circle"></i> 
-                </a>
+                
+                {% if servicio.proceso == 'terminado' %}
+                    <a href="{% url 'apy:imprimir_servicio' servicio.id %}" target="_blank" class="btn btn-outline-danger btn-sm" title="Generar PDF">
+                        <i class="fas fa-file-pdf"></i>
+                    </a>
+                {% endif %} {# <-- Aquí se cierra el bloque correctamente #}
+                
             </div>
         </td>
     </tr>
-  {% endfor %}
-
+    {% endfor %}
 {% endblock %}

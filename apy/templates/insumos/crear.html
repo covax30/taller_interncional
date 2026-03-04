@@ -15,6 +15,7 @@
             </div>
         </div>
     </div> 
+    <!-- Nombre -->
 <div class="form-group mb-3">
         <label for="{{ form.nombre.id_for_label }}">Nombre:</label>
         <div class="input-group">
@@ -30,7 +31,7 @@
     </div>
     <!-- Costo -->
     <div class="form-group mb-3">
-        <label for="{{ form.costo.id_for_label }}">Costo:</label>
+        <label for="{{ form.costo.id_for_label }}">Precio:</label>
         <div class="input-group">
             {{ form.costo|add_class:'form-control' }}
         </div>
@@ -43,11 +44,10 @@
         {% endif %}
     </div>
 
-    
 
     <!-- Cantidad -->
     <div class="form-group mb-3">
-        <label for="{{ form.cantidad.id_for_label }}">Cantidad:</label>
+        <label for="{{ form.cantidad.id_for_label }}"> Unidad:</label>
         <div class="input-group">
             {{ form.cantidad|add_class:'form-control' }}
         </div>
@@ -59,6 +59,27 @@
             </div>
         {% endif %}
     </div>
+
+    
+
+    <!-- Stock -->
+    <div class="form-group mb-3">
+        <label for="{{ form.stock.id_for_label }}"> Cantidad:</label>
+        <div class="input-group">
+            {{ form.stock|add_class:'form-control' }}
+        </div>
+        {% if form.stock.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.stock.errors %}
+                    <small>{{ error }}</small><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    
+    
+
+    
 
     <!-- Modal Marca -->
     <div class="modal fade" id="modal-id_marca" tabindex="-1" role="dialog">

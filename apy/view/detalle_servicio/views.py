@@ -1,3 +1,5 @@
+from multiprocessing import context
+
 from django.views.generic import CreateView, UpdateView, ListView, DeleteView, DetailView
 from django.urls import reverse_lazy
 from django.shortcuts import redirect, get_object_or_404, render
@@ -116,10 +118,60 @@ class CreateServicioView(PermisoRequeridoMixin, CreateView):
         context['tipos_mantenimiento'] = TipoMantenimiento.objects.filter(estado=True)
         context['insumos']             = Insumos.objects.filter(estado=True)
         context['perfiles']            = Profile.objects.select_related('user').filter(user__is_active=True)
+        
+        try:
+            context['perfil_actual_id'] = Profile.objects.get(user=self.request.user).pk
+            context['perfil_actual_nombre'] = self.request.user.get_full_name() or self.request.user.username
+        except Profile.DoesNotExist:
+            context['perfil_actual_id'] = None
+            context['perfil_actual_nombre'] = ''
+
+        try:
+            from apy.models import Empresa
+            empresa = Empresa.objects.filter(estado=True).first()
+            context['empresa_default_id'] = empresa.pk if empresa else None
+            context['empresa_default_nombre'] = str(empresa) if empresa else ''
+        except:
+            context['empresa_default_id'] = None
+            context['empresa_default_nombre'] = ''
+
         return context
+    
+    def get_initial(self):
+        initial = super().get_initial()
+        try:
+            perfil = Profile.objects.get(user=self.request.user)
+            initial['empleado'] = perfil.pk
+        except Profile.DoesNotExist:
+            pass
+        try:
+            from apy.models import Empresa
+            empresa = Empresa.objects.filter(estado=True).first()
+            if empresa:
+                initial['empresa'] = empresa.pk
+        except:
+            pass
+        return initial
+
+   
 
     @transaction.atomic
     def form_valid(self, form):
+        instance = form.save(commit=False)
+        
+        # Forzar empresa y empleado desde el servidor
+        try:
+            instance.empleado = Profile.objects.get(user=self.request.user)
+        except Profile.DoesNotExist:
+            pass
+        try:
+            from apy.models import Empresa
+            instance.empresa = Empresa.objects.filter(estado=True).first()
+        except:
+            pass
+        
+        instance.save()
+
         repuesto_formset      = DetalleRepuestoFormSet(self.request.POST, prefix='repuestos')
         mantenimiento_formset = DetalleTipoMantenimientoFormSet(self.request.POST, prefix='mantenimientos')
         insumo_formset        = DetalleInsumosFormSet(self.request.POST, prefix='insumos')
@@ -466,5 +518,8 @@ def imprimir_servicio_factura(request, pk):
 
     if pisa_status.err:
         return HttpResponse('Ocurrió un error al generar el PDF', status=500)
+    if servicio.proceso != 'terminado':
+        messages.error(request, '❌ No se puede imprimir la factura de un servicio en proceso.')
+        return redirect('apy:lista_servicios')
 
     return response

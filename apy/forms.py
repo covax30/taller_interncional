@@ -1516,6 +1516,7 @@ class HerramientaForm(ModelForm):
         
     class Meta:
         model = Herramienta
+        exclude = ['stock_minimo'] 
         fields = '__all__'
         widgets = {
             'nombre':TextInput(
@@ -1533,11 +1534,7 @@ class HerramientaForm(ModelForm):
                     'placeholder':'Ingrese el tipo de herramienta',
                 }
             ), 
-            'material':TextInput(
-                attrs={
-                    'placeholder':'Ingrese el material de la herramienta',
-                }
-            ),
+            
             'id_marca':Select(
                 attrs={
                     'placeholder':'Ingrese la marca de herramientas',
@@ -1559,15 +1556,14 @@ class HerramientaForm(ModelForm):
             'tipo': {
                 'required': 'El tipo de herramienta es obligatorio',
             },
-            'material': {
-                'required': 'El material de la herramienta es obligatorio',
-            },
+            
             'id_marca': {
                 'required': 'El id de la marca es obligatoria',
             },
             'stock': {
                 'required': 'El stock de la herramienta es obligatorio',
-            }
+            },
+            
         }
 
 class TipoMantenimientoForm(ModelForm):
@@ -1607,6 +1603,7 @@ class InsumoForm(ModelForm):
     class Meta:
         model = Insumos
         fields = '__all__'
+        exclude = ['stock_minimo'] 
         widgets = {
             'id_marca':Select(
                 attrs={
@@ -1628,6 +1625,11 @@ class InsumoForm(ModelForm):
                     'placeholder':'Ingrese la unidad de medida del insumo',
                 }
             ),
+            'stock_minimo':NumberInput(
+                attrs={
+                    'placeholder':'Ingrese el stock mínimo del insumo',
+                }
+            ),
         }
         error_messages = {
             'id_marca': {
@@ -1643,23 +1645,7 @@ class InsumoForm(ModelForm):
                 'required': 'La unidad de medida del insumo es obligatoria',
             },
         }
-        error_messages = {
-            'id_marca': {
-                'required': 'El id de la marca es obligatoria',
-            },
-            'nombre': {
-                'required': 'El nombre del insumo es obligatorio',
-            },
-            'costo': {
-                'required': 'El costo del insumo es obligatorio',
-            },
-            'tipo': {
-                'required': 'El tipo de insumo es obligatorio',
-            },
-            'stock': {
-                'required': 'El stock de insumo es obligatorio',
-            },
-        }
+        
 
 class RepuestoForm(ModelForm):
     def __init__(self, *args, **kwargs):
@@ -1674,8 +1660,8 @@ class RepuestoForm(ModelForm):
 
     class Meta:
         model = Repuesto
-        # ⚠️  Solo los campos que EXISTEN en el modelo Repuesto
-        fields = ['id_marca', 'nombre', 'categoria', 'fabricante', 'stock', 'stock_minimo']
+        exclude = ['stock_minimo'] 
+        fields = ['id_marca', 'nombre', 'categoria','stock', 'stock_minimo', 'precio_unitario']
         widgets = {
             'id_marca': Select(
                 attrs={
@@ -1693,9 +1679,13 @@ class RepuestoForm(ModelForm):
                     'class': 'form-control',
                 }
             ),
-            'fabricante': TextInput(
+            
+            'precio_unitario': NumberInput(
                 attrs={
-                    'placeholder': 'Ej: Bosch',
+                    'placeholder': '0',
+                    'min': '0',
+                    'step': '0.01',
+                    'class': 'form-control precio-unitario',
                 }
             ),
             'stock': NumberInput(
@@ -1710,12 +1700,13 @@ class RepuestoForm(ModelForm):
                     'min': '0',
                 }
             ),
+            
         }
         error_messages = {
             'id_marca':    {'required': 'La marca es obligatoria.'},
             'nombre':      {'required': 'El nombre del repuesto es obligatorio.'},
             'categoria':   {'required': 'La categoría es obligatoria.'},
-            'fabricante':  {'required': 'El fabricante es obligatorio.'},
+            'precio_unitario': {'required': 'El precio unitario es obligatorio.'},
             'stock':       {'required': 'El stock inicial es obligatorio.'},
             'stock_minimo':{'required': 'El stock mínimo es obligatorio.'},
         }

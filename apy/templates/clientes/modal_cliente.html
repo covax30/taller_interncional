@@ -63,31 +63,47 @@ $(document).off('click', '#btnGuardarCliente').on('click', '#btnGuardarCliente',
         contentType: false,
         headers: { 'X-Requested-With': 'XMLHttpRequest' },
         success: function(data) {
-            if (data.success) {
-                // Mensaje de éxito
-                const $msg = $modal.find('#msg-cliente');
-                $msg.html('<div class="alert alert-success">' + data.message + '</div>');
+    if (data.success) {
+        const $msg = $modal.find('#msg-cliente');
+        $msg.html('<div class="alert alert-success">' + data.message + '</div>');
 
-                // Actualizar select en la página principal
-                const $select = $('#id_id_cliente');
-                if ($select.find('option[value="' + data.id + '"]').length === 0) {
-                    const option = new Option(data.text, data.id, true, true);
-                    $select.append(option).val(data.id).trigger('change');
-                } else {
-                    $select.val(data.id).trigger('change');
-                }
+        // ── Detectar el select correcto según el contexto ──
+        // Buscar si hay un modal de vehículo abierto
+        var $modalVehiculo = $('#modal-id_vehiculo');
+        var $selectObjetivo;
 
-                // Cerrar el modal correctamente
-                $modal.modal('hide');
-                $modal.modal('hide');
-                $('body').removeClass('modal-open');
-                $('body').css('padding-right', '');
-                $('.modal-backdrop').remove();
-                $modal.removeClass('show');
-                $modal.css('display', 'none');
+        if ($modalVehiculo.hasClass('show') || $modalVehiculo.is(':visible')) {
+            // Fue abierto desde el modal de vehículo → actualizar el select dentro del modal
+            $selectObjetivo = $modalVehiculo.find('#id_id_cliente');
+        } else {
+            // Fue abierto desde la página principal
+            $selectObjetivo = $('#id_id_cliente');
+        }
+
+        if ($selectObjetivo && $selectObjetivo.length) {
+            if ($selectObjetivo.find('option[value="' + data.id + '"]').length === 0) {
+                var option = new Option(data.text, data.id, true, true);
+                $selectObjetivo.append(option).val(data.id).trigger('change');
             } else {
-                if (data.html) {
-                    $modal.find('.modal-body').html(data.html);
+                $selectObjetivo.val(data.id).trigger('change');
+            }
+        }
+
+        // Cerrar el modal de cliente
+        $modal.modal('hide');
+        $('body').removeClass('modal-open');
+        $('body').css('padding-right', '');
+        $('.modal-backdrop').remove();
+        $modal.removeClass('show');
+        $modal.css('display', 'none');
+
+        // Si había un modal de vehículo abierto, reabrirlo
+        if ($modalVehiculo.hasClass('show') || $modalVehiculo.data('estaba-abierto')) {
+            setTimeout(function() {
+                $modalVehiculo.modal('show');
+            }, 300);
+        }
+    }
                 } else {
                     $modal.find('#msg-cliente').html('<div class="alert alert-danger">' + data.message + '</div>');
                 }
