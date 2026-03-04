@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     'backup_module',
     'axes',
     'ia_assistant',
+    'django_recaptcha',
 ]
 
 MIDDLEWARE = [
@@ -277,8 +278,6 @@ STORAGES = {
 # La duplicación de MEDIA_URL y MEDIA_ROOT ha sido eliminada de aquí
 
 # Captcha
-RECAPTCHA_SITE_KEY = '6Lc4fHcsAAAAAASuIuVN4D0ZDiFB1ZmeQfRF4XoM'
-RECAPTCHA_SECRET_KEY = '6Lc4fHcsAAAAAGWhgt4dHliXDIQOiEEdev3-nFCZ'
-
-# IA Assistant
-GROQ_API_KEY = os.getenv('GROQ_API_KEY', '')
+RECAPTCHA_PUBLIC_KEY = '6LfxrX8sAAAAAL0qNDnErnyfY7SqlUV61EdDMxUp'
+RECAPTCHA_PRIVATE_KEY = '6LfxrX8sAAAAAIDWOhXp7iBZAT4GDhNKOKLuv_eR'
+SILENT_RECAPTCHA_FIELDS = True

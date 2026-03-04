@@ -10,9 +10,19 @@ from django.core.exceptions import ValidationError
 from .models import Profile,DetalleServicio
 from .validators import solo_letras_validator, ComplexPasswordValidator, telefono_validator
 from django.contrib.auth.password_validation import validate_password
+from django_recaptcha.fields import ReCaptchaField
+from django_recaptcha.widgets import ReCaptchaV2Checkbox
 
 from apy.models import *
         
+class ContactoForm(forms.Form):
+    name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre completo'}))
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo electrónico'}))
+    subject = forms.CharField(max_length=200, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Asunto'}))
+    message = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Mensaje', 'rows': 5}))
+    
+    # AQUÍ ESTÁ EL CUADRITO
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox())
 
 class EmpresaForm(ModelForm):
     def __init__(self, *args, **kwargs):
