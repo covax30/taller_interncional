@@ -97,20 +97,30 @@
     </div>
 
     <!-- Script Cliente. -->
-    <script>
-        $("#modal-id_cliente").on("show.bs.modal", function(){
-            var modal = $(this);
-            $.ajax({
-                url: "{% url 'apy:cliente_modal_crear' %}",
-                success: function(data){
-                    modal.find(".modal-body").html(data.html || data);
-                }
-            });
+<script>
+    $("#modal-id_cliente").on("show.bs.modal", function(){
+        var modal = $(this);
+        $.ajax({
+            url: "{% url 'apy:cliente_modal_crear' %}",
+            success: function(data){
+                modal.find(".modal-body").html(data.html || data);
+            }
         });
-        $('#id_id_cliente').select2({
-            theme: 'bootstrap-5',
-        });
-    </script>
+    });
+    
+    $('#id_id_cliente').select2({
+        theme: 'bootstrap-5',
+    });
+
+    // ── NUEVO: Marcar que el modal de vehículo estaba abierto ──
+    $('[data-target="#modal-id_cliente"]').on('click', function() {
+        var $modalVehiculo = $('#modal-id_vehiculo');
+        if ($modalVehiculo.is(':visible')) {
+            $modalVehiculo.data('estaba-abierto', true);
+            $modalVehiculo.modal('hide');
+        }
+    });
+</script>
 {% endblock %}
 
 {% block Cancelar %}

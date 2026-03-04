@@ -77,11 +77,6 @@ select.form-select:focus,
     outline: none !important;
 }
 
-select.form-select option[value=""],
-.form-select option[value=""] {
-    color: #9a9a9a !important;
-}
-
 select.form-select option,
 .form-select option {
     background-color: #2a2a2a !important;
@@ -99,9 +94,10 @@ select.form-select:disabled,
 }
 
 /* ============================================
-   SELECT2 EN MODO OSCURO (OPTIMIZADO)
+   SELECT2 EN MODO OSCURO - CORREGIDO
    ============================================ */
 
+/* Fondo del campo */
 .select2-container--bootstrap-5 .select2-selection {
     background-color: #2a2a2a !important;
     border: 1px solid #4a4a4a !important;
@@ -110,42 +106,40 @@ select.form-select:disabled,
     transition: all 0.2s ease;
 }
 
-/* TEXTO SELECCIONADO - CORREGIDO */
+/* Texto seleccionado - FORZADO */
 .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered,
-.select2-container .select2-selection .select2-selection__rendered,
 .select2-selection__rendered,
-span.select2-selection__rendered {
+.select2-container .select2-selection--single .select2-selection__rendered,
+span.select2-selection__rendered,
+[id^="select2-"][id$="-container"] {
     color: #f0f0f0 !important;
     -webkit-text-fill-color: #f0f0f0 !important;
     line-height: 38px !important;
     padding-left: 12px !important;
     font-size: 0.95rem !important;
+    background-color: transparent !important;
 }
 
-.select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__rendered {
-    color: #f0f0f0 !important;
-    -webkit-text-fill-color: #f0f0f0 !important;
-}
-
-.select2-container--bootstrap-5 .select2-selection {
-    color: #f0f0f0 !important;
-}
-
+/* Placeholder */
 .select2-container--bootstrap-5 .select2-selection--single .select2-selection__placeholder {
     color: #9a9a9a !important;
     font-style: normal !important;
+    -webkit-text-fill-color: #9a9a9a !important;
 }
 
+/* Hover */
 .select2-container--bootstrap-5 .select2-selection:hover {
     border-color: #5a9eff !important;
 }
 
+/* Focus */
 .select2-container--bootstrap-5.select2-container--focus .select2-selection,
 .select2-container--bootstrap-5.select2-container--open .select2-selection {
     border-color: #5a9eff !important;
     box-shadow: 0 0 0 3px rgba(90, 158, 255, 0.3) !important;
 }
 
+/* Flecha */
 .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
     height: 38px !important;
     right: 10px !important;
@@ -161,14 +155,17 @@ span.select2-selection__rendered {
     border-width: 0 4px 5px 4px !important;
 }
 
+/* Dropdown */
 .select2-container--bootstrap-5 .select2-dropdown {
     background-color: #2a2a2a !important;
     border: 1px solid #4a4a4a !important;
     border-radius: 6px !important;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5) !important;
     margin-top: 4px !important;
+    z-index: 9999 !important;
 }
 
+/* Opciones */
 .select2-container--bootstrap-5 .select2-results__option {
     color: #f0f0f0 !important;
     padding: 10px 12px !important;
@@ -180,21 +177,20 @@ span.select2-selection__rendered {
     border-bottom: none !important;
 }
 
+/* Opción resaltada */
 .select2-container--bootstrap-5 .select2-results__option--highlighted {
     background-color: #5a9eff !important;
     color: #ffffff !important;
 }
 
+/* Opción seleccionada */
 .select2-container--bootstrap-5 .select2-results__option--selected {
     background-color: #3a4a6a !important;
     color: #ffffff !important;
     font-weight: 500 !important;
 }
 
-.select2-container--bootstrap-5 .select2-results__option--selected.select2-results__option--highlighted {
-    background-color: #5a9eff !important;
-}
-
+/* Buscador */
 .select2-container--bootstrap-5 .select2-search--dropdown {
     padding: 10px !important;
     background-color: #2a2a2a !important;
@@ -220,6 +216,7 @@ span.select2-selection__rendered {
     color: #9a9a9a !important;
 }
 
+/* Botón X */
 .select2-container--bootstrap-5 .select2-selection--single .select2-selection__clear {
     color: #b0b0b0 !important;
     font-size: 1.2rem !important;
@@ -231,19 +228,54 @@ span.select2-selection__rendered {
     color: #ff8a8a !important;
 }
 
+/* Deshabilitado */
 .select2-container--bootstrap-5 .select2-selection--single[aria-disabled="true"] {
     background-color: #3a3a3a !important;
     border-color: #5a5a5a !important;
     opacity: 0.7 !important;
 }
 
-.select2-container--bootstrap-5 .select2-selection--single[aria-disabled="true"] .select2-selection__rendered {
-    color: #b0b0b0 !important;
-    -webkit-text-fill-color: #b0b0b0 !important;
+/* ============================================
+   BOTONES DE MODAL EN INPUT GROUPS
+   ============================================ */
+
+.input-group {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;
+}
+
+.input-group > *:first-child {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+
+.input-group .btn {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    margin-left: -1px !important;
+    background-color: #3a3a3a !important;
+    border: 1px solid #4a4a4a !important;
+    color: #f0f0f0 !important;
+    min-height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.input-group .btn:hover {
+    background-color: #4a4a4a !important;
+    border-color: #5a9eff !important;
+    color: white !important;
+}
+
+.input-group .btn:active {
+    background-color: #5a9eff !important;
+    border-color: #5a9eff !important;
 }
 
 /* ============================================
-   TARJETAS PARA SECCIONES (MODO OSCURO)
+   TARJETAS PARA SECCIONES
    ============================================ */
 
 .section-card {
@@ -287,7 +319,7 @@ span.select2-selection__rendered {
 }
 
 /* ============================================
-   MENSAJES DE ERROR (MODO OSCURO)
+   MENSAJES DE ERROR
    ============================================ */
 
 .errorlist {
@@ -330,19 +362,4 @@ span.select2-selection__rendered {
     padding: 4px 8px !important;
     border-radius: 4px !important;
     font-size: 0.85rem !important;
-    /* Fondo del contenedor principal del select2 */
-    
-.select2-container--bootstrap-5 .select2-selection--single {
-    background-color: #2a2a2a !important;
-    border: 1px solid #4a4a4a !important;
-    color: #f0f0f0 !important;
-}
-
-/* El span rendered específicamente */
-#select2-id_id_cliente-container,
-[id^="select2-"][id$="-container"] {
-    color: #f0f0f0 !important;
-    -webkit-text-fill-color: #f0f0f0 !important;
-    background-color: transparent !important;
-}
 }

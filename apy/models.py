@@ -131,7 +131,7 @@ class Repuesto(models.Model):
         ('industrial', 'Industrial'),
     ]
     categoria = models.CharField(max_length=100, choices=CATEGORIA_OPCIONES)
-    fabricante = models.CharField(max_length=100)
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.PositiveIntegerField(default=0, verbose_name="Stock disponible")  # ← NUEVO
     stock_minimo = models.PositiveIntegerField(default=1, verbose_name="Stock mínimo")  # ← NUEVO
     estado = models.BooleanField(default=True)
@@ -454,7 +454,7 @@ class Pagos(models.Model):
             )
 
     def recalcular_total(self):
-        """Recalcula el monto_total sumando todos los DetallePago hijos."""
+
         total = sum(d.subtotal for d in self.detalles.all())
         self.monto_total = total
         self.save(update_fields=['monto_total'])

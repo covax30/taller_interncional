@@ -219,8 +219,7 @@ MESSAGE_TAGS = {
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'apy', 'static'),
-    os.path.join(BASE_DIR, 'login', 'static'), 
+    BASE_DIR / 'static',
 ]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')

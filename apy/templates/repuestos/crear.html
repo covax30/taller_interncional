@@ -5,13 +5,7 @@
     {% csrf_token %}
 
     {# ── Mensajes de error globales del formulario ── #}
-    {% if form.non_field_errors %}
-        <div class="alert alert-danger">
-            {% for error in form.non_field_errors %}
-                <p class="mb-0">{{ error }}</p>
-            {% endfor %}
-        </div>
-    {% endif %}
+    
 
     {# ── MARCA con botón de modal ── #}
     <div class="form-group mb-3">
@@ -63,12 +57,23 @@
         {% endif %}
     </div>
 
-    
+    {# ── PRECIO UNITARIO ── #}
+    <div class="form-group mb-3">
+        <label for="{{ form.precio_unitario.id_for_label }}" class="font-weight-bold">
+            Precio Unitario <span class="text-danger">*</span>
+        </label>
+        {{ form.precio_unitario|add_class:'form-control'|attr:'min:0'|attr:'placeholder:0' }}
+        {% if form.precio_unitario.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.precio_unitario.errors %}<small>{{ error }}</small>{% endfor %}
+            </div>
+        {% endif %}
+    </div>
 
     {# ── STOCK DISPONIBLE ── #}
     <div class="form-group mb-3">
         <label for="{{ form.stock.id_for_label }}" class="font-weight-bold">
-            Stock Disponible <span class="text-danger">*</span>
+            Cantidad <span class="text-danger">*</span>
         </label>
         {{ form.stock|add_class:'form-control'|attr:'min:0'|attr:'placeholder:0' }}
         {% if form.stock.errors %}
@@ -78,19 +83,9 @@
         {% endif %}
     </div>
 
-    {# ── STOCK MÍNIMO ── #}
-    <div class="form-group mb-3">
-        <label for="{{ form.stock_minimo.id_for_label }}" class="font-weight-bold">
-            Stock Mínimo
-            <small class="text-muted font-weight-normal">(se usará para alertas de inventario)</small>
-        </label>
-        {{ form.stock_minimo|add_class:'form-control'|attr:'min:0'|attr:'placeholder:5' }}
-        {% if form.stock_minimo.errors %}
-            <div class="invalid-feedback d-block">
-                {% for error in form.stock_minimo.errors %}<small>{{ error }}</small>{% endfor %}
-            </div>
-        {% endif %}
-    </div>
+    
+
+    
 
     {# ── Modal para crear Marca en línea ── #}
     <div class="modal fade" id="modal-id_marca" tabindex="-1" role="dialog" aria-labelledby="modalMarcaLabel">
@@ -119,6 +114,27 @@
             </div>
         </div>
     </div>
+    {% block extra_js %}
+<script>
+
+
+    // ── Cargar formulario de Marca dentro del modal via AJAX ──
+    $("#modal-id_marca").on("show.bs.modal", function () {
+        var $modal = $(this);
+        
+
+        $.ajax({
+            url: "{% url 'apy:marca_modal_crear' %}",
+            success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+                }
+            });
+        });
+        $('#id_id_marca').select2({
+            theme: 'bootstrap-5',
+        });
+    </script>
+{% endblock %}
 
 {% endblock %}
 
@@ -134,33 +150,3 @@
     </a>
 {% endblock %}
 
-{% block extra_js %}
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    // ── Cargar formulario de Marca dentro del modal via AJAX ──
-    $("#modal-id_marca").on("show.bs.modal", function () {
-        var $modal = $(this);
-        var $body  = $modal.find(".modal-body");
-
-        $body.html('<div class="text-center py-3"><i class="fas fa-spinner fa-spin fa-2x text-secondary"></i></div>');
-
-        $.ajax({
-            url: "{% url 'apy:marca_modal_crear' %}",
-            success: function (data) {
-                $body.html(data.html || data);
-            },
-            error: function () {
-                $body.html('<div class="alert alert-danger">Error al cargar el formulario de Marca.</div>');
-            }
-        });
-    });
-
-    // ── Select2 para el campo Marca (si está disponible) ──
-    if (typeof $.fn.select2 !== 'undefined') {
-        $('#id_id_marca').select2({ theme: 'bootstrap-5', width: '100%' });
-    }
-
-});
-</script>
-{% endblock %}

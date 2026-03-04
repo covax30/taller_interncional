@@ -71,7 +71,7 @@
                     </div>
                 </div>
             </div>
-
+<!-- DATOS DEL REMITENTE -->
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-body py-3">
                     <h5 class="mb-0 text-primary"> 
@@ -80,32 +80,39 @@
                 </div>
                 <div class="card-body p-4">
                     <div class="row">
-                        <div class="col-md-6 border-end">
-                            <h6 class="text-muted fw-bold mb-3"><i class="fas fa-user me-2"></i>DATOS DEl REMITENTE</h6>
-                            <div class="form-group mb-4">
-                                <label class="form-label">Seleccionar remitente:</label>
-                                <div class="input-group">
-                                    {{ form.empresa|add_class:"form-control" }}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 ps-md-4">
-                            <h6 class="text-muted fw-bold mb-3"><i class="fas fa-car me-2"></i>DATOS DEL EMPLEADO A CARGO </h6>
-                            <div class="form-group mb-3">
-                                <label class="form-label">Empleado:</label>
-                                <div class="input-group" style="display: flex; flex-wrap: nowrap;">
-                                    <div style="flex-grow: 1;">
-                                        {{ form.empleado|add_class:"form-control" }}
-                                    </div>
-                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-empleado">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
-                                </div>
-                            </div>
+                        <!-- DATOS DEL REMITENTE -->
+            <div class="col-md-6 border-end">
+                <h6 class="text-muted fw-bold mb-3">
+                    <i class="fas fa-user me-2"></i>DATOS DEL REMITENTE
+                </h6>
+                <div class="form-group mb-4">
+                    <label class="form-label">Seleccionar remitente:</label>
+                    <div class="input-group">
+                        {{ form.empresa|add_class:"form-control" }}
+                    </div>
+                    <small class="text-muted">
+                        <i class="fas fa-lock me-1"></i>Autoseleccionado
+                    </small>
+                </div>
+            </div>
+
+            <!-- DATOS DEL EMPLEADO A CARGO -->
+            <div class="col-md-6 ps-md-4">
+                <h6 class="text-muted fw-bold mb-3">
+                    <i class="fas fa-car me-2"></i>DATOS DEL EMPLEADO A CARGO
+                </h6>
+                <div class="form-group mb-3">
+                    <label class="form-label">Empleado:</label>
+                    <div class="input-group" style="display: flex; flex-wrap: nowrap;">
+                        <div style="flex-grow: 1;">
+                            {{ form.empleado|add_class:"form-control" }}
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+    </div>
 
             <!-- Repuestos -->
             <div class="card shadow-sm border-0 mb-4">
@@ -298,7 +305,7 @@
                                 <label class="form-label">Registro de Salida:</label>
                                 <div class="input-group" style="display: flex; flex-wrap: nowrap;">
                                     {{ form.id_salida|add_class:"form-control" }}
-                                    <button type="button" class="btn btn-primary">
+                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-id_salida">
                                         <i class="fas fa-history"></i>
                                     </button>
                                 </div>
@@ -337,6 +344,8 @@
                 <a href="/apy/servicios/" class="btn btn-outline-danger border px-4 py-2">
                     <i class="fas fa-times me-2"></i>Cancelar
                 </a>
+                <input type="hidden" name="empresa" id="hidden_empresa">
+                <input type="hidden" name="empleado" id="hidden_empleado">
                 <button type="submit" id="btn-guardar" class="btn btn-success px-5 py-2 shadow-sm fw-bold">
                     <i class="fas fa-save me-2"></i>Guardar Servicio
                 </button>
@@ -450,35 +459,24 @@ window.perfilesData = [
 
 <script>
 $(document).ready(function() {
-    /* Select2 — igual que tu original */
-    function aplicarSelect2(selector) {
-        $(selector).select2({
+    // Inicializar Select2 con tema oscuro
+    $('select.form-control, select.form-select, .select2-field').each(function() {
+        $(this).select2({
             theme: 'bootstrap-5',
             width: '100%',
-            placeholder: 'Seleccione una opción',
-            allowClear: true
+            placeholder: $(this).data('placeholder') || 'Seleccione una opción',
+            allowClear: true,
+            dropdownParent: $(this).closest('.modal').length ? $(this).closest('.modal') : $(document.body)
         });
-    }
-    aplicarSelect2('select.form-control');
-
-    /* Modales AJAX — igual que tu original */
-    $(document).on('click', '[data-toggle="modal"]', function() {
-        var target = $(this).data('target');
-        var urlKey = target.replace('#modal-', '').replace('id_', '');
-        var url = window.DjangoConfig.urls[urlKey];
-        if (url) {
-            $.ajax({
-                url: url,
-                success: function(data) {
-                    $(target).find(".modal-body").html(data.html || data);
-                    $(target).find('select').select2({
-                        theme: 'bootstrap-5',
-                        width: '100%',
-                        dropdownParent: $(target)
-                    });
-                }
-            });
-        }
+    });
+    
+    // Para selects dentro de modales que se abren dinámicamente
+    $(document).on('shown.bs.modal', '.modal', function() {
+        $(this).find('select.form-control, select.form-select').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            dropdownParent: $(this)
+        });
     });
 });
 </script>
@@ -611,6 +609,91 @@ $(document).ready(function () {
         .catch(function (err) {
             console.warn('[Trazabilidad] Error fetch:', err);
         });
+});
+</script>
+
+<script>
+$(document).ready(function () {
+
+    function setSelect2(selector, value) {
+        var $sel = $(selector);
+        if (!$sel.length || !value) return;
+        $sel.val(value).trigger('change');
+    }
+
+    function disableSelect2(selector) {
+    var $sel = $(selector);
+    if (!$sel.length) return;
+    
+    // Destruir Select2, deshabilitar el select nativo, y re-inicializar
+    $sel.select2('destroy');
+    $sel.prop('disabled', true);
+    $sel.select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        allowClear: false,  // ← quita la X
+        minimumResultsForSearch: Infinity,  // ← quita el buscador
+        dropdownParent: $(document.body)
+    });
+    
+    // Bloquear clicks en el contenedor de Select2
+    $sel.next('.select2-container').css({
+        'pointer-events': 'none',
+        'opacity': '0.75'
+    });
+}
+
+    var perfilActualId  = "{{ perfil_actual_id|default:'' }}";
+    var empresaDefaultId = "{{ empresa_default_id|default:'' }}";
+
+    setTimeout(function () {
+
+        // ── Autoseleccionar y deshabilitar Empresa ──
+        if (empresaDefaultId) {
+            setSelect2('#id_empresa', empresaDefaultId);
+            setTimeout(function() { disableSelect2('#id_empresa'); }, 100);
+        }
+
+        // ── Autoseleccionar y deshabilitar Empleado ──
+        if (perfilActualId) {
+            setSelect2('#id_empleado', perfilActualId);
+            setTimeout(function() { disableSelect2('#id_empleado'); }, 100);
+        }
+
+    }, 500);
+
+    // ── Autocompletar al seleccionar entrada ──
+    $('#id_id_entrada').on('change', function () {
+        var entradaId = $(this).val();
+        if (!entradaId) return;
+
+        fetch("{% url 'apy:api_entrada_datos' 0 %}".replace('/0/', '/' + entradaId + '/'))
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (!data.ok) return;
+                setTimeout(function () {
+                    if (data.vehiculo_id) {
+                        var $v = $('#id_id_vehiculo');
+                        if ($v.find('option[value="' + data.vehiculo_id + '"]').length === 0)
+                            $v.append(new Option(data.vehiculo_texto, data.vehiculo_id, true, true));
+                        $v.val(data.vehiculo_id).trigger('change');
+                    }
+                    if (data.cliente_id) {
+                        var $c = $('#id_cliente');
+                        if ($c.find('option[value="' + data.cliente_id + '"]').length === 0)
+                            $c.append(new Option(data.cliente_texto, data.cliente_id, true, true));
+                        $c.val(data.cliente_id).trigger('change');
+                    }
+                }, 300);
+            })
+            .catch(function (err) { console.warn('[Entrada]', err); });
+    });
+
+    // Si ya hay entrada al cargar (modo edición)
+    if ($('#id_id_entrada').val()) {
+        $('#id_id_entrada').trigger('change');
+    }
+
 });
 </script>
 
