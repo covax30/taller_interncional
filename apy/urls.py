@@ -129,6 +129,8 @@ urlpatterns = [
     path('registro/crear/', RegistroUsuarioCreateView.as_view(), name='registro_usuario_crear'), 
     path('registro/editar/<int:pk>/', RegistroUpdateView.as_view(), name='registro_usuario_editar'), 
     path('registro/eliminar/<int:pk>/', RegistroDeleteView.as_view(), name='registro_usuario_eliminar'),
+    path('usuarios/inactivos/', RegistroUsuarioInactivosListView.as_view(), name='registro_usuario_inactivos'),
+    path('usuarios/activar/<int:pk>/', RegistroUsuarioActivarView.as_view(), name='registro_usuario_activar'),
     path("empleado/modal/crear/", EmpleadoCreateModalView.as_view(), name="empleado_modal_crear"),  
     
     

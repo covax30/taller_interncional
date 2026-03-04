@@ -2,38 +2,56 @@
 {% load static %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="p-4 border">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="text-right text-warning">{{ titulo }}</h4>
+<div class="container py-5 bg-body-tertiary">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden bg-body-tertiary">
+                
+                <div class="card-header bg-danger bg-gradient p-3 border-0">
+                    <h4 class="mb-0 text-white fw-bold text-center">
+                        <i class="fas fa-exclamation-circle me-2"></i> {{ titulo|default:"Confirmar Desactivación" }}
+                    </h4>
+                </div>
+                <div class="card-body p-4 p-md-5 text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-user-slash fa-4x text-danger opacity-75"></i>
+                    </div>
+
+                    <h5 class="fw-normal mb-3 text-secondary-emphasis">
+                        Estás a punto de desactivar al usuario:
+                    </h5>
+
+                    <div class="bg-danger bg-opacity-10 border border-danger border-opacity-25 rounded-3 p-3 mb-4">
+                        <h3 class="text-danger mb-1 fw-bold">{{ object.username }}</h3>
+                        <span class="badge bg-secondary text-light">ID de Sistema: {{ object.id }}</span>
+                    </div>
+
+                    <div class="alert alert-light border shadow-sm mb-4 text-start">
+                        <ul class="mb-0 small text-muted">
+                            <li><i class="fas fa-info-circle me-2"></i>El usuario ya no podrá acceder al sistema.</li>
+                            <li><i class="fas fa-database me-2"></i>Toda la información histórica y registros se conservarán.</li>
+                        </ul>
+                    </div>
+
+                    <p class="h6 fw-bold mb-4 text-body">¿Deseas continuar con esta acción?</p>
+
+                    <form method="post" class="d-grid d-sm-flex justify-content-sm-center gap-3">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-lg px-4 shadow-sm fw-bold">
+                            <i class="fas fa-check me-2"></i>Sí, Desactivar
+                        </button>
+                        <a href="{{ listar_url }}" class="btn btn-outline-secondary btn-lg px-4 fw-bold">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                    </form>
+                </div>
             </div>
-
-            <div class="alert alert-danger text-center" role="alert">
-                <p>Estás a punto de desactivar al siguiente usuario:</p>
-                <h5 class="alert-heading mb-3">
-                    <i class="fas fa-user-slash"></i> **{{ object.username }}** (ID: {{ object.id }})
-                </h5>
-                <p class="mb-0">**¿Estás absolutamente seguro de que deseas continuar?**</p>
-                <p>El usuario ya no podrá iniciar sesión, pero se conservarán sus registros relacionados.</p>
-            </div>
-
-            <form method="post" class="text-center mt-4">
-                {% csrf_token %}
-
-                <button type="submit" class="btn btn-warning me-3">
-                    <i class="fas fa-user-slash"></i> Sí, Desactivar Usuario
-                </button>
-
-                <a href="{{ listar_url }}" class="btn btn-secondary">
-                    <i class="fas fa-undo"></i> Cancelar
-                </a>
-            </form>
         </div>
     </div>
 </div>
 
-<!-- JS de Sienna Accessibility -->
+
+
 <script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
 <script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
 {% endblock %}
