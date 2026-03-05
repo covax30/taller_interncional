@@ -6,7 +6,7 @@
 
 {# ── Vehículo ── #}
 <div class="form-group mb-3">
-    <label for="{{ form.id_vehiculo.id_for_label }}"></i>Vehículo:
+    <label for="{{ form.id_vehiculo.id_for_label }}">Vehículo:
     </label>
     <div class="input-group" style="display:flex; flex-wrap:nowrap;">
         <div style="flex-grow:1;">
@@ -19,17 +19,14 @@
     </div>
     {% if form.id_vehiculo.errors %}
         <div class="invalid-feedback d-block">
-            {% for error in form.id_vehiculo.errors %}
-                <small>{{ error }}</small><br>
-            {% endfor %}
+            {% for error in form.id_vehiculo.errors %}<small>{{ error }}</small><br>{% endfor %}
         </div>
     {% endif %}
-    <small class="text-muted">Al seleccionar el vehículo, el cliente se rellenará automáticamente.</small>
 </div>
 
 {# ── Cliente ── #}
 <div class="form-group mb-3">
-    <label for="{{ form.id_cliente.id_for_label }}"></i>Cliente:
+    <label for="{{ form.id_cliente.id_for_label }}">Cliente:
     </label>
     {{ form.id_cliente|add_class:'form-control' }}
     {% if form.id_cliente.errors %}
