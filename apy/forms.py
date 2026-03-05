@@ -1,4 +1,4 @@
-from builtins import AttributeError, ValueError, len, list, str
+from builtins import AttributeError, ValueError, hasattr, len, list, str
 from pyexpat.errors import messages
 from django import forms
 from django.forms import ModelForm, Select, NumberInput, DateInput, TimeInput, TextInput, EmailInput
@@ -944,13 +944,8 @@ class ClienteForm(ModelForm):
         
     class Meta:
         model = Cliente
-<<<<<<< HEAD
         exclude = ['estado']  
         fields = ['identificacion', 'nombre', 'telefono', 'direccion']
-=======
-        exclude = ['estado']
-        fields = '__all__'
->>>>>>> 3b7624054b8a048b5e240107da19b41568e184a5
         widgets = {
             'tipo':Select(
                 attrs={
@@ -1053,7 +1048,6 @@ class VehiculoForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        # Configura cómo se muestran los clientes en el select
         if 'id_cliente' in self.fields:
             self.fields['id_cliente'].label_from_instance = (
                 lambda obj: f"{obj.id} - {obj.nombre}"  
@@ -1411,13 +1405,8 @@ class GastosForm(ModelForm):
 
     class Meta:
         model = Gastos
-<<<<<<< HEAD
         exclude = ['estado','id_pagos_servicios']
         fields = ['tipo_gastos', 'monto', 'fecha', 'descripcion']
-=======
-        exclude = ['estado']
-        fields = ['tipo_gastos', 'monto', 'fecha', 'descripcion', 'id_pagos_servicios']
->>>>>>> 3b7624054b8a048b5e240107da19b41568e184a5
         widgets = {
             'fecha': DateInput(attrs={'type': 'date'}),
             'monto': NumberInput(attrs={'type': 'number', 'step': '0.01', 'placeholder': 'Ingrese el monto del gasto'}),

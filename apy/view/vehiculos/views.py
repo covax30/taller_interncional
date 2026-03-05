@@ -1,3 +1,5 @@
+from builtins import getattr
+
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import HttpResponseRedirect, JsonResponse
@@ -291,23 +293,24 @@ class VehiculoCreateModalView(PermisoRequeridoMixin, CreateView):
                 "message": f"Error al guardar: {str(e)}"
             }, status=500)
     
-    def form_invalid(self, form):
-        """Manejar formulario inválido"""
-        # Renderizar el template con los errores
-        html = render_to_string(
-            self.template_name, 
-            {"form": form}, 
-            request=self.request
-        )
-        
-        # También puedes enviar los errores en formato JSON
-        errors_dict = {}
-        for field, errors in form.errors.items():
-            errors_dict[field] = [{"message": str(error)} for error in errors]
-        
-        return JsonResponse({
-            "success": False,
-            "html": html,
-            "errors": errors_dict,
-            "message": "Por favor, corrige los errores en el formulario ❌"
-        }, status=400)
+    def form_valid(self, form):
+        form.instance.estado = True 
+        try:
+            # Usamos un transaction.atomic si es posible para evitar datos huérfanos
+            self.object = form.save()
+
+            # ✅ Asegúrate de que 'id_vehiculo' sea el nombre correcto de tu PK
+            pk_value = getattr(self.object, 'id_vehiculo', self.object.pk)
+            
+            return JsonResponse({
+                "success": True,
+                "id": pk_value,
+                "text": str(self.object),
+                "message": "Vehículo registrado correctamente ✅"
+            })
+        except Exception as e:
+            # ... tu código de logging ...
+            return JsonResponse({
+                "success": False,
+                "message": f"Error interno: {str(e)}"
+            }, status=500)
