@@ -37,7 +37,9 @@
                                     <div style="flex-grow: 1;">
                                         {{ form.id_entrada|add_class:"form-control" }}
                                     </div>
-                                    
+                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-id_entrada">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
                                 </div>
                             </div>
                             <div class="form-group mb-3">
@@ -93,6 +95,7 @@
 </div>
                 </div>
             </div>
+    
 
 
             <!-- Repuestos -->
@@ -419,7 +422,7 @@ window.DjangoConfig = {
         id_tipo_mantenimiento: "{% url 'apy:tipo_mantenimiento_modal_crear' %}",
         salida: "{% url 'apy:salida_vehiculo_modal_crear' %}",
         insumos: "{% url 'apy:insumos_modal_crear' %}",
-        repuesto: "{% url 'apy:repuesto_modal_crear' %}"
+        repuesto: "{% url 'apy:repuesto_modal_crear' %}",
         api_entrada_datos: "{% url 'apy:api_entrada_datos' 0 %}"
     }
 };
@@ -567,7 +570,7 @@ $(document).ready(function () {
             setTimeout(function () {
 
                 // Entrada
-                setSelect2('#id_id_entrada', entradaId);
+                setSelect2('#id_entrada', entradaId);
 
                 // Vehículo
                 if (data.vehiculo_id) {
@@ -654,7 +657,7 @@ $(document).ready(function () {
                         $v.val(data.vehiculo_id).trigger('change');
                     }
                     if (data.cliente_id) {
-                        var $c = $('#id_cliente');
+                        var $c = $('#id_-id_cliente');
                         if ($c.find('option[value="' + data.cliente_id + '"]').length === 0)
                             $c.append(new Option(data.cliente_texto, data.cliente_id, true, true));
                         $c.val(data.cliente_id).trigger('change');
@@ -670,8 +673,6 @@ $(document).ready(function () {
     }
 
 });
-
-
 </script>
 
 {% endblock %}
