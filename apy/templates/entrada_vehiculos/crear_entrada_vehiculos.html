@@ -6,8 +6,7 @@
 
 {# ── Vehículo ── #}
 <div class="form-group mb-3">
-    <label for="{{ form.id_vehiculo.id_for_label }}">
-        <i class="fas fa-car me-1 text-primary"></i>Vehículo:
+    <label for="{{ form.id_vehiculo.id_for_label }}"></i>Vehículo:
     </label>
     <div class="input-group" style="display:flex; flex-wrap:nowrap;">
         <div style="flex-grow:1;">
@@ -19,7 +18,9 @@
     </div>
     {% if form.id_vehiculo.errors %}
         <div class="invalid-feedback d-block">
-            {% for error in form.id_vehiculo.errors %}<small>{{ error }}</small><br>{% endfor %}
+            {% for error in form.id_vehiculo.errors %}
+                <small>{{ error }}</small><br>
+            {% endfor %}
         </div>
     {% endif %}
     <small class="text-muted">Al seleccionar el vehículo, el cliente se rellenará automáticamente.</small>
@@ -27,8 +28,7 @@
 
 {# ── Cliente (se rellena automático) ── #}
 <div class="form-group mb-3">
-    <label for="{{ form.id_cliente.id_for_label }}">
-        <i class="fas fa-user me-1 text-primary"></i>Cliente:
+    <label for="{{ form.id_cliente.id_for_label }}"></i>Cliente:
     </label>
     {{ form.id_cliente|add_class:'form-control' }}
     {% if form.id_cliente.errors %}
@@ -40,8 +40,7 @@
 
 {# ── Fecha ── #}
 <div class="form-group mb-3">
-    <label for="{{ form.fecha_ingreso.id_for_label }}">
-        <i class="fas fa-calendar me-1 text-primary"></i>Fecha:
+    <label for="{{ form.fecha_ingreso.id_for_label }}"></i>Fecha:
     </label>
     {{ form.fecha_ingreso|add_class:'form-control' }}
     {% if form.fecha_ingreso.errors %}
@@ -53,8 +52,7 @@
 
 {# ── Hora ── #}
 <div class="form-group mb-3">
-    <label for="{{ form.hora_ingreso.id_for_label }}">
-        <i class="fas fa-clock me-1 text-primary"></i>Hora:
+    <label for="{{ form.hora_ingreso.id_for_label }}"></i>Hora:
     </label>
     {{ form.hora_ingreso|add_class:'form-control' }}
     {% if form.hora_ingreso.errors %}

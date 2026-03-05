@@ -13,6 +13,13 @@
                 </button>
             </div>
         </div> 
+        {% if form.id_cliente.errors %}
+        <div class="invalid-feedback d-block">
+            {% for error in form.id_cliente.errors %}
+                <small>{{ error }}</small><br>
+            {% endfor %}
+        </div>
+    {% endif %}
     </div>
 
     <!-- Placa -->

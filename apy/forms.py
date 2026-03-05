@@ -315,6 +315,7 @@ class ProveedorForm(ModelForm):
 
     class Meta:
         model = Proveedores
+        exclude = ['estado']  # Excluimos el campo 'estado' para que no sea visible en el formulario
         fields = '__all__'
         widgets = {
             'nombre': TextInput(attrs={'placeholder': 'Ingrese el nombre'}),
@@ -365,6 +366,7 @@ class ProveedorForm(ModelForm):
                 'unique': 'Ya existe un cliente con ese correo',
             }
         }
+        
 # ------------------- FORMS STEVEN -------------------     
 # ─────────────────────────────────────────────────────────────────────────────
 # CONSTANTES DE VALIDACIÓN
@@ -941,6 +943,7 @@ class ClienteForm(ModelForm):
         
     class Meta:
         model = Cliente
+        exclude = ['estado']
         fields = '__all__'
         widgets = {
             'tipo':Select(
@@ -954,6 +957,11 @@ class ClienteForm(ModelForm):
             'nombre':TextInput(
                 attrs={
                     'placeholder':'Ingrese el nombre del cliente',
+                }
+            ),
+            'tipo_identificacion': Select(
+                attrs={
+                    'class': 'form-control'
                 }
             ),
             'identificacion':TextInput(
@@ -1007,6 +1015,34 @@ class ClienteForm(ModelForm):
             }
            
         }
+        def clean(self):
+            """Validación personalizada que cruza tipo y número"""
+            cleaned_data = super().clean()
+            tipo = cleaned_data.get('tipo_identificacion')
+            identificacion = cleaned_data.get('identificacion')
+
+            if tipo and identificacion:
+                valor = str(identificacion).strip().upper()
+            
+                # Definición de reglas por cada tipo del SELECT
+                reglas = {
+                    'CC': (r'^\d{5,10}$', 'La Cédula debe tener entre 5 y 10 dígitos numéricos.'),
+                    'TI': (r'^\d{10,11}$', 'La Tarjeta de Identidad debe tener 10 u 11 dígitos.'),
+                    'RC': (r'^\d{10,11}$', 'El Registro Civil debe tener 10 u 11 dígitos.'),
+                    'NIT': (r'^\d{7,10}-\d{1}$', 'El NIT debe tener formato 123456789-0.'),
+                    'CE': (r'^\d{3,9}$', 'La Cédula de Extranjería debe ser numérica (hasta 9 dígitos).'),
+                    'PAS': (r'^[A-Z0-9]{5,20}$', 'El Pasaporte debe ser alfanumérico (5-20 caracteres).'),
+                    'PPT': (r'^[A-Z0-9]{4,15}$', 'El PPT debe ser alfanumérico.'),
+                }
+
+                if tipo in reglas:
+                    regex, mensaje = reglas[tipo]
+                    if not re.fullmatch(regex, valor):
+                        # Agrega el error específicamente al campo 'identificacion'
+                        self.add_error('identificacion', mensaje)
+        
+            return cleaned_data
+        
 class VehiculoForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -1023,6 +1059,7 @@ class VehiculoForm(ModelForm):
         
     class Meta:
         model = Vehiculo
+        exclude = ['estado']
         fields = '__all__'
         widgets = {
             'id_cliente': Select(
@@ -1099,6 +1136,7 @@ class EntradaVehiculoForm(ModelForm):
 
     class Meta:
         model = EntradaVehiculo
+        exclude = ['estado']
         fields = ['id_vehiculo', 'id_cliente', 'fecha_ingreso', 'hora_ingreso']
         widgets = {
             'id_vehiculo': Select(attrs={'class': 'form-control', 'id': 'id_id_vehiculo'}),
@@ -1125,6 +1163,7 @@ class SalidaVehiculoForm(ModelForm):
         
     class Meta:
         model = SalidaVehiculo
+        exclude = ['estado']
         fields = '__all__'
         widgets = {
             'id_salida':Select(
@@ -1175,6 +1214,7 @@ class SalidaVehiculoForm(ModelForm):
 class InformeForm(forms.ModelForm):
     class Meta:
         model = Informes
+        exclude = ['estado']
         # Sacamos 'detalle_servicio' e 'id_empleado' de aquí
         fields = ['tipo_informe', 'diagnostico_final']
 
@@ -1201,6 +1241,7 @@ class PagoServiciosForm(ModelForm):
             
     class Meta:
         model = PagoServiciosPublicos
+        exclude = ['estado']
         fields = '__all__'
         widgets = {
             'servicio': Select(
@@ -1228,12 +1269,21 @@ class PagoServiciosForm(ModelForm):
 class PagoForm(forms.ModelForm):
     class Meta:
         model  = Pagos
+        exclude = ['estado']
         fields = ['proveedor', 'fecha', 'tipo_pago']
         widgets = {
             'proveedor': forms.Select(attrs={'class': 'form-control'}),
             'fecha':     forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'tipo_pago': forms.Select(attrs={'class': 'form-control'}),
         }
+        error_messages = {
+            'fecha': {
+                'required': 'La fecha del pago es obligatoria',
+            },
+            'tipo_pago': {
+                'required': 'El tipo de pago es obligatorio',
+            },
+        } 
 
 
 # ── Form base para DetallePago (reutilizado por los 3 formsets) ──
@@ -1353,11 +1403,14 @@ class GastosForm(ModelForm):
 
     class Meta:
         model = Gastos
+        exclude = ['estado']
         fields = ['tipo_gastos', 'monto', 'fecha', 'descripcion', 'id_pagos_servicios']
         widgets = {
             'fecha': DateInput(attrs={'type': 'date'}),
+            'monto': NumberInput(attrs={'type': 'number', 'step': '0.01', 'placeholder': 'Ingrese el monto del gasto'}),
             'descripcion': TextInput(attrs={'placeholder': 'Ej: Pago de arriendo o papelería'}),
             'tipo_gastos': Select(attrs={'class': 'form-select'}),
+            'id_pagos_servicios': Select(attrs={'class': 'form-select'}),
         }
         error_messages = {
             'monto': {
@@ -1373,6 +1426,9 @@ class GastosForm(ModelForm):
             'id_pagos_servicios': {
                 'required': 'El id del pago de servicios es obligatorio',
             },
+            'fecha': {
+                'required': 'La fecha del gasto es obligatoria',
+            },
         }
 #-----formularo Marca ---------------        
 class MarcaForm(ModelForm):
@@ -1382,6 +1438,7 @@ class MarcaForm(ModelForm):
         
     class Meta:
         model = Marca
+        exclude = ['estado']
         fields = '__all__'
         widgets = {
             'nombre':TextInput(
@@ -1402,7 +1459,7 @@ class MarcaForm(ModelForm):
                 'required': 'El nombre de marca es obligatorio',
             },
             'tipo': {
-                'required': 'E tipo de marca es obligatoria',
+                'required': 'El tipo de marca es obligatoria',
             },
         }
     
@@ -1415,6 +1472,7 @@ class CajaForm(ModelForm):
         
     class Meta:
         model = Caja
+        exclude = ['estado']
         fields = '__all__'
         widgets = {
             'tipo_movimiento':Select(
@@ -1439,12 +1497,6 @@ class CajaForm(ModelForm):
                     'type': 'time' ,
                 }
             ),
-            
-            'id_admin':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
         }       
         error_messages = {
             'tipo_mantenimiento': {
@@ -1459,74 +1511,18 @@ class CajaForm(ModelForm):
             'hora': {
                 'required': 'La hora es obligatoria',
             },
-            'id_admin': {
-                'required': 'El id del administrador es obligatorio',
-            },
         }  
        
-        
-class MantenimientoForm(ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['fallas'].widget.attrs['autofocus'] = True
-        
-    class Meta:
-        model = Mantenimiento
-        fields = '__all__'
-        widgets = {
-            'fallas':TextInput(
-                attrs={
-                    'placeholder':'Ingrese las fallas',
-                }
-            ),
-            'procesos':TextInput(
-                attrs={
-                    'placeholder':'Ingrese los procesos',
-                }
-            ),
-            'id_vehiculo':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-            'id_empleado':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-            'id_tipo_mantenimiento':Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            )
-        }
-        error_messages = {
-            'fallas': {
-                'required': 'Es obligatorio registrar las fallas encontradas',
-            },
-            'procesos': {
-                'required': 'Es obligatorio registrar los procesos realizados al vehiculo',
-            },
-            'id_vehiculo': {
-                'required': 'El id del vehiculo es obligatorio',
-            },
-            'id_empleado': {
-                'required': 'El id del empleado es obligatorio',
-            },
-            'id_tipo_mantenimiento': {
-                'required': 'El id del tipo de mantenimiento es obligatorio',
-            }
-        }
-        
          
 class HerramientaForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['stock'].initial = None
         self.fields['nombre'].widget.attrs['autofocus'] = True
         
     class Meta:
         model = Herramienta
-        exclude = ['stock_minimo'] 
+        exclude = ['stock_minimo', 'estado'] 
         fields = '__all__'
         widgets = {
             'nombre':TextInput(
@@ -1575,6 +1571,11 @@ class HerramientaForm(ModelForm):
             },
             
         }
+        def clean_stock(self):
+            stock = self.cleaned_data.get('stock')
+            if stock is not None and stock <= 0:
+                raise forms.ValidationError("La cantidad debe ser mayor a 0.")
+            return stock
 
 class TipoMantenimientoForm(ModelForm):
     def __init__(self, *args, **kwargs):
@@ -1583,7 +1584,8 @@ class TipoMantenimientoForm(ModelForm):
         
     class Meta:
         model = TipoMantenimiento
-        fields = '__all__'
+        exclude = ['estado']
+        fields = ['nombre', 'descripcion']
         widgets = {
             'nombre':TextInput(
                 attrs={
@@ -1613,11 +1615,16 @@ class InsumoForm(ModelForm):
     class Meta:
         model = Insumos
         fields = '__all__'
-        exclude = ['stock_minimo'] 
+        exclude = ['stock_minimo', 'estado'] 
         widgets = {
             'id_marca':Select(
                 attrs={
                     'placeholder':'Ingrese la descripcion del insumo',
+                }
+            ),
+            'nombre':TextInput(
+                attrs={
+                    'placeholder':'Ingrese el nombre del insumo',
                 }
             ),
             'costo':NumberInput(
@@ -1645,6 +1652,9 @@ class InsumoForm(ModelForm):
             'id_marca': {
                 'required': 'El id de la marca es obligatoria',
             },
+            'nombre': {
+                'required': 'El nombre del insumo es obligatorio',
+            },
             'costo': {
                 'required': 'El costo del insumo es obligatorio',
             },
@@ -1660,6 +1670,7 @@ class InsumoForm(ModelForm):
 class RepuestoForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['stock'].initial = None
         # Primer campo en recibir foco
         self.fields['id_marca'].widget.attrs['autofocus'] = True
         # Aplica form-control a todos los campos automáticamente
@@ -1670,7 +1681,7 @@ class RepuestoForm(ModelForm):
 
     class Meta:
         model = Repuesto
-        exclude = ['stock_minimo'] 
+        exclude = ['estado']
         fields = ['id_marca', 'nombre', 'categoria','stock', 'stock_minimo', 'precio_unitario']
         widgets = {
             'id_marca': Select(
@@ -1733,6 +1744,12 @@ class RepuestoForm(ModelForm):
                     )
             return 0
         
+        def clean_stock(self):
+            stock = self.cleaned_data.get('stock')
+            if stock is not None and stock <= 0:
+                raise forms.ValidationError("La cantidad debe ser mayor a 0.")
+            return stock
+        
 class NominaForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -1743,6 +1760,7 @@ class NominaForm(ModelForm):
 
     class Meta:
         model = Nomina
+        exclude = ['estado']
         fields = ['empleado', 'monto', 'fecha_pago']
         widgets = {
             'fecha_pago': DateInput(attrs={'type': 'date'}),
@@ -1756,6 +1774,7 @@ class   NominaForm(ModelForm):
         
     class Meta:
         model = Nomina
+        exclude = ['estado']
         fields = '__all__'
         widgets = {
             

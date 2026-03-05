@@ -25,20 +25,26 @@
     </div>
     <div class="card-body p-4">
         <div class="row g-3">
+            
             <div class="col-md-5">
                 <label class="form-label fw-bold">Proveedor</label>
-                {{ form.proveedor|add_class:'form-control' }}
+                <div class="input-group">
+                    {{ form.proveedor|add_class:'form-control' }}
+                    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_proveedor">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
                 {% if form.proveedor.errors %}
                     <div class="text-danger small mt-1">{{ form.proveedor.errors|join:", " }}</div>
                 {% endif %}
-            </div>
-            <div class="col-md-4">
+            </div> <div class="col-md-4">
                 <label class="form-label fw-bold">Fecha</label>
                 {{ form.fecha|add_class:'form-control' }}
                 {% if form.fecha.errors %}
                     <div class="text-danger small mt-1">{{ form.fecha.errors|join:", " }}</div>
                 {% endif %}
             </div>
+
             <div class="col-md-3">
                 <label class="form-label fw-bold">Tipo de Pago</label>
                 {{ form.tipo_pago|add_class:'form-control' }}
@@ -46,8 +52,8 @@
                     <div class="text-danger small mt-1">{{ form.tipo_pago.errors|join:", " }}</div>
                 {% endif %}
             </div>
-        </div>
-    </div>
+
+        </div> </div>
 </div>
 
 <!-- SECCIÓN REPUESTOS -->
@@ -224,6 +230,43 @@
         </div>
     </div>
 </div>
+
+ <!-- Modal Marca -->
+    <div class="modal fade" id="modal-id_proveedor" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title mb-0">Crear Proveedor</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
+                        style="background-color: #dc3545; color: white; border: none; 
+                                border-radius: 50%; width: 35px; height: 35px;
+                                font-size: 1.5rem; line-height: 1; 
+                                display: flex; justify-content: center; align-items: center;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el form por AJAX -->
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script proveedor. -->
+    <script>
+        $("#modal-id_proveedor").on("show.bs.modal", function(){
+            var modal = $(this);
+            $.ajax({
+                url: "{% url 'apy:proveedor_modal_crear' %}",  // <-- endpoint para crear Proveedor
+                success: function(data){
+                    modal.find(".modal-body").html(data.html || data);
+                }
+            });
+        });
+        $('#id_id_proveedor').select2({
+            theme: 'bootstrap-5',
+        });
+    </script>
 
 <!-- BOTONES -->
 <div class="d-flex justify-content-end gap-2 mb-2">
