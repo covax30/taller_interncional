@@ -1,4 +1,5 @@
-from builtins import Exception, int, property, sum, super
+from builtins import Exception, float, int, len, property, sum, super
+from locale import str
 
 
 from django.utils import timezone
@@ -479,7 +480,7 @@ class Pagos(models.Model):
     ]
 
     id_pago      = models.AutoField(primary_key=True)
-    proveedor    = models.ForeignKey(Proveedores, on_delete=models.PROTECT)
+    proveedor    = models.ForeignKey(Proveedores, on_delete=models.SET_NULL, null=True, blank=True)
     fecha        = models.DateField(default=timezone.now)
     tipo_pago    = models.CharField(max_length=20, choices=TIPO_PAGO_OPCIONES)  # ← NUEVO
     monto_total  = models.IntegerField(default=0)

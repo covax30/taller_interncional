@@ -1,4 +1,4 @@
-from builtins import AttributeError, ValueError, getattr, hasattr, len, list, str
+from builtins import AttributeError, ValueError, getattr, len, list, str
 from pyexpat.errors import messages
 from django import forms
 from django.forms import ModelForm, Select, NumberInput, DateInput, TimeInput, TextInput, EmailInput
@@ -11,8 +11,8 @@ from django.core.exceptions import ValidationError
 from .models import Profile,DetalleServicio
 from .validators import solo_letras_validator, ComplexPasswordValidator, telefono_validator
 from django.contrib.auth.password_validation import validate_password
-from django_recaptcha.fields import ReCaptchaField
-from django_recaptcha.widgets import ReCaptchaV2Checkbox
+from django_recaptcha.fields import ReCaptchaField # pyright: ignore[reportMissingImports]
+from django_recaptcha.widgets import ReCaptchaV2Checkbox # pyright: ignore[reportMissingImports]
 
 from apy.models import *
         
@@ -1052,6 +1052,7 @@ class VehiculoForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
+        # Configura cómo se muestran los clientes en el select
         if 'id_cliente' in self.fields:
             self.fields['id_cliente'].label_from_instance = (
                 lambda obj: f"{obj.id} - {obj.nombre}"  
