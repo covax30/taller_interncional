@@ -1232,7 +1232,7 @@ class InformeForm(forms.ModelForm):
 class PagoServiciosForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Add safety check to prevent KeyError
+        
         if 'monto' in self.fields:
             self.fields['monto'].widget.attrs['autofocus'] = True
             

@@ -2,6 +2,9 @@
 # apy/view/pagos/views.py
 # ============================================================
 
+from builtins import Exception, dict, float, print, str
+from datetime import timezone
+
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
@@ -154,7 +157,7 @@ class PagosCreateView(PermisoRequeridoMixin, CreateView):
     module_name = 'Pagos'
     permission_required = 'add'
     
-    # IMPORTANTE: Añadir esto explícitamente
+    
     queryset = Pagos.objects.all()
 
     def get_context_data(self, **kwargs):
@@ -172,6 +175,36 @@ class PagosCreateView(PermisoRequeridoMixin, CreateView):
             'modo_edicion':        False,  # Explícitamente false para creación
         })
         return context
+    
+    def form_valid(self, form):
+        try:
+            with transaction.atomic():
+                # 1. Guardar el Pago
+                form.instance.estado = True
+                self.object = form.save()
+
+                # 2. Procesar y guardar Formsets (si aplica)
+                rep_fs, ins_fs, her_fs = _build_formsets(self.request)
+                if rep_fs.is_valid() and ins_fs.is_valid() and her_fs.is_valid():
+                    # Asignar el ID del pago a cada instancia del formset antes de guardar
+                    for fs in [rep_fs, ins_fs, her_fs]:
+                        instances = fs.save(commit=False)
+                        for instance in instances:
+                            instance.id_pago = self.object # Ajusta según tu modelo
+                            instance.save()
+                
+                # 3. Crear el Gasto asociado
+                from .models import Gastos 
+                Gastos.objects.create(
+                    monto=self.object.monto,
+                    descripcion=f"Pago de servicio: {self.object.get_servicio_display()}",
+                    tipo_gastos='costo fijo', 
+                    id_pagos_servicios=self.object,
+                    fecha=timezone.now().date()
+                )
+                
+            messages.success(self.request, "Pago, Formsets y Gasto registrados correctamente ✅")
+            return redirect(self.success_url)
 
     def _actualizar_stock_insumo(self, insumo, cantidad, unidad):
         """

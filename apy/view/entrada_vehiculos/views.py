@@ -4,18 +4,19 @@
 # para que el template pueda autocompletar el cliente.
 # ═══════════════════════════════════════════════════════════════
 
-import html
+from builtins import Exception, str, super
 import json
-from django.shortcuts import render, redirect
-from apy.models import EntradaVehiculo, Vehiculo, Cliente
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.shortcuts import render
 from django.http import JsonResponse
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from django.urls import reverse_lazy
-from apy.forms import EntradaVehiculoForm
 from django.contrib import messages
-from django.template.loader import render_to_string
+
+from apy.models import EntradaVehiculo, Vehiculo
+from apy.forms import EntradaVehiculoForm
 from apy.decorators import PermisoRequeridoMixin
 
 
@@ -152,7 +153,6 @@ class EntradaCreateModalView(CreateView):
     model = EntradaVehiculo
     form_class = EntradaVehiculoForm
     template_name = "entrada_vehiculos/modal_entrada.html"
-    success_url = reverse_lazy("apy:entrada_vehiculo_lista")
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -160,34 +160,38 @@ class EntradaCreateModalView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        # Aseguramos que el mapa de clientes esté disponible
         context['vehiculo_cliente_map'] = json.dumps(_vehiculo_cliente_map())
         return context
+
     def get(self, request, *args, **kwargs):
         form = self.get_form()
         context = self.get_context_data(form=form)
-        html = render_to_string(
-            'entrada_vehiculos/modal_entrada.html',
+        # Renderizamos el HTML para enviarlo via AJAX
+        html_content = render_to_string(
+            self.template_name,
             context,
             request=request
         )
-        return JsonResponse({'html': html, 'success': True})
+        return JsonResponse({'html': html_content, 'success': True})
 
     def form_valid(self, form):
         try:
             self.object = form.save()
             return JsonResponse({
                 "success": True,
-                "id":      self.object.id_entrada,
-                "text":    str(self.object),
+                "id": self.object.pk,
+                "text": str(self.object),
                 "message": "Entrada registrada correctamente ✅"
             })
         except Exception as e:
             return JsonResponse({"success": False, "message": str(e)}, status=500)
 
     def form_invalid(self, form):
-        html = render_to_string(self.template_name, {"form": form}, request=self.request)
+        context = self.get_context_data(form=form)
+        html_content = render_to_string(self.template_name, context, request=self.request)
         return JsonResponse({
             "success": False,
-            "html":    html,
+            "html": html_content,
             "message": "Corrige los errores en el formulario ❌"
         })

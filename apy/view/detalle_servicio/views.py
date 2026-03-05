@@ -1,3 +1,4 @@
+from builtins import sum, super
 from email.message import EmailMessage
 
 from multiprocessing import context
@@ -20,6 +21,7 @@ from xhtml2pdf import pisa
 # Modelos y Formularios
 from apy.models import (
     DetalleServicio,
+    Empresa,
     Repuesto,
     TipoMantenimiento,
     Insumos,
@@ -45,7 +47,7 @@ from apy.forms import (
 # CREAR SERVICIO
 # ─────────────────────────────────────────────────────────────
 class CreateServicioView(PermisoRequeridoMixin, CreateView):
-    module_name = 'Factura'
+    module_name = 'DetalleServicio'
     permission_required = 'add'
     model = DetalleServicio
     form_class = DetalleServicioForm
@@ -77,7 +79,14 @@ class CreateServicioView(PermisoRequeridoMixin, CreateView):
         except Profile.DoesNotExist:
             context['perfil_actual_id'] = None
 
-        return context
+        
+
+        try:
+            empresa_default = Empresa.objects.filter(estado=True).first()
+            context['empresa_default_id'] = empresa_default.pk if empresa_default else None
+        except:
+            context['empresa_default_id'] = None
+        return context        
 
     @transaction.atomic
     def form_valid(self, form):

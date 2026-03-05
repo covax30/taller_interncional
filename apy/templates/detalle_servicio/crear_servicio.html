@@ -80,39 +80,26 @@
                 </div>
                 <div class="card-body p-4">
                     <div class="row">
-                        <!-- DATOS DEL REMITENTE -->
-            <div class="col-md-6 border-end">
-                <h6 class="text-muted fw-bold mb-3">
-                    <i class="fas fa-user me-2"></i>DATOS DEL REMITENTE
-                </h6>
-                <div class="form-group mb-4">
-                    <label class="form-label">Seleccionar remitente:</label>
-                    <div class="input-group">
-                        {{ form.empresa|add_class:"form-control" }}
-                    </div>
-                    <small class="text-muted">
-                        <i class="fas fa-lock me-1"></i>Autoseleccionado
-                    </small>
-                </div>
-            </div>
-
-            <!-- DATOS DEL EMPLEADO A CARGO -->
-            <div class="col-md-6 ps-md-4">
-                <h6 class="text-muted fw-bold mb-3">
-                    <i class="fas fa-car me-2"></i>DATOS DEL EMPLEADO A CARGO
-                </h6>
-                <div class="form-group mb-3">
-                    <label class="form-label">Empleado:</label>
-                    <div class="input-group" style="display: flex; flex-wrap: nowrap;">
-                        <div style="flex-grow: 1;">
-                            {{ form.empleado|add_class:"form-control" }}
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="col-md-6 border-end">
+        <h6 class="text-muted fw-bold mb-3"><i class="fas fa-user me-2"></i>REMITENTE</h6>
+        <div class="form-group mb-4">
+            {{ form.empresa|add_class:"form-control" }}
+            <small class="text-muted d-block mt-1">
+                <i class="fas fa-lock me-1"></i>Autoseleccionado
+            </small>
         </div>
     </div>
+
+    <div class="col-md-6 ps-md-4">
+        <h6 class="text-muted fw-bold mb-3"><i class="fas fa-id-badge me-2"></i>RESPONSABLE</h6>
+        <div class="form-group mb-3">
+            {{ form.empleado|add_class:"form-control" }}
+        </div>
     </div>
+</div>
+                </div>
+            </div>
+    
 
 
             <!-- Repuestos -->
@@ -439,7 +426,7 @@ window.DjangoConfig = {
         id_tipo_mantenimiento: "{% url 'apy:tipo_mantenimiento_modal_crear' %}",
         salida: "{% url 'apy:salida_vehiculo_modal_crear' %}",
         insumos: "{% url 'apy:insumos_modal_crear' %}",
-        repuesto: "{% url 'apy:repuesto_modal_crear' %}"
+        repuesto: "{% url 'apy:repuesto_modal_crear' %}",
         api_entrada_datos: "{% url 'apy:api_entrada_datos' 0 %}"
     }
 };
@@ -587,7 +574,7 @@ $(document).ready(function () {
             setTimeout(function () {
 
                 // Entrada
-                setSelect2('#id_id_entrada', entradaId);
+                setSelect2('#id_entrada', entradaId);
 
                 // Vehículo
                 if (data.vehiculo_id) {

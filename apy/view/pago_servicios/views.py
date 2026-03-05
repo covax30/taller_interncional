@@ -1,3 +1,6 @@
+from builtins import Exception, print, super
+from locale import str
+
 from django.shortcuts import render, redirect
 from apy.models import * # Asegúrate de que PagoServiciosPublicos, Module, y Permission sean importados
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
@@ -70,26 +73,39 @@ class PagoServiciosInactivosListView(PermisoRequeridoMixin, ListView):
         return context    
     
     
-class PagoServiciosCreateView(PermisoRequeridoMixin, CreateView): 
+class PagoServiciosCreateView(PermisoRequeridoMixin, CreateView):
     model = PagoServiciosPublicos
     form_class = PagoServiciosForm
-    template_name = 'Pago_Servicios/crear_pagoservicios.html'
+    template_name = 'pago_servicios/crear.html'
     success_url = reverse_lazy('apy:pago_servicios_lista')
-    
-    # --- Configuración de Permisos ---
     module_name = 'PagoServicios'
     permission_required = 'add'
-    
+
     def form_valid(self, form):
+        # 1. Marcamos el estado del pago
         form.instance.estado = True
-        messages.success(self.request, "Pago de servicio creado correctamente")
-        return super().form_valid(form)
-    
+        
+        # 2. Guardamos el objeto PagoServicio y lo capturamos
+        response = super().form_valid(form)
+        self.object = form.save() 
+
+        # 3. Creamos el Gasto asociado
+        Gastos.objects.create(
+            monto=self.object.monto,
+            descripcion=f"Pago de servicio: {self.object.get_servicio_display()}",
+            tipo_gastos='costo fijo', 
+            id_pagos_servicios=self.object, # Relacionamos con el pago recién creado
+            fecha=timezone.now().date()
+        )
+
+        messages.success(self.request, "Pago de servicio y gasto registrados correctamente ✅")
+        return response
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context ['titulo'] = 'Crear Pago Servicios Publicos'
-        context ['entidad'] = 'PagoServiciosPublicos'
-        context ['listar_url'] = reverse_lazy('apy:pago_servicios_lista')
+        context['titulo'] = 'Crear Pago Servicios Públicos'
+        context['entidad'] = 'PagoServiciosPublicos'
+        context['listar_url'] = reverse_lazy('apy:pago_servicios_lista')
         return context
     
 class PagoServiciosUpdateView(PermisoRequeridoMixin, UpdateView):
@@ -98,21 +114,32 @@ class PagoServiciosUpdateView(PermisoRequeridoMixin, UpdateView):
     template_name = 'Pago_Servicios/crear_pagoservicios.html'
     success_url = reverse_lazy('apy:pago_servicios_lista')
     
-    # --- Configuración de Permisos ---
     module_name = 'PagoServicios'
     permission_required = 'change'
     
     def form_valid(self, form):
-        messages.success(self.request, "Pago de servicio actualizado correctamente")
-        return super().form_valid(form)
+        # 1. Guardamos los cambios del Pago
+        response = super().form_valid(form)
+        pago = self.object
+
+        # 2. Buscamos el Gasto asociado para actualizarlo
+        # Usamos .filter().update() para ser más eficientes
+        Gastos.objects.filter(id_pagos_servicios=pago).update(
+            monto=pago.monto,
+            descripcion=f"Pago de servicio (Editado): {pago.get_servicio_display()}",
+            # Mantenemos la fecha original o la actualizamos según tu preferencia
+        )
+
+        messages.success(self.request, "Pago de servicio y gasto asociado actualizados correctamente ✅")
+        return response
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['titulo'] = 'Editar Pago Servicios Publicos'
+        context['titulo'] = 'Editar Pago Servicios Públicos'
         context['entidad'] = 'PagoServiciosPublicos'
         context['listar_url'] = reverse_lazy('apy:pago_servicios_lista')
         return context
-
+    
 class PagoServiciosDeleteView(PermisoRequeridoMixin, DeleteView): 
     model = PagoServiciosPublicos
     template_name = 'Pago_Servicios/eliminar_pagoservicios.html'
