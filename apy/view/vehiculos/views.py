@@ -199,7 +199,7 @@ class VehiculoInactivoDeleteView(PermisoRequeridoMixin, DeleteView):
         self.object.estado = True
         self.object.save()
         
-        messages.success(self.request,     f"Vehículo con placa {Vehiculo.placa} activado correctamente")
+        messages.success(self.request, f"Vehículo con placa {self.object.placa}activado correctamente")
         return HttpResponseRedirect(success_url)
     
     def form_valid(self, form):
