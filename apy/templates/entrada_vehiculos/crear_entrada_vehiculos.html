@@ -25,12 +25,12 @@
 
 {# ── Cliente ── #}
 <div class="form-group mb-3">
-    <label for="{{ form.id_id_cliente.auto_id }}">Cliente:</label>
+    <label for="{{ form.id_cliente.auto_id }}">Cliente:</label>
     {# Este campo se llenará solo gracias a tu script y el vehiculoClienteMap #}
     {{ form.id_cliente|add_class:'form-control select2' }}
     {% if form.id_id_cliente.errors %}
         <div class="invalid-feedback d-block">
-            {% for error in form.id_cliente.errors %}<small>{{ error }}</small><br>{% endfor %}
+            {% for error in form.id_id_cliente.errors %}<small>{{ error }}</small><br>{% endfor %}
         </div>
     {% endif %}
 </div>

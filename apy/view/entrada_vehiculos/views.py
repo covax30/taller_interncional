@@ -8,7 +8,7 @@ from builtins import Exception, str, super
 import html
 import json
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from apy.models import EntradaVehiculo, Vehiculo, Cliente
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import JsonResponse
@@ -34,7 +34,7 @@ def api_entrada_datos(request, pk):
 
         vehiculo = entrada.id_vehiculo
         # Lógica: Usamos el cliente de la entrada, y si no hay, el que tiene registrado el vehículo
-        cliente = entrada.id_id_cliente or (vehiculo.id_cliente if vehiculo else None)
+        cliente = entrada.id_id_cliente or (vehiculo.id_id_cliente if vehiculo else None)
 
         return JsonResponse({
             'ok': True,
@@ -123,6 +123,21 @@ class EntradaVehiculoCreateView(PermisoRequeridoMixin, CreateView):
         # Mapa JSON para autocompletar cliente al elegir vehículo
         context['vehiculo_cliente_map'] = json.dumps(_vehiculo_cliente_map())
         return context
+    
+    def get_initial(self):
+        initial = super().get_initial()
+        # Leemos '?entrada=X' de la URL
+        entrada_id = self.request.GET.get('entrada')
+        
+        if entrada_id:
+            # Buscamos la entrada en la base de datos MySQL
+            entrada = get_object_or_404(EntradaVehiculo, id_entrada=entrada_id)
+            
+            # Asignamos los valores iniciales al formulario
+            initial['id_vehiculo'] = entrada.id_vehiculo
+            initial['id_cliente'] = entrada.id_id_cliente
+            
+        return initial
 
 
 # ─────────────────────────────────────────────────────────────
