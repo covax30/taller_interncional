@@ -223,7 +223,6 @@ def api_contador_clientes(request):
     """Retorna el total de clientes para actualización AJAX."""
     total_clientes = Cliente.objects.count()
     return JsonResponse({'total_clientes': total_clientes})
-
 class ClienteCreateModalView(CreateView):
     model = Cliente
     form_class = ClienteForm
@@ -235,26 +234,25 @@ class ClienteCreateModalView(CreateView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
+        # Esta línea causaba el error si no tenía exactamente 8 espacios (4 de la clase + 4 de la función)
         form.instance.estado = True
-        try:
-            self.object = form.save()
-            display_text = f"{self.object.identificacion} - {self.object.nombre}"
-            return JsonResponse({ 
-                "success": True,
-                "id": self.object.id,
-                "text": display_text,
-                "message": "Cliente registrado correctamente ✅"
-            })
-        except Exception as e:
-            return JsonResponse({
-                "success": False,
-                "message": f"Error al guardar: {str(e)}"
-            }, status=500)
-    
+        self.object = form.save()
+        
+        # El texto debe coincidir con el formato que usas en tus Select2 (Identificación - Nombre)
+        display_text = f"{self.object.identificacion} - {self.object.nombre}"
+        
+        return JsonResponse({ 
+            "success": True,
+            "id": self.object.id,
+            "text": display_text,
+            "message": "Cliente registrado correctamente ✅"
+        })
+
     def form_invalid(self, form):
+        # Renderiza el formulario con los errores específicos de Django para devolverlos al modal
         html = render_to_string(self.template_name, {"form": form}, request=self.request)
         return JsonResponse({
             "success": False,
             "html": html,
-            "message": "Por favor, corrige los errores en el formulario ❌"
+            "message": "Por favor, corrige los errores indicados."
         })

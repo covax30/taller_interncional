@@ -931,7 +931,7 @@ class ClienteForm(ModelForm):
         
     class Meta:
         model = Cliente
-        fields = '__all__'
+        fields = ['identificacion', 'nombre', 'telefono', 'direccion']
         widgets = {
             'tipo':Select(
                 attrs={
