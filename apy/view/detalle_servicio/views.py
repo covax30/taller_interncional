@@ -1,3 +1,4 @@
+from builtins import sum, super
 from email.message import EmailMessage
 
 from multiprocessing import context
@@ -34,18 +35,9 @@ from apy.forms import (
 )
 
 
-# ─────────────────────────────────────────────────────────────
-# LISTAR SERVICIOS ACTIVOS
-# ─────────────────────────────────────────────────────────────
-# ─────────────────────────────────────────────────────────────
-# LISTAR SERVICIOS (Vista Única - Historial Completo)
-# ─────────────────────────────────────────────────────────────
 
-# ─────────────────────────────────────────────────────────────
-# CREAR SERVICIO
-# ─────────────────────────────────────────────────────────────
 class CreateServicioView(PermisoRequeridoMixin, CreateView):
-    module_name = 'Factura'
+    module_name = 'DetalleServicio'
     permission_required = 'add'
     model = DetalleServicio
     form_class = DetalleServicioForm
@@ -183,10 +175,6 @@ class DeleteServicioView(PermisoRequeridoMixin, DeleteView):
 
         return HttpResponseRedirect(self.get_success_url())
 
-
-# ─────────────────────────────────────────────────────────────
-# IMPRIMIR FACTURA (Validación al inicio)
-# ─────────────────────────────────────────────────────────────
 def imprimir_servicio_factura(request, pk):
     servicio = get_object_or_404(DetalleServicio, pk=pk)
 
@@ -222,10 +210,8 @@ def imprimir_servicio_factura(request, pk):
     return response
 
 # ─────────────────────────────────────────────────────────────
-# EDITAR SERVICIO (Con bloqueo por finalización)
-# ─────────────────────────────────────────────────────────────
 class UpdateServicioView(PermisoRequeridoMixin, UpdateView):
-    module_name = 'Factura'
+    module_name = 'DetalleServicio'
     permission_required = 'change'
     model = DetalleServicio
     form_class = DetalleServicioForm
@@ -298,7 +284,7 @@ class UpdateServicioView(PermisoRequeridoMixin, UpdateView):
 # DETALLE / VER SERVICIO (Optimizado con prefetch_related)
 # ─────────────────────────────────────────────────────────────
 class DetalleServicioView(PermisoRequeridoMixin, DetailView):
-    module_name = 'Factura'
+    module_name = 'DetalleServicio'
     permission_required = 'view'
     model = DetalleServicio
     template_name = 'detalle_servicio/detalle_servicio.html'

@@ -931,6 +931,7 @@ class ClienteForm(ModelForm):
         
     class Meta:
         model = Cliente
+        exclude = ['estado']  
         fields = ['identificacion', 'nombre', 'telefono', 'direccion']
         widgets = {
             'tipo':Select(

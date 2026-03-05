@@ -1,3 +1,5 @@
+from builtins import Exception, print, str, super
+
 from django.shortcuts import render, redirect
 from apy.models import * # Asegúrate de que PagoServiciosPublicos, Module, y Permission sean importados
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView

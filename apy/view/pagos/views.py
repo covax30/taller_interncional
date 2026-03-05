@@ -2,6 +2,8 @@
 # apy/view/pagos/views.py
 # ============================================================
 
+from builtins import dict, float, print, super
+
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.shortcuts import redirect

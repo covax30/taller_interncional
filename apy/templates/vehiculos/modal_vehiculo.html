@@ -11,9 +11,7 @@
         <div class="input-group">
             {{ form.id_cliente|add_class:'form-control'|attr:'autocomplete:off' }}
             <div class="input-group-append">
-                <button type="button" class="btn btn-secondary" id="btnAbrirModalCliente" title="Agregar nuevo cliente">
-                    <i class="fas fa-plus"></i>
-                </button>
+                
             </div> 
         </div>
         {% if form.id_cliente.errors %}
@@ -86,9 +84,6 @@
 </div>
 
 <script>
-// ════════════════════════════════════════════════════
-// CIERRE MANUAL — apunta directo a #modal-id_vehiculo
-// ════════════════════════════════════════════════════
 function cerrarModalVehiculo() {
     var el = document.getElementById('modal-id_vehiculo');
     if (!el) { console.warn('No se encontró #modal-id_vehiculo'); return; }

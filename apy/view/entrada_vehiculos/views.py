@@ -4,6 +4,7 @@
 # para que el template pueda autocompletar el cliente.
 # ═══════════════════════════════════════════════════════════════
 
+from builtins import Exception, str, super
 import html
 import json
 from django.shortcuts import render, redirect
