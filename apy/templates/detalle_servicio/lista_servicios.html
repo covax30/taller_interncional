@@ -91,6 +91,10 @@
                     <a href="{% url 'apy:imprimir_servicio' servicio.id %}" target="_blank" class="btn btn-outline-danger btn-sm" title="Generar PDF">
                         <i class="fas fa-file-pdf"></i>
                     </a>
+                    <a href="{% url 'apy:enviar_factura_email' servicio.id %}" 
+                        style="background: #27ae60; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold; margin-left: 10px; display: inline-block;">
+                        📧 ENVIAR POR CORREO
+                    </a>
                 {% endif %} {# <-- Aquí se cierra el bloque correctamente #}
                 
             </div>

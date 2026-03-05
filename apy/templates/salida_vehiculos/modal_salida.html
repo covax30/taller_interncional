@@ -1,4 +1,5 @@
 {% load widget_tweaks %}
+
 {% block form %}
 
 <div id="msg-salida"></div>
@@ -7,14 +8,333 @@
     {% csrf_token %}
 
     <div class="form-group mb-3">
-        <label>Fecha de salida:</label>
+        <label class="form-label fw-semibold">Fecha de salida:</label>
         {{ form.fecha_salida|add_class:'form-control' }}
+        {% if form.fecha_salida.errors %}
+            <small class="text-danger d-block mt-1">
+                <i class="fas fa-exclamation-circle me-1"></i>
+                {{ form.fecha_salida.errors.0 }}
+            </small>
+        {% endif %}
     </div>
 
     <div class="form-group mb-3">
-        <label>Hora de salida:</label>
+        <label class="form-label fw-semibold">Hora de salida:</label>
         {{ form.hora_salida|add_class:'form-control' }}
+        {% if form.hora_salida.errors %}
+            <small class="text-danger d-block mt-1">
+                <i class="fas fa-exclamation-circle me-1"></i>
+                {{ form.hora_salida.errors.0 }}
+            </small>
+        {% endif %}
     </div>
 
 </form>
+
+{% endblock %}
+
+{% block Cancelar %}
+    <button type="button" id="btnGuardarSalida" class="btn btn-primary btn-flat">
+        <i class="fas fa-save me-2"></i>Agregar
+    </button>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    
+    console.log('📋 Inicializando modal salida...');
+    
+    /* ═══════════════════════════════════════════════════════════
+       GUARDAR SALIDA DEL VEHÍCULO
+       ═══════════════════════════════════════════════════════════ */
+    
+    // ✅ Usar off() para evitar duplicar listeners
+    $(document).off('click', '#btnGuardarSalida').on('click', '#btnGuardarSalida', function(e) {
+        e.preventDefault();
+        
+        const $btn = $(this);
+        const $modal = $('#modal-id_salida');
+        const $form = $modal.find('form#salidaForm');
+        
+        // ✅ Validar que el formulario exista
+        if (!$form.length) {
+            console.error('❌ No se encontró el formulario #salidaForm dentro del modal.');
+            alert('Error: No se pudo encontrar el formulario. Recarga la página.');
+            return;
+        }
+        
+        // ✅ Obtener datos del formulario
+        const url = $form.attr('action');
+        const formData = new FormData($form[0]);
+        
+        // ✅ Validar que haya datos
+        if (!url) {
+            console.error('❌ No se encontró la URL de acción del formulario.');
+            return;
+        }
+        
+        // ✅ Deshabilitar botón mientras se guarda
+        $btn.prop('disabled', true).addClass('disabled');
+        const textOriginal = $btn.html();
+        $btn.html('<i class="fas fa-spinner fa-spin me-2"></i>Guardando...');
+        
+        // ✅ AJAX request
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: { 
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': $form.find('[name="csrfmiddlewaretoken"]').val()
+            },
+            
+            /* ✅ SUCCESS */
+            success: function(data) {
+                console.info('✓ Respuesta del servidor:', data);
+                
+                if (data.success) {
+                    // ✅ Mostrar mensaje de éxito
+                    const $msg = $modal.find('#msg-salida');
+                    $msg.html(
+                        '<div class="alert alert-success alert-dismissible fade show" role="alert">' +
+                        '<i class="fas fa-check-circle me-2"></i>' +
+                        '<strong>¡Éxito!</strong> ' + data.message +
+                        '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+                        '</div>'
+                    );
+                    
+                    console.log('Datos retornados:', {
+                        id: data.id,
+                        text: data.text,
+                        success: data.success
+                    });
+                    
+                    // ✅ ACTUALIZAR SELECT EN LA PÁGINA PRINCIPAL
+                    if (data.id && data.text) {
+                        actualizarSelectSalida(data.id, data.text);
+                    }
+                    
+                    // ✅ Cerrar el modal después de 1.2 segundos
+                    setTimeout(function() {
+                        cerrarModalCorrectamente($modal);
+                    }, 1200);
+                    
+                } else {
+                    // ✅ Error desde el servidor (validación fallida)
+                    const $msg = $modal.find('#msg-salida');
+                    $msg.html(
+                        '<div class="alert alert-warning alert-dismissible fade show" role="alert">' +
+                        '<i class="fas fa-exclamation-triangle me-2"></i>' +
+                        '<strong>Validación:</strong> ' + (data.message || 'Hay errores en el formulario') +
+                        '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+                        '</div>'
+                    );
+                    
+                    if (data.errors) {
+                        console.warn('Errores de validación:', data.errors);
+                    }
+                }
+            },
+            
+            /* ✅ ERROR */
+            error: function(xhr, status, err) {
+                console.error('❌ AJAX error:', {status, err, xhr});
+                
+                const $msg = $modal.find('#msg-salida');
+                let mensajeError = 'Error en el servidor. Intenta de nuevo.';
+                
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    mensajeError = xhr.responseJSON.message;
+                } else if (xhr.status === 403) {
+                    mensajeError = 'No tienes permiso para realizar esta acción.';
+                } else if (xhr.status === 400) {
+                    mensajeError = 'Los datos enviados son inválidos.';
+                } else if (xhr.status === 500) {
+                    mensajeError = 'Error interno del servidor. Contacta al administrador.';
+                }
+                
+                $msg.html(
+                    '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
+                    '<i class="fas fa-exclamation-circle me-2"></i>' +
+                    '<strong>Error:</strong> ' + mensajeError +
+                    '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+                    '</div>'
+                );
+            },
+            
+            /* ✅ COMPLETE - Siempre ejecutar */
+            complete: function() {
+                // ✅ Restaurar botón
+                $btn.prop('disabled', false).removeClass('disabled').html(textOriginal);
+            }
+        });
+    });
+});
+
+/**
+ * Actualizar el select de salida en la página principal
+ */
+function actualizarSelectSalida(salidaId, salidaText) {
+    
+    const $select = $('#id_id_salida');
+    
+    if (!$select.length) {
+        console.warn('⚠ Select #id_id_salida no encontrado en la página');
+        return;
+    }
+    
+    console.log('Poblando select con:', {id: salidaId, text: salidaText});
+    
+    const optionExists = $select.find(`option[value="${salidaId}"]`).length > 0;
+    
+    if (!optionExists) {
+        const $newOption = $('<option></option>')
+            .attr('value', salidaId)
+            .text(salidaText);
+        
+        $select.append($newOption);
+        console.log('✓ Nueva opción agregada al select');
+    }
+    
+    $select.val(salidaId).trigger('change');
+    console.log('✓ Opción seleccionada:', salidaId);
+    
+    // ✅ Si usa Select2, actualizar también
+    if ($select.data('select2')) {
+        $select.select2('close');
+        console.log('✓ Select2 actualizado');
+    }
+}
+
+/**
+ * Cerrar el modal correctamente
+ * Soporta: Bootstrap 5, Bootstrap 4, y jQuery directamente
+ */
+function cerrarModalCorrectamente($modal) {
+    
+    if (!$modal.length) {
+        console.warn('Modal no encontrado');
+        return;
+    }
+    
+    console.log('Cerrando modal...');
+    
+    try {
+        
+        // ✅ INTENTO 1: Bootstrap 5 con la API correcta
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            try {
+                // Primero intentar getInstance
+                let bsModal = bootstrap.Modal.getInstance($modal[0]);
+                
+                if (!bsModal) {
+                    // Si no existe instancia, crear una nueva
+                    bsModal = new bootstrap.Modal($modal[0], { backdrop: true });
+                }
+                
+                bsModal.hide();
+                console.log('✓ Modal cerrado con Bootstrap 5');
+            } catch (e) {
+                console.warn('Bootstrap 5 falló, intentando fallback...');
+                throw e;
+            }
+        } else {
+            throw new Error('Bootstrap 5 no disponible');
+        }
+        
+    } catch (err1) {
+        
+        try {
+            // ✅ INTENTO 2: Bootstrap 4 (jQuery)
+            if (typeof $modal.modal === 'function') {
+                $modal.modal('hide');
+                console.log('✓ Modal cerrado con Bootstrap 4 (jQuery)');
+            } else {
+                throw new Error('Bootstrap 4 no disponible');
+            }
+        } catch (err2) {
+            // ✅ INTENTO 3: Cierre manual forzado
+            console.warn('Bootstrap no funciona, haciendo cierre manual...');
+            $modal.removeClass('show');
+            $modal.css('display', 'none');
+            $modal.attr('aria-hidden', 'true');
+            console.log('✓ Modal cerrado manualmente');
+        }
+    }
+    
+    // ✅ Limpiar backdrop y body en TODOS los casos
+    setTimeout(function() {
+        
+        $('body').removeClass('modal-open');
+        $('body').css('padding-right', '');
+        
+        // Remover todos los backdrops
+        const $backdrops = $('.modal-backdrop');
+        if ($backdrops.length) {
+            $backdrops.each(function() {
+                $(this).fadeOut(200, function() {
+                    $(this).remove();
+                });
+            });
+            console.log('✓ Backdrop removido');
+        }
+        
+        $modal.removeClass('show');
+        $modal.css('display', 'none');
+        console.log('✓ Clases y display limpiadas');
+        
+    }, 300);
+}
+
+/**
+ * Limpiar modal al cerrarse
+ */
+$(document).off('hidden.bs.modal', '#modal-id_salida').on('hidden.bs.modal', '#modal-id_salida', function() {
+    
+    console.log('Modal cerrado, limpiando...');
+    
+    const $form = $(this).find('form#salidaForm');
+    const $msgContainer = $(this).find('#msg-salida');
+    
+    if ($form.length) {
+        $form[0].reset();
+        console.log('✓ Formulario limpiado');
+    }
+    
+    $msgContainer.html('');
+    console.log('✓ Mensajes limpiados');
+});
+
+/**
+ * Handler alternativo para el botón X (por si el anterior no funciona)
+ */
+$(document).on('click', '#modal-id_salida .btn-close', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    console.log('Botón X clickeado');
+    
+    const $modal = $('#modal-id_salida');
+    cerrarModalCorrectamente($modal);
+});
+
+/**
+ * Handler de escape key
+ */
+$(document).on('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const $modal = $('#modal-id_salida');
+        if ($modal.hasClass('show')) {
+            console.log('Tecla Escape presionada');
+            cerrarModalCorrectamente($modal);
+        }
+    }
+});
+
+console.log('✓ Script salida_vehiculo.js cargado correctamente');
+
+</script>
 {% endblock %}

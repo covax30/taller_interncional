@@ -1,147 +1,459 @@
-$(document).ready(function () {
+/**
+ * servicios.js - Manejo de formularios de servicios con Select2 y formsets
+ * Versión: 2.0 - Con soporte completo para light/dark theme y select2 disabled
+ */
 
-    /* ═══════════════════════════════════════════════════════════════
-       SELECT2
-    ═══════════════════════════════════════════════════════════════ */
-    function initSelect2($ctx) {
-        $ctx.find('select.form-control').each(function () {
-            if (!$(this).hasClass('select2-hidden-accessible')) {
-                $(this).select2({
-                    theme: 'bootstrap-5',
-                    width: '100%',
-                    placeholder: 'Seleccione una opción',
-                    allowClear: true
-                });
+// ============================================
+// CONFIGURACIÓN GLOBAL DE SELECT2
+// ============================================
+
+$(document).ready(function() {
+    
+    // Inicializar todos los Select2 existentes
+    initializeAllSelect2();
+    
+    // Re-inicializar Select2 cuando se abre un modal dinámico
+    $(document).on('shown.bs.modal', '.modal', function() {
+        $(this).find('select').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            dropdownParent: $(this),
+            allowClear: true
+        });
+    });
+});
+
+/**
+ * Inicializa todos los select2 en la página
+ */
+function initializeAllSelect2() {
+    $('select.form-control, select.form-select, [data-select2="1"]').each(function() {
+        if (!$(this).data('select2')) { // Evitar duplicar inicialización
+            $(this).select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: $(this).attr('data-placeholder') || 'Seleccione una opción',
+                allowClear: !$(this).prop('required'),
+                dropdownParent: $(this).closest('.modal').length ? $(this).closest('.modal') : $(document.body),
+                language: {
+                    noResults: function() { return 'Sin resultados'; },
+                    searching: function() { return 'Buscando...'; }
+                }
+            });
+        }
+    });
+}
+
+/**
+ * Establece un valor en Select2 correctamente
+ */
+function setSelect2Value(selector, value, text = null) {
+    const $select = $(selector);
+    if (!$select.length) return false;
+    
+    // Si la opción no existe, crearla
+    if (!$select.find(`option[value="${value}"]`).length && value && text) {
+        $select.append(new Option(text, value, true, true));
+    }
+    
+    $select.val(value).trigger('change');
+    return true;
+}
+
+/**
+ * Deshabilita un Select2 de forma visual y funcional
+ */
+function disableSelect2(selector) {
+    const $select = $(selector);
+    if (!$select.length) return;
+    
+    // Destruir Select2 anterior
+    if ($select.data('select2')) {
+        $select.select2('destroy');
+    }
+    
+    // Deshabilitar select nativo
+    $select.prop('disabled', true).addClass('disabled');
+    
+    // Re-inicializar con opciones de disabled
+    $select.select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        allowClear: false,
+        minimumResultsForSearch: Infinity, // Quitar buscador
+        dropdownParent: $(document.body),
+        templateSelection: function(data) {
+            return data.text; // Mostrar texto sin ícono de X
+        }
+    });
+    
+    // Bloquear visualmente el contenedor de Select2
+    const $container = $select.next('.select2-container');
+    $container.css({
+        'opacity': '0.65',
+        'pointer-events': 'none'
+    }).addClass('select2-disabled-custom');
+}
+
+/**
+ * Habilita un Select2
+ */
+function enableSelect2(selector) {
+    const $select = $(selector);
+    if (!$select.length) return;
+    
+    if ($select.data('select2')) {
+        $select.select2('destroy');
+    }
+    
+    $select.prop('disabled', false).removeClass('disabled');
+    
+    $select.select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        allowClear: true,
+        dropdownParent: $(document.body)
+    });
+    
+    const $container = $select.next('.select2-container');
+    $container.css({
+        'opacity': '1',
+        'pointer-events': 'auto'
+    }).removeClass('select2-disabled-custom');
+}
+
+// ============================================
+// AUTOSELECCIÓN Y DESHABILITAR CAMPOS
+// ============================================
+
+$(document).ready(function() {
+    
+    const perfilActualId = DjangoConfig?.perfil_actual_id || $('[data-perfil-actual]').data('perfil-actual');
+    const empresaDefaultId = DjangoConfig?.empresa_default_id || $('[data-empresa-default]').data('empresa-default');
+    
+    // Esperar a que Select2 esté completamente inicializado
+    setTimeout(function() {
+        
+        // Empresa
+        if (empresaDefaultId && $('#id_empresa').length) {
+            setSelect2Value('#id_empresa', empresaDefaultId);
+            disableSelect2('#id_empresa');
+        }
+        
+        // Empleado (Perfil actual)
+        if (perfilActualId && $('#id_empleado').length) {
+            setSelect2Value('#id_empleado', perfilActualId);
+            disableSelect2('#id_empleado');
+        }
+        
+    }, 500);
+});
+
+// ============================================
+// AUTOCOMPLETAR DESDE ENTRADA
+// ============================================
+
+$(document).ready(function() {
+    
+    // Detectar si hay un parámetro ?entrada=id en la URL
+    const params = new URLSearchParams(window.location.search);
+    const entradaId = params.get('entrada');
+    const entradaField = $('#id_id_entrada');
+    
+    if (entradaField.length) {
+        // Si hay parámetro entrada en URL, cargar automáticamente
+        if (entradaId) {
+            setTimeout(function() {
+                setSelect2Value('#id_id_entrada', entradaId);
+                cargarDatosEntrada(entradaId);
+            }, 300);
+        }
+        
+        // Listener para cambios en el select de entrada
+        entradaField.on('change', function() {
+            const val = $(this).val();
+            if (val) {
+                cargarDatosEntrada(val);
             }
         });
     }
-
-    initSelect2($(document.body));
-    $.fn.select2.defaults.set('selectionCssClass', ':all:');
-    $(document).on('select2:open', function() {
-        document.querySelector('.select2-search__field')?.removeAttribute('aria-hidden');
-    });
-
-    /* ═══════════════════════════════════════════════════════════════
-       UTILIDADES
-    ═══════════════════════════════════════════════════════════════ */
-    function formatCOP(valor) {
-        return '$' + Math.round(valor).toLocaleString('es-CO');
-    }
-    function limpiarMonto(texto) {
-        return parseInt(String(texto || '').replace(/\D/g, '')) || 0;
-    }
-
-    /* ═══════════════════════════════════════════════════════════════
-       TOTALES
-    ═══════════════════════════════════════════════════════════════ */
-    var SECCIONES = {
-        repuestos:      { clase: '.repuesto-form',      idTotal: 'total-repuestos',      clsSub: '.subtotal-repuesto'      },
-        mantenimientos: { clase: '.mantenimiento-form', idTotal: 'total-mantenimientos', clsSub: '.subtotal-mantenimiento' },
-        insumos:        { clase: '.insumo-form',        idTotal: 'total-insumos',        clsSub: '.subtotal-insumos'       }
-    };
-
-    function recalcularSeccion(prefijo) {
-        var cfg = SECCIONES[prefijo];
-        if (!cfg) return;
-        var total = 0;
-        $(cfg.clase).each(function () {
-            var cant   = parseFloat($(this).find('input[name*="cantidad"]').val())        || 0;
-            var precio = parseFloat($(this).find('input[name*="precio_unitario"]').val()) || 0;
-            var sub    = cant * precio;
-            total += sub;
-            $(this).find(cfg.clsSub).val(formatCOP(sub));
-        });
-        $('#' + cfg.idTotal).text(formatCOP(total));
-        actualizarGranTotal();
-    }
-
-    function actualizarGranTotal() {
-        var gran = 0;
-        Object.values(SECCIONES).forEach(function (cfg) {
-            gran += limpiarMonto($('#' + cfg.idTotal).text());
-        });
-        $('#gran-total-servicio').text(formatCOP(gran));
-    }
-
-    window.recalcular = recalcularSeccion;
-
-    $(document).on('input change', 'input[name*="cantidad"], input[name*="precio_unitario"]', function () {
-        var name = $(this).attr('name') || '';
-        if      (name.startsWith('repuestos'))      recalcularSeccion('repuestos');
-        else if (name.startsWith('mantenimientos')) recalcularSeccion('mantenimientos');
-        else if (name.startsWith('insumos'))        recalcularSeccion('insumos');
-    });
-
-    setTimeout(function () { Object.keys(SECCIONES).forEach(recalcularSeccion); }, 300);
-
-    /* ═══════════════════════════════════════════════════════════════
-       ELIMINAR FILA
-    ═══════════════════════════════════════════════════════════════ */
-    $(document).on('click', '.remove-form', function () {
-        var $fila = $(this).closest('.repuesto-form, .mantenimiento-form, .insumo-form');
-        if (!$fila.length) return;
-        var prefijo = $fila.hasClass('repuesto-form')      ? 'repuestos'
-                    : $fila.hasClass('mantenimiento-form') ? 'mantenimientos'
-                    : 'insumos';
-        $fila.find('select.select2-hidden-accessible').each(function () {
-            $(this).select2('destroy');
-        });
-        $fila.remove();
-        recalcularSeccion(prefijo);
-    });
-
-    /* ═══════════════════════════════════════════════════════════════
-       AGREGAR FILA
-       CLAVE: el <template> de mantenimiento ya tiene las opciones
-       de empleados renderizadas por Django → solo clonar + Select2
-    ═══════════════════════════════════════════════════════════════ */
-    window.addForm = function (type) {
-        var container  = document.getElementById(type + '-formset');
-        var template   = document.getElementById(type.slice(0, -1) + '-template');
-        var totalForms = document.getElementById('id_' + type + '-TOTAL_FORMS');
-
-        if (!container || !template || !totalForms) {
-            console.error('[addForm] Elementos no encontrados para:', type);
-            return;
-        }
-
-        var index = parseInt(totalForms.value);
-        var html  = template.innerHTML.replace(/__prefix__/g, index);
-
-        $(container).append(html);
-        totalForms.value = index + 1;
-
-        // initSelect2 aplica a select.form-control — que ahora incluye
-        // el select del mecánico (cambiado de form-select a form-control)
-        initSelect2($(container).children().last());
-    };
-
-    /* ═══════════════════════════════════════════════════════════════
-       BOTONES AGREGAR
-    ═══════════════════════════════════════════════════════════════ */
-    $('#add-repuesto')     .on('click', function () { window.addForm('repuestos'); });
-    $('#add-mantenimiento').on('click', function () { window.addForm('mantenimientos'); });
-    $('#add-insumo')       .on('click', function () { window.addForm('insumos'); });
-
-    /* ═══════════════════════════════════════════════════════════════
-       MODALES AJAX
-    ═══════════════════════════════════════════════════════════════ */
-    $(document).on('click', '[data-toggle="modal"]', function () {
-        var target = $(this).data('target');
-        var urlKey = target.replace('#modal-', '').replace(/^id_/, '');
-        var url    = window.DjangoConfig && window.DjangoConfig.urls[urlKey];
-        if (!url) return;
-        $.ajax({
-            url: url,
-            success: function (data) {
-                var $modal = $(target);
-                $modal.find('.modal-body').html(data.html || data);
-                initSelect2($modal);
-                $modal.modal('show');
-            },
-            error: function () { console.error('[Modal AJAX] Error:', url); }
-        });
-    });
-
 });
+
+/**
+ * Carga datos de una entrada via API
+ */
+function cargarDatosEntrada(entradaId) {
+    if (!entradaId) return;
+    
+    const urlBase = "{% url 'apy:api_entrada_datos' 0 %}".replace('/0/', '/');
+    
+    fetch(urlBase + entradaId + '/')
+        .then(res => res.json())
+        .then(data => {
+            if (!data.ok) {
+                console.warn('[Entrada API] Error:', data);
+                return;
+            }
+            
+            console.info('[Entrada API] Datos cargados:', data);
+            
+            setTimeout(function() {
+                // Vehículo
+                if (data.vehiculo_id) {
+                    setSelect2Value('#id_id_vehiculo', data.vehiculo_id, data.vehiculo_texto);
+                }
+                
+                // Cliente
+                if (data.cliente_id) {
+                    setSelect2Value('#id_cliente', data.cliente_id, data.cliente_texto);
+                }
+            }, 100);
+        })
+        .catch(err => {
+            console.warn('[Entrada API] Error fetch:', err);
+        });
+}
+
+// ============================================
+// FORMSETS: AGREGAR Y ELIMINAR FILAS
+// ============================================
+
+$(document).ready(function() {
+    
+    // Agregar Repuesto
+    $('#add-repuesto').on('click', function(e) {
+        e.preventDefault();
+        agregarFilaFormset('repuestos', 'repuesto-template', '#repuestos-formset');
+    });
+    
+    // Agregar Mantenimiento
+    $('#add-mantenimiento').on('click', function(e) {
+        e.preventDefault();
+        agregarFilaFormset('mantenimientos', 'mantenimiento-template', '#mantenimientos-formset');
+    });
+    
+    // Agregar Insumo
+    $('#add-insumo').on('click', function(e) {
+        e.preventDefault();
+        agregarFilaFormset('insumos', 'insumo-template', '#insumos-formset');
+    });
+    
+    // Eliminar filas
+    $(document).on('click', '.remove-form', function(e) {
+        e.preventDefault();
+        $(this).closest('.repuesto-form, .mantenimiento-form, .insumo-form').remove();
+        updateFormsetManagementForm();
+        recalcularTotales();
+    });
+});
+
+/**
+ * Agrega una nueva fila al formset
+ */
+function agregarFilaFormset(formsetName, templateId, containerSelector) {
+    const $container = $(containerSelector);
+    const $template = $('#' + templateId);
+    
+    if (!$template.length) {
+        console.error(`Template #${templateId} no encontrado`);
+        return;
+    }
+    
+    // Obtener el índice actual
+    const $managementForm = $(`input[name="${formsetName}-TOTAL_FORMS"]`);
+    const totalForms = parseInt($managementForm.val()) || 0;
+    
+    // Clonar el template y reemplazar __prefix__
+    let html = $template.html();
+    html = html.replace(/__prefix__/g, totalForms);
+    
+    // Añadir al contenedor
+    $container.append(html);
+    
+    // Actualizar management form
+    $managementForm.val(totalForms + 1);
+    
+    // Inicializar Select2 en los nuevos selects
+    $container.find(`[name="${formsetName}-${totalForms}-id_repuesto"], [name="${formsetName}-${totalForms}-id_insumos"], [name="${formsetName}-${totalForms}-id_tipo_mantenimiento"]`).select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        dropdownParent: $(document.body)
+    });
+    
+    // Inicializar Select2 para el select de empleado (mantenimientos)
+    $container.find(`[name="${formsetName}-${totalForms}-empleado"]`).select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        dropdownParent: $(document.body)
+    });
+    
+    console.log(`✓ Fila agregada a ${formsetName}`);
+}
+
+/**
+ * Actualiza el management form de Django formset
+ */
+function updateFormsetManagementForm() {
+    // Actualizar TOTAL_FORMS para repuestos
+    const repuestosCount = $('#repuestos-formset .repuesto-form').length;
+    $('input[name="repuestos-TOTAL_FORMS"]').val(repuestosCount);
+    
+    // Actualizar TOTAL_FORMS para mantenimientos
+    const mantenimientosCount = $('#mantenimientos-formset .mantenimiento-form').length;
+    $('input[name="mantenimientos-TOTAL_FORMS"]').val(mantenimientosCount);
+    
+    // Actualizar TOTAL_FORMS para insumos
+    const insumosCount = $('#insumos-formset .insumo-form').length;
+    $('input[name="insumos-TOTAL_FORMS"]').val(insumosCount);
+}
+
+// ============================================
+// CÁLCULOS DE SUBTOTALES Y TOTALES
+// ============================================
+
+$(document).ready(function() {
+    
+    // Escuchar cambios en campos de cantidad y precio
+    $(document).on('input change', '.cantidad-repuestos, .precio-repuestos, .cantidad-mantenimientos, .precio-mantenimientos, .cantidad-insumo, .precio-insumo', function() {
+        recalcularTotales();
+    });
+});
+
+/**
+ * Recalcula todos los subtotales y totales
+ */
+function recalcularTotales() {
+    
+    // Repuestos
+    let totalRepuestos = 0;
+    $('#repuestos-formset .repuesto-form').each(function() {
+        const cant = parseFloat($(this).find('.cantidad-repuestos').val()) || 0;
+        const precio = parseFloat($(this).find('.precio-repuestos').val()) || 0;
+        const subtotal = cant * precio;
+        $(this).find('.subtotal-repuesto').val('$' + subtotal.toFixed(2));
+        totalRepuestos += subtotal;
+    });
+    $('#total-repuestos').text('$' + totalRepuestos.toFixed(2));
+    
+    // Mantenimientos
+    let totalMantenimientos = 0;
+    $('#mantenimientos-formset .mantenimiento-form').each(function() {
+        const cant = parseFloat($(this).find('.cantidad-mantenimientos').val()) || 0;
+        const precio = parseFloat($(this).find('.precio-mantenimientos').val()) || 0;
+        const subtotal = cant * precio;
+        $(this).find('.subtotal-mantenimiento').val('$' + subtotal.toFixed(2));
+        totalMantenimientos += subtotal;
+    });
+    $('#total-mantenimientos').text('$' + totalMantenimientos.toFixed(2));
+    
+    // Insumos
+    let totalInsumos = 0;
+    $('#insumos-formset .insumo-form').each(function() {
+        const cant = parseFloat($(this).find('.cantidad-insumo').val()) || 0;
+        const precio = parseFloat($(this).find('.precio-insumo').val()) || 0;
+        const subtotal = cant * precio;
+        $(this).find('.subtotal-insumos').val('$' + subtotal.toFixed(2));
+        totalInsumos += subtotal;
+    });
+    $('#total-insumos').text('$' + totalInsumos.toFixed(2));
+    
+    // Gran total
+    const granTotal = totalRepuestos + totalMantenimientos + totalInsumos;
+    $('#gran-total-servicio').text('$' + granTotal.toFixed(2));
+}
+
+// ============================================
+// MODALES DINÁMICOS
+// ============================================
+
+/**
+ * Abre un modal y carga contenido via AJAX
+ */
+function abrirModalConFormulario(urlForm, modalSelector) {
+    const $modal = $(modalSelector);
+    
+    if (!$modal.length) {
+        console.error(`Modal ${modalSelector} no encontrado`);
+        return;
+    }
+    
+    $.ajax({
+        url: urlForm,
+        success: function(data) {
+            $modal.find('.modal-body').html(data.html || data);
+            
+            // Re-inicializar Select2 dentro del modal
+            setTimeout(function() {
+                $modal.find('select').select2({
+                    theme: 'bootstrap-5',
+                    width: '100%',
+                    dropdownParent: $modal
+                });
+            }, 100);
+        },
+        error: function(err) {
+            console.error('Error cargando modal:', err);
+            alert('Error al cargar el formulario. Intenta de nuevo.');
+        }
+    });
+}
+
+// ============================================
+// LISTENERS PARA BOTONES DE MODALES
+// ============================================
+
+$(document).ready(function() {
+    
+    // Botón agregar vehículo
+    $('[data-target="#modal-id_vehiculo"]').on('click', function() {
+        abrirModalConFormulario(window.DjangoConfig?.urls?.id_vehiculo, '#modal-id_vehiculo');
+    });
+    
+    // Botón agregar cliente
+    $('[data-target="#modal-id_cliente"]').on('click', function() {
+        abrirModalConFormulario(window.DjangoConfig?.urls?.cliente, '#modal-cliente');
+    });
+    
+    // Etc para otros modales
+});
+
+// ============================================
+// VALIDACIÓN ANTES DE GUARDAR
+// ============================================
+
+$(document).ready(function() {
+    
+    $('#servicio-form').on('submit', function(e) {
+        
+        // Validar que al menos haya un item (repuesto, mantenimiento o insumo)
+        const totalItems = 
+            $('#repuestos-formset .repuesto-form').length +
+            $('#mantenimientos-formset .mantenimiento-form').length +
+            $('#insumos-formset .insumo-form').length;
+        
+        if (totalItems === 0) {
+            e.preventDefault();
+            alert('Debes agregar al menos un repuesto, mantenimiento o insumo.');
+            return false;
+        }
+        
+        // Si todo está bien, permitir el submit
+        return true;
+    });
+});
+
+// ============================================
+// INICIALIZACIÓN DE DATA CONFIG DE DJANGO
+// ============================================
+
+// Asegurar que window.DjangoConfig existe
+if (typeof window.DjangoConfig === 'undefined') {
+    window.DjangoConfig = {
+        indices: { repuestos: 0, mantenimientos: 0, insumos: 0 },
+        urls: {},
+        perfil_actual_id: null,
+        empresa_default_id: null
+    };
+}
+
+console.log('✓ servicios.js cargado correctamente');

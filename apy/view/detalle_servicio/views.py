@@ -1,3 +1,5 @@
+from email.message import EmailMessage
+from io import BytesIO
 from multiprocessing import context
 
 from django.views.generic import CreateView, UpdateView, ListView, DeleteView, DetailView
@@ -523,3 +525,59 @@ def imprimir_servicio_factura(request, pk):
         return redirect('apy:lista_servicios')
 
     return response
+
+def enviar_factura_email(request, pk):
+    servicio = get_object_or_404(DetalleServicio, pk=pk)
+    cliente = servicio.id_vehiculo.id_cliente
+    
+    # Validar que el cliente tenga correo
+    if not hasattr(cliente, 'email') or not cliente.email:
+        messages.error(request, f'❌ El cliente {cliente.nombre} no tiene un correo registrado.')
+        return redirect('apy:detalle_servicio', pk=pk)
+
+    # 1. Preparar el mismo contexto que usas para imprimir
+    context = {
+        'servicio':       servicio,
+        'vehiculo':       servicio.id_vehiculo,
+        'cliente':        cliente,
+        'repuestos':      servicio.detallerepuesto_set.all(),
+        'mantenimientos': servicio.detalletipomantenimiento_set.all(),
+        'insumos':        servicio.detalleinsumos_set.all(),
+        'total': (
+            sum(r.subtotal for r in servicio.detallerepuesto_set.all()) +
+            sum(m.subtotal for m in servicio.detalletipomantenimiento_set.all()) +
+            sum(i.subtotal for i in servicio.detalleinsumos_set.all())
+        ),
+    }
+
+    # 2. Generar el HTML y el PDF en memoria (BytesIO)
+    html_string = render_to_string('detalle_servicio/factura_impresion.html', context)
+    buffer = BytesIO()
+    pisa_status = pisa.CreatePDF(html_string, dest=buffer)
+
+    if pisa_status.err:
+        messages.error(request, 'Ocurrió un error al generar el PDF para el correo.')
+        return redirect('apy:detalle_servicio', pk=pk)
+
+    # 3. Crear el objeto de correo
+    subject = f"Factura Orden de Servicio N° {servicio.id} - Taller Internacional"
+    body = f"Cordial saludo {cliente.nombre},\n\nAdjuntamos la factura detallada del servicio realizado al vehículo con placa {servicio.id_vehiculo.placa}.\n\nGracias por su confianza."
+    
+    email = EmailMessage(
+        subject,
+        body,
+        'tu_correo@gmail.com', # Esto debe coincidir con tu settings.py
+        [cliente.email],
+    )
+
+    # 4. Adjuntar el PDF desde el buffer
+    pdf_content = buffer.getvalue()
+    email.attach(f'Factura_{servicio.id}_{servicio.id_vehiculo.placa}.pdf', pdf_content, 'application/pdf')
+
+    try:
+        email.send()
+        messages.success(request, f'✅ Factura enviada con éxito al correo: {cliente.email}')
+    except Exception as e:
+        messages.error(request, f'❌ Error al enviar el correo: {str(e)}')
+
+    return redirect('apy:detalle_servicio', pk=pk)

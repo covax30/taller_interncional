@@ -30,39 +30,121 @@
     <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/bootstrap.css' %}" />
     <link rel="stylesheet" href="{% static 'css/select2-dark.css' %}">
     <link rel="stylesheet" href="{% static 'css/select2.min.css' %}" />
+        <link rel="stylesheet" href="{% static 'css/select2-bootstrap-5-theme.min.css' %}" />
     
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
     <!-- Estilos para DataTables responsivos -->
     <link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/css/jquery.dataTables.min.css' %}">
     <link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/css/responsive.bootstrap4.min.css' %}">
     
+    
     <!-- BLOQUE PARA ESTILOS ADICIONALES DE PÁGINAS ESPECÍFICAS -->
     {% block extra_head %}
        <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/custom.css' %}" />
+
        <style>
-        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection,
-        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-dropdown,
-        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-search__field {
-        background-color: #2b3035 !important; /* Color oscuro de BS5 */
-        color: #0080ff !important;
-        border-color: #495057 !important;
-    }
-    /* Fix para el dropdown que se ve blanco en tu imagen */
-    .select2-dropdown {
-        z-index: 9999 !important;
-    }
-    </style>
+/* ============================================
+   SELECT2 MODO CLARO (LIGHT THEME)
+   ============================================ */
+[data-bs-theme="light"] .select2-container--bootstrap-5 .select2-selection {
+    background-color: #ffffff !important;
+    border: 1px solid #dee2e6 !important;
+    color: #212529 !important;
+}
+
+[data-bs-theme="light"] .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+    color: #212529 !important;
+    -webkit-text-fill-color: #212529 !important;
+}
+
+[data-bs-theme="light"] .select2-container--bootstrap-5 .select2-selection--single .select2-selection__placeholder {
+    color: #6c757d !important;
+    -webkit-text-fill-color: #6c757d !important;
+}
+
+[data-bs-theme="light"] .select2-container--bootstrap-5 .select2-selection:hover {
+    border-color: #0d6efd !important;
+}
+
+[data-bs-theme="light"] .select2-container--bootstrap-5.select2-container--focus .select2-selection,
+[data-bs-theme="light"] .select2-container--bootstrap-5.select2-container--open .select2-selection {
+    border-color: #0d6efd !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+}
+
+[data-bs-theme="light"] .select2-container--bootstrap-5 .select2-dropdown {
+    background-color: #ffffff !important;
+    border: 1px solid #dee2e6 !important;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+[data-bs-theme="light"] .select2-container--bootstrap-5 .select2-results__option {
+    color: #212529 !important;
+    padding: 10px 12px !important;
+}
+
+[data-bs-theme="light"] .select2-container--bootstrap-5 .select2-results__option--highlighted {
+    background-color: #0d6efd !important;
+    color: #ffffff !important;
+}
+
+[data-bs-theme="light"] .select2-container--bootstrap-5 .select2-results__option--selected {
+    background-color: #e7f1ff !important;
+    color: #0d6efd !important;
+}
+
+[data-bs-theme="light"] .select2-container--bootstrap-5 .select2-search__field {
+    background-color: #ffffff !important;
+    border: 1px solid #dee2e6 !important;
+    color: #212529 !important;
+}
+
+[data-bs-theme="light"] .select2-container--bootstrap-5 .select2-search__field:focus {
+    border-color: #0d6efd !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+}
+
+/* ============================================
+   SELECT2 MODO OSCURO (DARK THEME)
+   ============================================ */
+[data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection,
+[data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-dropdown,
+[data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-search__field {
+    background-color: #2b3035 !important;
+    border-color: #495057 !important;
+}
+
+[data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+    color: #f8f9fa !important;
+    -webkit-text-fill-color: #f8f9fa !important;
+}
+
+[data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-results__option {
+    color: #f8f9fa !important;
+}
+
+[data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-results__option--highlighted {
+    background-color: #0d6efd !important;
+    color: #ffffff !important;
+}
+
+/* Z-index global para dropdown */
+.select2-dropdown {
+    z-index: 9999 !important;
+}
+       </style>
     {% endblock %}
 
     <!-- Scripts JS necesarios para funcionalidad -->
     <script src="{% static 'lib/datatables-1.10.20/jquery-3.7.1.min.js' %}"></script>
 
     <script src="{% static 'AdminLTE/dist/js/popper.js' %}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script src="{% static 'js/select2.bundle.min.js' %}"></script>
+    <script src="{% static 'js/select2.min.js' %}"></script>
+
+
     <script src="{% static 'lib/datatables-1.10.20/datatables.min.js' %}"></script>
     
     <script src="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/js/dataTables.responsive.min.js' %}"></script>
@@ -82,14 +164,22 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
-<link rel="stylesheet" href="{% static 'css/material-icons.css' %}">
 
+<script>
+window.AccessibilityManager = window.AccessibilityManager || function() {
+    return {
+        init: function() {},
+        destroy: function() {},
+        addLandmarks: function() {},
+        removeLandmarks: function() {},
+        updateLandmarks: function() {},
+        addSkipLink: function() {},
+        removeSkipLink: function() {}
+    };
+};
+</script>
+<script src="{% static 'AdminLTE/dist/js/adminlte.js' %}"></script>
 
-
-
-
-
-    
 
     <script>
     // === Configuración global de CSRF ===
@@ -117,7 +207,7 @@
     [data-bs-theme="light"] .app-header, 
     [data-bs-theme="light"] .app-footer,
     [data-bs-theme="light"] .app-sidebar {
-        background-color: #ffffff !important; /* Un crema muy elegante y sutil */
+        background-color: #ffffff !important;
         border-color: #312e3d !important;
         color: #243241 !important;
     }
@@ -139,20 +229,20 @@
 .app-sidebar {
     background-color: var(--bs-body-bg) !important;
     opacity: 1 !important;
-    z-index: 1039 !important; /* Asegura que esté sobre el contenido */
+    z-index: 1039 !important;
 }
 
 /* Ajuste específico para modo claro */
 [data-bs-theme="light"] .app-sidebar {
     background-color: #ffffff !important;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Agrega sombra para que no se pierda */
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
 /* Ajuste específico para modo oscuro */
 [data-bs-theme="dark"] .app-sidebar {
     background-color: #343a40 !important;
 }
-</style>
+    </style>
   </head>
 
   <!-- Inclusión del encabezado desde otra plantilla -->
@@ -163,7 +253,30 @@
 
   {% include 'footer.html' %}
 
+<!-- ✅ PRIMERO: definir la función -->
+<script>
+function initSelect2EnModal($modal) {
+    $(document).off('focusin.select2');
+    $modal.find('select').each(function() {
+        var $select = $(this);
+        if ($select.data('select2')) {
+            $select.select2('destroy');
+        }
+        $select.select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            dropdownParent: $modal
+        });
+        $select.removeAttr('aria-hidden');
+    });
+    console.log('✓ Select2 inicializado en:', $modal.attr('id'));
+}
+</script>
 
+<!-- DESPUÉS: scripts de modales -->
+<script>
+$("#modal-id_vehiculo").on("show.bs.modal", function() { ... });
+</script>
 <!-- Sub-Modal Marca -->
     <div class="modal fade" id="modal-id_marca" tabindex="-1" role="dialog" data-backdrop="static">
         <div class="modal-dialog modal-md" role="document">
@@ -182,9 +295,6 @@
         </div>
     </div>
     </div>
-
-    
-
 
     <!-- Sub-Modal Vehiculo. -->
     <div class="modal fade" id="modal-id_vehiculo" tabindex="-1" role="dialog" data-backdrop="static">
@@ -243,8 +353,6 @@
     </div>
     </div>
 
-    
-
     <!-- Script Marca. -->
     <script>
         $("#modal-id_marca").on("show.bs.modal", function(){
@@ -257,32 +365,60 @@
         });
     });
     </script>
+<script>
+    $("#modal-id_vehiculo").on("show.bs.modal", function(){
+        var modal = $(this);
+        $.ajax({
+            url: "{% url 'apy:vehiculo_modal_crear' %}",
+            success: function(data){
+                modal.find(".modal-body").html(data.html || data);
 
-    <!-- Script Vehiculo. -->
-    <script>
-        $("#modal-id_vehiculo").on("show.bs.modal", function(){
-            var modal = $(this);
-            $.ajax({
-                url: "{% url 'apy:vehiculo_modal_crear' %}",
-                success: function(data){
-                    modal.find(".modal-body").html(data.html || data);
+                // ✅ Inicializar Select2 dentro del modal después de cargar
+                $(document).off('focusin.select2');
+                modal.find('select').each(function() {
+                    if (!$(this).data('select2')) {
+                        $(this).select2({
+                            theme: 'bootstrap-5',
+                            width: '100%',
+                            dropdownParent: modal  // ← CLAVE
+                        });
+                    }
+                });
             }
         });
     });
-    </script>
+</script>
 
     <!-- Script Cliente. -->
     <script>
-        $("#modal-id_cliente").on("show.bs.modal", function(){
-            var modal = $(this);
-            $.ajax({
-                url: "{% url 'apy:cliente_modal_crear' %}",
-                success: function(data){
-                    modal.find(".modal-body").html(data.html || data);
+$("#modal-id_cliente").on("show.bs.modal", function() {
+    var $modal = $(this);
+
+    // ✅ Detectar cuál modal abrió este modal
+    // Si el modal de vehículo está visible, entonces cliente fue abierto desde vehículo
+    var vehiculoEsVisible = $('#modal-id_vehiculo').is(':visible');
+    
+    if (vehiculoEsVisible) {
+        $modal.data('caller', 'modal-id_vehiculo');
+        console.log('✓ Modal cliente abierto desde: VEHÍCULO');
+    } else {
+        $modal.data('caller', 'main');
+        console.log('✓ Modal cliente abierto desde: PÁGINA PRINCIPAL (ENTRADA)');
+    }
+
+    $.ajax({
+        url: "{% url 'apy:cliente_modal_crear' %}",
+        success: function(data) {
+            $modal.find(".modal-body").html(data.html || data);
+            
+            // ✅ Inicializar Select2
+            if (typeof initSelect2EnModal === 'function') {
+                initSelect2EnModal($modal);
             }
-        });
+        }
     });
-    </script>
+});
+</script>
 
     <!-- Script Tipo Mantenimiento. -->
     <script>
@@ -373,9 +509,33 @@ $('#modal-id_cliente').on('hidden.bs.modal', function() {
     $(this).find('#msg-cliente').html('');
 });
 </script>
-<script src="{% static 'AdminLTE/dist/js/adminlte.js' %}"></script>
+    
+    <script>
+$(document).ready(function() {
+    
+    // Inicializar Select2
+    $('select.form-control, select.form-select').each(function() {
+        if (!$(this).data('select2')) {
+            $(this).select2({
+                theme: 'bootstrap-5',
+                width: '100%'
+            });
+        }
+    });
+    
+    // ✅ ARREGLO: Remover aria-hidden que causa el warning
+    setTimeout(function() {
+        $('[data-select2-id]').removeAttr('aria-hidden');
+        console.log('✓ Select2 aria-hidden fix aplicado');
+    }, 300);
+    
+    // ✅ Para formularios dinámicos
+    $(document).on('select2:opening', function(e) {
+        $(e.target).removeAttr('aria-hidden');
+    });
+});
+</script>
 
 </body>
-
 
 </html>
