@@ -12,7 +12,8 @@
         <div style="flex-grow:1;">
             {{ form.id_vehiculo|add_class:'form-control' }}
         </div>
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-id_vehiculo_entrada">
+        <!-- ✅ CAMBIO: Cambiar de data-toggle a id="btnAbrirModalVehiculo" -->
+        <button type="button" class="btn btn-primary" id="btnAbrirModalVehiculo">
             <i class="fas fa-plus"></i>
         </button>
     </div>
@@ -26,7 +27,7 @@
     <small class="text-muted">Al seleccionar el vehículo, el cliente se rellenará automáticamente.</small>
 </div>
 
-{# ── Cliente (se rellena automático) ── #}
+{# ── Cliente ── #}
 <div class="form-group mb-3">
     <label for="{{ form.id_cliente.id_for_label }}"></i>Cliente:
     </label>
@@ -62,53 +63,119 @@
     {% endif %}
 </div>
 
-{# Modal para crear vehículo #}
-<div class="modal fade" id="modal-id_vehiculo_entrada" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header d-flex justify-content-between align-items-center">
-                <h5 class="modal-title mb-0">Crear Vehículo</h5>
-                <button type="button" class="close" data-dismiss="modal"
-                    style="background:#dc3545;color:#fff;border:none;border-radius:50%;width:35px;height:35px;font-size:1.5rem;display:flex;justify-content:center;align-items:center;">
-                    <span>&times;</span>
-                </button>
-            </div>
-            <div class="modal-body"></div>
-        </div>
-    </div>
-</div>
-
-{# Mapa vehiculo → cliente (JSON) #}
+{# ── Mapa vehiculo → cliente ── #}
 {{ vehiculo_cliente_map|json_script:"vehiculo-cliente-map" }}
 
 <script>
-$(document).ready(function () {
-    var vehiculoClienteMap = JSON.parse(document.getElementById('vehiculo-cliente-map').textContent);
+(function() {
+    // Esperar a que jQuery esté listo
+    function initEntrada() {
+        console.log('=== CREAR ENTRADA INICIALIZADO ===');
 
-    // Al cambiar el vehículo → autocompletar cliente
-    $('#id_id_vehiculo').on('change', function () {
-        var vidStr = $(this).val();
-        if (!vidStr) return;
-        var clienteId = vehiculoClienteMap[vidStr];
-        if (clienteId) {
-            $('#id_id_cliente').val(clienteId).trigger('change');
-        }
-    });
+        // ── Mapa vehículo → cliente ──
+        var vehiculoClienteMap = {};
+        try {
+            var el = document.getElementById('vehiculo-cliente-map');
+            if (el) { vehiculoClienteMap = JSON.parse(el.textContent); }
+            console.log('Mapa cargado:', Object.keys(vehiculoClienteMap).length, 'registros');
+        } catch(e) { console.error('Error mapa:', e); }
 
-    // Modal para crear vehículo nuevo
-    $('#modal-id_vehiculo_entrada').on('show.bs.modal', function () {
-        var modal = $(this);
-        $.ajax({
-            url: "{% url 'apy:vehiculo_modal_crear' %}",
-            success: function (data) {
-                modal.find('.modal-body').html(data.html || data);
+        // ── Autocompletado vehículo → cliente ──
+        $(document).on('change', '#id_id_vehiculo', function() {
+            var vid = $(this).val();
+            if (!vid) { $('#id_id_cliente').val('').trigger('change'); return; }
+            var cid = vehiculoClienteMap[String(vid)];
+            if (cid) {
+                $('#id_id_cliente').val(cid).trigger('change');
+                console.log('Cliente autocompletado:', cid);
+            } else {
+                $('#id_id_cliente').val('').trigger('change');
             }
         });
-    });
-});
+
+        // Trigger inicial (modo edición)
+        if ($('#id_id_vehiculo').val()) {
+            $('#id_id_vehiculo').trigger('change');
+        }
+
+        // ── Cargar formulario al abrir modal ──
+        $('#modal-id_vehiculo').on('show.bs.modal', function() {
+            var $body = $(this).find('.modal-body');
+            $body.html(
+                '<div class="text-center p-4">' +
+                '<div class="spinner-border text-primary"></div>' +
+                '<p class="mt-2 text-muted">Cargando...</p></div>'
+            );
+            $.ajax({
+                url: "{% url 'apy:vehiculo_modal_crear' %}",
+                type: 'GET',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                success: function(response) {
+                    $body.html(response.html || response);
+                    console.log('Formulario vehículo cargado');
+                },
+                error: function(xhr) {
+                    $body.html('<div class="alert alert-danger">Error ' + xhr.status + '</div>');
+                }
+            });
+        });
+
+        // ── vehiculoCreado → actualizar select ──
+        $(document).on('vehiculoCreado', function(event, nuevoVehiculo) {
+            console.log('vehiculoCreado recibido en entrada:', nuevoVehiculo);
+            if (!nuevoVehiculo || !nuevoVehiculo.id) { return; }
+
+            var $sel = $('#id_id_vehiculo');
+            if (!$sel.length) { console.error('Select vehículo no encontrado'); return; }
+
+            // Agregar opción si no existe
+            if ($sel.find('option[value="' + nuevoVehiculo.id + '"]').length === 0) {
+                $sel.append(new Option(nuevoVehiculo.text, nuevoVehiculo.id, true, true));
+                console.log('Opción agregada:', nuevoVehiculo.text);
+            } else {
+                $sel.val(nuevoVehiculo.id);
+            }
+
+            // Actualizar mapa y autocompletar cliente
+            if (nuevoVehiculo.cliente_id) {
+                vehiculoClienteMap[String(nuevoVehiculo.id)] = nuevoVehiculo.cliente_id;
+            }
+
+            $sel.trigger('change');
+
+            if ($sel.data('select2')) { $sel.select2('close'); }
+
+            console.log('Select vehículo actualizado:', $sel.val());
+        });
+
+        // ════════════════════════════════════════════════════════════════════════════
+        // ✅ NUEVO: BOTÓN ABRIR MODAL VEHÍCULO DESDE ENTRADA
+        // ════════════════════════════════════════════════════════════════════════════
+        $(document).off('click', '#btnAbrirModalVehiculo')
+            .on('click', '#btnAbrirModalVehiculo', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                console.log('🔓 Abriendo modal vehículo desde entrada...');
+                $('#modal-id_vehiculo').modal('show');
+            });
+
+        console.log('=== LISTENERS REGISTRADOS OK ===');
+    }
+
+    // Ejecutar cuando el DOM esté listo
+    if (typeof $ !== 'undefined') {
+        $(document).ready(initEntrada);
+    } else {
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof $ !== 'undefined') { initEntrada(); }
+        });
+    }
+})();
 </script>
 
 {% endblock %}
+
 
 {% block Cancelar %}
     <button type="submit" class="btn btn-primary btn-flat">

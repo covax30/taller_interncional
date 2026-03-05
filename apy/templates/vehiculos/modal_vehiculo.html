@@ -1,18 +1,17 @@
 {% load widget_tweaks %} 
-{% block form %}
 
-    <div id="msg-vehiculo"></div>  {# Aquí se mostrarán los mensajes #}
+<div id="msg-vehiculo"></div>
 
-    <form id="vehiculoForm" method="post" action="{% url 'apy:vehiculo_modal_crear' %}">
-        {% csrf_token %}
+<form id="vehiculoForm" method="post" action="{% url 'apy:vehiculo_modal_crear' %}">
+    {% csrf_token %}
 
-        <!-- Campo Cliente con botón para abrir modal -->
+    <!-- Cliente -->
     <div class="form-group mb-3">
         <label for="{{ form.id_cliente.id_for_label }}">Id Cliente:</label>
         <div class="input-group">
             {{ form.id_cliente|add_class:'form-control'|attr:'autocomplete:off' }}
             <div class="input-group-append">
-                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_cliente" title="Agregar nuevo cliente">
+                <button type="button" class="btn btn-secondary" id="btnAbrirModalCliente" title="Agregar nuevo cliente">
                     <i class="fas fa-plus"></i>
                 </button>
             </div> 
@@ -26,13 +25,10 @@
         {% endif %}
     </div>
 
-     <!-- PLACA -->
+    <!-- PLACA -->
     <div class="form-group mb-3">
         <label for="{{ form.placa.id_for_label }}">Placa:</label>
-        <div class="input-group">
-            {{ form.placa|add_class:'form-control'|attr:'autocomplete:off' }}
-        </div>
-
+        {{ form.placa|add_class:'form-control'|attr:'autocomplete:off' }}
         {% if form.placa.errors %}
             <div class="invalid-feedback d-block">
                 {% for error in form.placa.errors %}
@@ -42,13 +38,10 @@
         {% endif %}
     </div>
 
-     <!-- Modelo vehiculo -->
+    <!-- Modelo -->
     <div class="form-group mb-3">
         <label for="{{ form.modelo_vehiculo.id_for_label }}">Modelo vehículo:</label>
-        <div class="input-group">
-            {{ form.modelo_vehiculo|add_class:'form-control'|attr:'autocomplete:off' }}
-        </div>
-
+        {{ form.modelo_vehiculo|add_class:'form-control'|attr:'autocomplete:off' }}
         {% if form.modelo_vehiculo.errors %}
             <div class="invalid-feedback d-block">
                 {% for error in form.modelo_vehiculo.errors %}
@@ -58,13 +51,10 @@
         {% endif %}
     </div>
 
-     <!-- Marca vehículo -->
+    <!-- Marca -->
     <div class="form-group mb-3">
         <label for="{{ form.marca_vehiculo.id_for_label }}">Marca vehículo:</label>
-        <div class="input-group">
-            {{ form.marca_vehiculo|add_class:'form-control'|attr:'autocomplete:off' }}
-        </div>
-
+        {{ form.marca_vehiculo|add_class:'form-control'|attr:'autocomplete:off' }}
         {% if form.marca_vehiculo.errors %}
             <div class="invalid-feedback d-block">
                 {% for error in form.marca_vehiculo.errors %}
@@ -74,13 +64,10 @@
         {% endif %}
     </div>
 
-     <!-- color -->
+    <!-- Color -->
     <div class="form-group mb-3">
         <label for="{{ form.color.id_for_label }}">Color:</label>
-        <div class="input-group">
-            {{ form.color|add_class:'form-control'|attr:'autocomplete:off' }}
-        </div>
-
+        {{ form.color|add_class:'form-control'|attr:'autocomplete:off' }}
         {% if form.color.errors %}
             <div class="invalid-feedback d-block">
                 {% for error in form.color.errors %}
@@ -90,90 +77,144 @@
         {% endif %}
     </div>
 </form>
-{% endblock %}
 
-{% block Cancelar %}
-    <button type="button" id="btnGuardarVehiculo" class="btn btn-primary btn-flat">
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" id="btnCancelarVehiculo">Cancelar</button>
+    <button type="button" id="btnGuardarVehiculo" class="btn btn-primary">
         <i class="fas fa-save"></i> Agregar
     </button>
-{% endblock %}
+</div>
 
- 
-
-{% block extra_js %}
 <script>
-/* ✅ Evita duplicar eventos (clave del arreglo) */
-$(document).off('click', '#btnGuardarVehiculo').on('click', '#btnGuardarVehiculo', function(e) {
-    e.preventDefault();
+// ════════════════════════════════════════════════════
+// CIERRE MANUAL — apunta directo a #modal-id_vehiculo
+// ════════════════════════════════════════════════════
+function cerrarModalVehiculo() {
+    var el = document.getElementById('modal-id_vehiculo');
+    if (!el) { console.warn('No se encontró #modal-id_vehiculo'); return; }
 
-    const $btn = $(this);
-    const $modal = $('#modal-id_vehiculo');
-    const $form = $modal.find('form#vehiculoForm');
+    el.classList.remove('show');
+    el.style.display = 'none';
+    el.setAttribute('aria-hidden', 'true');
+    el.removeAttribute('aria-modal');
 
-    if (!$form.length) {
-        console.error('No se encontró el formulario #vehiculoForm dentro del modal.');
-        return;
+    document.body.classList.remove('modal-open');
+    document.body.style.paddingRight = '';
+
+    var bds = document.querySelectorAll('.modal-backdrop');
+    for (var i = 0; i < bds.length; i++) {
+        bds[i].parentNode.removeChild(bds[i]);
     }
+    console.log('Modal #modal-id_vehiculo cerrado OK');
+}
 
-    const url = $form.attr('action');
-    const formData = new FormData($form[0]);
+$(document).ready(function() {
+    console.log('=== MODAL VEHÍCULO INICIALIZADO ===');
 
-    $btn.prop('disabled', true).addClass('disabled').text('Guardando...');
+    // ════════════════════════════════════════════════════════════════════════════
+    // BOTÓN CANCELAR
+    // ════════════════════════════════════════════════════════════════════════════
+    $(document).off('click', '#btnCancelarVehiculo').on('click', '#btnCancelarVehiculo', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('🔄 Cancelando modal vehículo...');
+        cerrarModalVehiculo();
+    });
 
-    $.ajax({
-        url: url,
-        type: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false,
-        headers: { 'X-Requested-With': 'XMLHttpRequest' },
-        success: function(data) {
-            if (data.success) {
-                // Mensaje de éxito
-                const $msg = $modal.find('#msg-vehiculo');
-                $msg.html('<div class="alert alert-success">' + data.message + '</div>');
+    // ════════════════════════════════════════════════════════════════════════════
+    // ✅ NUEVO: BOTÓN ABRIR MODAL CLIENTE DESDE VEHÍCULO
+    // ════════════════════════════════════════════════════════════════════════════
+    $(document).off('click', '#btnAbrirModalCliente').on('click', '#btnAbrirModalCliente', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        console.log('🔓 Abriendo modal cliente desde vehículo...');
+        
+        // El script en base.html detectará automáticamente que modal-id_vehiculo está visible
+        // y setteará data('caller') en consecuencia
+        $('#modal-id_cliente').modal('show');
+    });
 
-                // Actualizar select en la página principal
-                const $select = $('#id_id_vehiculo');
-                if ($select.find('option[value="' + data.id + '"]').length === 0) {
-                    const option = new Option(data.text, data.id, true, true);
-                    $select.append(option).val(data.id).trigger('change');
+    // ── BOTÓN GUARDAR ──
+    $(document).off('click', '#btnGuardarVehiculo').on('click', '#btnGuardarVehiculo', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        var $btn     = $(this);
+        var $form    = $('#vehiculoForm');
+        var $msgBox  = $('#msg-vehiculo');
+        var formData = new FormData($form[0]);
+
+        console.log('=== DATOS ENVIADOS ===');
+        formData.forEach(function(value, key) {
+            console.log(key + ': ' + value);
+        });
+
+        $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Guardando...');
+
+        $.ajax({
+            url: '{% url "apy:vehiculo_modal_crear" %}',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+
+            success: function(response) {
+                console.log('Respuesta servidor:', response);
+
+                if (response.success) {
+                    $msgBox.html('<div class="alert alert-success">' + response.message + '</div>');
+
+                    var clienteId = $('#id_id_cliente').val();
+
+                    $(document).trigger('vehiculoCreado', [{
+                        id:         response.id,
+                        text:       response.text,
+                        cliente_id: clienteId
+                    }]);
+                    console.log('Evento vehiculoCreado disparado ID:', response.id);
+
+                    // Cerrar modal después del mensaje
+                    setTimeout(function() {
+                        cerrarModalVehiculo();
+                    }, 1200);
+
                 } else {
-                    $select.val(data.id).trigger('change');
+                    var html = '<div class="alert alert-danger">';
+                    if (response.errors) {
+                        html += '<ul class="mb-0">';
+                        for (var field in response.errors) {
+                            var msg = response.errors[field][0];
+                            html += '<li><strong>' + field + ':</strong> ';
+                            html += (msg && msg.message) ? msg.message : msg;
+                            html += '</li>';
+                        }
+                        html += '</ul>';
+                    } else {
+                        html += (response.message || 'Error al crear vehículo');
+                    }
+                    html += '</div>';
+                    $msgBox.html(html);
                 }
+            },
 
-                // Cerrar el modal correctamente
-                $modal.modal('hide');
-                $modal.modal('hide');
-                $('body').removeClass('modal-open');
-                $('body').css('padding-right', '');
-                $('.modal-backdrop').remove();
-                $modal.removeClass('show');
-                $modal.css('display', 'none');
-            } else {
-                if (data.html) {
-                    $modal.find('.modal-body').html(data.html);
-                } else {
-                    $modal.find('#msg-vehiculo').html('<div class="alert alert-danger">' + data.message + '</div>');
-                }
+            error: function(xhr) {
+                console.error('Error AJAX:', xhr);
+                $msgBox.html('<div class="alert alert-danger">Error en el servidor.</div>');
+            },
+
+            complete: function() {
+                $btn.prop('disabled', false).html('<i class="fas fa-save"></i> Agregar');
             }
-        },
-        error: function(xhr, status, err) {
-            const $msg = $modal.find('#msg-vehiculo');
-            $msg.html('<div class="alert alert-danger">Error en el servidor. Revisa consola.</div>');
-            console.error('AJAX error:', status, err);
-        },
-        complete: function() {
-            $btn.prop('disabled', false).removeClass('disabled').text('Agregar');
-        }
+        });
+    });
+
+    // ── LIMPIAR al cerrar ──
+    $('#modal-id_vehiculo').on('hidden.bs.modal', function() {
+        $('#vehiculoForm')[0] && $('#vehiculoForm')[0].reset();
+        $('#msg-vehiculo').html('');
+        console.log('Form vehículo limpiado');
     });
 });
-
-/* ✅ Limpiar el formulario y mensajes al cerrar */
-$('#modal-id_vehiculo').on('hidden.bs.modal', function() {
-    const $form = $(this).find('form#vehiculoForm')[0];
-    if ($form) $form.reset();
-    $(this).find('#msg-vehiculo').html('');
-});
 </script>
-{% endblock %}

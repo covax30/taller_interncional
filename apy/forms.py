@@ -1064,7 +1064,7 @@ class VehiculoForm(ModelForm):
         widgets = {
             'id_cliente': Select(
                 attrs={
-                    'class': 'form-control foreign-key-field',  # ← Solo una clase
+                    'class': 'form-control foreign-key-field',
                 }
             ),
             'placa': TextInput(
@@ -1073,13 +1073,13 @@ class VehiculoForm(ModelForm):
                     'placeholder': 'Ingrese la placa del vehiculo (ej: ABC123) o (A1C234)',
                 }
             ),
-            'modelo_vehiculo': TextInput(
+            'modelo_vehiculo': TextInput(  # ← CORRECTO: coincide con el modelo
                 attrs={
                     'class': 'form-control',
                     'placeholder': 'Ingrese el modelo del vehiculo (ej: 2024)',
                 }
             ),
-            'marca_vehiculo': TextInput(
+            'marca_vehiculo': TextInput(  # ← CORRECTO: coincide con el modelo
                 attrs={
                     'class': 'form-control',
                     'placeholder': 'Ingrese la marca del vehiculo',
@@ -1100,10 +1100,11 @@ class VehiculoForm(ModelForm):
                 'required': 'La placa del vehiculo es obligatoria',
                 'unique': 'Ya existe un vehiculo con esa placa',
             },
-            'modelo_vehiculo': {
+            'modelo_vehiculo': {  # ← CORRECTO
                 'required': 'El modelo de vehiculo es obligatorio',
+                'invalid': 'El modelo debe tener 4 dígitos',
             },
-            'marca_vehiculo': {
+            'marca_vehiculo': {  # ← CORRECTO
                 'required': 'La marca del vehiculo es obligatoria',
             },
             'color': {

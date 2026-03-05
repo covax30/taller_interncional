@@ -1,4 +1,5 @@
 {% load widget_tweaks %}
+
 {% block form %}
 
 <div id="msg-entrada"></div>
@@ -11,7 +12,7 @@
         <label for="{{ form.id_vehiculo.id_for_label }}">Vehículo:</label>
         <div class="input-group" style="display:flex; flex-wrap:nowrap;">
             <div style="flex-grow:1;">
-                {{ form.id_vehiculo|add_class:'form-control' }}
+                {{ form.id_vehiculo|add_class:'form-control form-select' }}
             </div>
             <button type="button" class="btn btn-primary" id="btn-abrir-vehiculo-entrada">
                 <i class="fas fa-plus"></i>
@@ -24,7 +25,7 @@
         <label for="{{ form.id_cliente.id_for_label }}">Cliente:</label>
         <div class="input-group" style="display:flex; flex-wrap:nowrap;">
             <div style="flex-grow:1;">
-                {{ form.id_cliente|add_class:'form-control' }}
+                {{ form.id_cliente|add_class:'form-control form-select' }}
             </div>
             <button type="button" class="btn btn-primary" id="btn-abrir-cliente-entrada">
                 <i class="fas fa-plus"></i>
@@ -47,107 +48,292 @@
 </form>
 
 {# ── Modal Vehículo dentro de Entrada ── #}
-<div class="modal fade" id="modal-vehiculo-en-entrada" tabindex="-1">
+<div class="modal fade" id="modal-vehiculo-en-entrada" tabindex="-1" data-modal-level="2">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header d-flex justify-content-between align-items-center">
                 <h5 class="modal-title">Crear Vehículo</h5>
-                <button type="button" class="close" id="btn-cerrar-vehiculo-entrada"
-                    style="background:#dc3545;color:#fff;border:none;border-radius:50%;width:35px;height:35px;font-size:1.5rem;display:flex;justify-content:center;align-items:center;">
-                    <span>&times;</span>
-                </button>
+                <button type="button" class="btn-close" id="btn-cerrar-vehiculo-entrada" aria-label="Cerrar"></button>
             </div>
-            <div class="modal-body" id="body-vehiculo-entrada"></div>
+            <div class="modal-body" id="body-vehiculo-entrada">
+                <p class="text-muted"><i class="fas fa-spinner fa-spin"></i> Cargando formulario...</p>
+            </div>
         </div>
     </div>
 </div>
 
 {# ── Modal Cliente dentro de Entrada ── #}
-<div class="modal fade" id="modal-cliente-en-entrada" tabindex="-1">
+<div class="modal fade" id="modal-cliente-en-entrada" tabindex="-1" data-modal-level="2">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header d-flex justify-content-between align-items-center">
                 <h5 class="modal-title">Crear Cliente</h5>
-                <button type="button" class="close" id="btn-cerrar-cliente-entrada"
-                    style="background:#dc3545;color:#fff;border:none;border-radius:50%;width:35px;height:35px;font-size:1.5rem;display:flex;justify-content:center;align-items:center;">
-                    <span>&times;</span>
-                </button>
+                <button type="button" class="btn-close" id="btn-cerrar-cliente-entrada" aria-label="Cerrar"></button>
             </div>
-            <div class="modal-body" id="body-cliente-entrada"></div>
+            <div class="modal-body" id="body-cliente-entrada">
+                <p class="text-muted"><i class="fas fa-spinner fa-spin"></i> Cargando formulario...</p>
+            </div>
         </div>
     </div>
 </div>
 
-<script>
-$(document).ready(function () {
+{% endblock %}
 
-    // ── Abrir modal vehículo ──
-    $(document).on('click', '#btn-abrir-vehiculo-entrada', function () {
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    
+    console.log('✓ Entrada inicializado');
+    
+    // ═══════════════════════════════════════════════════════════════
+    // HELPER: Abrir modal (funciona con Bootstrap 4 y 5)
+    // ═══════════════════════════════════════════════════════════════
+    
+    function abrirModal($modal) {
+        try {
+            // Intenta Bootstrap 5
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                var bsModal = new bootstrap.Modal($modal[0]);
+                bsModal.show();
+                console.log('✓ Modal abierto (Bootstrap 5)');
+                return;
+            }
+        } catch (e) {
+            console.log('Bootstrap 5 no disponible, intentando 4...');
+        }
+        
+        // Fallback: Bootstrap 4 o jQuery
+        try {
+            $modal.modal('show');
+            console.log('✓ Modal abierto (Bootstrap 4/jQuery)');
+        } catch (e) {
+            console.error('No se pudo abrir modal:', e);
+        }
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // HELPER: Cerrar modal (funciona con Bootstrap 4 y 5)
+    // ═══════════════════════════════════════════════════════════════
+    
+    function cerrarModal($modal) {
+        try {
+            // Intenta Bootstrap 5
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                var bsModal = bootstrap.Modal.getInstance($modal[0]);
+                if (bsModal) {
+                    bsModal.hide();
+                    console.log('✓ Modal cerrado (Bootstrap 5)');
+                    return;
+                }
+            }
+        } catch (e) {
+            console.log('Bootstrap 5 no disponible, intentando 4...');
+        }
+        
+        // Fallback: Bootstrap 4 o jQuery
+        try {
+            $modal.modal('hide');
+            console.log('✓ Modal cerrado (Bootstrap 4/jQuery)');
+        } catch (e) {
+            console.error('No se pudo cerrar modal:', e);
+        }
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // EVENTO: CLIENTE CREADO
+    // ═══════════════════════════════════════════════════════════════
+    
+    $(document).on('clienteCreado', function(e, data) {
+        console.log('✓ clienteCreado recibido en entrada:', data);
+        
+        // Actualizar TODOS los selects de cliente
+        var $selects = $('select[id*="cliente"], select[name*="cliente"]');
+        
+        console.log('Selects encontrados:', $selects.length);
+        
+        $selects.each(function(index) {
+            var $select = $(this);
+            var selectId = $select.attr('id') || $select.attr('name');
+            
+            console.log('Actualizando select:', selectId);
+            
+            // Saltar si está oculto
+            if ($select.is(':hidden')) {
+                console.log('  → Ignorado (oculto)');
+                return;
+            }
+            
+            // Verificar si ya existe la opción
+            var existe = false;
+            $select.find('option').each(function() {
+                if ($(this).val() == data.id) {
+                    existe = true;
+                    return false;
+                }
+            });
+            
+            // Agregar opción si no existe
+            if (!existe) {
+                $select.append($('<option>', {
+                    value: data.id,
+                    text: data.text
+                }));
+                console.log('  → Opción agregada:', data.text);
+            } else {
+                console.log('  → Opción ya existe');
+            }
+            
+            // Seleccionar el valor
+            $select.val(data.id).trigger('change');
+            console.log('  → Seleccionado:', data.id);
+            
+            // Actualizar Select2 si existe
+            if ($select.data('select2')) {
+                $select.select2('close');
+                console.log('  → Select2 actualizado');
+            }
+        });
+        
+        console.log('✓ Todos los selects de cliente actualizados');
+    });
+    
+    // ═══════════════════════════════════════════════════════════════
+    // ABRIR MODAL VEHÍCULO
+    // ═══════════════════════════════════════════════════════════════
+    
+    $(document).on('click', '#btn-abrir-vehiculo-entrada', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        console.log('Abriendo modal vehículo...');
+        
+        var $modal = $('#modal-vehiculo-en-entrada');
+        var $body = $modal.find('.modal-body');
+        
+        $body.html('<p class="text-muted text-center"><i class="fas fa-spinner fa-spin me-2"></i>Cargando...</p>');
+        
         $.ajax({
             url: "{% url 'apy:vehiculo_modal_crear' %}",
+            type: 'GET',
+            timeout: 5000,
             success: function(data) {
-                $('#body-vehiculo-entrada').html(data.html || data);
-                $('#modal-id_entrada').modal('hide');
+                console.log('✓ Vehículo cargado');
+                $body.html(data.html || data);
+                
+                // Inicializar Select2
                 setTimeout(function() {
-                    $('#modal-vehiculo-en-entrada').modal('show');
-                }, 400);
+                    var $selects = $body.find('select');
+                    if ($selects.length > 0) {
+                        $selects.each(function() {
+                            try {
+                                $(this).select2({
+                                    theme: 'bootstrap-5',
+                                    width: '100%',
+                                    dropdownParent: $modal
+                                });
+                            } catch (e) {
+                                console.log('Select2 no disponible para este select');
+                            }
+                        });
+                    }
+                }, 100);
+            },
+            error: function(err) {
+                console.error('Error cargando vehículo:', err);
+                $body.html('<div class="alert alert-danger">Error cargando vehículo</div>');
             }
         });
+        
+        // Abrir modal
+        setTimeout(function() {
+            abrirModal($modal);
+        }, 500);
     });
-
-    // ── Abrir modal cliente ──
-    $(document).on('click', '#btn-abrir-cliente-entrada', function () {
+    
+    // ═══════════════════════════════════════════════════════════════
+    // CERRAR MODAL VEHÍCULO
+    // ═══════════════════════════════════════════════════════════════
+    
+    $(document).on('click', '#btn-cerrar-vehiculo-entrada', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        console.log('Cerrando modal vehículo');
+        cerrarModal($('#modal-vehiculo-en-entrada'));
+    });
+    
+    // ═══════════════════════════════════════════════════════════════
+    // ABRIR MODAL CLIENTE
+    // ═══════════════════════════════════════════════════════════════
+    
+    $(document).on('click', '#btn-abrir-cliente-entrada', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        console.log('Abriendo modal cliente...');
+        
+        var $modal = $('#modal-cliente-en-entrada');
+        var $body = $modal.find('.modal-body');
+        
+        $body.html('<p class="text-muted text-center"><i class="fas fa-spinner fa-spin me-2"></i>Cargando...</p>');
+        
         $.ajax({
             url: "{% url 'apy:cliente_modal_crear' %}",
+            type: 'GET',
+            timeout: 5000,
             success: function(data) {
-                $('#body-cliente-entrada').html(data.html || data);
-                $('#modal-id_entrada').modal('hide');
+                console.log('✓ Cliente cargado');
+                $body.html(data.html || data);
+                
+                // Inicializar Select2
                 setTimeout(function() {
-                    $('#modal-cliente-en-entrada').modal('show');
-                }, 400);
+                    var $selects = $body.find('select');
+                    if ($selects.length > 0) {
+                        $selects.each(function() {
+                            try {
+                                $(this).select2({
+                                    theme: 'bootstrap-5',
+                                    width: '100%',
+                                    dropdownParent: $modal
+                                });
+                            } catch (e) {
+                                console.log('Select2 no disponible para este select');
+                            }
+                        });
+                    }
+                }, 100);
+            },
+            error: function(err) {
+                console.error('Error cargando cliente:', err);
+                $body.html('<div class="alert alert-danger">Error cargando cliente</div>');
             }
         });
-    });
-
-    // ── Cerrar modal vehículo y volver a entrada ──
-    $(document).on('click', '#btn-cerrar-vehiculo-entrada', function () {
-        $('#modal-vehiculo-en-entrada').modal('hide');
+        
+        // Abrir modal
         setTimeout(function() {
-            $('#modal-id_entrada').modal('show');
-        }, 400);
+            abrirModal($modal);
+        }, 500);
     });
-
-    // ── Cerrar modal cliente y volver a entrada ──
-    $(document).on('click', '#btn-cerrar-cliente-entrada', function () {
-        $('#modal-cliente-en-entrada').modal('hide');
-        setTimeout(function() {
-            $('#modal-id_entrada').modal('show');
-        }, 400);
+    
+    // ═══════════════════════════════════════════════════════════════
+    // CERRAR MODAL CLIENTE
+    // ═══════════════════════════════════════════════════════════════
+    
+    $(document).on('click', '#btn-cerrar-cliente-entrada', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        console.log('Cerrando modal cliente');
+        cerrarModal($('#modal-cliente-en-entrada'));
     });
-
-    // ── Cuando se crea un vehículo, actualizar select de entrada ──
-    $(document).on('vehiculoCreado', function(e, data) {
-        var $select = $('#modal-id_entrada').find('#id_id_vehiculo, select[name="id_vehiculo"]').first();
-        if ($select.find('option[value="' + data.id + '"]').length === 0) {
-            $select.append(new Option(data.text, data.id, true, true));
-        }
-        $select.val(data.id).trigger('change');
-        $('#modal-vehiculo-en-entrada').modal('hide');
-        setTimeout(function() { $('#modal-id_entrada').modal('show'); }, 400);
-    });
-
-    // ── Cuando se crea un cliente, actualizar select de entrada ──
-    $(document).on('clienteCreado', function(e, data) {
-        var $select = $('#modal-id_entrada').find('#id_id_cliente, select[name="id_cliente"]').first();
-        if ($select.find('option[value="' + data.id + '"]').length === 0) {
-            $select.append(new Option(data.text, data.id, true, true));
-        }
-        $select.val(data.id).trigger('change');
-        $('#modal-cliente-en-entrada').modal('hide');
-        setTimeout(function() { $('#modal-id_entrada').modal('show'); }, 400);
-    });
-
+    
+    console.log('✓ Entrada handlers listos');
 });
 </script>
+{% endblock %}
 
+{% block Cancelar %}
+    <button type="button" id="btnGuardarEntrada" class="btn btn-primary btn-flat">
+        <i class="fas fa-save"></i> Agregar
+    </button>
 {% endblock %}
