@@ -3,428 +3,274 @@
 {% load static tz %} 
 
 {% block content %}
-<div class="container rounded mt-5 mb-5 shadow-sm pl-4 pr- bg-body">
-<div class="row"> 
-    <h3 class="text-primary mb-4">Gestión de Respaldos</h3>
-    <h4 class="text-primary mb-3">Estadísticas Rápidas</h4>
-    <div class="card mb-4 bg-light text-dark shadow-sm m-15">
-        <div class="card-body">
-            <div class="row align-items-center text-center">
-                <div class="col-sm-4 border-end">
-                    <i class="fas fa-save fa-2x text-primary"></i> 
-                    <span class="d-block mt-2">Programados:</span>
-                    <span class="font-weight-bold">{{ cantidad_programados|default:"0" }}</span>
-                </div>
-                <div class="col-sm-4 border-end">
-                    <i class="fas fa-hdd fa-2x text-danger"></i> 
-                    <span class="d-block mt-2">Espacio Ocupado:</span>
-                    <span class="font-weight-bold">{{ espacio_ocupado|default:"0 MB" }}</span>
-                </div>
-                <div class="col-sm-4">
-                    <i class="fas fa-clock fa-2x text-success"></i> 
-                    <span class="d-block mt-2">Último Éxito:</span>
-                    <span class="font-weight-bold">{{ ultimo_backup_fecha|default:"N/A"|date:"d/m/Y H:i" }}</span>
+<div class="container rounded mt-5 mb-5 shadow-sm pl-4 pr-4 bg-body">
+    <div class="row"> 
+        <h3 class="text-primary mb-4">Gestión de Respaldos</h3>
+        
+        <h4 class="text-primary mb-3">Estadísticas Rápidas</h4>
+        <div class="card mb-4 bg-light text-dark shadow-sm">
+            <div class="card-body">
+                <div class="row align-items-center text-center">
+                    <div class="col-sm-4 border-end">
+                        <i class="fas fa-save fa-2x text-primary"></i> 
+                        <span class="d-block mt-2">Programados:</span>
+                        <span class="font-weight-bold">{{ cantidad_programados|default:"0" }}</span>
+                    </div>
+                    <div class="col-sm-4 border-end">
+                        <i class="fas fa-hdd fa-2x text-danger"></i> 
+                        <span class="d-block mt-2">Espacio Ocupado:</span>
+                        <span class="font-weight-bold">{{ espacio_ocupado|default:"0 MB" }}</span>
+                    </div>
+                    <div class="col-sm-4">
+                        <i class="fas fa-clock fa-2x text-success"></i> 
+                        <span class="d-block mt-2">Último Éxito:</span>
+                        <span class="font-weight-bold">{{ ultimo_backup_fecha|default:"N/A"|date:"d/m/Y H:i" }}</span>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="col-md-6 mb-4">
-        <h4 class="text-primary mb-3">Respaldo Manual</h4>
-        <div class="card shadow">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0"><i class="fas fa-cloud-upload-alt"></i> Generar Respaldo Ahora</h5>
-            </div>
-            <div class="card-body">
-                <form method="POST" action="{% url 'backup_module:backup_ejecutar' %}">
-                    {% csrf_token %} 
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-check mb-4 mt-3">
-                                <input class="form-check-input" type="checkbox" id="incluirDB" name="incluirDB" checked>
-                                <label class="form-check-label" for="incluirDB">Incluir Base de Datos</label>
+        <div class="col-md-6 mb-4">
+            <h4 class="text-primary mb-3">Respaldo Manual</h4>
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-cloud-upload-alt"></i> Generar Respaldo Ahora</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{% url 'backup_module:backup_ejecutar' %}">
+                        {% csrf_token %} 
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-check mb-4 mt-3">
+                                    <input class="form-check-input" type="checkbox" id="incluirDB" name="incluirDB" checked>
+                                    <label class="form-check-label" for="incluirDB">Incluir Base de Datos (Recomendado)</label>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-
+                        <div class="form-floating mb-4">
+                            <select class="form-select" id="ubicacion" name="ubicacion" required>
+                                <option value="local">Servidor Local</option>
+                            </select>
+                            <label for="ubicacion">Destino del Respaldo</label>
                         </div>
-                    </div>
-                    
-                    <div class="form-floating mb-4">
-                        <select class="form-select" id="ubicacion" name="ubicacion" required>
-                            <option value="local">Servidor Local</option>
-                        </select>
-                        <label for="ubicacion">Destino del Respaldo</label>
-                    </div>
-                    
-                    <div class="text-center mt-3">
-                        <button type="submit" class="btn btn-success btn-lg w-100">
-                            <i class="fas fa-save"></i> Generar Respaldo Ahora
+                        <div class="text-center mt-3">
+                            <button type="submit" class="btn btn-success btn-lg w-100">
+                                <i class="fas fa-save"></i> Iniciar Proceso de Respaldo
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4" >
+            <h4 class="text-primary mb-3">Programación Automática</h4>
+            <div class="card shadow mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-clock"></i> Configuración de Tareas</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{% url 'backup_module:backup_configurar' %}"> 
+                        {% csrf_token %}
+                        <div class="form-floating mb-4">
+                            <select class="form-select" id="frecuencia" name="frecuencia" disabled>
+                                <option value="diario">Diario</option>
+                                <option value="semanal" selected>Semanal</option>
+                                <option value="mensual">Mensual</option>
+                                <option value="inactivo">Desactivado</option>
+                            </select>
+                            <label for="frecuencia">Frecuencia de Respaldo</label>
+                        </div>
+                        <div class="form-floating mb-4">
+                            <input type="time" class="form-control" id="hora" name="hora" value="03:00" disabled>
+                            <label for="hora">Hora de Ejecución (HH:MM)</label>
+                        </div>
+                        <button type="submit" class="btn btn-info w-100" disabled>
+                            <i class="fas fa-tools"></i> Próximamente disponible
                         </button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
-    
-    <div class="col-md-6 mb-4" >
-        <h4 class="text-primary mb-3">Programacion automatica</h4>
         
-        <div class="card shadow mb-4">
-            <div class="card-header bg-info text-white">
-                <h5 class="mb-0"><i class="fas fa-clock"></i> funcion pendiente</h5>
-            </div>
-            <div class="card-body">
-                <form method="POST" action="{% url 'backup_module:backup_configurar' %}"> 
-                    {% csrf_token %}
-                    
-                    <div class="form-floating mb-4" disabled>
-                        <select class="form-select" id="frecuencia" name="frecuencia" required>
-                            <option value="diario">Diario</option>
-                            <option value="semanal" selected>Semanal</option>
-                            <option value="mensual">Mensual</option>
-                            <option value="inactivo">Desactivado</option>
-                        </select>
-                        <label for="frecuencia">Frecuencia de Respaldo</label>
-                    </div>
-                    
-                    <div class="form-floating mb-4">
-                        <input type="time" class="form-control" id="hora" name="hora" value="03:00" required>
-                        <label for="hora">Hora de Ejecución (HH:MM)</label>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-info w-100" disabled>
-                        <i class="fas fa-tools"></i> Guardar Programación - proximamente
-                    </button>
-                </form>
-            </div>
+        <div class="col-md-12 mb-4">
+            <h4 class="text-primary mb-3">Archivos Externos</h4>
+            <div class="card shadow"> 
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-upload"></i> Subir Respaldo Externo</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Agregue archivos `.sql`, `.gz` o `.zip` para restauración externa.</p>
+                    <form method="POST" action="{% url 'backup_module:subir_respaldo' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-group mb-3">
+                            <input type="file" class="form-control" id="archivo_restauracion" name="archivo_restauracion" accept=".sql,.gz,.zip" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-3 w-100">
+                            <i class="fas fa-file-upload"></i> Subir y Registrar
+                        </button>
+                    </form>
+                </div>
+            </div> 
         </div>
-    </div>
-    
-    <div class="col-md-12 mb-4">
-        <h4 class="text-primary mb-3">Archivos Externos</h4>
-        <div class="card shadow"> <div class="card-header bg-warning text-dark">
-                <h5 class="mb-0"><i class="fas fa-upload"></i> Subir Respaldo Externo</h5>
-            </div>
-            <div class="card-body">
-                <p class="card-text">Agregue archivos `.sql`, `.gz` o `.zip` para restauración.</p>
-                <form method="POST" action="{% url 'backup_module:subir_respaldo' %}" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    
-                    <div class="form-group mb-3">
-                        <label for="archivo_restauracion" class="form-label">Archivo de respaldo:</label>
-                        <input type="file" class="form-control" id="archivo_restauracion" name="archivo_restauracion" accept=".sql,.gz,.zip" required>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary mt-3 w-100">
-                        <i class="fas fa-file-upload"></i> Subir Archivo
-                    </button>
-                </form>
-            </div>
-        </div> </div>
-    
-    <div class="col-md-12 mb-4">
-        <h3 class="text-primary mb-4 center">Historial de Copias de Seguridad</h3>
         
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table id="backupTable" class="table table-striped table-hover w-100">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Fecha y Hora</th>
-                                <th>Fin</th>
-                                <th>Tipo</th>
-                                <th>Estado</th>
-                                <th>Tamaño</th>
-                                <th>Ejecutado por</th> 
-                                <th data-orderable="false">Acciones</th> 
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for log in historial_respaldos %} 
-                            <tr>
-                                <td>{{ log.pk }}</td> <td>{{ log.fecha_inicio|date:"d/m/Y H:i" }}</td> 
-                                <td>{{ log.fecha_fin|default:"N/A"|date:"H:i" }}</td>
-                                <td>{{ log.tipo }}</td>
-                                <td>
-                                    {% if log.estado == 'Éxito' %}
-                                        <span class="badge bg-success">Éxito</span>
-                                    {% elif log.estado == 'Fallo' %}
-                                        <span class="badge bg-danger">Fallo</span>
-                                    {% else %}
-                                        <span class="badge bg-warning text-dark">En Proceso</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if log.tamaño_mb %}
-                                        {{ log.tamaño_mb|floatformat:2 }} MB
-                                    {% else %}
-                                        N/A
-                                    {% endif %}
-                                </td>
-                                <td>{{ log.usuario.username|default:"Sistema" }}</td> 
-                                <td>
-                                    {% if log.estado == 'Éxito' or log.estado == 'Fallo' %}
-
-                                        <a href="{% url 'backup_module:backup_descargar' log.pk %}" class="btn btn-sm btn-info me-1" title="Descargar" {% if log.estado == 'Fallo' %}disabled{% endif %}>
-                                            <i class="fas fa-download"></i>
-                                        </a>
-                                        
+        <div class="col-md-12 mb-4">
+            <h3 class="text-primary mb-4 text-center">Historial de Copias de Seguridad</h3>
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="backupTable" class="table table-striped table-hover w-100">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Fecha y Hora</th>
+                                    <th>Fin</th>
+                                    <th>Tipo</th>
+                                    <th>Estado</th>
+                                    <th>Tamaño</th>
+                                    <th>Ejecutado por</th> 
+                                    <th data-orderable="false">Acciones</th> 
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in historial_respaldos %} 
+                                <tr>
+                                    <td>{{ log.pk }}</td> 
+                                    <td>{{ log.fecha_inicio|date:"d/m/Y H:i" }}</td> 
+                                    <td>{{ log.fecha_fin|default:"N/A"|date:"H:i" }}</td>
+                                    <td>{{ log.tipo }}</td>
+                                    <td>
                                         {% if log.estado == 'Éxito' %}
-                                            <form method="POST" action="{% url 'backup_module:backup_restaurar' log.pk %}" style="display:inline;" 
-                                                onsubmit="return confirm('⚠️ ADVERTENCIA CRÍTICA: ¿Estás ABSOLUTAMENTE SEGURO de que quieres restaurar el sistema a este punto ({{ log.fecha_inicio|date:"d/m/Y H:i" }})? Esto REEMPLAZARÁ TODOS los datos actuales. ¡Esta acción es irreversible!');">
+                                            <span class="badge bg-success">Éxito</span>
+                                        {% elif log.estado == 'Fallo' %}
+                                            <span class="badge bg-danger">Fallo</span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark">En Proceso</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ log.tamaño_mb|floatformat:2|default:"N/A" }} MB</td>
+                                    <td>{{ log.usuario.username|default:"Sistema" }}</td> 
+                                    <td>
+                                        {% if log.estado != 'En Proceso' %}
+                                            <a href="{% url 'backup_module:backup_descargar' log.pk %}" class="btn btn-sm btn-info me-1" title="Descargar" {% if log.estado == 'Fallo' %}style="pointer-events: none; opacity: 0.5;"{% endif %}>
+                                                <i class="fas fa-download"></i>
+                                            </a>
+                                            
+                                            {% if log.estado == 'Éxito' %}
+                                                <form method="POST" action="{% url 'backup_module:backup_restaurar' log.pk %}" style="display:inline;" onsubmit="return confirm('⚠️ ADVERTENCIA CRÍTICA: ¿Estás ABSOLUTAMENTE SEGURO de restaurar el sistema a este punto?');">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm btn-warning me-1" title="Restaurar"><i class="fas fa-undo-alt"></i></button>
+                                                </form>
+                                            {% endif %}
+
+                                            <form method="POST" action="{% url 'backup_module:backup_eliminar' log.pk %}" style="display:inline;" onsubmit="return confirm('¿Eliminar respaldo #{{ log.pk }}?');">
                                                 {% csrf_token %}
-                                                <button type="submit" class="btn btn-sm btn-warning me-1" title="Restaurar Sistema">
-                                                    <i class="fas fa-undo-alt"></i>
-                                                </button>
+                                                <button type="submit" class="btn btn-sm btn-danger" title="Eliminar"><i class="fas fa-trash"></i></button>
                                             </form>
                                         {% else %}
-                                            <button type="button" class="btn btn-sm btn-warning me-1" title="Restaurar no disponible" disabled>
-                                                <i class="fas fa-undo-alt"></i>
-                                            </button>
+                                            <button class="btn btn-sm btn-secondary" disabled><i class="fas fa-spinner fa-spin"></i></button>
                                         {% endif %}
-                                        
-                                        <form method="POST" action="{% url 'backup_module:backup_eliminar' log.pk %}" style="display:inline;" 
-                                            onsubmit="return confirm('¿Estás seguro de que quieres eliminar el respaldo #{{ log.pk }}? Esta acción es irreversible.');">
-                                            {% csrf_token %}
-                                            {# Añadimos me-1 para el espacio antes del botón de Drive #}
-                                            <button type="submit" class="btn btn-sm btn-danger me-1" title="Eliminar Respaldo"> 
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
-                                        
-                                        {% if log.estado == 'Éxito' %}
-                                            {# ✅ BOTÓN: SUBIR A GOOGLE DRIVE (Detrás de Eliminar) #}
-                                            <form method="POST" action="{% url 'backup_module:backup_subir_drive' log.pk %}" style="display:inline;" 
-                                                onsubmit="return confirm('¿Está seguro que desea subir el respaldo #{{ log.pk }} a Google Drive?');">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-sm btn-primary" title="Subir a Google Drive">
-                                                    <i class="fab fa-google-drive"></i>
-                                                </button>
-                                            </form>
-                                        {% endif %}
-
-                                    {% else %}
-                                        <button type="button" class="btn btn-sm btn-secondary" title="No Disponible" disabled>
-                                            <i class="fas fa-ban"></i>
-                                        </button>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="8" class="text-center text-muted">Aún no hay respaldos registrados.</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-</div>  
+
 <style>
-/* =======================================================
-SOLUCIÓN: SINCRONIZACIÓN DE DATATABLES CON TEMA OSCURO
-======================================================= */
-/* Sobrescribe los colores de texto cuando el tema oscuro está activo */
+/* Sincronización con Tema Oscuro de AdminLTE */
 html[data-bs-theme="dark"] .dataTables_wrapper .dataTables_length,
 html[data-bs-theme="dark"] .dataTables_wrapper .dataTables_filter,
 html[data-bs-theme="dark"] .dataTables_wrapper .dataTables_info,
-html[data-bs-theme="dark"] .dataTables_wrapper .dataTables_processing,
 html[data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate,
 html[data-bs-theme="dark"] .dataTable { 
-    color: #c2c7d0 !important; /* Texto claro de AdminLTE Dark */
+    color: #c2c7d0 !important; 
 }
-
-/* Sobrescribe el color del campo de búsqueda a blanco en tema oscuro */
 html[data-bs-theme="dark"] .dataTables_filter input {
-    background-color: #343a40 !important; /* Fondo oscuro de AdminLTE */
-    color: #c2c7d0 !important;              /* Texto claro */
-    border-color: #454d55 !important;
+    background-color: #343a40 !important;
+    color: #fff !important;
+    border: 1px solid #4b545c;
 }
 </style>
 
 <script>
-    // ----------------------------------------------------------------------------------
-    // 🚨 PASO 1: DEFINIR URLs DE DJANGO PARA USO EN AJAX (VARIABLE GLOBAL) 🚨
-    // ----------------------------------------------------------------------------------
+    // Configuración de URLs para el Polling JS
     const urlEndpoints = {
-        // Usamos '0' como marcador de posición para el PK, luego lo eliminamos para obtener la base.
-        descargar: "{% url 'backup_module:backup_descargar' 0 %}".replace('/0/', '/'),
-        restaurar: "{% url 'backup_module:backup_restaurar' 0 %}".replace('/0/', '/'),
-        eliminar: "{% url 'backup_module:backup_eliminar' 0 %}".replace('/0/', '/'),
-        subir_drive: "{% url 'backup_module:backup_subir_drive' 0 %}".replace('/0/', '/'), 
+        descargar: "{% url 'backup_module:backup_descargar' 0 %}".replace('0', ''),
+        restaurar: "{% url 'backup_module:backup_restaurar' 0 %}".replace('0', ''),
+        eliminar: "{% url 'backup_module:backup_eliminar' 0 %}".replace('0', ''),
     };
     
-    // Variable global para la instancia de DataTables
     let logTable; 
 
-    document.addEventListener('DOMContentLoaded', function() {
-        // ... (Tu código de manejo de clases y alertas) ...
-        var formFields = document.querySelectorAll('.form-floating input, .form-floating select, .form-control-file');
-        formFields.forEach(function(field) {
-            if (!field.classList.contains('form-control') && !field.classList.contains('form-select') && field.type !== 'checkbox') {
-                field.classList.add('form-control'); 
+    $(document).ready(function() {
+        // Inicialización de DataTable
+        if ($.fn.DataTable.isDataTable('#backupTable')) {
+            $('#backupTable').DataTable().destroy();
+        }
+
+        logTable = $('#backupTable').DataTable({ 
+            responsive: true,
+            autoWidth: false,
+            order: [[ 0, "desc" ]], 
+            pageLength: 10,
+            language: {
+                url: "{% static 'lenguajes/espanol.json' %}" 
             }
         });
-        
-        document.getElementById('ubicacion').classList.add('form-select');
-        document.getElementById('frecuencia').classList.add('form-select');
-        document.getElementById('incluirDB').classList.add('form-check-input');
-        document.getElementById('incluirArchivos').classList.add('form-check-input');
 
-        // 🚨 INICIALIZACIÓN DE DATATABLE PRINCIPAL 🚨
-        if (typeof $.fn.DataTable !== 'undefined') {
-            logTable = $('#backupTable').DataTable({ 
-                responsive: true,
-                order: [[ 0, "desc" ]], 
-                pageLength: 50, 
-                lengthMenu: [
-                    [10, 25, 50, -1],
-                    [10, 25, 50, "Todo"]
-                ],
-                language: {
-                    url: "{% static 'lenguajes/espanol.json' %}" 
-                }
-            });
-        }
-        
-        // 🚨 CÓDIGO PARA CONVERTIR ALERTAS DE DJANGO A POPUPS 🚨
-        const alertContainer = document.getElementById('django-alerts-root');
-        
-        if (alertContainer) {
-            const alerts = alertContainer.querySelectorAll('.alert');
-            
-            alerts.forEach(alert => {
-                const tagsMatch = alert.className.match(/alert-(success|error|warning|info)/);
-                const type = tagsMatch ? tagsMatch[1] : 'info';
-                let message = alert.textContent.replace('×', '').trim();
-                
-                if (typeof showCustomAlert === 'function') { 
-                    showCustomAlert(type, message);
-                } else {
-                    console.warn(`Función showCustomAlert no definida. La alerta solo se verá como barra de Bootstrap.`);
-                }
-            });
-
-            alertContainer.style.display = 'none';
-        }
-    });
-</script>
-
-<script>
-    $(document).ready(function() {
-        // ----------------------------------------------------
-        // FUNCIÓN DE ACTUALIZACIÓN ASÍNCRONA (POLLING)
-        // ----------------------------------------------------
+        // Función de Polling (Actualización automática)
         function actualizarEstadoLogs() {
-            if (!logTable) {
-                console.warn("DataTables no inicializado. Cancelando polling.");
-                return;
-            }
-            
-            const apiUrl = "{% url 'backup_module:logs_estado_api' %}";
-            
-            // Obtenemos el token CSRF
-            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value; 
-            
-            // 🚨 Obtener la instancia de DataTables para asegurar que existe
-            const currentLogTable = $('#backupTable').DataTable({ retrieve: true }); 
-            
             $.ajax({
-                url: apiUrl,
+                url: "{% url 'backup_module:logs_estado_api' %}",
                 method: 'GET',
-                dataType: 'json',
                 success: function(response) {
                     if (response.logs) {
-                        // 1. Limpiar la tabla de DataTables
-                        currentLogTable.clear();
-                        
-                        // 2. Insertar los nuevos datos
+                        logTable.clear();
                         response.logs.forEach(function(log) {
-                            
-                            // 💡 Función para generar el badge de estado
-                            function getStatusBadge(estado) {
-                                let className = 'badge bg-secondary';
-                                if (estado === 'Éxito') className = 'badge bg-success';
-                                else if (estado === 'Fallo') className = 'badge bg-danger';
-                                else if (estado === 'En Proceso') className = 'badge bg-warning text-dark';
-                                else if (estado === 'Éxito con advertencias') className = 'badge bg-info text-dark';
-                                return `<span class="${className}">${estado}</span>`;
-                            }
+                            let badge = `<span class="badge bg-secondary">${log.estado}</span>`;
+                            if (log.estado === 'Éxito') badge = `<span class="badge bg-success">Éxito</span>`;
+                            else if (log.estado === 'Fallo') badge = `<span class="badge bg-danger">Fallo</span>`;
+                            else if (log.estado === 'En Proceso') badge = `<span class="badge bg-warning text-dark"><i class="fas fa-spinner fa-spin"></i> En Proceso</span>`;
 
-                            // ----------------------------------------------------------------------
-                            // 3. Crear el HTML de las Acciones (Descargar, Restaurar, Eliminar, Google Drive)
-                            // ----------------------------------------------------------------------
-                            let accionesHtml = '';
-
-                            if (log.estado === 'Éxito' || log.estado === 'Fallo') {
-                                const disableDownload = log.estado === 'Fallo' ? 'disabled' : '';
-                                
-                                // 💡 DESCARGA (Position 1)
-                                const urlDescargar = urlEndpoints.descargar + log.pk + '/';
-                                accionesHtml += `<a href="${urlDescargar}" class="btn btn-sm btn-info me-1" title="Descargar" ${disableDownload}><i class="fas fa-download"></i></a>`;
-                                
-                                // Formulario de Restaurar (Position 2)
+                            let acciones = '';
+                            if (log.estado !== 'En Proceso') {
+                                acciones = `<a href="${urlEndpoints.descargar}${log.pk}" class="btn btn-sm btn-info me-1"><i class="fas fa-download"></i></a>`;
                                 if (log.estado === 'Éxito') {
-                                    const urlRestaurar = urlEndpoints.restaurar + log.pk + '/';
-                                    accionesHtml += `<form method="POST" action="${urlRestaurar}" style="display:inline;" onsubmit="return confirm('⚠️ ADVERTENCIA CRÍTICA: ¿Estás ABSOLUTAMENTE SEGURO de que quieres restaurar el sistema a este punto?');"><input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}"><button type="submit" class="btn btn-sm btn-warning me-1" title="Restaurar Sistema"><i class="fas fa-undo-alt"></i></button></form>`;
-                                } else {
-                                    // Botón Restaurar deshabilitado si no es Éxito
-                                    accionesHtml += `<button type="button" class="btn btn-sm btn-warning me-1" title="Restaurar no disponible" disabled><i class="fas fa-undo-alt"></i></button>`;
+                                    acciones += `<form method="POST" action="${urlEndpoints.restaurar}${log.pk}" style="display:inline;">{% csrf_token %}<button class="btn btn-sm btn-warning me-1"><i class="fas fa-undo-alt"></i></button></form>`;
                                 }
-
-                                // 🛑 ELIMINAR (Position 3) - Añadimos me-1 para el espacio antes del botón de Drive
-                                const urlEliminar = urlEndpoints.eliminar + log.pk + '/';
-                                accionesHtml += `<form method="POST" action="${urlEliminar}" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que quieres eliminar el respaldo #${log.pk}? Esta acción es irreversible.');"><input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}"><button type="submit" class="btn btn-sm btn-danger me-1" title="Eliminar Respaldo"><i class="fas fa-trash"></i></button></form>`;
-                                
-                                // ✅ MOVIDO: Formulario de Subir a Google Drive (Position 4, último)
-                                if (log.estado === 'Éxito') {
-                                    const urlSubirDrive = urlEndpoints.subir_drive + log.pk + '/';
-                                    accionesHtml += `<form method="POST" action="${urlSubirDrive}" style="display:inline;" onsubmit="return confirm('¿Está seguro que desea subir el respaldo #${log.pk} a Google Drive?');"><input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}"><button type="submit" class="btn btn-sm btn-primary" title="Subir a Google Drive"><i class="fab fa-google-drive"></i></button></form>`;
-                                }
-
+                                acciones += `<form method="POST" action="${urlEndpoints.eliminar}${log.pk}" style="display:inline;">{% csrf_token %}<button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button></form>`;
                             } else {
-                                // Estado "En Proceso" o desconocido
-                                accionesHtml = `<button type="button" class="btn btn-sm btn-secondary"><i class="fas fa-ban"></i></button>`;
+                                acciones = `<button class="btn btn-sm btn-secondary" disabled><i class="fas fa-ban"></i></button>`;
                             }
-                            
-                            const tamanio = log.tamaño_mb ? `${log.tamaño_mb} MB` : 'N/A';
 
-                            // 4. Agregar la fila a la tabla (8 columnas en total)
-                            currentLogTable.row.add([
-                                log.pk, // 0. ID
-                                log.fecha_inicio, // 1. Fecha y Hora Inicio
-                                log.fecha_fin, // 2. Fecha Fin
-                                log.tipo, // 3. Tipo
-                                getStatusBadge(log.estado), // 4. Estado con Badge
-                                tamanio, // 5. Tamaño
-                                log.usuario, // 6. Ejecutado por
-                                accionesHtml, // 7. Acciones (Botones)
+                            logTable.row.add([
+                                log.pk,
+                                log.fecha_inicio,
+                                log.fecha_fin,
+                                log.tipo,
+                                badge,
+                                log.tamaño_mb ? log.tamaño_mb + ' MB' : 'N/A',
+                                log.usuario,
+                                acciones
                             ]);
                         });
-                        
-                        // 4. Redibujar la tabla manteniendo la paginación y el filtro
-                        currentLogTable.draw(false); 
+                        logTable.draw(false);
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error("Error al obtener estado de logs:", error);
                 }
             });
         }
 
-        // Ejecutar la actualización cada 5 segundos (5000 milisegundos)
-        setInterval(actualizarEstadoLogs, 5000); 
+        // Ejecutar polling cada 7 segundos para no saturar el servidor
+        setInterval(actualizarEstadoLogs, 7000);
     });
 </script>
 
 <script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
 <script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
-    
 {% endblock content %}
