@@ -1,4 +1,5 @@
 from builtins import Exception, int, property, sum, super
+from locale import str
 
 from django.utils import timezone
 
@@ -47,8 +48,15 @@ def validar_monto(value):
 
     monto = float(s)
 
-    if monto < 99:
-        raise ValidationError('El monto debe ser mayor o igual a 99')
+    if monto < 1000:
+        raise ValidationError('El monto debe ser mayor o igual a 1000')
+    
+def validar_stock(value):
+    s = str(value).strip()
+    stock = int(s)
+
+    if stock <= 0:
+        raise ValidationError('El stock debe ser un número válido (entero) mayor a 0')
 
 placa_regex = RegexValidator(
         regex=r'^[A-Z0-9]{6}$',
@@ -133,8 +141,8 @@ class Repuesto(models.Model):
         ('industrial', 'Industrial'),
     ]
     categoria = models.CharField(max_length=100, choices=CATEGORIA_OPCIONES)
-    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
-    stock = models.PositiveIntegerField(default=0, verbose_name="Stock disponible")  # ← NUEVO
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2,validators=[validar_monto])
+    stock = models.PositiveIntegerField(verbose_name="Stock disponible", validators=[validar_stock])  # ← NUEVO
     stock_minimo = models.PositiveIntegerField(default=1, verbose_name="Stock mínimo")  # ← NUEVO
     estado = models.BooleanField(default=True)
 
@@ -161,7 +169,7 @@ class Herramienta(models.Model):
     ]
     tipo = models.CharField(max_length=100, choices=TIPO_OPCIONES)
     id_marca = models.ForeignKey(Marca, on_delete=models.PROTECT)
-    stock = models.PositiveIntegerField(default=0, verbose_name="Stock disponible")  # ← NUEVO
+    stock = models.PositiveIntegerField(verbose_name="Stock disponible", validators=[validar_stock])  # ← NUEVO
     stock_minimo = models.PositiveIntegerField(default=2, verbose_name="Stock mínimo")  # ← NUEVO
     estado = models.BooleanField(default=True)
 
@@ -189,7 +197,7 @@ class Insumos(models.Model):
         ('unidades', 'Unidades'),
     ]
     cantidad = models.CharField(max_length=20, choices=CANTIDAD_OPCIONES)
-    stock = models.PositiveIntegerField(default=0, verbose_name="Stock disponible")  # ← NUEVO
+    stock = models.PositiveIntegerField(verbose_name="Stock disponible", validators=[validar_stock])  # ← NUEVO
     stock_minimo = models.PositiveIntegerField(default=5, verbose_name="Stock mínimo")  # ← NUEVO
     estado = models.BooleanField(default=True)
 
@@ -267,18 +275,52 @@ class Cliente(models.Model):
     ]
     tipo = models.CharField(max_length=20, choices=TIPO_CLIENTE)
     nombre = models.CharField(max_length=255, verbose_name="Nombre/Razón Social")
+    DOCUMENT_CHOICES = [
+        ('CC', 'Cédula de Ciudadanía'),
+        ('CE', 'Cédula de Extranjería'),
+        ('NIT', 'NIT'),
+        ('TI', 'Tarjeta de Identidad'),
+        ('RC', 'Registro Civil'),
+        ('PAS', 'Pasaporte'),
+        ('PPT', 'Permiso por Protección Temporal'),
+    ]
+    tipo_identificacion = models.CharField(choices=DOCUMENT_CHOICES, max_length=5)
     identificacion = models.CharField(
-        max_length=50, 
+        max_length=20, 
         unique=True, 
-        verbose_name="Documento/NIT", 
-        validators=[validar_identificacion], 
-        blank=False, 
-        null=False 
     )
-    telefono = models.CharField(max_length=20)
+    telefono = models.CharField(max_length=20, validators=[validar_telefono])
     correo = models.EmailField(validators=[validar_email], unique=True)
     direccion = models.TextField(verbose_name="Dirección")
     estado = models.BooleanField(default=True, verbose_name="Activo")
+    
+    def clean(self):
+        """
+        Este método se ejecuta antes de guardar los datos.
+        Valida la identificación dependiendo del tipo seleccionado.
+        """
+        super().clean()
+        
+        # Obtenemos los valores y limpiamos espacios
+        tipo = self.tipo_identificacion
+        valor = str(self.identificacion).strip().upper()
+
+        # Diccionario de Reglas: { 'TIPO': (Regex, Mensaje) }
+        reglas = {
+            'CC': (r'^\d{5,10}$', 'La Cédula de Ciudadanía debe tener entre 5 y 10 dígitos numéricos.'),
+            'CE': (r'^\d{3,9}$', 'La Cédula de Extranjería debe tener hasta 9 dígitos numéricos.'),
+            'NIT': (r'^\d{7,10}-\d{1}$', 'El NIT debe seguir el formato 123456789-0.'),
+            'TI': (r'^\d{10,11}$', 'La Tarjeta de Identidad debe tener 10 u 11 dígitos numéricos.'),
+            'RC': (r'^\d{10,11}$', 'El Registro Civil debe tener 10 u 11 dígitos numéricos.'),
+            'PAS': (r'^[A-Z0-9]{5,20}$', 'El Pasaporte debe tener entre 5 y 20 caracteres alfanuméricos.'),
+            'PPT': (r'^[A-Z0-9]{4,15}$', 'El PPT debe tener entre 4 y 15 caracteres alfanuméricos.'),
+        }
+
+        if tipo in reglas:
+            regex, mensaje = reglas[tipo]
+            if not re.fullmatch(regex, valor):
+                # Lanzamos el error específicamente en el campo identificación
+                raise ValidationError({'identificacion': mensaje})
 
     def __str__(self):
         return f"{self.nombre} - {self.identificacion}"
@@ -439,7 +481,7 @@ class Pagos(models.Model):
     id_pago      = models.AutoField(primary_key=True)
     proveedor    = models.ForeignKey(Proveedores, on_delete=models.PROTECT)
     fecha        = models.DateField(default=timezone.now)
-    tipo_pago    = models.CharField(max_length=20, choices=TIPO_PAGO_OPCIONES, default='efectivo')  # ← NUEVO
+    tipo_pago    = models.CharField(max_length=20, choices=TIPO_PAGO_OPCIONES)  # ← NUEVO
     monto_total  = models.IntegerField(default=0)
     estado       = models.BooleanField(default=True)
     def save(self, *args, **kwargs):
@@ -559,20 +601,6 @@ class Gastos(models.Model):
      #class meta
        #verbose_name = 'Gastos'
         #verbose_name_plural = 'Gastos'          
-
-
-#------ ENTIDAD GESTION DE MANTENIMIENTO --------2
-class Mantenimiento(models.Model):
-    fallas = models.TextField()
-    procesos = models.CharField(max_length=50)
-    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT)
-    id_empleado = models.ForeignKey(Profile, on_delete=models.PROTECT, db_column='id_usuario_id')
-    id_tipo_mantenimiento = models.ForeignKey(TipoMantenimiento, on_delete=models.PROTECT)
-    estado = models.BooleanField(default=True)
-
-    def __str__(self):
-        return f"{self.fallas} - {self.id_tipo_mantenimiento}"
-    
 
 
 # ----- modulo detalle servicio  ---------
@@ -810,7 +838,6 @@ class Caja(models.Model):
     monto = models.IntegerField(validators=[validar_monto])
     fecha = models.DateField(default=timezone.now)
     hora = models.TimeField(auto_now_add=True)
-    descripcion = models.CharField(max_length=255, blank=True) # Para saber de dónde viene
     estado = models.BooleanField(default=True)
     
     

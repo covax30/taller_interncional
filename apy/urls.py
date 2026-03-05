@@ -19,7 +19,6 @@ from apy.view.informes.views import *
 from apy.view.pago_servicios.views import *
 from apy.view.pagos.views import *
 
-from apy.view.gestion_mantenimiento.views import *
 from apy.view.herramienta.views import *
 from apy.view.tipo_mantenimiento.views import *
 from apy.view.insumos.views import *
@@ -51,7 +50,7 @@ urlpatterns = [
     path('contacto/', contact_informacion, name='contact_informacion'),
     path('servicios_informacion/', service_informacion, name='service_informacion'),
     path('terminos/', terms_informacion, name='terms_informacion'), 
-    path('contacto/formulario/', contacto_formulario, name='contacto_formulario'),
+    path('contacto/formulario/', contact_informacion, name='contacto_formulario'),
 
     path('inicio/index/', index.as_view(), name='index'),
     
@@ -128,6 +127,8 @@ urlpatterns = [
     path('registro/crear/', RegistroUsuarioCreateView.as_view(), name='registro_usuario_crear'), 
     path('registro/editar/<int:pk>/', RegistroUpdateView.as_view(), name='registro_usuario_editar'), 
     path('registro/eliminar/<int:pk>/', RegistroDeleteView.as_view(), name='registro_usuario_eliminar'),
+    path('usuarios/inactivos/', RegistroUsuarioInactivosListView.as_view(), name='registro_usuario_inactivos'),
+    path('usuarios/activar/<int:pk>/', RegistroUsuarioActivarView.as_view(), name='registro_usuario_activar'),
     path("empleado/modal/crear/", EmpleadoCreateModalView.as_view(), name="empleado_modal_crear"),  
     
     
@@ -184,20 +185,6 @@ urlpatterns = [
     path('caja/eliminar/<int:pk>/', CajaDeleteView.as_view(), name='caja_eliminar'),
     path("caja/inactivos/", CajaInactivaListView.as_view(), name="caja_inactivos"),
     path('caja/activar/<int:pk>/', CajaActivateView.as_view(), name="caja_activar"),
-    
-    
-    
-
-        # --------------urls erick---------------
-    
-    path('mantenimiento/listar/', MantenimientoListView.as_view() , name='mantenimiento_lista'),
-    path('mantenimiento/agregar/', MantenimientoCreateView.as_view() , name='mantenimiento_crear'),
-    path('mantenimiento/editar/<int:pk>/', MantenimientoUpdateView.as_view() , name='mantenimiento_editar'),
-    path('mantenimiento/eliminar/<int:pk>/', MantenimientoDeleteView.as_view() , name='mantenimiento_eliminar'),
-    path("mantenimiento/modal/crear/", MantenimientoCreateModalView.as_view(), name="mantenimiento_modal_crear"),
-    path("mantenimiento/inactivos/", MantenimientoInactivosListView.as_view(), name="mantenimiento_inactivos"),
-    path('mantenimiento/activar/<int:pk>/', MantenimientoActivateView.as_view(), name="mantenimiento_activar"),
-    
 
     path('herramienta/listar/', HerramientaListView.as_view() , name='herramienta_lista'),
     path('herramienta/agregar/', HerramientaCreateView.as_view() , name='herramienta_crear'),

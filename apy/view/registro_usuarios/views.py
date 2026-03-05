@@ -12,7 +12,6 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
 from django.db import transaction
-# MIXINS DE PROTECCIÓN
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 from apy.models import Profile
@@ -20,7 +19,7 @@ from apy.models import Profile
 # Clase base que implementa la lógica para verificar si el usuario es superusuario
 class SuperuserRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     # Asegura que el usuario esté logueado
-    login_url = '/login/' 
+    login_url = reverse_lazy('login:login') 
     
     # URL a la que se redirige si el usuario no pasa la prueba (no es Superuser)
     raise_exception = False
@@ -100,11 +99,13 @@ class RegistroDeleteView(SuperuserRequiredMixin, DeleteView):
         return context
     
     def form_valid(self, form):
-        messages.success(self.request, f"Usuario '{self.object.username}' eliminado correctamente.")
-        return super().form_valid(form)
+        self.object = self.get_object()
+        self.object.is_active = False
+        self.object.save()
+        messages.success(self.request, f"Usuario {self.object.username} desactivado correctamente.")        
+        return redirect(self.success_url)
     
     def dispatch(self, request, *args, **kwargs):
-        # Obtenemos el usuario que se quiere eliminar
         user_to_delete = self.get_object()
         
         # 1. EVITAR AUTO-ELIMINACIÓN
@@ -133,12 +134,47 @@ class RegistroUsuarioListView(SuperuserRequiredMixin, ListView):
     module_name = 'GestionUsuarios'
     permission_required = 'view'
 
+    def get_queryset(self):
+        return User.objects.filter(is_active=True)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['crear_url'] = reverse_lazy('apy:registro_usuario_crear') 
         context['entidad'] = 'Usuarios'
         context['titulo'] = 'Gestión de Usuarios'
         return context
+    
+# 5. VISTA DE USUARIOS INACTIVOS (RegistroUsuarioInactivosListView) - PROTEGIDA
+class RegistroUsuarioInactivosListView(SuperuserRequiredMixin, ListView):
+    model = User
+    template_name = 'registro_usuarios/usuarios_inactivos.html'
+    context_object_name = 'object_list'
+    
+    module_name = 'GestionUsuarios'
+    permission_required = 'view'
+
+    def get_queryset(self):
+        # Filtramos solo los usuarios que no están activos
+        return User.objects.filter(is_active=False)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['listar_url'] = reverse_lazy('apy:registro_usuario_lista')
+        context['entidad'] = 'Usuarios Inactivos'
+        context['titulo'] = 'Usuarios Inactivos'
+        return context
+
+# 6. VISTA DE ACTIVACIÓN (RegistroUsuarioActivarView) - PROTEGIDA
+class RegistroUsuarioActivarView(SuperuserRequiredMixin, UpdateView):
+    model = User
+    
+    def get(self, request, *args, **kwargs):
+        user = self.get_object()
+        user.is_active = True
+        user.save()
+        messages.success(request, f"El usuario {user.username} ha sido reactivado correctamente.")
+        return redirect('apy:registro_usuario_inactivos')
+    
     
 class EmpleadoCreateModalView(CreateView):
     model = Profile

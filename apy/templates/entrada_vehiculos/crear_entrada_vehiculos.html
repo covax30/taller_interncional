@@ -18,7 +18,9 @@
     </div>
     {% if form.id_vehiculo.errors %}
         <div class="invalid-feedback d-block">
-            {% for error in form.id_vehiculo.errors %}<small>{{ error }}</small><br>{% endfor %}
+            {% for error in form.id_vehiculo.errors %}
+                <small>{{ error }}</small><br>
+            {% endfor %}
         </div>
     {% endif %}
 </div>

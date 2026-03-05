@@ -9,4 +9,4 @@ from apy.forms import *
 
 class index(LoginRequiredMixin, TemplateView):
     template_name = 'body.html'
-    login_url = reverse_lazy('apy:login') # Redirige si no está logueado
+    login_url = reverse_lazy('login:login')

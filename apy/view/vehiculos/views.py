@@ -79,7 +79,7 @@ class VehiculoCreateView(PermisoRequeridoMixin, CreateView):
     module_name = 'Vehiculos'
     permission_required = 'add'
     
-    def form_valid(self, form):
+    def form_valid(self, form): 
         form.instance.estado = True 
         messages.success(self.request, "Vehículo creado correctamente")
         response = super().form_valid(form)
@@ -94,6 +94,13 @@ class VehiculoCreateView(PermisoRequeridoMixin, CreateView):
             })
         
         return response
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Crear Vehículo'
+        context['entidad'] = 'Vehículo'
+        context['listar_url'] = reverse_lazy('apy:vehiculo_lista')
+        return context
 
 
 class VehiculoUpdateView(PermisoRequeridoMixin, UpdateView): 
