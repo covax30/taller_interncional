@@ -84,7 +84,6 @@ class GastosCreateView(PermisoRequeridoMixin, CreateView):
     permission_required = 'add'
     
     def form_valid(self, form):
-        # 1. Guardamos el gasto primero
         form.instance.estado = True 
         response = super().form_valid(form)
         

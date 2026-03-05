@@ -89,22 +89,28 @@ class NominaUpdateView(PermisoRequeridoMixin, UpdateView):
     template_name = 'Nomina/crear_nomina.html'
     success_url = reverse_lazy('apy:nomina_lista')
     
-    # --- Configuración de Permisos ---
     module_name = 'Nomina'
     permission_required = 'change'
     
     def form_valid(self, form):
+        # 1. Guardamos los cambios en la Nómina
+        response = super().form_valid(form)
+        nomina_editada = self.object
         
-        form.instance.estado = True 
-        messages.success(self.request, "Nomina actualizada correctamente")
-        return super().form_valid(form)
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['titulo'] = 'Editar empleado'
-        context['entidad'] = 'Nomina'
-        context['listar_url'] = reverse_lazy('apy:nomina_lista')
-        return context
+        from .models import Gastos  # pyright: ignore[reportMissingImports]
+        
+        # Usamos el campo 'nomina' del modelo Gastos para encontrar el registro
+        gasto_asociado = Gastos.objects.filter(nomina=nomina_editada).first()
+        
+        if gasto_asociado:
+            # 3. Sincronizamos los datos del Gasto
+            gasto_asociado.monto = nomina_editada.monto
+            gasto_asociado.descripcion = f"Pago de Nómina (Editado): {nomina_editada.empleado.user.username}"
+            gasto_asociado.fecha = nomina_editada.fecha_pago
+            gasto_asociado.save() # Esto disparará la actualización en la Caja automáticamente
+            
+        messages.success(self.request, "Nómina y gasto asociado actualizados correctamente")
+        return response
 
 class NominaDeleteView(PermisoRequeridoMixin, DeleteView): 
     model = Nomina

@@ -100,20 +100,26 @@ class PagoServiciosUpdateView(PermisoRequeridoMixin, UpdateView):
     template_name = 'Pago_Servicios/crear_pagoservicios.html'
     success_url = reverse_lazy('apy:pago_servicios_lista')
     
-    # --- Configuración de Permisos ---
     module_name = 'PagoServicios'
     permission_required = 'change'
     
     def form_valid(self, form):
-        messages.success(self.request, "Pago de servicio actualizado correctamente")
-        return super().form_valid(form)
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['titulo'] = 'Editar Pago Servicios Publicos'
-        context['entidad'] = 'PagoServiciosPublicos'
-        context['listar_url'] = reverse_lazy('apy:pago_servicios_lista')
-        return context
+        response = super().form_valid(form)
+        servicio_editado = self.object
+        
+        from .models import Gastos  # pyright: ignore[reportMissingImports]
+        
+        gasto_asociado = Gastos.objects.filter(id_pagos_servicios=servicio_editado).first()
+        
+        if gasto_asociado:
+            # 3. Actualizamos los datos del gasto con la nueva información
+            gasto_asociado.monto = servicio_editado.monto
+            gasto_asociado.descripcion = f"Pago de servicio (Editado): {servicio_editado.get_servicio_display()}"
+            gasto_asociado.fecha = timezone.now().date()
+            gasto_asociado.save() # Al guardar el gasto, este actualizará la Caja automáticamente
+            
+        messages.success(self.request, "Pago de servicio y gasto asociado actualizados correctamente")
+        return response
 
 class PagoServiciosDeleteView(PermisoRequeridoMixin, DeleteView): 
     model = PagoServiciosPublicos

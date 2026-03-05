@@ -6,14 +6,13 @@
 
 {# ── Vehículo ── #}
 <div class="form-group mb-3">
-    <label for="{{ form.id_vehiculo.id_for_label }}">Vehículo:
-    </label>
+    <label for="{{ form.id_vehiculo.auto_id }}">Vehículo:</label>
     <div class="input-group" style="display:flex; flex-wrap:nowrap;">
         <div style="flex-grow:1;">
-            {{ form.id_vehiculo|add_class:'form-control' }}
+            {# Asegúrate de que el ID aquí sea el que espera tu JS (ej: id_id_vehiculo) #}
+            {{ form.id_vehiculo|add_class:'form-control select2' }}
         </div>
-        <!-- ✅ CAMBIO: Cambiar de data-toggle a id="btnAbrirModalVehiculo" -->
-        <button type="button" class="btn btn-primary" id="btnAbrirModalVehiculo">
+        <button type="button" class="btn btn-primary" id="btnAbrirModalVehiculo" title="Agregar nuevo vehículo">
             <i class="fas fa-plus"></i>
         </button>
     </div>
@@ -26,16 +25,15 @@
 
 {# ── Cliente ── #}
 <div class="form-group mb-3">
-    <label for="{{ form.id_cliente.id_for_label }}">Cliente:
-    </label>
-    {{ form.id_cliente|add_class:'form-control' }}
-    {% if form.id_cliente.errors %}
+    <label for="{{ form.id_id_cliente.auto_id }}">Cliente:</label>
+    {# Este campo se llenará solo gracias a tu script y el vehiculoClienteMap #}
+    {{ form.id_cliente|add_class:'form-control select2' }}
+    {% if form.id_id_cliente.errors %}
         <div class="invalid-feedback d-block">
             {% for error in form.id_cliente.errors %}<small>{{ error }}</small><br>{% endfor %}
         </div>
     {% endif %}
 </div>
-
 {# ── Fecha ── #}
 <div class="form-group mb-3">
     <label for="{{ form.fecha_ingreso.id_for_label }}"></i>Fecha:
@@ -96,7 +94,7 @@
         }
 
         // ── Cargar formulario al abrir modal ──
-        $('#modal-id_vehiculo').on('show.bs.modal', function() {
+        $('#modal-id_id_vehiculo').on('show.bs.modal', function() {
             var $body = $(this).find('.modal-body');
             $body.html(
                 '<div class="text-center p-4">' +

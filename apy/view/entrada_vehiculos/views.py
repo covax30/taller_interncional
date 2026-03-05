@@ -7,6 +7,7 @@
 from builtins import Exception, str, super
 import html
 import json
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from apy.models import EntradaVehiculo, Vehiculo, Cliente
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
@@ -25,22 +26,46 @@ from apy.decorators import PermisoRequeridoMixin
 # ─────────────────────────────────────────────────────────────
 def api_entrada_datos(request, pk):
     try:
+        # Optimizamos la consulta con select_related para traer los datos del vehículo y cliente de un solo golpe
         entrada = EntradaVehiculo.objects.select_related(
-            'id_vehiculo__id_cliente', 'id_cliente'
+            'id_vehiculo', 
+            'id_id_cliente'
         ).get(pk=pk)
 
         vehiculo = entrada.id_vehiculo
-        cliente  = entrada.id_cliente or (vehiculo.id_cliente if vehiculo else None)
+        # Lógica: Usamos el cliente de la entrada, y si no hay, el que tiene registrado el vehículo
+        cliente = entrada.id_id_cliente or (vehiculo.id_cliente if vehiculo else None)
 
         return JsonResponse({
-            'ok':             True,
-            'vehiculo_id':    vehiculo.pk if vehiculo else None,
-            'vehiculo_texto': f"{vehiculo.placa} — {vehiculo.marca_vehiculo} {vehiculo.modelo_vehiculo}" if vehiculo else '',
-            'cliente_id':     cliente.pk if cliente else None,
-            'cliente_texto':  cliente.nombre if cliente else '',
+            'ok': True,
+            'vehiculo_id': vehiculo.pk if vehiculo else None,
+            # Formateamos un texto descriptivo para que se vea bien en el Select2
+            'vehiculo_texto': f"{vehiculo.placa} — {vehiculo.marca_vehiculo} {vehiculo.modelo_vehiculo}" if vehiculo else 'Sin vehículo',
+            'cliente_id': cliente.pk if cliente else None,
+            'cliente_texto': str(cliente) if cliente else 'Sin cliente',
         })
     except EntradaVehiculo.DoesNotExist:
         return JsonResponse({'ok': False, 'error': 'Entrada no encontrada'}, status=404)
+    except Exception as e:
+        return JsonResponse({'ok': False, 'error': str(e)}, status=500)
+@login_required 
+def obtener_cliente_por_vehiculo(request):
+    vehiculo_id = request.GET.get('id')
+    
+    if not vehiculo_id:
+        return JsonResponse({'error': 'No se proporcionó ID'}, status=400)
+
+    try:
+        # Buscamos el vehículo y obtenemos su cliente relacionado
+        vehiculo = Vehiculo.objects.select_related('cliente').get(id=vehiculo_id)
+        return JsonResponse({
+            'cliente_id': vehiculo.cliente.id,
+            'nombre_cliente': str(vehiculo.cliente) # Útil si quieres mostrar el nombre en consola
+        })
+    except Vehiculo.DoesNotExist:
+        return JsonResponse({'error': 'Vehículo no encontrado'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)    
 
 
 def _vehiculo_cliente_map():
@@ -192,3 +217,5 @@ class EntradaCreateModalView(CreateView):
             "html":    html,
             "message": "Corrige los errores en el formulario ❌"
         })
+        
+        

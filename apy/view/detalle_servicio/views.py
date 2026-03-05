@@ -21,6 +21,7 @@ from xhtml2pdf import pisa
 # Modelos y Formularios
 from apy.models import (
     DetalleServicio,
+    Empresa,
     Repuesto,
     TipoMantenimiento,
     Insumos,
@@ -69,7 +70,14 @@ class CreateServicioView(PermisoRequeridoMixin, CreateView):
         except Profile.DoesNotExist:
             context['perfil_actual_id'] = None
 
-        return context
+        
+
+        try:
+            empresa_default = Empresa.objects.filter(estado=True).first()
+            context['empresa_default_id'] = empresa_default.pk if empresa_default else None
+        except:
+            context['empresa_default_id'] = None
+        return context        
 
     @transaction.atomic
     def form_valid(self, form):
@@ -120,6 +128,8 @@ class CreateServicioView(PermisoRequeridoMixin, CreateView):
             messages.error(self.request, 'Error en los detalles del servicio. Verifique cantidades y stock.')
             return self.render_to_response(self.get_context_data(form=form))
         
+
+
 class ListServicioView(PermisoRequeridoMixin, ListView):
     module_name = 'DetalleServicio'
     permission_required = 'view'

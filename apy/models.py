@@ -1,4 +1,4 @@
-from builtins import Exception, int, property, super
+from builtins import Exception, int, property, sum, super
 
 from django.utils import timezone
 
@@ -513,13 +513,12 @@ class Nomina(models.Model):
         es_nuevo = self.pk is None
         super().save(*args, **kwargs)
         if es_nuevo:
-            Caja.objects.create(
-                tipo_movimiento='Nomina',
+            Gastos.objects.create(
+                tipo_gastos='costo fijo',
                 monto=self.monto,
                 fecha=self.fecha_pago,
                 descripcion=f"Sueldo: {self.empleado.user.username}"
             )    
-#--------------Modulo Compra (STEVEN)-----------------
 
 
 class Gastos(models.Model):
@@ -537,9 +536,9 @@ class Gastos(models.Model):
         ('costo variable', 'Costo variable'),
     ]
     tipo_gastos=models.CharField(max_length=100, choices=TIPO_GASTOS_OPCIONES)
-    id_pagos_servicios = models.ForeignKey(PagoServiciosPublicos, on_delete=models.PROTECT,blank=True, null=True)
-    id_pago = models.ForeignKey(Pagos, on_delete=models.PROTECT, null=True, blank=True)
-    nomina = models.ForeignKey(Nomina, on_delete=models.PROTECT, null=True, blank=True) 
+    id_pagos_servicios = models.ForeignKey(PagoServiciosPublicos, on_delete=models.SET_NULL,blank=True, null=True)
+    id_pago = models.ForeignKey(Pagos, on_delete=models.SET_NULL, null=True, blank=True)
+    nomina = models.ForeignKey(Nomina, on_delete=models.SET_NULL, null=True, blank=True) 
     fecha = models.DateField(default=timezone.now)
     estado = models.BooleanField(default=True)
     

@@ -1,3 +1,4 @@
+from builtins import AttributeError, ValueError, len, list, str
 from pyexpat.errors import messages
 from django import forms
 from django.forms import ModelForm, Select, NumberInput, DateInput, TimeInput, TextInput, EmailInput
@@ -1342,10 +1343,12 @@ class GastosForm(ModelForm):
         super().__init__(*args, **kwargs)
         for field in self.fields:
             self.fields[field].widget.attrs.update({'class': 'form-control'})
+            
 
     class Meta:
         model = Gastos
-        fields = ['tipo_gastos', 'monto', 'fecha', 'descripcion', 'id_pagos_servicios']
+        exclude = ['estado','id_pagos_servicios']
+        fields = ['tipo_gastos', 'monto', 'fecha', 'descripcion']
         widgets = {
             'fecha': DateInput(attrs={'type': 'date'}),
             'descripcion': TextInput(attrs={'placeholder': 'Ej: Pago de arriendo o papelería'}),
