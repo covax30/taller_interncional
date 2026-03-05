@@ -1,4 +1,4 @@
-from builtins import AttributeError, ValueError, hasattr, len, list, str
+from builtins import AttributeError, ValueError, getattr, hasattr, len, list, str
 from pyexpat.errors import messages
 from django import forms
 from django.forms import ModelForm, Select, NumberInput, DateInput, TimeInput, TextInput, EmailInput

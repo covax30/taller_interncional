@@ -1,5 +1,5 @@
 from builtins import Exception, int, property, sum, super
-from locale import str
+
 
 from django.utils import timezone
 
