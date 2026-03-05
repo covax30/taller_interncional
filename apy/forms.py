@@ -272,10 +272,14 @@ class DetalleServicioForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Configurar cómo se muestran los vehículos en el select
-        self.fields['id_vehiculo'].label_from_instance = (
-            lambda obj: f"{obj.placa} - {obj.marca_vehiculo} {obj.modelo_vehiculo} - {obj.color}"
-        )
+        # Configurar cómo se muestran los vehículos de forma segura
+        def vehiculo_label(obj):
+            placa = getattr(obj, 'placa', 'Sin Placa')
+            marca = getattr(obj, 'marca_vehiculo', '')
+            modelo = getattr(obj, 'modelo_vehiculo', '')
+            return f"{placa} - {marca} {modelo}".strip()
+        
+        self.fields['id_vehiculo'].label_from_instance = vehiculo_label
 
 # Formsets definidos fuera de las clases
 DetalleRepuestoFormSet = inlineformset_factory(
