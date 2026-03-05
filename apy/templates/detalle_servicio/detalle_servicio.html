@@ -23,24 +23,34 @@
                     <p class="mb-1 fw-bold fs-5">{{ servicio.cliente.nombre }}</p>
                     <p class="text-muted mb-0">NIT/CC: {{ servicio.cliente.identificacion }}</p>
                     <p class="text-muted mb-0">Teléfono: {{ servicio.cliente.telefono }}</p>
-                    <p class="text-muted mb-0">Correo: {{ servicio.cliente.email }}</p> 
+                    <p class="text-muted mb-0">Correo: {{ servicio.cliente.correo|default:"No registrado" }}</p> 
                 </div>
             </div>
         </div>
+
         <div class="col-md-4">
             <div class="card h-100 border-0 shadow-sm bg-body">
                 <div class="card-body text-center">
                     <h6 class="text-uppercase text-muted small fw-bold mb-3"><i class="fas fa-car me-2"></i>Vehículo</h6>
                     <span class="badge bg-primary fs-5 px-3 py-2">{{ servicio.id_vehiculo.placa }}</span>
-                    <p class="mt-2 mb-0 text-muted small">{{ servicio.id_vehiculo.modelo }} - {{ servicio.id_vehiculo.marca }}</p>
+                    <p class="mt-2 mb-0 text-muted small">
+                        {{ servicio.id_vehiculo.marca }} {{ servicio.id_vehiculo.modelo }}
+                    </p>
                 </div>
             </div>
         </div>
+
         <div class="col-md-4">
             <div class="card h-100 border-0 shadow-sm bg-body">
                 <div class="card-body">
                     <h6 class="text-uppercase text-muted small fw-bold mb-3"><i class="fas fa-user-tie me-2"></i>Responsable</h6>
-                    <p class="mb-1 fw-bold">{{ servicio.empleado.user.get_full_name|default:servicio.empleado.user.username }}</p>
+                    <p class="mb-1 fw-bold">
+                        {% if servicio.empleado.user.get_full_name %}
+                            {{ servicio.empleado.user.get_full_name }}
+                        {% else %}
+                            {{ servicio.empleado.user.username }}
+                        {% endif %}
+                    </p>
                     <p class="text-muted mb-0 small">Atendido por el equipo técnico</p>
                 </div>
             </div>
@@ -67,12 +77,24 @@
                             <td class="text-center">${{ r.precio_unitario|intcomma }}</td>
                             <td class="text-end pe-4 fw-bold">${{ r.subtotal|intcomma }}</td>
                         </tr>
+                        {% empty %}
                         {% endfor %}
                         
                         {% for m in servicio.detalletipomantenimiento_set.all %}
                         <tr>
                             <td class="ps-4">{{ m.cantidad }}</td>
-                            <td><span class="badge badge-dot bg-success me-2"></span> Mantenimiento: {{ m.id_tipo_mantenimiento.nombre }}</td>
+                            <td>
+                                <span class="badge badge-dot bg-success me-2"></span> 
+                                Mantenimiento: {{ m.id_tipo_mantenimiento.nombre }}
+                                <br><small class="text-muted ms-4">
+                                    Mecánico: 
+                                    {% if servicio.empleado.user.get_full_name %}
+                                        {{ servicio.empleado.user.get_full_name }}
+                                    {% else %}
+                                        {{ servicio.empleado.user.username }}
+                                    {% endif %}
+                                </small>
+                            </td>
                             <td class="text-center">${{ m.precio_unitario|intcomma }}</td>
                             <td class="text-end pe-4 fw-bold">${{ m.subtotal|intcomma }}</td>
                         </tr>
@@ -90,7 +112,9 @@
                     <tfoot class="bg-light">
                         <tr>
                             <td colspan="3" class="text-end fw-bold py-3 fs-5">Total Facturado:</td>
-                            <td class="text-end pe-4 py-3 fs-5 fw-bold text-primary">${{ servicio.total|default:servicio.subtotal|intcomma }}</td>
+                            <td class="text-end pe-4 py-3 fs-5 fw-bold text-primary">
+                                ${{ servicio.total|default:servicio.subtotal|intcomma }}
+                            </td>
                         </tr>
                     </tfoot>
                 </table>
@@ -102,7 +126,8 @@
         <a href="{% url 'apy:lista_servicios' %}" class="btn btn-outline-secondary px-4">
             <i class="fas fa-chevron-left me-2"></i> Volver a la Lista 
         </a>
-        <div class="btn-group">
+        <div class="btn-group gap-2">
+            
             <a href="{% url 'apy:imprimir_servicio' servicio.id %}" target="_blank" class="btn btn-danger px-4">
                 <i class="fas fa-file-pdf me-2"></i> Generar PDF
             </a>

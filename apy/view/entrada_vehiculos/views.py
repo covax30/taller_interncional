@@ -4,6 +4,7 @@
 # para que el template pueda autocompletar el cliente.
 # ═══════════════════════════════════════════════════════════════
 
+import html
 import json
 from django.shortcuts import render, redirect
 from apy.models import EntradaVehiculo, Vehiculo, Cliente
@@ -161,6 +162,15 @@ class EntradaCreateModalView(CreateView):
         context = super().get_context_data(**kwargs)
         context['vehiculo_cliente_map'] = json.dumps(_vehiculo_cliente_map())
         return context
+    def get(self, request, *args, **kwargs):
+        form = self.get_form()
+        context = self.get_context_data(form=form)
+        html = render_to_string(
+            'entrada_vehiculos/modal_entrada.html',
+            context,
+            request=request
+        )
+        return JsonResponse({'html': html, 'success': True})
 
     def form_valid(self, form):
         try:

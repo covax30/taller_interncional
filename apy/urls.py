@@ -62,12 +62,8 @@ urlpatterns = [
     path('servicios/editar/<int:pk>/', UpdateServicioView.as_view(), name='editar_servicio'),
     path('servicios/eliminar/<int:pk>/', DeleteServicioView.as_view(), name='eliminar_servicio'),
     path('servicios/detalle/<int:pk>/', DetalleServicioView.as_view(), name='detalle_servicio'),
-    path('servicios/inactivos/', ServicioInactivosListView.as_view(), name='servicios_inactivos'),  
-    path('servicios/activar/<int:pk>/', ServicioActivateView.as_view(), name='servicio_activar'),
-    path('servicios/modal/crear/', DetalleCreateModalView.as_view(), name='servicio_modal_crear'),
+   
     path('servicios/imprimir/<int:pk>/', imprimir_servicio_factura, name='imprimir_servicio'),
-    # En tu apy/urls.py
-    path('servicio/enviar/<int:pk>/', enviar_factura_email, name='enviar_factura_email'),
     # -------------URL modulo proveedor---------------
     path('Proveedor/listar/', ProveedorListView.as_view(), name='proveedor_lista'),
     path('Proveedor/agregar/', ProveedorCreateView.as_view(), name='proveedor_crear'),
