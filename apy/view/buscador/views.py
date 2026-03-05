@@ -131,10 +131,5 @@ def buscador_global(request):
                 Q(correo__icontains=query) | Q(identificacion__icontains=query) 
             )
             
-            context['mantenimiento'] = Mantenimiento.objects.filter(
-                Q(id_vehiculo__placa__icontains=query) | Q(fallas__icontains=query) | 
-                Q(id_tipo_mantenimiento__nombre__icontains=query) | Q(id_empleado__user__username__icontains=query)
-            ).select_related('id_vehiculo', 'id_empleado', 'id_tipo_mantenimiento').distinct()
-            
         
     return render(request, 'buscador_global.html', context)

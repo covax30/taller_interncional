@@ -56,7 +56,6 @@
                   <li class="nav-item">
                     <a href="#" class="nav-link"><i class="nav-icon bi bi-wrench"></i><p>Mantenimiento y Repuestos<i class="nav-arrow bi bi-chevron-right"></i></p></a>
                     <ul class="nav nav-treeview">
-                      {% if user_perms == 'all' or user_perms.GestionMantenimiento.view %}<li class="nav-item"><a href="{% url 'apy:mantenimiento_lista' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Mantenimientos</p></a></li>{% endif %}
                       {% if user_perms == 'all' or user_perms.Repuestos.view %}<li class="nav-item"><a href="{% url 'apy:repuesto_lista' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Repuestos</p></a></li>{% endif %}
                       {% if user_perms == 'all' or user_perms.TipoMantenimientos.view %}<li class="nav-item"><a href="{% url 'apy:tipo_mantenimiento_lista' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Tipos Mantenimiento</p></a></li>{% endif %}
                       {% if user_perms == 'all' or user_perms.Herramientas.view %}<li class="nav-item"><a href="{% url 'apy:herramienta_lista' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Herramientas</p></a></li>{% endif %}
