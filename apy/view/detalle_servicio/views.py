@@ -1,4 +1,4 @@
-from builtins import sum, super
+from builtins import Exception, print, str, sum, super
 from email.message import EmailMessage
 
 from multiprocessing import context
@@ -128,6 +128,29 @@ class CreateServicioView(PermisoRequeridoMixin, CreateView):
             messages.error(self.request, 'Error en los detalles del servicio. Verifique cantidades y stock.')
             return self.render_to_response(self.get_context_data(form=form))
         
+    def get_initial(self):
+        initial = super().get_initial()
+        entrada_id = self.request.GET.get('entrada')
+        
+        if entrada_id:
+            try:
+                from apy.models import EntradaVehiculo
+                # Traemos la entrada con sus relaciones
+                entrada = EntradaVehiculo.objects.select_related(
+                    'id_vehiculo', 
+                    'id_cliente'
+                ).get(pk=entrada_id)
+                
+                # REGLA DE ORO: La llave debe ser IGUAL al nombre del campo en el form
+                initial['id_entrada'] = entrada.id_entrada
+                initial['id_vehiculo'] = entrada.id_vehiculo
+                initial['cliente'] = entrada.id_cliente # Cambiado de 'id_cliente' a 'cliente'
+                
+                print(f"DEBUG: Cargando Cliente ID: {entrada.id_cliente.id}")
+                
+            except EntradaVehiculo.DoesNotExist:
+                print("DEBUG: Entrada no encontrada")
+        return initial
 
 
 class ListServicioView(PermisoRequeridoMixin, ListView):

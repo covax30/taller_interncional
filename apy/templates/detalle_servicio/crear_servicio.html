@@ -456,6 +456,7 @@ $(document).ready(function() {
             dropdownParent: $(this)
         });
     });
+    $('#id_id_entrada, #id_id_vehiculo, #id_cliente').trigger('change');
 });
 </script>
 
@@ -657,7 +658,7 @@ $(document).ready(function () {
                         $v.val(data.vehiculo_id).trigger('change');
                     }
                     if (data.cliente_id) {
-                        var $c = $('#id_-id_cliente');
+                        var $c = $('#id_id_cliente');
                         if ($c.find('option[value="' + data.cliente_id + '"]').length === 0)
                             $c.append(new Option(data.cliente_texto, data.cliente_id, true, true));
                         $c.val(data.cliente_id).trigger('change');
