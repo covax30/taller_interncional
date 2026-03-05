@@ -168,6 +168,55 @@
     }
 })();
 </script>
+<script>
+(function() {
+    function initEntrada() {
+        // 1. Obtener los IDs reales que generó Django
+        var vehiculoSelectId = '#{{ form.id_vehiculo.auto_id }}';
+        var clienteSelectId = '#{{ form.id_cliente.auto_id }}';
+        
+        // 2. Cargar el mapa de datos
+        var vehiculoClienteMap = {};
+        try {
+            var data = document.getElementById('vehiculo-cliente-map');
+            if (data) vehiculoClienteMap = JSON.parse(data.textContent);
+        } catch(e) { console.error('Error al cargar mapa:', e); }
+
+        // 3. Función principal de autocompletado
+        $(document).on('change', vehiculoSelectId, function() {
+            var vehiculoId = $(this).val();
+            var $clienteSelect = $(clienteSelectId);
+
+            if (!vehiculoId) {
+                $clienteSelect.val('').trigger('change.select2');
+                return;
+            }
+
+            var clienteId = vehiculoClienteMap[String(vehiculoId)];
+            
+            if (clienteId) {
+                // Seteamos el valor y avisamos a Select2 para que se refresque visualmente
+                $clienteSelect.val(clienteId).trigger('change.select2');
+                console.log('Autocompletado: Vehículo ' + vehiculoId + ' -> Cliente ' + clienteId);
+            } else {
+                $clienteSelect.val('').trigger('change.select2');
+            }
+        });
+
+        // 4. Forzar ejecución inicial (por si es una edición o recarga)
+        if ($(vehiculoSelectId).val()) {
+            $(vehiculoSelectId).trigger('change');
+        }
+    }
+
+    // Asegurar que jQuery y el DOM estén listos
+    if (typeof $ !== 'undefined') {
+        $(document).ready(initEntrada);
+    } else {
+        window.addEventListener('load', initEntrada);
+    }
+})();
+</script>
 
 {% endblock %}
 
