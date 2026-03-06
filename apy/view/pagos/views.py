@@ -90,6 +90,26 @@ class PagosListView(PermisoRequeridoMixin, ListView):
         context['entidad']   = 'Pagos'
         return context
 
+class PagosInactivosListView(PermisoRequeridoMixin, ListView):
+    model               = Pagos
+    template_name       = 'Pagos/pago_inactivos.html'
+    module_name         = 'Pagos'
+    permission_required = 'view'
+
+    def get_queryset(self):
+        return Pagos.objects.filter(estado=False).prefetch_related('detalles')
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo']    = 'Lista de Pagos'
+        context['crear_url'] = reverse_lazy('apy:pagos_crear')
+        context['entidad']   = 'Pagos'
+        return context
+
 
 class PagosCreateView(PermisoRequeridoMixin, CreateView):
     model               = Pagos
@@ -429,3 +449,5 @@ class PagosActivateView(PermisoRequeridoMixin, DeleteView):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Activar Pago'
         return context
+    
+    

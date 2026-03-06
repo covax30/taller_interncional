@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+from builtins import OSError
 import logging
 import os
 from datetime import timedelta
@@ -21,12 +22,6 @@ from django.contrib.messages import constants as messages
 
 # Cargar variables del entorno ANTES de cualquier configuración
 load_dotenv()
-
-print("EMAIL USER:", os.environ.get('EMAIL_HOST_USER', 'NO CARGADO'))
-print("ADMINS STOCK:", os.environ.get('ADMINS_CORREO_STOCK', 'NO CARGADO'))
-print(f"DEBUG: DB_NAME={os.getenv('DB_NAME')}")
-print(f"DEBUG: DB_HOST={os.getenv('DB_HOST')}")
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -220,7 +215,8 @@ MESSAGE_TAGS = {
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),  # Directorio donde tienes tus archivos estáticos
+    os.path.join(BASE_DIR, 'static'),         # <--- Aquí busca la carpeta en la raíz
+    os.path.join(BASE_DIR, 'apy', 'static'),  # <--- Aquí busca la de tu app
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 

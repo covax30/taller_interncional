@@ -20,7 +20,11 @@
     <th>Descripción</th>
     <th>Tipo Gastos</th>
     <th>Id Pago Servicios</th>
+    
     <th>Monto</th>
+    <th>Acciones</th>
+    
+
 {% endblock %}
 
 {% block iterar %}
@@ -31,6 +35,14 @@
         <td>{{ g.tipo_gastos }}</td>
         <td>{{ g.id_pagos_servicios }}</td>
         <td>{{ g.monto|intcomma }}</td>
+        <th>
+            <a href="{% url 'apy:gasto_editar' g.id %}" class="btn btn-warning btn-xs" title="Editar gasto">
+                <i class="fas fa-edit"></i>
+            </a>
+            <a href="{% url 'apy:gasto_eliminar' g.id %}" class="btn btn-danger btn-xs" title="Eliminar gasto">
+                <i class="fas fa-trash"></i>
+            </a>
+        </th>
         
            
             

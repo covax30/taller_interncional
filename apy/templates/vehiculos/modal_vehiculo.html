@@ -7,7 +7,7 @@
 
     <!-- Cliente -->
     <div class="form-group mb-3">
-        <label for="{{ form.id_cliente.id_for_label }}">Id Cliente:</label>
+        <label for="{{ form.id_id_cliente.id_for_label }}">Id Cliente:</label>
         <div class="input-group">
             {{ form.id_cliente|add_class:'form-control'|attr:'autocomplete:off' }}
             <div class="input-group-append">
@@ -105,6 +105,7 @@ function cerrarModalVehiculo() {
 
 $(document).ready(function() {
     console.log('=== MODAL VEHÍCULO INICIALIZADO ===');
+    
 
     // ════════════════════════════════════════════════════════════════════════════
     // BOTÓN CANCELAR

@@ -1,6 +1,6 @@
 from django.urls import path
 from apy.context_processors import api_stock_bajo
-from apy.view.Nomina.views import NominaCreateModalView, NominaCreateView, NominaDeleteView, NominaListView, NominaUpdateView
+from apy.view.Nomina.views import NominaCreateModalView, NominaCreateView, NominaDeleteView, NominaInactivosListView, NominaListView, NominaUpdateView
 from apy.view.empresa.views import *
 from apy.view.usuario.datos.views import ActualizarPerfilImagenView, PerfilEditarView
 from apy.views import *
@@ -159,6 +159,7 @@ urlpatterns = [
     path('Pagos/editar/<int:pk>/', PagosUpdateView.as_view() , name='pagos_editar'),
     path('Pagos/eliminar/<int:pk>/', PagosDeleteView.as_view() , name='pagos_eliminar'),
     path('Pagos/activar/<int:pk>/', PagosActivateView.as_view(), name="pagos_activar"),
+    path("Pagos/inactivos/", PagosInactivosListView.as_view(), name="pagos_inactivos"),
 
     #--------------urls Yury
     #----------url Gastos-------
@@ -208,6 +209,7 @@ urlpatterns = [
     path('nomina/editar/<int:pk>/', NominaUpdateView.as_view(), name='nomina_editar'),
     path('nomina/eliminar/<int:pk>/', NominaDeleteView.as_view(), name='nomina_eliminar'),  
     path("nomina/modal/crear/", NominaCreateModalView.as_view(), name="nomina_modal_crear"),
+    path("nomina/inactivos/", NominaInactivosListView.as_view(), name="nomina_inactivos"),
 
     
     path('insumos/listar/', InsumoListView.as_view() , name='insumo_lista'),

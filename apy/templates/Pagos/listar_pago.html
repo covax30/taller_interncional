@@ -10,6 +10,8 @@
 <a href="{{ crear_url }}" class="btn btn-primary btn-xs" title="Agregar registro de pago">
     <i class="fas fa-plus"></i> Agregar
 </a>
+<a href="{% url 'apy:pagos_inactivos' %}" class="btn btn-outline-secondary btn-xs" title="Lista de Pagos Inactivos">
+    <i class="fas fa-list"></i> Lista de Pagos Inactivos</a>
 
 {% endblock %}
 

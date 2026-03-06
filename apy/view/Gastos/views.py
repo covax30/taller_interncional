@@ -145,7 +145,7 @@ class GastosDeleteView(PermisoRequeridoMixin, DeleteView):
         self.object.estado = False
         self.object.save()
         
-        messages.success(self.request, f"Gasto {self.object.nombre} desactivado ")
+        messages.success(self.request, f"Gasto {self.object.descripcion} desactivado ")
         return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):
@@ -173,7 +173,7 @@ class GastosActivateView(PermisoRequeridoMixin, DeleteView):
         self.object.estado = True
         self.object.save()
         
-        messages.success(self.request, f"Gasto {self.object.nombre} activado ")
+        messages.success(self.request, f"Gasto {self.object.descripcion} activado ")
         return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):
