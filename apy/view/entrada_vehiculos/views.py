@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from apy.models import EntradaVehiculo, Vehiculo, Cliente
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse_lazy
@@ -19,6 +19,7 @@ from apy.forms import EntradaVehiculoForm
 from django.contrib import messages
 from django.template.loader import render_to_string
 from apy.decorators import PermisoRequeridoMixin
+from apy.view import Gastos
 
 
 # ─────────────────────────────────────────────────────────────
@@ -84,6 +85,9 @@ class EntradaVehiculoListView(PermisoRequeridoMixin, ListView):
     template_name = 'entrada_vehiculos/listar_entrada_vehiculos.html'
     module_name = 'EntradaVehiculos'
     permission_required = 'view'
+    
+    def get_queryset(self):
+        return EntradaVehiculo.objects.filter(estado=True)
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -99,6 +103,29 @@ class EntradaVehiculoListView(PermisoRequeridoMixin, ListView):
         context['entidad']   = 'Entrada de Vehículos'
         return context
 
+
+class EntradaVehiculoInactivosListView(PermisoRequeridoMixin, ListView):
+    model = EntradaVehiculo
+    template_name = 'entrada_vehiculos/entrada_vehiculos_inactivos.html'
+    module_name = 'EntradaVehiculos'
+    permission_required = 'view'
+    
+    def get_queryset(self):
+        return EntradaVehiculo.objects.filter(estado=False)
+    
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return JsonResponse({'nombre': 'Entrada de Vehiculos Inactivos'})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo']    = 'Lista de Entrada de Vehículos Inactivos'
+        context['crear_url'] = reverse_lazy('apy:entrada_vehiculo_crear')
+        context['entidad']   = 'Entrada de Vehículos'
+        return context
 
 # ─────────────────────────────────────────────────────────────
 # CREAR
@@ -137,7 +164,9 @@ class EntradaVehiculoUpdateView(PermisoRequeridoMixin, UpdateView):
     permission_required = 'change'
 
     def form_valid(self, form):
-        messages.success(self.request, "Entrada de Vehículo actualizada correctamente.")
+        
+        form.instance.estado = True 
+        messages.success(self.request, "Vehiculo actualizado correctamente")
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -158,6 +187,14 @@ class EntradaVehiculoDeleteView(PermisoRequeridoMixin, DeleteView):
     success_url = reverse_lazy('apy:entrada_vehiculo_lista')
     module_name = 'EntradaVehiculos'
     permission_required = 'delete'
+    
+    def post(self, request, *args, **kwargs):
+        
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        
+        self.object.estado = False
+        self.object.save()
 
     def form_valid(self, form):
         messages.success(self.request, "Entrada de Vehículo eliminada correctamente.")
@@ -170,7 +207,19 @@ class EntradaVehiculoDeleteView(PermisoRequeridoMixin, DeleteView):
         context['listar_url'] = reverse_lazy('apy:entrada_vehiculo_lista')
         return context
 
-
+class EntradaVehiculoActivateView(PermisoRequeridoMixin, DeleteView):
+    model = EntradaVehiculo
+    template_name = 'entrada_vehiculos/activar_entrada_vehiculos.html'
+    success_url = reverse_lazy('apy:entrada_vehiculo_lista')
+    module_name = 'EntradaVehiculos'
+    permission_required = 'delete'
+    
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.estado = True
+        self.object.save()
+        messages.success(self.request, "Entrada de Vehículo activada correctamente.")
+        return HttpResponseRedirect(self.get_success_url())
 # ─────────────────────────────────────────────────────────────
 # MODAL CREAR
 # ─────────────────────────────────────────────────────────────

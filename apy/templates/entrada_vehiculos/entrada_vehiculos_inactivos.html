@@ -2,26 +2,23 @@
 
 {% block titulo %}
     <i class="fa-solid fa-car"></i>
-    <h1 class="text-center">Lista de Entrada de Vehículos</h1>
+    <h1 class="text-center">Lista de Entrada de Vehículos Inactivos </h1>
 {% endblock %}
 
 {% block agregar %}
-    <a href="{% url 'apy:entrada_vehiculo_crear' %}" class="btn btn-primary" title="Agregar entrada de vehículo">
-        <i class="fas fa-plus me-1"></i>Agregar Entrada de Vehículo
+    <a href="{% url 'apy:entrada_vehiculo_lista' %}" class="btn btn-primary" title="Lista de Entrada de Vehículos">
+        <i class="fas fa-plus me-1"></i>Lista entrada de vehículos activos
     </a>
-    <a href="{% url 'apy:entrada_vehiculo_inactivos' %}" class="btn btn-secondary" title="Lista de Entrada de Vehículos Inactivos">
-        <i class="fas fa-list me-1"></i>Lista entrada de vehículos inactivos
-    </a> 
 {% endblock %}
 
-            {% block columnas %}
-            <th>ID</th>
-            <th>Vehículo</th>
-            <th>Cliente</th>
-            <th>Fecha Entrada</th>
-            <th>Hora Entrada</th>
-            <th>Acciones</th>
-            {% endblock %}
+{% block columnas %}
+  <th>ID</th>
+  <th>Vehículo</th>
+  <th>Cliente</th>
+  <th>Fecha Entrada</th>
+  <th>Hora Entrada</th>
+  <th>Acciones</th>
+{% endblock %}
 
 {% block iterar %}
   {% for e in object_list %}
@@ -51,30 +48,15 @@
         <td>{{ e.hora_ingreso }}</td>
 
         <td>
-            {# ── Crear Servicio ── #}
-            <a href="{% url 'apy:crear_servicio' %}?entrada={{ e.id_entrada }}"
-               class="btn btn-success btn-xs"
-               data-toggle="tooltip"
-               data-placement="top"
-               title="Crear orden de servicio para esta entrada">
-               <i class="fas fa-file-invoice"></i>
-            </a>
+           
+            
 
-            {# ── Editar ── #}
-            <a href="{% url 'apy:entrada_vehiculo_editar' e.id_entrada %}"
-               class="btn btn-info btn-xs"
-               data-toggle="tooltip"
-               data-placement="top"
-               title="Editar entrada de vehículo">
-               <i class="fas fa-edit"></i>
-            </a>
-
-            {# ── Eliminar ── #}
-            <a href="{% url 'apy:entrada_vehiculo_eliminar' e.id_entrada %}"
+            {# ── activa ── #}
+            <a href="{% url 'apy:entrada_vehiculo_activar' e.id_entrada %}"
                class="btn btn-danger btn-xs"
                data-toggle="tooltip"
                data-placement="top"
-               title="Eliminar entrada de vehículo">
+               title="Activar entrada de vehículo">
                <i class="fas fa-trash-alt"></i>
             </a>
         </td>

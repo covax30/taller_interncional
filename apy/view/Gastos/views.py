@@ -52,7 +52,7 @@ class GastosInactivosListView(PermisoRequeridoMixin, ListView):
     template_name = 'Gastos/gastos_inactivos.html'
     
     # --- Configuración de Permisos ---
-    module_name = GASTOS_MODULE_NAME # <-- CORRECCIÓN APLICADA
+    module_name = GASTOS_MODULE_NAME 
     permission_required = 'view'
     
     def get_queryset(self):

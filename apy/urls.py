@@ -107,7 +107,8 @@ urlpatterns = [
     path('entrada_vehiculo/eliminar/<int:pk>/', EntradaVehiculoDeleteView.as_view(), name='entrada_vehiculo_eliminar'),
     path("entrada_vehiculo/modal/crear/", EntradaCreateModalView.as_view(), name="entrada_vehiculo_modal_crear"),
     path('vehiculo/activar/<int:pk>/', VehiculoInactivoDeleteView.as_view(), name="vehiculo_activar"),
-    
+    path('entrada_vehiculo/activar/<int:pk>/', EntradaVehiculoActivateView.as_view(), name="entrada_vehiculo_activar"),
+    path('entrada_vehiculo/inactivos/', EntradaVehiculoInactivosListView.as_view(), name='entrada_vehiculo_inactivos'),
     
     path('entrada_vehiculo/datos/<int:pk>/', api_entrada_datos, name='api_entrada_datos'),
     

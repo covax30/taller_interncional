@@ -305,6 +305,7 @@ class EntradaVehiculo(models.Model):
     id_cliente     = models.ForeignKey('Cliente',on_delete=models.PROTECT,verbose_name="Cliente",related_name='entradas',blank=True, null=True)
     fecha_ingreso  = models.DateField()
     hora_ingreso   = models.TimeField()
+    estado = models.BooleanField(default=True, verbose_name="Activo")
     def save(self, *args, **kwargs):
         # Auto-rellenar cliente desde el vehículo si no se especificó
         if self.id_vehiculo and not self.id_cliente:
@@ -581,13 +582,13 @@ class DetalleServicio(models.Model):
         ('terminado', 'Terminado'),
         ('proceso', 'En proceso'),
     ]
-    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.SET_DEFAULT, default=None, related_name="servicios")
-    cliente = models.ForeignKey(Cliente,on_delete=models.SET_DEFAULT, default=None, related_name="servicios")
-    id_entrada = models.ForeignKey(EntradaVehiculo, on_delete=models.SET_DEFAULT, default=None, blank=True, null=True)
-    empresa = models.ForeignKey('Empresa', on_delete=models.SET_DEFAULT, default=None, blank=True, null=True)
-    empleado = models.ForeignKey(Profile, on_delete=models.SET_DEFAULT, default=None, blank=True, null=True)
+    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.SET_NULL , default=None,blank=True, null=True, related_name="servicios")
+    cliente = models.ForeignKey(Cliente,on_delete=models.SET_NULL, default=None, blank=True, null=True, related_name="servicios")
+    id_entrada = models.ForeignKey(EntradaVehiculo, on_delete=models.SET_NULL, default=None, blank=True, null=True)
+    empresa = models.ForeignKey('Empresa', on_delete=models.SET_NULL, default=None, blank=True, null=True)
+    empleado = models.ForeignKey(Profile, on_delete=models.SET_NULL, default=None, blank=True, null=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    id_salida = models.ForeignKey(SalidaVehiculo, on_delete=models.SET_DEFAULT, default=None, blank=True, null=True)
+    id_salida = models.ForeignKey(SalidaVehiculo, on_delete=models.SET_NULL, default=None, blank=True, null=True)
     proceso = models.CharField(max_length=20, choices=PROCESO_OPCIONES, default='proceso')
     
     estado = models.BooleanField(default=True)
@@ -668,8 +669,8 @@ class DetalleServicio(models.Model):
         return f"Servicio #{self.id} - {self.id_vehiculo.placa}"
 
 class DetalleRepuesto(models.Model):
-    detalle_servicio = models.ForeignKey(DetalleServicio, on_delete=models.PROTECT)
-    id_repuesto = models.ForeignKey(Repuesto, on_delete=models.PROTECT)
+    detalle_servicio = models.ForeignKey(DetalleServicio, on_delete=models.SET_NULL, default=None, blank=True, null=True)
+    id_repuesto = models.ForeignKey(Repuesto, on_delete=models.SET_NULL, default=None, blank=True, null=True)
     cantidad = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
     precio_unitario = models.PositiveIntegerField(validators=[validar_monto])
     # Asegúrate de que este campo NO tenga una @property con el mismo nombre abajo
@@ -683,8 +684,8 @@ class DetalleRepuesto(models.Model):
         return f"Repuesto: {self.id_repuesto.nombre} - Cantidad: {self.cantidad}"
 
 class DetalleTipoMantenimiento(models.Model):
-    detalle_servicio = models.ForeignKey(DetalleServicio, on_delete=models.PROTECT)
-    id_tipo_mantenimiento = models.ForeignKey(TipoMantenimiento, on_delete=models.PROTECT)
+    detalle_servicio = models.ForeignKey(DetalleServicio, on_delete=models.SET_NULL, default=None, blank=True, null=True)
+    id_tipo_mantenimiento = models.ForeignKey(TipoMantenimiento, on_delete=models.SET_NULL, default=None, blank=True, null=True)
     # ── NUEVO CAMPO ──────────────────────────────────────────
     empleado = models.ForeignKey(
         Profile,
@@ -709,8 +710,8 @@ class DetalleTipoMantenimiento(models.Model):
 
 
 class DetalleInsumos(models.Model):
-    detalle_servicio = models.ForeignKey(DetalleServicio, on_delete=models.PROTECT)
-    id_insumos = models.ForeignKey(Insumos, on_delete=models.PROTECT)
+    detalle_servicio = models.ForeignKey(DetalleServicio, on_delete=models.SET_NULL, default=None, blank=True, null=True)
+    id_insumos = models.ForeignKey(Insumos, on_delete=models.SET_NULL, default=None, blank=True, null=True)
     cantidad = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
     precio_unitario = models.PositiveIntegerField(validators=[validar_monto])
     # Reactivamos el campo y usamos save()

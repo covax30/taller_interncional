@@ -1404,6 +1404,8 @@ DetallePagoHerramientaFormSet = inlineformset_factory(
 class GastosForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['id_vehiculo'].required = True
+        self.fields['cliente'].required = True
         for field in self.fields:
             self.fields[field].widget.attrs.update({'class': 'form-control'})
             
