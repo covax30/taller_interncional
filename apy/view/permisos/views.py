@@ -1,3 +1,5 @@
+from builtins import Exception, any
+
 from django.shortcuts import render, redirect, reverse
 from apy.models import Module, Permission 
 from django.contrib.auth.models import User

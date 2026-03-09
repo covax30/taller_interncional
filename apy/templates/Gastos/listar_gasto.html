@@ -7,22 +7,15 @@
 {% endblock titulo %}
 
 {% block agregar %}
-<a href="{{ crear_url }}" class="btn btn-primary btn-xs" title="Agregar gasto">
-    <i class="fas fa-plus"></i> Agregar
-</a>
-<a href="{% url 'apy:gasto_inactivos' %}" class="btn btn-secondary btn-xs">
-    <i class="fas fa-list"></i> Lista de Gastos Inactivos
-</a>
+
 {% endblock %}
 
 {% block columnas %}
     <th>Id gasto </th>
     <th>Descripción</th>
     <th>Tipo Gastos</th>
-    <th>Id Pago Servicios</th>
     
     <th>Monto</th>
-    <th>Acciones</th>
     
 
 {% endblock %}
@@ -33,16 +26,8 @@
         <td>{{ g.id }}</td>
         <td>{{ g.descripcion }}</td>
         <td>{{ g.tipo_gastos }}</td>
-        <td>{{ g.id_pagos_servicios }}</td>
         <td>{{ g.monto|intcomma }}</td>
-        <th>
-            <a href="{% url 'apy:gasto_editar' g.id %}" class="btn btn-warning btn-xs" title="Editar gasto">
-                <i class="fas fa-edit"></i>
-            </a>
-            <a href="{% url 'apy:gasto_eliminar' g.id %}" class="btn btn-danger btn-xs" title="Eliminar gasto">
-                <i class="fas fa-trash"></i>
-            </a>
-        </th>
+        
         
            
             

@@ -948,9 +948,9 @@ class ClienteForm(ModelForm):
         
     class Meta:
         model = Cliente
-        exclude = ['estado']  
-        fields = ['identificacion', 'nombre', 'telefono', 'direccion']
+        fields = ['identificacion', 'nombre', 'telefono', 'direccion', 'correo', 'tipo']
         widgets = {
+            
             'tipo':Select(
                 attrs={
                     'class': 'form-control',
@@ -964,11 +964,7 @@ class ClienteForm(ModelForm):
                     'placeholder':'Ingrese el nombre del cliente',
                 }
             ),
-            'tipo_identificacion': Select(
-                attrs={
-                    'class': 'form-control'
-                }
-            ),
+            
             'identificacion':TextInput(
                 attrs={
                     'placeholder':'Ingrese el documento del cliente',
@@ -1410,7 +1406,7 @@ class GastosForm(ModelForm):
             self.fields[field].widget.attrs.update({'class': 'form-control'})
             
 
-    class Meta:
+class Meta:
         model = Gastos
         exclude = ['estado','id_pagos_servicios']
         fields = ['tipo_gastos', 'monto', 'fecha', 'descripcion']
@@ -1690,7 +1686,7 @@ class RepuestoForm(ModelForm):
 
     class Meta:
         model = Repuesto
-        exclude = ['estado']
+        exclude = ['estado', 'stock_minimo']
         fields = ['id_marca', 'nombre', 'categoria','stock', 'stock_minimo', 'precio_unitario']
         widgets = {
             'id_marca': Select(

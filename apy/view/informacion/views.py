@@ -1,3 +1,5 @@
+from builtins import Exception
+
 import requests
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -36,7 +38,7 @@ def contact_informacion(request):
                     f"WEB T.I.M: {asunto}",
                     f"De: {nombre} ({correo})\n\nMensaje:\n{mensaje}",
                     settings.EMAIL_HOST_USER,
-                    ['karoltalerolopez@gmail.com'],
+                    ['yury45884@gmail.com'],
                     fail_silently=False,
                 )
                 messages.success(request, "Tu mensaje ha sido enviado con éxito.")

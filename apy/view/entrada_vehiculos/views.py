@@ -189,16 +189,17 @@ class EntradaVehiculoDeleteView(PermisoRequeridoMixin, DeleteView):
     permission_required = 'delete'
     
     def post(self, request, *args, **kwargs):
-        
         self.object = self.get_object()
         success_url = self.get_success_url()
         
+        # Realizamos el borrado lógico
         self.object.estado = False
         self.object.save()
-
-    def form_valid(self, form):
-        messages.success(self.request, "Entrada de Vehículo eliminada correctamente.")
-        return super().form_valid(form)
+        
+        # ✅ SOLUCIÓN: Mensaje de éxito y retorno de la redirección
+        from django.contrib import messages
+        messages.success(request, "Entrada de Vehículo desactivada correctamente.")
+        return HttpResponseRedirect(success_url)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -3,7 +3,7 @@
         <!--begin::Sidebar Brand-->
         <div class="sidebar-brand">
           <!--begin::Brand Link-->
-          <a href="../index.html" class="brand-link">
+          <a href="#" class="brand-link">
             <!--begin::Brand Image-->
             <img src="{% static 'img/logo.jpeg' %}"
               alt="T.I.M Logo"
@@ -28,7 +28,7 @@
                         
                   {% if user_perms == 'all' or user_perms.EstadisticasGenerales.view or user_perms.Informes.view %}
                   <li class="nav-item">
-                    <a href="#" class="nav-link"><i class="nav-icon bi bi-graph-down"></i><p>Análisis y Reportes<i class="nav-arrow bi bi-chevron-right"></i></p></a>
+                    <a href="#" class="nav-link"><i class="nav-icon bi bi-graph-down"></i><p> Estadisticas <i class="nav-arrow bi bi-chevron-right"></i></p></a>
                     <ul class="nav nav-treeview">
                       {% if user_perms == 'all' or user_perms.EstadisticasGenerales.view %}
                       <li class="nav-item"><a href="{% url 'apy:estadisticas' %}" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Estadísticas Generales</p></a></li>

@@ -253,11 +253,10 @@ class Profile(models.Model):
     def clean(self):
         super().clean()
         if self.tipo_identificacion and self.identificacion:
-            # Esto lanzará el error si no cumple la regex
             validar_por_tipo(self.identificacion, self.tipo_identificacion)
     
     def __str__(self):
-        return f'Perfil de {self.user.username}'
+        return f'Perfil de {self.user.username  }'
     
 class Cliente(models.Model):
 
@@ -265,7 +264,7 @@ class Cliente(models.Model):
         ('cliente particular', 'Cliente Particular'),
         ('empresa', 'Empresa'),
     ]
-    tipo = models.CharField(max_length=20, choices=TIPO_CLIENTE)
+    tipo = models.CharField(max_length=20, choices=TIPO_CLIENTE,default='cliente particular')
     nombre = models.CharField(max_length=255, verbose_name="Nombre/Razón Social")
     identificacion = models.CharField(
         max_length=50, 
@@ -279,7 +278,7 @@ class Cliente(models.Model):
     correo = models.EmailField(validators=[validar_email], unique=True)
     direccion = models.TextField(verbose_name="Dirección")
     estado = models.BooleanField(default=True, verbose_name="Activo")
-
+   
     def __str__(self):
         return f"{self.nombre} - {self.identificacion}"
     
@@ -582,6 +581,7 @@ class DetalleServicio(models.Model):
         ('terminado', 'Terminado'),
         ('proceso', 'En proceso'),
     ]
+    
     id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.SET_NULL , default=None,blank=True, null=True, related_name="servicios")
     cliente = models.ForeignKey(Cliente,on_delete=models.SET_NULL, default=None, blank=True, null=True, related_name="servicios")
     id_entrada = models.ForeignKey(EntradaVehiculo, on_delete=models.SET_NULL, default=None, blank=True, null=True)
