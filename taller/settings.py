@@ -213,12 +213,11 @@ MESSAGE_TAGS = {
 ## 📁 Configuración de Archivos Estáticos (STATIC)
 # -----------------------------------------------------
 STATIC_URL = '/static/'
-
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),         # <--- Aquí busca la carpeta en la raíz
-    os.path.join(BASE_DIR, 'apy', 'static'),  # <--- Aquí busca la de tu app
-]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] # <--- Aquí busca la de tu app
+
+
 
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -266,7 +265,7 @@ STORAGES = {
     },
     
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage" if not DEBUG else "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
 

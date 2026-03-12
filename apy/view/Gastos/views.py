@@ -80,7 +80,7 @@ class GastosCreateView(PermisoRequeridoMixin, CreateView):
     success_url = reverse_lazy('apy:gasto_lista')
     
     # --- Configuración de Permisos ---
-    module_name = GASTOS_MODULE_NAME # <-- CORRECCIÓN APLICADA
+    module_name = GASTOS_MODULE_NAME 
     permission_required = 'add'
     
     def form_valid(self, form):

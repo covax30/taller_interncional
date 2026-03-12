@@ -1,3 +1,5 @@
+from builtins import Exception, print, str, super
+
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views import View
 from apy.models import Empresa # Importa explícitamente
@@ -122,10 +124,9 @@ class EmpresaCreateView(PermisoRequeridoMixin, CreateView):
                 return None
         return empresa
 
-# En tu Vista:
 def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
-    empresa = get_or_create_empresa_default()
+    empresa = get_or_create_empresa_default() # type: ignore
     
     # Usamos diccionarios de forma segura
     context.update({

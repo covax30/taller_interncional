@@ -432,8 +432,7 @@ class Pagos(models.Model):
     TIPO_PAGO_OPCIONES = [
         ('efectivo', 'Efectivo'),
         ('transferencia', 'Transferencia'),
-        ('cheque', 'Cheque'),
-        ('credito', 'Crédito'),
+        
     ]
 
     id_pago      = models.AutoField(primary_key=True)
@@ -523,7 +522,7 @@ class Nomina(models.Model):
 
 class Gastos(models.Model):
    
-    monto = models.IntegerField(  # 🔹 ENTEROS, sin decimales
+    monto = models.IntegerField(  
         error_messages={
             'invalid': 'Ingrese un número válido para el monto.',
             'required': 'El monto del gasto es obligatorio.'

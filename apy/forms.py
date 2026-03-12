@@ -1349,7 +1349,7 @@ class DetallePagoInsumoForm(forms.ModelForm):
 
 
 class DetallePagoHerramientaForm(forms.ModelForm):
-    """Solo muestra el campo herramienta."""
+    
     class Meta:
         model  = DetallePago
         fields = ['herramienta', 'cantidad', 'precio_unitario']
