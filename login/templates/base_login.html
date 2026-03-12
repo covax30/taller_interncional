@@ -79,12 +79,13 @@
 
     <div id="slideshow-background"></div>
 
-    <a href="{% url 'apy:index_informacion' %}"
-        class="position-fixed top-0 left-0 m-3 d-block overflow-hidden rounded-circle bg-white shadow-lg transition-all p-0 border border-white"
-        style="width: 70px; height: 70px; z-index: 1050;" title="ir a la pagina principal">
-        <img src="{% static 'img/favico.jpg' %}" alt="Imagen" class="h-100 w-100 elevation-hover-2"
-            style="object-fit: cover; transition: all 0.2s ease;">
-    </a>
+<a href="{% url 'apy:index_informacion' %}"
+   class="position-fixed top-0 start-0 m-3 d-block overflow-hidden rounded-circle bg-white shadow-lg transition-all p-0 border border-white"
+   style="width: 70px; height: 70px; z-index: 1050;" 
+   title="ir a la pagina principal">
+    <img src="{% static 'img/favico.jpg' %}" alt="Imagen" class="h-100 w-100 elevation-hover-2"
+         style="object-fit: cover; transition: all 0.2s ease;">
+</a>
     <div class="login-box">
 
         {% block contenido_login %}
