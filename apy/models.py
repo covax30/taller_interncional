@@ -161,8 +161,9 @@ class Herramienta(models.Model):
     ]
     tipo = models.CharField(max_length=100, choices=TIPO_OPCIONES)
     id_marca = models.ForeignKey(Marca, on_delete=models.PROTECT)
-    stock = models.PositiveIntegerField(default=0, verbose_name="Stock disponible")  # ← NUEVO
-    stock_minimo = models.PositiveIntegerField(default=2, verbose_name="Stock mínimo")  # ← NUEVO
+    
+    stock = models.PositiveIntegerField(default=0, verbose_name="Stock disponible")  
+    stock_minimo = models.PositiveIntegerField(default=2, verbose_name="Stock mínimo")  
     estado = models.BooleanField(default=True)
 
     def __str__(self):
@@ -290,12 +291,12 @@ class Vehiculo(models.Model):
     id_cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)  
     placa = models.CharField(max_length=10, unique=True,validators=[placa_regex])
     modelo_vehiculo = models.CharField(max_length=4,validators=[modelo_regex])
-    marca_vehiculo = models.CharField(max_length=100, validators=[marca_regex])
+    marca_vehiculo = models.ForeignKey(Marca, on_delete=models.PROTECT) 
     color = models.CharField(max_length=100, validators=[color_regex])
     estado = models.BooleanField(default=True, verbose_name="Activo")
 
     def __str__(self):
-        return f"{self.placa} -  {self.marca_vehiculo} - {self.modelo_vehiculo}- {self.color} - {self.id_cliente.id}"
+        return f"{self.placa} -  {self.marca_vehiculo.nombre} - {self.modelo_vehiculo}- {self.color} - {self.id_cliente.id}"
     
 
 class EntradaVehiculo(models.Model):
@@ -442,26 +443,38 @@ class Pagos(models.Model):
     monto_total  = models.IntegerField(default=0)
     estado       = models.BooleanField(default=True)
     def save(self, *args, **kwargs):
-        es_nuevo = self.pk is None
+        update_fields = kwargs.get('update_fields')
         super().save(*args, **kwargs)
-        if es_nuevo:
-            from .models import Gastos 
-            Gastos.objects.create(
-                monto=self.monto_total,
-                descripcion=f"Pago a proveedores: {self.get_tipo_pago_display()}",
-                tipo_gastos='costo fijo', 
+        
+        
+        if self.monto_total > 0:
+            Gastos.objects.update_or_create(
                 id_pago=self,
-                fecha=timezone.now().date()
+                defaults={
+                    'monto': self.monto_total,
+                    'descripcion': f"Pago a proveedores: {self.proveedor.nombre} ({self.get_tipo_pago_display()})",
+                    'tipo_gastos': 'costo fijo',
+                    'fecha': self.fecha,
+                }
             )
 
     def recalcular_total(self):
-
+        from django.db.models import Sum
+        from decimal import Decimal
         total = sum(d.subtotal for d in self.detalles.all())
-        self.monto_total = total
-        self.save(update_fields=['monto_total'])
-
-    def __str__(self):
-        return f"Pago #{self.id_pago} - {self.proveedor.nombre}"
+        self.monto_total = int(total)
+        
+        Pagos.objects.filter(pk=self.pk).update(monto_total=self.monto_total)
+        
+        Gastos.objects.update_or_create(
+            id_pago=self,
+            defaults={
+                'monto': self.monto_total,
+                'descripcion': f"Pago a proveedores: {self.proveedor.nombre} ({self.get_tipo_pago_display()})",
+                'tipo_gastos': 'costo fijo',
+                'fecha': self.fecha,
+            }
+        )
     
 class DetallePago(models.Model):
     TIPO_CHOICES = [
@@ -801,23 +814,20 @@ class Factura(models.Model):
 
 #-----------Caja-----------------
 class Caja(models.Model):
-    TIPO_OPCIONES = [
+    TIPO_MOVIMIENTO = [
         ('Ingreso', 'Ingreso'),
         ('Gasto', 'Gasto'),
-        ('Nomina', 'Nomina'), # Agregamos este para mayor detalle
     ]
-    tipo_movimiento = models.CharField(max_length=20, choices=TIPO_OPCIONES)
-    monto = models.IntegerField(validators=[validar_monto])
+    tipo_movimiento = models.CharField(max_length=20, choices=TIPO_MOVIMIENTO)
+    monto = models.DecimalField(max_digits=12, decimal_places=2) 
+    descripcion = models.TextField()
     fecha = models.DateField(default=timezone.now)
-    hora = models.TimeField(auto_now_add=True)
-    descripcion = models.CharField(max_length=255, blank=True) # Para saber de dónde viene
     estado = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.tipo_movimiento} - {self.monto}"
     
     
-    
-    # ═══════════════════════════════════════════════════════════════
-# Agrega esta clase al FINAL de tu apy/models.py
-# ═══════════════════════════════════════════════════════════════
 
 class AlertaStock(models.Model):
     """

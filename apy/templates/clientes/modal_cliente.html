@@ -1,42 +1,36 @@
 {% load widget_tweaks %}
 {% block form %}
 
-    <div id="msg-cliente"></div>  
-
-     <!-- Id Cliente con modal -->
+    <div id="msg-cliente"></div>
 
     <form id="clienteForm" method="post" action="{% url 'apy:cliente_modal_crear' %}">
         {% csrf_token %}
-   
+
         {% for field in form.visible_fields %}
-    <div class="form-group mb-3">
-        <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
-        {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
-
-        {% if field.errors %}
-            <div class="invalid-feedback d-block">
-                {% for error in field.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
-            </div>
-        {% endif %}
-    </div>
-
-    {% endfor %}
+        <div class="form-group mb-3">
+            <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
+            {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
+            {% if field.errors %}
+                <div class="invalid-feedback d-block">
+                    {% for error in field.errors %}
+                        <small>{{ error }}</small><br>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        {% endfor %}
     </form>
 
 {% endblock %}
 
-    {% block Cancelar %}
+{% block Cancelar %}
     <button type="button" id="btnGuardarCliente" class="btn btn-primary btn-flat">
         <i class="fas fa-save"></i> Agregar
     </button>
 {% endblock %}
 
-
 {% block extra_js %}
 <script>
-
 $(document).off('click', '#btnGuardarCliente')
            .on('click', '#btnGuardarCliente', function(e) {
     e.preventDefault();
@@ -46,25 +40,11 @@ $(document).off('click', '#btnGuardarCliente')
     const $form  = $modal.find('form#clienteForm');
 
     if (!$form.length) {
-        console.error('❌ No se encontró el formulario #clienteForm dentro del modal.');
+        console.error('❌ No se encontró #clienteForm');
         return;
     }
 
     const url      = $form.attr('action');
-    const formData = new FormData($form[0]);
-
-    $btn.prop('disabled', true).addClass('disabled').text('Guardando...');
-
-    $(document).off('click', '#btnGuardarCliente').on('click', '#btnGuardarCliente', function(e) {
-    e.preventDefault();
-
-    const $btn = $(this);
-    const $modal = $('#modal-id_cliente');
-    const $form = $modal.find('form#clienteForm');
-
-    if (!$form.length) return;
-
-    const url = $form.attr('action');
     const formData = new FormData($form[0]);
 
     $btn.prop('disabled', true).text('Guardando...');
@@ -78,52 +58,38 @@ $(document).off('click', '#btnGuardarCliente')
         headers: { 'X-Requested-With': 'XMLHttpRequest' },
         success: function(data) {
             if (data.success) {
-                // --- CASO ÉXITO ---
-                const caller = $modal.data('caller');
-                let $selectObjetivo = (caller === 'modal-id_vehiculo') 
-                    ? $('#modal-id_vehiculo').find('#id_id_cliente') 
-                    : $('#id_id_cliente');
+                console.log('✅ Cliente creado, disparando clienteCreado:', data);
 
-                if ($selectObjetivo.length) {
-                    // Añadir y seleccionar la nueva opción
-                    if ($selectObjetivo.find('option[value="' + data.id + '"]').length === 0) {
-                        const newOption = new Option(data.text, data.id, true, true);
-                        $selectObjetivo.append(newOption).trigger('change.select2');
-                    } else {
-                        $selectObjetivo.val(data.id).trigger('change.select2');
-                    }
-                }
+                // ← Disparar evento para cadena de modales
+                $(document).trigger('clienteCreado', [{
+                    id:   data.id,
+                    text: data.text
+                }]);
 
-                // Cerrar y limpiar
+                // Cerrar modal
                 $modal.modal('hide');
                 $('.modal-backdrop').remove();
                 $('body').removeClass('modal-open').css('padding-right', '');
-                
+
             } else {
-                // --- CASO ERROR DE VALIDACIÓN (Django form.errors) ---
                 if (data.html) {
-                    // Reemplazamos el contenido del body para mostrar los errores rojos de Django
                     $modal.find('.modal-body').html(data.html);
-                    
-                    // Re-inicializamos Select2 si el formulario los usa
-                    if (typeof initSelect2EnModal === 'function') {
-                        initSelect2EnModal($modal);
-                    }
+                } else {
+                    $modal.find('#msg-cliente').html(
+                        '<div class="alert alert-danger">' + (data.message || 'Error') + '</div>'
+                    );
                 }
-                
-                $modal.find('#msg-cliente').html(
-                    '<div class="alert alert-danger">' + (data.message || 'Error en los datos') + '</div>'
-                );
             }
         },
         error: function(xhr) {
-            // Manejo de Error 500 o fallos de red
             let errorMsg = 'Error en el servidor.';
             if (xhr.responseJSON && xhr.responseJSON.message) {
                 errorMsg = xhr.responseJSON.message;
             }
-            $modal.find('#msg-cliente').html('<div class="alert alert-danger">' + errorMsg + '</div>');
-            console.error('❌ Error Crítico:', xhr.status);
+            $modal.find('#msg-cliente').html(
+                '<div class="alert alert-danger">' + errorMsg + '</div>'
+            );
+            console.error('❌ Error:', xhr.status);
         },
         complete: function() {
             $btn.prop('disabled', false).text('Agregar');
@@ -131,14 +97,13 @@ $(document).off('click', '#btnGuardarCliente')
     });
 });
 
-// ✅ Limpiar al cerrar
+// Limpiar al cerrar
 $('#modal-id_cliente').on('hidden.bs.modal', function() {
     const $form = $(this).find('form#clienteForm')[0];
     if ($form) $form.reset();
     $(this).find('#msg-cliente').html('');
     $(this).removeData('caller');
-    console.log('🧹 Modal cliente limpiado - caller removed');
+    console.log('🧹 Modal cliente limpiado');
 });
-
 </script>
 {% endblock %}

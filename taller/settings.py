@@ -110,7 +110,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'taller.wsgi.application'
-# settings.py (CONFIGURACIÓN PERMANENTE MYSQL)
 
 DATABASES = {
     'default': {

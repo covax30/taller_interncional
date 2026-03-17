@@ -1047,72 +1047,49 @@ class ClienteForm(ModelForm):
 class VehiculoForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
-        # Configura cómo se muestran los clientes en el select
+ 
         if 'id_cliente' in self.fields:
             self.fields['id_cliente'].label_from_instance = (
-                lambda obj: f"{obj.id} - {obj.nombre}"  
+                lambda obj: f"{obj.id} - {obj.nombre}"
             )
             self.fields['id_cliente'].widget.attrs.update({
                 'class': 'form-control foreign-key-field',
                 'autofocus': True
             })
-        
+ 
     class Meta:
         model = Vehiculo
         exclude = ['estado']
-        fields = '__all__'
+        fields = '__all__'   # ← corregido, sin queryset aquí
         widgets = {
-            'id_cliente': Select(
-                attrs={
-                    'class': 'form-control foreign-key-field',
-                }
-            ),
-            'placa': TextInput(
-                attrs={
-                    'class': 'form-control',
-                    'placeholder': 'Ingrese la placa del vehiculo (ej: ABC123) o (A1C234)',
-                }
-            ),
-            'modelo_vehiculo': TextInput(  # ← CORRECTO: coincide con el modelo
-                attrs={
-                    'class': 'form-control',
-                    'placeholder': 'Ingrese el modelo del vehiculo (ej: 2024)',
-                }
-            ),
-            'marca_vehiculo': TextInput(  # ← CORRECTO: coincide con el modelo
-                attrs={
-                    'class': 'form-control',
-                    'placeholder': 'Ingrese la marca del vehiculo',
-                }
-            ),
-            'color': TextInput(
-                attrs={
-                    'class': 'form-control',
-                    'placeholder': 'Ingrese el color del vehiculo',
-                }
-            ),
+            'id_cliente': Select(attrs={'class': 'form-control foreign-key-field'}),
+            'placa': TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ingrese la placa del vehiculo (ej: ABC123) o (A1C234)',
+            }),
+            'modelo_vehiculo': TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ingrese el modelo del vehiculo (ej: 2024)',
+            }),
+            'marca_vehiculo': Select(attrs={  
+                'class': 'form-control',
+                'placeholder': 'Ingrese la marca del vehiculo',
+            }),
+            'color': TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ingrese el color del vehiculo',
+            }),
         }
         error_messages = {
-            'id_cliente': {
-                'required': 'El cliente es obligatorio',
-            },
-            'placa': {
-                'required': 'La placa del vehiculo es obligatoria',
-                'unique': 'Ya existe un vehiculo con esa placa',
-            },
-            'modelo_vehiculo': {  # ← CORRECTO
-                'required': 'El modelo de vehiculo es obligatorio',
-                'invalid': 'El modelo debe tener 4 dígitos',
-            },
-            'marca_vehiculo': {  # ← CORRECTO
-                'required': 'La marca del vehiculo es obligatoria',
-            },
-            'color': {
-                'required': 'El color del vehiculo es obligatorio',
-            },
+            'id_cliente':      {'required': 'El cliente es obligatorio'},
+            'placa':           {'required': 'La placa del vehiculo es obligatoria',
+                                'unique': 'Ya existe un vehiculo con esa placa'},
+            'modelo_vehiculo': {'required': 'El modelo de vehiculo es obligatorio',
+                                'invalid': 'El modelo debe tener 4 dígitos'},
+            'marca_vehiculo':  {'required': 'La marca del vehiculo es obligatoria'},
+            'color':           {'required': 'El color del vehiculo es obligatorio'},
         }
-        
+ 
         
 class EntradaVehiculoForm(ModelForm):
     def __init__(self, *args, **kwargs):
@@ -1522,60 +1499,28 @@ class CajaForm(ModelForm):
 class HerramientaForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['stock'].initial = None
         self.fields['nombre'].widget.attrs['autofocus'] = True
-        
+        # Filtrar solo marcas de tipo Herramienta
+        self.fields['id_marca'].queryset = Marca.objects.filter(tipo='Herramienta', estado=True)
+ 
     class Meta:
         model = Herramienta
-        exclude = ['stock_minimo', 'estado'] 
-        fields = '__all__'
+        exclude = [ 'stock_minimo', 'estado']   
         widgets = {
-            'nombre':TextInput(
-                attrs={
-                    'placeholder':'Ingrese el nombre de la herramienta',
-                }
-            ),
-             'color':TextInput(
-                attrs={
-                    'placeholder':'Ingrese el color de la herramienta',
-                }
-            ),
-            'tipo':Select(
-                attrs={
-                    'placeholder':'Ingrese el tipo de herramienta',
-                }
-            ), 
-            
-            'id_marca':Select(
-                attrs={
-                    'placeholder':'Ingrese la marca de herramientas',
-                }
-            ),
-            'stock':NumberInput(
-                attrs={
-                    'placeholder':'Ingrese el stock de herramientas',
-                },
-            )
+            'nombre': TextInput(attrs={'placeholder': 'Ingrese el nombre de la herramienta'}),
+            'color':  TextInput(attrs={'placeholder': 'Ingrese el color de la herramienta'}),
+            'tipo':   Select(attrs={'placeholder': 'Ingrese el tipo de herramienta'}),
+            'id_marca': Select(attrs={'placeholder': 'Ingrese la marca de herramientas'}),
+            'stock': NumberInput(attrs={'placeholder': 'Ingrese la cantidad de herramientas'}),
         }
         error_messages = {
-            'nombre': {
-                'required': 'El nombre de la herramienta es obligatorio',
-            },
-            'color': {
-                'required': 'Es color de la herramienta es obligatorio',
-            },
-            'tipo': {
-                'required': 'El tipo de herramienta es obligatorio',
-            },
-            
-            'id_marca': {
-                'required': 'El id de la marca es obligatoria',
-            },
-            'stock': {
-                'required': 'El stock de la herramienta es obligatorio',
-            },
-            
+            'nombre':   {'required': 'El nombre de la herramienta es obligatorio'},
+            'color':    {'required': 'El color de la herramienta es obligatorio'},
+            'tipo':     {'required': 'El tipo de herramienta es obligatorio'},
+            'id_marca': {'required': 'El id de la marca es obligatoria'},
+            'stock':     {'required': 'El stock de herramientas es obligatorio'},
         }
+ 
         def clean_stock(self):
             stock = self.cleaned_data.get('stock')
             if stock is not None and stock <= 0:
@@ -1615,6 +1560,7 @@ class TipoMantenimientoForm(ModelForm):
 class InsumoForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['id_marca'].queryset = Marca.objects.filter(tipo='Insumo', estado=True)
         self.fields['id_marca'].widget.attrs['autofocus'] = True
         
     class Meta:
@@ -1675,67 +1621,38 @@ class InsumoForm(ModelForm):
 class RepuestoForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['stock'].initial = None
-        # Primer campo en recibir foco
+        # Filtrar solo marcas de tipo Repuesto
+        self.fields['id_marca'].queryset = Marca.objects.filter(tipo='Repuesto', estado=True)
         self.fields['id_marca'].widget.attrs['autofocus'] = True
-        # Aplica form-control a todos los campos automáticamente
         for field_name, field in self.fields.items():
             existing = field.widget.attrs.get('class', '')
             if 'form-control' not in existing:
                 field.widget.attrs['class'] = f'{existing} form-control'.strip()
-
+ 
     class Meta:
         model = Repuesto
-        exclude = ['estado', 'stock_minimo']
-        fields = ['id_marca', 'nombre', 'categoria','stock', 'stock_minimo', 'precio_unitario']
+        exclude = ['stock', 'stock_minimo', 'estado']   # ← stock excluido, lo maneja el signal
         widgets = {
-            'id_marca': Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-            'nombre': TextInput(
-                attrs={
-                    'placeholder': 'Ej: Filtro de aceite',
-                    'autocomplete': 'off',
-                }
-            ),
-            'categoria': Select(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-            
-            'precio_unitario': NumberInput(
-                attrs={
-                    'placeholder': '0',
-                    'min': '0',
-                    'step': '0.01',
-                    'class': 'form-control precio-unitario',
-                }
-            ),
-            'stock': NumberInput(
-                attrs={
-                    'placeholder': '0',
-                    'min': '0',
-                }
-            ),
-            'stock_minimo': NumberInput(
-                attrs={
-                    'placeholder': '1',
-                    'min': '0',
-                }
-            ),
-            
+            'id_marca': Select(attrs={'class': 'form-control'}),
+            'nombre': TextInput(attrs={
+                'placeholder': 'Ej: Filtro de aceite',
+                'autocomplete': 'off',
+            }),
+            'categoria': Select(attrs={'class': 'form-control'}),
+            'precio_unitario': NumberInput(attrs={
+                'placeholder': '0',
+                'min': '0',
+                'step': '0.01',
+                'class': 'form-control precio-unitario',
+            }),
         }
         error_messages = {
-            'id_marca':    {'required': 'La marca es obligatoria.'},
-            'nombre':      {'required': 'El nombre del repuesto es obligatorio.'},
-            'categoria':   {'required': 'La categoría es obligatoria.'},
+            'id_marca':        {'required': 'La marca es obligatoria.'},
+            'nombre':          {'required': 'El nombre del repuesto es obligatorio.'},
+            'categoria':       {'required': 'La categoría es obligatoria.'},
             'precio_unitario': {'required': 'El precio unitario es obligatorio.'},
-            'stock':       {'required': 'El stock inicial es obligatorio.'},
-            'stock_minimo':{'required': 'El stock mínimo es obligatorio.'},
         }
+ 
         def clean_precio(self):
             precio = self.data.get('precio')
             if precio:

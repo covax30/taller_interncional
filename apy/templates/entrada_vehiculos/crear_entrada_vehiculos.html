@@ -116,32 +116,42 @@
         });
 
         // ── vehiculoCreado → actualizar select ──
-        $(document).on('vehiculoCreado', function(event, nuevoVehiculo) {
-            console.log('vehiculoCreado recibido en entrada:', nuevoVehiculo);
-            if (!nuevoVehiculo || !nuevoVehiculo.id) { return; }
+$(document).on('vehiculoCreado', function(event, nuevoVehiculo) {
+    console.log('vehiculoCreado recibido en entrada:', nuevoVehiculo);
+    if (!nuevoVehiculo || !nuevoVehiculo.id) return;
 
-            var $sel = $('#id_id_vehiculo');
-            if (!$sel.length) { console.error('Select vehículo no encontrado'); return; }
+    // ── Vehículo ──
+    var $sel = $('#id_id_vehiculo');
+    if ($sel.find('option[value="' + nuevoVehiculo.id + '"]').length === 0) {
+        $sel.append(new Option(nuevoVehiculo.text, nuevoVehiculo.id, true, true));
+    }
+    $sel.val(nuevoVehiculo.id);
+    // Forzar actualización visual de Select2
+    if ($sel.data('select2')) {
+        $sel.trigger('change.select2');
+    }
 
-            // Agregar opción si no existe
-            if ($sel.find('option[value="' + nuevoVehiculo.id + '"]').length === 0) {
-                $sel.append(new Option(nuevoVehiculo.text, nuevoVehiculo.id, true, true));
-                console.log('Opción agregada:', nuevoVehiculo.text);
-            } else {
-                $sel.val(nuevoVehiculo.id);
-            }
+    // Actualizar mapa
+    if (nuevoVehiculo.cliente_id) {
+        vehiculoClienteMap[String(nuevoVehiculo.id)] = nuevoVehiculo.cliente_id;
+    }
 
-            // Actualizar mapa y autocompletar cliente
-            if (nuevoVehiculo.cliente_id) {
-                vehiculoClienteMap[String(nuevoVehiculo.id)] = nuevoVehiculo.cliente_id;
-            }
+    // ── Cliente ──
+    if (nuevoVehiculo.cliente_id) {
+        var $selCliente = $('#id_id_cliente');
+        if ($selCliente.find('option[value="' + nuevoVehiculo.cliente_id + '"]').length === 0) {
+            // Si la opción no existe, hacer fetch para obtener el texto del cliente
+            $.get("{% url 'apy:api_entrada_datos' 0 %}".replace('/0/', '/0/'), function() {});
+        }
+        $selCliente.val(nuevoVehiculo.cliente_id);
+        if ($selCliente.data('select2')) {
+            $selCliente.trigger('change.select2');
+        }
+        console.log('✅ Cliente autocompletado en entrada:', nuevoVehiculo.cliente_id);
+    }
 
-            $sel.trigger('change');
-
-            if ($sel.data('select2')) { $sel.select2('close'); }
-
-            console.log('Select vehículo actualizado:', $sel.val());
-        });
+    console.log('✅ Select vehículo actualizado:', $sel.val());
+});
 
         // ════════════════════════════════════════════════════════════════════════════
         // ✅ NUEVO: BOTÓN ABRIR MODAL VEHÍCULO DESDE ENTRADA

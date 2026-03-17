@@ -248,11 +248,25 @@ class ClienteCreateModalView(CreateView):
             "message": "Cliente registrado correctamente ✅"
         })
 
+    def form_valid(self, form):
+        try:
+            self.object = form.save()
+            return JsonResponse({
+                "success": True,
+                "id": self.object.pk,
+                "text": str(self.object),
+                "message": "Cliente creado correctamente ✅"
+            })
+        except Exception as e:
+            return JsonResponse({
+                "success": False,
+                "message": f"Error al guardar: {str(e)}"
+            }, status=500)
+
     def form_invalid(self, form):
-        # Renderiza el formulario con los errores específicos de Django para devolverlos al modal
         html = render_to_string(self.template_name, {"form": form}, request=self.request)
         return JsonResponse({
             "success": False,
             "html": html,
             "message": "Por favor, corrige los errores indicados."
-        })
+        })  

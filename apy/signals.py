@@ -18,21 +18,13 @@ logger = logging.getLogger(__name__)
 # ══════════════════════════════════════════════════════════════
 
 def _verificar_y_alertar(tipo_item: str, item):
-    """
-    Si el ítem está en stock bajo:
-      1. Guarda/actualiza una AlertaStock en la BD (para el banner visual)
-      2. Envía correo al gerente si no se envió en las últimas 2 horas
-    """
     if not item.stock_bajo:
         return
 
     nivel = 'sin_stock' if item.stock == 0 else 'stock_bajo'
 
-    # ── 1. Persistir alerta en BD ────────────────────────────
-    # import local para evitar importación circular en el arranque
     from .models import AlertaStock
 
-    # Busca si ya existe una alerta no leída para este ítem
     alerta_existente = AlertaStock.objects.filter(
         tipo        = tipo_item,
         nombre_item = item.nombre,
@@ -40,7 +32,6 @@ def _verificar_y_alertar(tipo_item: str, item):
     ).first()
 
     if alerta_existente:
-        # Actualiza el stock actual (puede haber bajado más)
         alerta_existente.stock_actual = item.stock
         alerta_existente.nivel        = nivel
         alerta_existente.fecha        = timezone.now()
@@ -54,7 +45,6 @@ def _verificar_y_alertar(tipo_item: str, item):
             nivel        = nivel,
         )
 
-    # ── 2. Enviar correo (con anti-spam de 2 horas) ──────────
     from django.core.cache import cache
     cache_key = f"email_alerta_stock_{tipo_item}_{item.pk}"
 
@@ -62,12 +52,11 @@ def _verificar_y_alertar(tipo_item: str, item):
         logger.debug(f"Correo ya enviado recientemente para {tipo_item} #{item.pk}, omitiendo.")
         return
 
-    cache.set(cache_key, True, timeout=7200)   # 2 horas
+    cache.set(cache_key, True, timeout=7200)
     _enviar_correo_alerta(tipo_item, item.nombre, item.stock, item.stock_minimo)
 
 
 def _enviar_correo_alerta(tipo_item: str, nombre: str, stock_actual: int, stock_minimo: int):
-    """Envía el correo HTML al gerente."""
     destinatarios_raw = getattr(settings, 'ADMINS_CORREO_STOCK', '')
     if not destinatarios_raw:
         logger.warning("ADMINS_CORREO_STOCK no configurado — correo no enviado.")
@@ -156,7 +145,7 @@ def _enviar_correo_alerta(tipo_item: str, nombre: str, stock_actual: int, stock_
 
 
 # ══════════════════════════════════════════════════════════════
-# SEÑALES — PAGOS (compra a proveedor → SUMA stock)
+# SEÑALES — PAGOS (compra a proveedor → SUMA stock + actualiza precio)
 # ══════════════════════════════════════════════════════════════
 
 @receiver(post_save, sender=DetallePago)
@@ -168,12 +157,14 @@ def sumar_stock_al_comprar(sender, instance, created, **kwargs):
         if instance.tipo_item == 'Repuesto' and instance.repuesto:
             rep = instance.repuesto
             rep.stock += instance.cantidad
-            rep.save(update_fields=['stock'])
+            rep.precio_unitario = instance.precio_unitario  # ← actualiza precio con último costo
+            rep.save(update_fields=['stock', 'precio_unitario'])
 
         elif instance.tipo_item == 'Insumo' and instance.insumo:
             ins = instance.insumo
             ins.stock += instance.cantidad
-            ins.save(update_fields=['stock'])
+            ins.costo = instance.precio_unitario  # ← actualiza costo del insumo
+            ins.save(update_fields=['stock', 'costo'])
 
         elif instance.tipo_item == 'Herramienta' and instance.herramienta:
             her = instance.herramienta
@@ -201,7 +192,7 @@ def restar_stock_al_anular_compra(sender, instance, **kwargs):
 
 
 # ══════════════════════════════════════════════════════════════
-# SEÑALES — DETALLE SERVICIO (factura → RESTA stock + alerta)
+# SEÑALES — DETALLE SERVICIO (uso en servicio → RESTA stock + alerta)
 # ══════════════════════════════════════════════════════════════
 
 @receiver(post_save, sender=DetalleRepuesto)
@@ -214,7 +205,6 @@ def restar_stock_repuesto_en_servicio(sender, instance, created, **kwargs):
         repuesto.stock = max(0, repuesto.stock - instance.cantidad)
         repuesto.save(update_fields=['stock'])
 
-    # Verificar FUERA de la transacción para no bloquearla
     repuesto.refresh_from_db()
     _verificar_y_alertar('Repuesto', repuesto)
 
@@ -226,7 +216,6 @@ def devolver_stock_repuesto_al_cancelar_servicio(sender, instance, **kwargs):
         repuesto.stock += instance.cantidad
         repuesto.save(update_fields=['stock'])
 
-    # Si el stock ya superó el mínimo, marcar alertas previas como leídas
     repuesto.refresh_from_db()
     if not repuesto.stock_bajo:
         from .models import AlertaStock

@@ -87,7 +87,7 @@ class GastosCreateView(PermisoRequeridoMixin, CreateView):
         form.instance.estado = True 
         response = super().form_valid(form)
         
-        # 2. Lógica Financiera: Crear el movimiento en Caja
+        # Crear el movimiento en Caja
         Caja.objects.create(
             tipo_movimiento='Egreso',  # O el valor que uses en tu modelo
             monto=form.instance.monto,

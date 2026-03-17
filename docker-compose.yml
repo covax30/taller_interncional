@@ -7,7 +7,7 @@ services:
       - .:/app
       - taller_internacional_static_data:/app/staticfiles
       - taller_internacional_media_data:/app/media
-    ports:
+    ports:    
       - "8015:8000"
     networks:
       - taller_internacional_network

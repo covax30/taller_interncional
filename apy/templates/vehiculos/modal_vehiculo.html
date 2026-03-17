@@ -7,18 +7,18 @@
 
     <!-- Cliente -->
     <div class="form-group mb-3">
-        <label for="{{ form.id_id_cliente.id_for_label }}">Id Cliente:</label>
-        <div class="input-group">
-            {{ form.id_cliente|add_class:'form-control'|attr:'autocomplete:off' }}
-            <div class="input-group-append">
-                
-            </div> 
+        <label for="{{ form.id_cliente.id_for_label }}">Cliente:</label>
+        <div class="input-group" style="display:flex; flex-wrap:nowrap;">
+            <div style="flex-grow:1;">
+                {{ form.id_cliente|add_class:'form-control select2' }}
+            </div>
+            <button type="button" class="btn btn-primary" id="btnAbrirModalClienteDesdeVehiculo" title="Agregar nuevo cliente">
+                <i class="fas fa-plus"></i>
+            </button>
         </div>
         {% if form.id_cliente.errors %}
             <div class="invalid-feedback d-block">
-                {% for error in form.id_cliente.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
+                {% for error in form.id_cliente.errors %}<small>{{ error }}</small><br>{% endfor %}
             </div>
         {% endif %}
     </div>
@@ -29,9 +29,7 @@
         {{ form.placa|add_class:'form-control'|attr:'autocomplete:off' }}
         {% if form.placa.errors %}
             <div class="invalid-feedback d-block">
-                {% for error in form.placa.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
+                {% for error in form.placa.errors %}<small>{{ error }}</small><br>{% endfor %}
             </div>
         {% endif %}
     </div>
@@ -42,9 +40,7 @@
         {{ form.modelo_vehiculo|add_class:'form-control'|attr:'autocomplete:off' }}
         {% if form.modelo_vehiculo.errors %}
             <div class="invalid-feedback d-block">
-                {% for error in form.modelo_vehiculo.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
+                {% for error in form.modelo_vehiculo.errors %}<small>{{ error }}</small><br>{% endfor %}
             </div>
         {% endif %}
     </div>
@@ -55,9 +51,7 @@
         {{ form.marca_vehiculo|add_class:'form-control'|attr:'autocomplete:off' }}
         {% if form.marca_vehiculo.errors %}
             <div class="invalid-feedback d-block">
-                {% for error in form.marca_vehiculo.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
+                {% for error in form.marca_vehiculo.errors %}<small>{{ error }}</small><br>{% endfor %}
             </div>
         {% endif %}
     </div>
@@ -68,9 +62,7 @@
         {{ form.color|add_class:'form-control'|attr:'autocomplete:off' }}
         {% if form.color.errors %}
             <div class="invalid-feedback d-block">
-                {% for error in form.color.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
+                {% for error in form.color.errors %}<small>{{ error }}</small><br>{% endfor %}
             </div>
         {% endif %}
     </div>
@@ -86,13 +78,12 @@
 <script>
 function cerrarModalVehiculo() {
     var el = document.getElementById('modal-id_vehiculo');
-    if (!el) { console.warn('No se encontró #modal-id_vehiculo'); return; }
+    if (!el) return;
 
     el.classList.remove('show');
     el.style.display = 'none';
     el.setAttribute('aria-hidden', 'true');
     el.removeAttribute('aria-modal');
-
     document.body.classList.remove('modal-open');
     document.body.style.paddingRight = '';
 
@@ -100,51 +91,29 @@ function cerrarModalVehiculo() {
     for (var i = 0; i < bds.length; i++) {
         bds[i].parentNode.removeChild(bds[i]);
     }
-    console.log('Modal #modal-id_vehiculo cerrado OK');
+    console.log('Modal vehículo cerrado OK');
 }
 
 $(document).ready(function() {
     console.log('=== MODAL VEHÍCULO INICIALIZADO ===');
-    
 
-    // ════════════════════════════════════════════════════════════════════════════
-    // BOTÓN CANCELAR
-    // ════════════════════════════════════════════════════════════════════════════
+    // ── CANCELAR ──
     $(document).off('click', '#btnCancelarVehiculo').on('click', '#btnCancelarVehiculo', function(e) {
         e.preventDefault();
         e.stopPropagation();
-        console.log('🔄 Cancelando modal vehículo...');
         cerrarModalVehiculo();
     });
 
-    // ════════════════════════════════════════════════════════════════════════════
-    // ✅ NUEVO: BOTÓN ABRIR MODAL CLIENTE DESDE VEHÍCULO
-    // ════════════════════════════════════════════════════════════════════════════
-    $(document).off('click', '#btnAbrirModalCliente').on('click', '#btnAbrirModalCliente', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        console.log('🔓 Abriendo modal cliente desde vehículo...');
-        
-        // El script en base.html detectará automáticamente que modal-id_vehiculo está visible
-        // y setteará data('caller') en consecuencia
-        $('#modal-id_cliente').modal('show');
-    });
-
-    // ── BOTÓN GUARDAR ──
+    // ── GUARDAR ──
     $(document).off('click', '#btnGuardarVehiculo').on('click', '#btnGuardarVehiculo', function(e) {
         e.preventDefault();
         e.stopPropagation();
 
-        var $btn     = $(this);
-        var $form    = $('#vehiculoForm');
-        var $msgBox  = $('#msg-vehiculo');
+        var $btn    = $(this);
+        var $modal  = $('#modal-id_vehiculo');
+        var $form   = $('#vehiculoForm');
+        var $msgBox = $('#msg-vehiculo');
         var formData = new FormData($form[0]);
-
-        console.log('=== DATOS ENVIADOS ===');
-        formData.forEach(function(value, key) {
-            console.log(key + ': ' + value);
-        });
 
         $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Guardando...');
 
@@ -162,19 +131,25 @@ $(document).ready(function() {
                 if (response.success) {
                     $msgBox.html('<div class="alert alert-success">' + response.message + '</div>');
 
-                    var clienteId = $('#id_id_cliente').val();
+                    // ← CORRECTO: tomar clienteId del select DENTRO del modal
+                    var $selClienteModal = $modal.find('#id_id_cliente');
+                    var clienteId = $selClienteModal.val();
 
+                    console.log('clienteId desde modal vehículo:', clienteId);
+
+                    // Disparar evento ANTES de cerrar
                     $(document).trigger('vehiculoCreado', [{
                         id:         response.id,
                         text:       response.text,
                         cliente_id: clienteId
                     }]);
-                    console.log('Evento vehiculoCreado disparado ID:', response.id);
 
-                    // Cerrar modal después del mensaje
+                    console.log('✅ vehiculoCreado disparado ID:', response.id, '| cliente:', clienteId);
+
+                    // Cerrar modal después con delay
                     setTimeout(function() {
                         cerrarModalVehiculo();
-                    }, 1200);
+                    }, 800);
 
                 } else {
                     var html = '<div class="alert alert-danger">';

@@ -275,9 +275,7 @@ function initSelect2EnModal($modal) {
 </script>
 
 <!-- DESPUÉS: scripts de modales -->
-<script>
-$("#modal-id_vehiculo").on("show.bs.modal", function() );
-</script>
+
 <!-- Sub-Modal Marca -->
     <div class="modal fade" id="modal-id_marca" tabindex="-1" role="dialog" data-backdrop="static">
         <div class="modal-dialog modal-md" role="document">
@@ -534,6 +532,58 @@ $(document).ready(function() {
     $(document).on('select2:opening', function(e) {
         $(e.target).removeAttr('aria-hidden');
     });
+});
+</script>
+<script>
+// ══════════════════════════════════════════════════════
+// CADENA DE MODALES: Entrada → Vehículo → Cliente
+// ══════════════════════════════════════════════════════
+$(document).on('click', '#btnAbrirModalClienteDesdeVehiculo', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Marcar que cliente fue abierto desde vehículo
+    $('#modal-id_cliente').data('caller', 'modal-id_vehiculo');
+    
+    // Abrir modal cliente
+    $('#modal-id_cliente').modal('show');
+    
+    console.log('Modal cliente abierto desde vehículo');
+});
+
+$(document).on('clienteCreado', function(event, nuevoCliente) {
+    var caller = $('#modal-id_cliente').data('caller');
+    
+    if (caller === 'modal-id_vehiculo') {
+        var $modal = $('#modal-id_vehiculo');
+        var $selCliente = $modal.find('#id_id_cliente');
+
+        console.log('Select encontrado:', $selCliente.length);
+
+        if ($selCliente.length) {
+            // Destruir Select2, agregar opción, reinicializar
+            if ($selCliente.data('select2')) {
+                $selCliente.select2('destroy');
+            }
+
+            // Agregar opción si no existe
+            if ($selCliente.find('option[value="' + nuevoCliente.id + '"]').length === 0) {
+                $selCliente.append(new Option(nuevoCliente.text, nuevoCliente.id, true, true));
+            }
+
+            $selCliente.val(nuevoCliente.id);
+
+            // Reinicializar Select2
+            $selCliente.select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                dropdownParent: $modal
+            });
+
+            $selCliente.trigger('change');
+            console.log('✅ Cliente autoseleccionado en modal vehículo:', nuevoCliente.id);
+        }
+    }
 });
 </script>
 
