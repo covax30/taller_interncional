@@ -291,12 +291,12 @@ class Vehiculo(models.Model):
     id_cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)  
     placa = models.CharField(max_length=10, unique=True,validators=[placa_regex])
     modelo_vehiculo = models.CharField(max_length=4,validators=[modelo_regex])
-    marca_vehiculo = models.ForeignKey(Marca, on_delete=models.PROTECT) 
+    id_marca = models.ForeignKey(Marca, on_delete=models.PROTECT) 
     color = models.CharField(max_length=100, validators=[color_regex])
     estado = models.BooleanField(default=True, verbose_name="Activo")
 
     def __str__(self):
-        return f"{self.placa} -  {self.marca_vehiculo.nombre} - {self.modelo_vehiculo}- {self.color} - {self.id_cliente.id}"
+        return f"{self.placa} -  {self.id_marca.nombre} - {self.modelo_vehiculo}- {self.color} - {self.id_cliente.id}"
     
 
 class EntradaVehiculo(models.Model):

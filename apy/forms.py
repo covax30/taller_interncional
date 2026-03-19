@@ -421,9 +421,29 @@ def _validar_solo_letras(valor: str, nombre_campo: str) -> str:
 # FORMULARIO PRINCIPAL: Registro / Edición de Usuario (por parte del Admin)
 # ─────────────────────────────────────────────────────────────────────────────
 class RegistroUsuarioForm(forms.ModelForm):
+    first_name = forms.CharField(
+        label='Nombre del empleado',
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Ingrese el nombre',
+            'autocomplete': 'off',
+        })
+    )
+
+    last_name = forms.CharField(
+        label='Apellido del empleado',
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Ingrese el apellido',
+            'autocomplete': 'off',
+        })
+    )
 
     # ── Campos extra no presentes en el modelo User ──────────────────────────
     old_password = forms.CharField(
+        
         label='Contraseña Antigua',
         widget=forms.PasswordInput(attrs={'placeholder': 'Contraseña actual'}),
         required=False,
@@ -1047,7 +1067,11 @@ class ClienteForm(ModelForm):
 class VehiculoForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
- 
+        self.fields['id_marca'].queryset = Marca.objects.filter(
+            tipo='Vehiculo', 
+            estado=True
+        )
+
         if 'id_cliente' in self.fields:
             self.fields['id_cliente'].label_from_instance = (
                 lambda obj: f"{obj.id} - {obj.nombre}"
@@ -1071,7 +1095,7 @@ class VehiculoForm(ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Ingrese el modelo del vehiculo (ej: 2024)',
             }),
-            'marca_vehiculo': Select(attrs={  
+            'id_vehiculo': Select(attrs={  
                 'class': 'form-control',
                 'placeholder': 'Ingrese la marca del vehiculo',
             }),
@@ -1086,7 +1110,7 @@ class VehiculoForm(ModelForm):
                                 'unique': 'Ya existe un vehiculo con esa placa'},
             'modelo_vehiculo': {'required': 'El modelo de vehiculo es obligatorio',
                                 'invalid': 'El modelo debe tener 4 dígitos'},
-            'marca_vehiculo':  {'required': 'La marca del vehiculo es obligatoria'},
+            'id_vehiculo':  {'required': 'La marca del vehiculo es obligatoria'},
             'color':           {'required': 'El color del vehiculo es obligatorio'},
         }
  
@@ -1099,7 +1123,7 @@ class EntradaVehiculoForm(ModelForm):
         # Label bonito para el select de vehículo
         self.fields['id_vehiculo'].queryset = Vehiculo.objects.filter(estado=True)
         self.fields['id_vehiculo'].label_from_instance = (
-            lambda v: f"{v.placa} — {v.marca_vehiculo} {v.modelo_vehiculo} ({v.color})"
+            lambda v: f"{v.placa} — {v.id_marca} {v.modelo_vehiculo} ({v.color})"
         )
         self.fields['id_vehiculo'].empty_label = "Seleccione un vehículo"
 
@@ -1130,10 +1154,13 @@ class EntradaVehiculoForm(ModelForm):
             }),
         }
         error_messages = {
-            'id_vehiculo':  {'required': 'El vehículo es obligatorio.'},
-            'fecha_ingreso': {'required': 'La fecha de ingreso es obligatoria.'},
-            'hora_ingreso':  {'required': 'La hora de ingreso es obligatoria.'},
-        }
+        'id_vehiculo':   {
+            'required':      'El vehículo es obligatorio.',
+            'invalid_choice': 'Seleccione un vehículo válido.',
+        },
+        'fecha_ingreso': {'required': 'La fecha de ingreso es obligatoria.'},
+        'hora_ingreso':  {'required': 'La hora de ingreso es obligatoria.'},
+    }
         
 class SalidaVehiculoForm(ModelForm):
     def __init__(self, *args, **kwargs):
@@ -1631,7 +1658,7 @@ class RepuestoForm(ModelForm):
  
     class Meta:
         model = Repuesto
-        exclude = ['stock', 'stock_minimo', 'estado']   # ← stock excluido, lo maneja el signal
+        exclude = [ 'stock_minimo', 'estado']   # ← stock excluido, lo maneja el signal
         widgets = {
             'id_marca': Select(attrs={'class': 'form-control'}),
             'nombre': TextInput(attrs={

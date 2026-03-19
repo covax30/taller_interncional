@@ -53,16 +53,26 @@
     </div>
 
     <!-- Marca Vehiculo -->
+    {# ── MARCA con botón de modal ── #}
     <div class="form-group mb-3">
-        <label for="{{ form.marca_vehiculo.id_for_label }}">Marca vehiculo:</label>
-        <div class="input-group">
-            {{ form.marca_vehiculo|add_class:'form-control'|attr:'autocomplete:off' }}
+        <label for="{{ form.id_marca.id_for_label }}" class="font-weight-bold">
+            Marca <span class="text-danger">*</span>
+        </label>
+        <div class="input-group"> 
+            {{ form.id_marca|add_class:'form-control' }}
+            <div class="input-group-append">
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-toggle="modal"
+                        data-target="#modal-id_marca"
+                        title="Crear nueva marca">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
         </div>
-        {% if form.marca_vehiculo.errors %}
+        {% if form.id_marca.errors %}
             <div class="invalid-feedback d-block">
-                {% for error in form.marca_vehiculo.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
+                {% for error in form.id_marca.errors %}<small>{{ error }}</small>{% endfor %}
             </div>
         {% endif %}
     </div>
@@ -102,6 +112,33 @@
             </div>
         </div>
     </div>
+    {# ── Modal para crear Marca en línea ── #}
+    <div class="modal fade" id="modal-id_marca" tabindex="-1" role="dialog" aria-labelledby="modalMarcaLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header d-flex justify-content-between align-items-center">
+                    <h5 class="modal-title mb-0" id="modalMarcaLabel">
+                        <i class="fas fa-tag mr-1"></i> Crear Marca
+                    </h5>
+                    <button type="button"
+                            class="close"
+                            data-dismiss="modal"
+                            aria-label="Cerrar"
+                            style="background:#dc3545;color:#fff;border:none;border-radius:50%;
+                                   width:35px;height:35px;font-size:1.2rem;
+                                   display:flex;justify-content:center;align-items:center;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {# Contenido cargado por AJAX #}
+                    <div class="text-center py-3">
+                        <i class="fas fa-spinner fa-spin fa-2x text-secondary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Script Cliente. -->
 <script>
@@ -126,6 +163,23 @@
             $modalVehiculo.data('estaba-abierto', true);
             $modalVehiculo.modal('hide');
         }
+    });
+</script>
+<script>
+    // ── Modal Marca ──
+    $("#modal-id_marca").on("show.bs.modal", function () {
+        var $modal = $(this);  // ← usa $modal consistentemente
+
+        $.ajax({
+            url: "{% url 'apy:marca_modal_crear' %}",
+            success: function(data){
+                $modal.find(".modal-body").html(data.html || data);  // ← $modal con $
+            }
+        });
+    });
+
+    $('#id_id_marca').select2({
+        theme: 'bootstrap-5',
     });
 </script>
 {% endblock %}

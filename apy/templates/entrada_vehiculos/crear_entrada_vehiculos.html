@@ -9,7 +9,6 @@
     <label for="{{ form.id_vehiculo.auto_id }}">Vehículo:</label>
     <div class="input-group" style="display:flex; flex-wrap:nowrap;">
         <div style="flex-grow:1;">
-            {# Asegúrate de que el ID aquí sea el que espera tu JS (ej: id_id_vehiculo) #}
             {{ form.id_vehiculo|add_class:'form-control select2' }}
         </div>
         <button type="button" class="btn btn-primary" id="btnAbrirModalVehiculo" title="Agregar nuevo vehículo">
@@ -25,10 +24,9 @@
 
 {# ── Cliente ── #}
 <div class="form-group mb-3">
-    <label for="{{ form.id_id_cliente.auto_id }}">Cliente:</label>
-    {# Este campo se llenará solo gracias a tu script y el vehiculoClienteMap #}
+    <label for="{{ form.id_cliente.auto_id }}">Cliente:</label>
     {{ form.id_cliente|add_class:'form-control select2' }}
-    {% if form.id_id_cliente.errors %}
+    {% if form.id_cliente.errors %}  
         <div class="invalid-feedback d-block">
             {% for error in form.id_cliente.errors %}<small>{{ error }}</small><br>{% endfor %}
         </div>
@@ -115,42 +113,43 @@
             });
         });
 
-        // ── vehiculoCreado → actualizar select ──
+// ── vehiculoCreado → actualizar select ──
 $(document).on('vehiculoCreado', function(event, nuevoVehiculo) {
     console.log('vehiculoCreado recibido en entrada:', nuevoVehiculo);
     if (!nuevoVehiculo || !nuevoVehiculo.id) return;
 
-    // ── Vehículo ──
-    var $sel = $('#id_id_vehiculo');
-    if ($sel.find('option[value="' + nuevoVehiculo.id + '"]').length === 0) {
-        $sel.append(new Option(nuevoVehiculo.text, nuevoVehiculo.id, true, true));
+    // ── 1. Agregar vehículo al select y seleccionarlo ──
+    var $selVehiculo = $('#id_id_vehiculo');
+    if ($selVehiculo.find('option[value="' + nuevoVehiculo.id + '"]').length === 0) {
+        $selVehiculo.append(new Option(nuevoVehiculo.text, nuevoVehiculo.id, true, true));
     }
-    $sel.val(nuevoVehiculo.id);
-    // Forzar actualización visual de Select2
-    if ($sel.data('select2')) {
-        $sel.trigger('change.select2');
+    $selVehiculo.val(nuevoVehiculo.id).trigger('change');
+    if ($selVehiculo.data('select2')) {
+        $selVehiculo.trigger('change.select2');
     }
 
-    // Actualizar mapa
+    // Actualizar mapa local
     if (nuevoVehiculo.cliente_id) {
         vehiculoClienteMap[String(nuevoVehiculo.id)] = nuevoVehiculo.cliente_id;
     }
 
-    // ── Cliente ──
-    if (nuevoVehiculo.cliente_id) {
+    // ── 2. Agregar cliente al select y seleccionarlo ──
+    if (nuevoVehiculo.cliente_id && nuevoVehiculo.cliente_texto) {
         var $selCliente = $('#id_id_cliente');
+
+        // Si la opción no existe, créala
         if ($selCliente.find('option[value="' + nuevoVehiculo.cliente_id + '"]').length === 0) {
-            // Si la opción no existe, hacer fetch para obtener el texto del cliente
-            $.get("{% url 'apy:api_entrada_datos' 0 %}".replace('/0/', '/0/'), function() {});
+            $selCliente.append(new Option(nuevoVehiculo.cliente_texto, nuevoVehiculo.cliente_id, true, true));
         }
-        $selCliente.val(nuevoVehiculo.cliente_id);
+
+        $selCliente.val(nuevoVehiculo.cliente_id).trigger('change');
         if ($selCliente.data('select2')) {
             $selCliente.trigger('change.select2');
         }
         console.log('✅ Cliente autocompletado en entrada:', nuevoVehiculo.cliente_id);
     }
 
-    console.log('✅ Select vehículo actualizado:', $sel.val());
+    console.log('✅ Select vehículo actualizado:', $selVehiculo.val());
 });
 
         // ════════════════════════════════════════════════════════════════════════════

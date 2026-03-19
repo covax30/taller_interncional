@@ -366,26 +366,114 @@ function initSelect2EnModal($modal) {
     </script>
 <script>
     $("#modal-id_vehiculo").on("show.bs.modal", function(){
-        var modal = $(this);
-        $.ajax({
-            url: "{% url 'apy:vehiculo_modal_crear' %}",
-            success: function(data){
-                modal.find(".modal-body").html(data.html || data);
+    var modal = $(this);
+    $.ajax({
+        url: "{% url 'apy:vehiculo_modal_crear' %}",
+        success: function(data){
+            modal.find(".modal-body").html(data.html || data);
 
-                // ✅ Inicializar Select2 dentro del modal después de cargar
-                $(document).off('focusin.select2');
-                modal.find('select').each(function() {
-                    if (!$(this).data('select2')) {
-                        $(this).select2({
-                            theme: 'bootstrap-5',
-                            width: '100%',
-                            dropdownParent: modal  // ← CLAVE
-                        });
-                    }
-                });
-            }
-        });
+            // Inicializar Select2
+            $(document).off('focusin.select2');
+            modal.find('select').each(function() {
+                if (!$(this).data('select2')) {
+                    $(this).select2({
+                        theme: 'bootstrap-5',
+                        width: '100%',
+                        dropdownParent: modal
+                    });
+                }
+            });
+        }
     });
+});
+
+// ✅ GUARDAR VEHÍCULO - delegado desde document para funcionar con HTML dinámico
+$(document).off('click', '#btnGuardarVehiculo').on('click', '#btnGuardarVehiculo', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    var $btn    = $(this);
+    var $modal  = $('#modal-id_vehiculo');
+    var $form   = $modal.find('#vehiculoForm');
+    var $msgBox = $modal.find('#msg-vehiculo');
+    var formData = new FormData($form[0]);
+
+    $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Guardando...');
+
+    $.ajax({
+        url: $form.attr('action'),
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+
+        success: function(response) {
+            if (response.success) {
+                $msgBox.html('<div class="alert alert-success">' + response.message + '</div>');
+
+                var $selClienteModal = $form.find('select[name="id_cliente"]');
+                var clienteId    = $selClienteModal.val();
+                var clienteTexto = $selClienteModal.find('option:selected').text();
+
+                $(document).trigger('vehiculoCreado', [{
+                    id:            response.id,
+                    text:          response.text,
+                    cliente_id:    clienteId,
+                    cliente_texto: clienteTexto
+                }]);
+
+                setTimeout(function() {
+                    $modal.modal('hide');
+                    $('body').removeClass('modal-open');
+                    $('body').css('padding-right', '');
+                    $('.modal-backdrop').remove();
+                }, 800);
+
+            } else {
+                if (response.html) {
+                    $modal.find('.modal-body').html(response.html);
+                    // Reinicializar select2
+                    $modal.find('select').each(function() {
+                        if (!$(this).data('select2')) {
+                            $(this).select2({ theme: 'bootstrap-5', width: '100%', dropdownParent: $modal });
+                        }
+                    });
+                    setTimeout(function() {
+                        $modal.find('.select2-container').css('width', '100%');
+                    }, 50);
+                } else {
+                    $msgBox.html('<div class="alert alert-danger">' + (response.message || 'Error al crear vehículo') + '</div>');
+                }
+            }
+        },
+
+        error: function(xhr) {
+            try {
+                var resp = JSON.parse(xhr.responseText);
+                if (resp.html) {
+                    $modal.find('.modal-body').html(resp.html);
+                    $modal.find('select').each(function() {
+                        if (!$(this).data('select2')) {
+                            $(this).select2({ theme: 'bootstrap-5', width: '100%', dropdownParent: $modal });
+                        }
+                    });
+                    setTimeout(function() {
+                        $modal.find('.select2-container').css('width', '100%');
+                    }, 50);
+                } else {
+                    $msgBox.html('<div class="alert alert-danger">' + (resp.message || 'Error en el servidor.') + '</div>');
+                }
+            } catch(err) {
+                $msgBox.html('<div class="alert alert-danger">Error en el servidor.</div>');
+            }
+        },
+
+        complete: function() {
+            $btn.prop('disabled', false).html('<i class="fas fa-save"></i> Agregar');
+        }
+    });
+});
 </script>
 
     <!-- Script Cliente. -->

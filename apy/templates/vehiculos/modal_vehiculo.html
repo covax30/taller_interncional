@@ -47,11 +47,11 @@
 
     <!-- Marca -->
     <div class="form-group mb-3">
-        <label for="{{ form.marca_vehiculo.id_for_label }}">Marca vehículo:</label>
-        {{ form.marca_vehiculo|add_class:'form-control'|attr:'autocomplete:off' }}
-        {% if form.marca_vehiculo.errors %}
+        <label for="{{ form.id_marca.id_for_label }}">Marca vehículo:</label>
+        {{ form.id_marca|add_class:'form-control'|attr:'autocomplete:off' }}
+        {% if form.id_marca.errors %}
             <div class="invalid-feedback d-block">
-                {% for error in form.marca_vehiculo.errors %}<small>{{ error }}</small><br>{% endfor %}
+                {% for error in form.id_marca.errors %}<small>{{ error }}</small><br>{% endfor %}
             </div>
         {% endif %}
     </div>
@@ -75,23 +75,56 @@
     </button>
 </div>
 
+<style>
+    /* Ancho completo siempre */
+    #vehiculoForm .select2-container,
+    .modal-body .select2-container {
+        width: 100% !important;
+        flex-grow: 1 !important;
+    }
+
+    /* Fondo oscuro siempre */
+    .select2-container--default .select2-selection--single,
+    .select2-container--default .select2-selection--multiple {
+        background-color: #2b3035 !important;
+        border: 1px solid #6c757d !important;
+        color: #fff !important;
+        height: 38px !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #fff !important;
+        line-height: 36px !important;
+    }
+
+    .select2-container--default .select2-selection__arrow {
+        top: 6px !important;
+    }
+
+    .select2-container--default .select2-selection__arrow b {
+        border-color: #fff transparent transparent transparent !important;
+    }
+</style>
+
 <script>
 function cerrarModalVehiculo() {
-    var el = document.getElementById('modal-id_vehiculo');
-    if (!el) return;
-
-    el.classList.remove('show');
-    el.style.display = 'none';
-    el.setAttribute('aria-hidden', 'true');
-    el.removeAttribute('aria-modal');
-    document.body.classList.remove('modal-open');
-    document.body.style.paddingRight = '';
-
-    var bds = document.querySelectorAll('.modal-backdrop');
-    for (var i = 0; i < bds.length; i++) {
-        bds[i].parentNode.removeChild(bds[i]);
+    var $modal = $('#modal-id_vehiculo');
+    
+    if ($modal.hasClass('show')) {
+        $modal.modal('hide');
     }
-    console.log('Modal vehículo cerrado OK');
+
+    setTimeout(function() {
+        $modal.removeClass('show');
+        $modal.css('display', 'none');
+        $modal.attr('aria-hidden', 'true');
+        $modal.removeAttr('aria-modal');
+        document.body.classList.remove('modal-open');
+        document.body.style.paddingRight = '';
+        $('.modal-backdrop').remove();
+    }, 300);
 }
 
 $(document).ready(function() {
@@ -126,30 +159,27 @@ $(document).ready(function() {
             headers: { 'X-Requested-With': 'XMLHttpRequest' },
 
             success: function(response) {
-                console.log('Respuesta servidor:', response);
+    if (response.success) {
+        $msgBox.html('<div class="alert alert-success">' + response.message + '</div>');
 
-                if (response.success) {
-                    $msgBox.html('<div class="alert alert-success">' + response.message + '</div>');
+        // Tomar clienteId Y texto del cliente del select dentro del modal
+        var $selClienteModal = $modal.find('select[name="id_cliente"]');  // 👈 por name, más seguro
+        var clienteId   = $selClienteModal.val();
+        var clienteTexto = $selClienteModal.find('option:selected').text();  // 👈 agregar esto
 
-                    // ← CORRECTO: tomar clienteId del select DENTRO del modal
-                    var $selClienteModal = $modal.find('#id_id_cliente');
-                    var clienteId = $selClienteModal.val();
+        console.log('clienteId desde modal vehículo:', clienteId);
 
-                    console.log('clienteId desde modal vehículo:', clienteId);
+        $(document).trigger('vehiculoCreado', [{
+            id:             response.id,
+            text:           response.text,
+            cliente_id:     clienteId,
+            cliente_texto:  clienteTexto  // 👈 pasar el texto también
+        }]);
 
-                    // Disparar evento ANTES de cerrar
-                    $(document).trigger('vehiculoCreado', [{
-                        id:         response.id,
-                        text:       response.text,
-                        cliente_id: clienteId
-                    }]);
-
-                    console.log('✅ vehiculoCreado disparado ID:', response.id, '| cliente:', clienteId);
-
-                    // Cerrar modal después con delay
-                    setTimeout(function() {
-                        cerrarModalVehiculo();
-                    }, 800);
+        setTimeout(function() {
+            cerrarModalVehiculo();
+        }, 800);
+    }
 
                 } else {
                     var html = '<div class="alert alert-danger">';
@@ -171,10 +201,53 @@ $(document).ready(function() {
             },
 
             error: function(xhr) {
-                console.error('Error AJAX:', xhr);
-                $msgBox.html('<div class="alert alert-danger">Error en el servidor.</div>');
-            },
+    console.error('Error AJAX:', xhr);
+    try {
+        var resp = JSON.parse(xhr.responseText);
 
+        // Si el servidor devuelve HTML con errores, reinyectarlo al modal
+        if (resp.html) {
+    var $modalBody = $modal.find('.modal-body');
+    $modalBody.html(resp.html);
+
+    if ($.fn.select2) {
+        $modalBody.find('.select2').each(function() {
+            $(this).select2({
+                dropdownParent: $modal,
+                width: '100%'
+            });
+        });
+    }
+
+    // Forzar ancho después de inicializar
+    setTimeout(function() {
+        $modalBody.find('.select2-container').css('width', '100%');
+    }, 50);
+
+    return;
+}
+
+        // Si devuelve errores en JSON, mostrarlos campo a campo
+        if (resp.errors) {
+            for (var field in resp.errors) {
+                var msg = resp.errors[field][0];
+                var msgText = (msg && msg.message) ? msg.message : msg;
+                var $input = $form.find('[name="' + field + '"]');
+                $input.addClass('is-invalid');
+                $input.closest('.form-group').find('.invalid-feedback').remove();
+                $input.closest('.form-group').append(
+                    '<div class="invalid-feedback d-block"><small>' + msgText + '</small></div>'
+                );
+            }
+            $msgBox.html('<div class="alert alert-danger">' + (resp.message || 'Corrige los errores del formulario') + '</div>');
+            return;
+        }
+
+        $msgBox.html('<div class="alert alert-danger">' + (resp.message || 'Error en el servidor.') + '</div>');
+    } catch(e) {
+        $msgBox.html('<div class="alert alert-danger">Error en el servidor.</div>');
+    }
+},
             complete: function() {
                 $btn.prop('disabled', false).html('<i class="fas fa-save"></i> Agregar');
             }

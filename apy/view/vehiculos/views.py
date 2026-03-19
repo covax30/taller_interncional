@@ -281,7 +281,6 @@ class VehiculoCreateModalView(PermisoRequeridoMixin, CreateView):
                 "message": "Vehículo registrado correctamente ✅"
             })
         except Exception as e:
-            # Log del error para debugging
             import logging
             logger = logging.getLogger(__name__)
             logger.error(f"Error al guardar vehículo: {str(e)}", exc_info=True)

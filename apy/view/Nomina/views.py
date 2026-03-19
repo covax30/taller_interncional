@@ -97,7 +97,7 @@ class NominaUpdateView(PermisoRequeridoMixin, UpdateView):
         response = super().form_valid(form)
         nomina_editada = self.object
         
-        from .models import Gastos  # pyright: ignore[reportMissingImports]
+        from apy.models import Gastos  
         
         # Usamos el campo 'nomina' del modelo Gastos para encontrar el registro
         gasto_asociado = Gastos.objects.filter(nomina=nomina_editada).first()

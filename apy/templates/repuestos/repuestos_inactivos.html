@@ -15,12 +15,10 @@
         <th>Id Marca</th>
         <th>Nombre</th>
         <th>Categoría</th>
-        <th>Fabricante</th>
         <th>Stock</th>
-        <th>Ubicación</th>
         <th>Precio</th>
         <th>Acciones</th>
-
+ 
 {% endblock %}
 
 {% block iterar %}
@@ -30,10 +28,8 @@
         <td>{{r.id_marca}}</td>
         <td>{{r.nombre}}</td>
         <td>{{r.categoria}}</td>
-        <td>{{r.fabricante}}</td>
         <td>{{r.stock}}</td>
-        <td>{{r.ubicacion}}</td>
-        <td>{{r.precio|intcomma }}</td>
+        <td>{{r.precio_unitario|intcomma }}</td>
 
         <form method="post">
 

@@ -7,7 +7,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-sm-6">
-                    <h3 class="mb-0">Resultados de Búsqueda</h3>
+                    <h3 class="text-right text-body">Resultados de Búsqueda</h3>
                 </div>
             </div>
         </div>
@@ -712,7 +712,7 @@
                                             <th>Tipo de Movimiento</th>
                                             <th>Monto</th>
                                             <th>Fecha</th>
-                                            <th>Hora</th>
+                                            
                                             <th class="text-center">Acciones</th>
                                         </tr>
                                     </thead>
@@ -723,7 +723,7 @@
                                             <td>{{ c.tipo_movimiento }}</td>
                                             <td>{{ c.monto|intcomma }}</td>
                                             <td>{{ c.fecha }}</td>
-                                            <td>{{ c.hora }}</td>
+                                            
                                             <td>
                                                 <a href="{% url 'apy:caja_editar' c.id %}"
                                                     class="btn btn-primary btn-sm" title="Editar caja">
