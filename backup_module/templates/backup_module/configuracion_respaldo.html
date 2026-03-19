@@ -50,12 +50,13 @@
 
                         </div>
                     </div>
-                    
+                    <label for="ubicacion">Destino del Respaldo</label>
                     <div class="form-floating mb-4">
+                        
                         <select class="form-select" id="ubicacion" name="ubicacion" required>
                             <option value="local">Servidor Local</option>
                         </select>
-                        <label for="ubicacion">Destino del Respaldo</label>
+                        
                     </div>
                     
                     <div class="text-center mt-3">
@@ -190,22 +191,12 @@
                                         <form method="POST" action="{% url 'backup_module:backup_eliminar' log.pk %}" style="display:inline;" 
                                             onsubmit="return confirm('¿Estás seguro de que quieres eliminar el respaldo #{{ log.pk }}? Esta acción es irreversible.');">
                                             {% csrf_token %}
-                                            {# Añadimos me-1 para el espacio antes del botón de Drive #}
                                             <button type="submit" class="btn btn-sm btn-danger me-1" title="Eliminar Respaldo"> 
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </form>
                                         
-                                        {% if log.estado == 'Éxito' %}
-                                            {# ✅ BOTÓN: SUBIR A GOOGLE DRIVE (Detrás de Eliminar) #}
-                                            <form method="POST" action="{% url 'backup_module:backup_subir_drive' log.pk %}" style="display:inline;" 
-                                                onsubmit="return confirm('¿Está seguro que desea subir el respaldo #{{ log.pk }} a Google Drive?');">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-sm btn-primary" title="Subir a Google Drive">
-                                                    <i class="fab fa-google-drive"></i>
-                                                </button>
-                                            </form>
-                                        {% endif %}
+                                
 
                                     {% else %}
                                         <button type="button" class="btn btn-sm btn-secondary" title="No Disponible" disabled>

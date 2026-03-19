@@ -216,7 +216,7 @@ MESSAGE_TAGS = {
 # -----------------------------------------------------
 ## 📁 Configuración de Archivos Estáticos (STATIC)
 # -----------------------------------------------------
-STATIC_URL = '/static/'
+STATIC_URL = 'apy/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] # <--- Aquí busca la de tu app
