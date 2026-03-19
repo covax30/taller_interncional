@@ -10,22 +10,17 @@
 <a href="{{ crear_url }}" class="btn btn-primary btn-xs" title="Agregar registro de pago">
     <i class="fas fa-plus"></i> Agregar
 </a>
-<a href="{% url 'apy:pagos_inactivos' %}" class="btn btn-secondary btn-xs" title="Ver pagos inactivos">
-    <i class="fas fa-list"></i> Ver Inactivos
-</a>
+<a href="{% url 'apy:pagos_inactivos' %}" class="btn btn-outline-secondary btn-xs" title="Lista de Pagos Inactivos">
+    <i class="fas fa-list"></i> Lista de Pagos Inactivos</a>
+
 {% endblock %}
 
 {% block columnas %}
     <th>ID Pago</th>
     <th>Tipo Pago</th>
     <th>Fecha</th>
-    <th>Hora</th>
     <th>Monto</th>
     <th>Proveedor</th>
-    <th>Herramientas</th>
-    <th>Insumos</th>
-    <th>Repuestos</th>
-    <th>Nómina</th>
     <th>Acciones</th>
 {% endblock %}
 
@@ -42,14 +37,8 @@
         </td>
         <td>{{ p.tipo_pago|default:"No especificado" }}</td>
         <td>{{ p.fecha|date:"d/m/Y"|default:"No especificada" }}</td>
-        <td>{{ p.hora|default:"No especificada" }}</td>
-        <td>{{ p.monto|intcomma|default:"0" }}</td>
-        <td>{{ p.id_proveedor|default:"Sin proveedor" }}</td>
-        <td>{{ p.id_herramienta|default:"Sin herramienta" }}</td>
-        <td>{{ p.id_insumos|default:"Sin insumos" }}</td>
-        <td>{{ p.id_repuestos|default:"Sin repuestos" }}</td>
-        <td>{{ p.id_nomina|default:"Sin nómina" }}</td>
-        
+        <td>{{ p.monto_total|intcomma|default:"0" }}</td>
+        <td>{{ p.proveedor|default:"Sin proveedor" }}</td>
         <td>
             <!-- Solo mostrar botones si existe id_pago -->
             {% if p.id_pago %}

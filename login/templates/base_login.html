@@ -1,0 +1,110 @@
+{% load static %}
+{% load widget_tweaks %}
+
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <meta name="color-scheme" content="light dark" />
+
+    <title>{% block title %}Taller Internacional | Iniciar Sesión{% endblock %}</title>
+
+    <!-- Estilos base -->
+    <link rel="icon" href="{% static 'img/favico.jpg' %}" type="image/png">
+    <link rel="stylesheet" href="{% static 'fontawesome-free-7.0.1-web/css/all.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/adminlte.css' %}" />
+    <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/bootstrap.css' %}" />
+    <link rel="stylesheet" href="{% static 'login/css/custom.css' %}?v=5.0" />
+    <link rel="stylesheet" href="{% static 'css/material-icons.css' %}">
+
+    {% block estilos_extra %}
+    <style>
+        /* CAJA DE LOGIN (CRISTAL OSCURO) */
+        .login-page .login-box .card {
+            background-color: rgba(0, 0, 0, 0.65) !important;
+            backdrop-filter: blur(15px) !important;
+            -webkit-backdrop-filter: blur(15px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 20px !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8) !important;
+        }
+
+        .login-card-body,
+        .card-body {
+            background: transparent !important;
+            color: white !important;
+        }
+
+        .form-control {
+            background-color: white !important;
+            color: #000 !important;
+            border: none !important;
+        }
+
+        .input-group-text {
+            background-color: white !important;
+            color: #007bff !important;
+            border: none !important;
+        }
+
+        .btn-primary {
+            background: #007bff !important;
+            border: none !important;
+            font-weight: bold !important;
+        }
+
+        .btn-volver {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border: 1px solid white !important;
+            color: white !important;
+            margin-top: 10px;
+        }
+
+        .login-logo b,
+        .login-box-msg {
+            color: white !important;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 1) !important;
+        }
+    </style>
+    {% endblock estilos_extra %}
+</head>
+
+<body class="hold-transition login-page">
+
+    <div id="slideshow-background"></div>
+
+    <a href="{% url 'apy:index_informacion' %}"
+        class="position-fixed top-0 left-0 m-3 d-block overflow-hidden rounded-circle bg-white shadow-lg transition-all p-0 border border-white"
+        style="width: 70px; height: 70px; z-index: 1050;" title="ir a la pagina principal">
+        <img src="{% static 'img/favico.jpg' %}" alt="Imagen" class="h-100 w-100 elevation-hover-2"
+            style="object-fit: cover; transition: all 0.2s ease;">
+    </a>
+    <div class="login-box">
+
+        {% block contenido_login %}
+        {% endblock contenido_login %}
+
+    </div>
+
+    <!-- Scripts comunes -->
+    <script src="{% static 'lib/datatables-1.10.20/jquery-3.7.1.min.js' %}"></script>
+    <script src="{% static 'lib/sweetalert2/sweetalert2.all.min.js' %}"></script>
+    <script src="{% static 'AdminLTE/dist/js/popper.js' %}"></script>
+    <script src="{% static 'AdminLTE/dist/js/bootstrap.js' %}"></script>
+    <script src="{% static 'AdminLTE/dist/js/adminlte.js' %}"></script>
+
+    {% block scripts_extra %}
+    {% endblock scripts_extra %}
+
+    <script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
+    <script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
+
+</body>
+
+</html>

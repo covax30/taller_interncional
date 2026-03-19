@@ -15,7 +15,7 @@
         z-index: -1;
     }
     /* Efecto sutil al enfocar campos */
-    .form-control:focus {
+    .form-control:focus, .form-select:focus {
         border-color: #0d6efd;
         box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
     }
@@ -23,7 +23,7 @@
     /* Mejora para el borde responsivo entre columnas */
     @media (max-width: 767.98px) {
         .border-end {
-            border-end: none !important;
+            border-right: none !important;
             border-bottom: 1px solid #dee2e6;
             margin-bottom: 2rem;
             padding-bottom: 2rem;
@@ -34,19 +34,49 @@
         }
     }
 
-    /* Elimina el ojo nativo en navegadores basados en Chromium (Edge, Chrome) */
-    input::-ms-reveal,
-    input::-ms-clear {
-        display: none;
-    }
-
-    /* Para otros navegadores que intenten meter iconos internos */
+    /* Elimina el ojo nativo en navegadores basados en Chromium */
+    input::-ms-reveal, input::-ms-clear { display: none; }
     input::-webkit-contacts-auto-fill-button,
     input::-webkit-credentials-auto-fill-button {
         visibility: hidden;
         position: absolute;
         right: 0;
     }
+
+    /* --- ESTILOS DE VALIDACIÓN --- */
+    .invalid-feedback {
+        display: block; 
+        font-size: 0.72rem;
+        font-weight: 600;
+        margin-top: 4px;
+        color: #dc3545;
+        animation: fadeInError 0.3s ease-in-out;
+    }
+
+    .is-invalid {
+        background-image: none !important;
+        border-color: #dc3545 !important;
+        background-color: rgba(220, 53, 69, 0.02) !important;
+    }
+
+    @keyframes fadeInError {
+        from { opacity: 0; transform: translateY(-3px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* --- FIX PARA EL OJO DE LA CONTRASEÑA --- */
+    .toggle-password {
+        position: absolute;
+        top: 29px !important; 
+        right: 12px !important;
+        transform: translateY(-50%) !important;
+        z-index: 10;
+        padding: 0.25rem 0.5rem;
+        opacity: 0.7;
+    }
+    
+    .toggle-password:hover { opacity: 1; }
+
 </style>
 
 {% with user_to_edit=object %}
@@ -70,7 +100,6 @@
                     <i class="fas fa-envelope me-1 small"></i>{{ user_to_edit.email|default:"pendiente@correo.com" }}
                 </span>
                 
-                {# Adaptación de alerta para modo oscuro #}
                 <div class="alert bg-body-tertiary border small mt-3 w-75 text-body" style="font-size: 0.85rem;">
                     <i class="fas fa-user-shield text-primary me-2"></i> 
                     Panel de <strong>Administración</strong>
@@ -86,7 +115,7 @@
                     <i class="fas fa-user-edit fa-2x text-body opacity-50"></i>
                 </div>
 
-                <form method="POST" enctype="multipart/form-data">
+                <form method="POST" enctype="multipart/form-data" novalidate>
                     {% csrf_token %} 
 
                     {% if form.non_field_errors %}
@@ -104,46 +133,54 @@
                         <hr class="flex-grow-1 ms-3 opacity-25">
                     </div>
 
-                    <div class="row g-3"> {# g-3 para espaciado uniforme responsivo #}
+                    <div class="row g-3">
                         <div class="col-sm-6">
-                            <div class="form-floating mb-1">
-                                {{ form.first_name|add_class:"form-control bg-body text-body" }} 
+                            <div class="form-floating">
+                                {% render_field form.first_name class+="form-control bg-body text-body" placeholder="Nombres" %}
                                 <label class="text-body"><i class="fas fa-id-card-alt me-2 text-muted"></i>Nombres</label>
-                                {% if form.first_name.errors %}<small class="text-danger">{{ form.first_name.errors }}</small>{% endif %}
+                                {% for error in form.first_name.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
                             </div>
                         </div>
-                        
+                                                
                         <div class="col-sm-6">
-                            <div class="form-floating mb-1">
-                                {{ form.last_name|add_class:"form-control bg-body text-body" }} 
+                            <div class="form-floating">
+                                {% render_field form.last_name class+="form-control bg-body text-body" placeholder="Apellidos" %}
                                 <label class="text-body"><i class="fas fa-id-card-alt me-2 text-muted"></i>Apellidos</label>
-                                {% if form.last_name.errors %}<small class="text-danger">{{ form.last_name.errors }}</small>{% endif %}
+                                {% for error in form.last_name.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
                             </div>
                         </div>
 
                         <div class="col-sm-6">
-                            <div class="form-floating mb-1">
-                                {{ form.username|add_class:"form-control bg-body text-body" }} 
+                            <div class="form-floating">
+                                {% render_field form.username class+="form-control bg-body text-body" placeholder="Usuario" %}
                                 <label class="text-body"><i class="fas fa-user me-2 text-muted"></i>Nombre de Usuario</label>
-                                {% if form.username.errors %}<small class="text-danger">{{ form.username.errors }}</small>{% endif %}
+                                {% for error in form.username.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
                             </div>
                         </div>
+
                         <div class="col-sm-6">
-                            <div class="form-floating mb-1">
-                                {{ form.email|add_class:"form-control bg-body text-body text-truncate" }} 
-                                <label class="text-body">
-                                    <i class="fas fa-at me-2 text-muted"></i>Correo Electrónico
-                                </label>
-                                {% if form.email.errors %}
-                                    <small class="text-danger">{{ form.email.errors }}</small>
-                                {% endif %}
+                            <div class="form-floating">
+                                {% render_field form.email class+="form-control bg-body text-body" placeholder="Email" %}
+                                <label class="text-body"><i class="fas fa-at me-2 text-muted"></i>Correo Electrónico</label>
+                                {% for error in form.email.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
                             </div>
                         </div>
+
                         <div class="col-12 col-md-6">
-                            <div class="form-floating mb-1">
-                                {{ form.role|add_class:"form-select bg-body text-body" }}
+                            <div class="form-floating">
+                                {% render_field form.role class+="form-select bg-body text-body" %}
                                 <label class="text-body"><i class="fas fa-id-badge me-2 text-muted"></i>Rol en el Sistema</label>
-                                {% if form.role.errors %}<small class="text-danger">{{ form.role.errors }}</small>{% endif %}
+                                {% for error in form.role.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
@@ -155,38 +192,40 @@
                     </div>
 
                     {% if user_to_edit %}
-                    <div class="alert bg-body-tertiary border-0 shadow-sm d-flex align-items-center p-2 px-3 mb-4" style="border-left: 4px solid #adb5bd !important;">
+                    <div class="alert bg-body-tertiary border-0 shadow-sm d-flex align-items-center p-2 px-3 mb-3" style="border-left: 4px solid #adb5bd !important;">
                         <i class="fas fa-shield-alt text-muted me-2"></i>
-                        <span class="text-muted small">Para mantener la contraseña actual, deja estos campos en blanco.</span>
+                        <span class="text-muted small">Deja en blanco para no cambiar la contraseña.</span>
                     </div>
 
                     <div class="form-floating mb-3 position-relative">
-                        {{ form.old_password|add_class:"form-control border-warning-subtle bg-body text-body pe-5" }}
+                        {% render_field form.old_password class+="form-control border-warning-subtle bg-body text-body pe-5" placeholder="Actual" %}
                         <label class="text-body"><i class="fas fa-unlock me-2 text-muted"></i>Contraseña Actual</label>
                         <button type="button" class="btn position-absolute top-50 end-0 translate-middle-y border-0 text-muted toggle-password" style="z-index: 10;">
                             <i class="fas fa-eye"></i>
                         </button>
-                        {% if form.old_password.errors %}<div class="text-danger small mt-1">{{ form.old_password.errors }}</div>{% endif %}
+                        {% for error in form.old_password.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                     </div>
                     {% endif %}
 
                     <div class="row g-3">
                         <div class="col-sm-6">
-                            <div class="form-floating mb-1 position-relative">
-                                {{ form.password|add_class:"form-control bg-body text-body pe-5" }} 
+                            <div class="form-floating position-relative">
+                                {% render_field form.password class+="form-control bg-body text-body pe-5" placeholder="Clave" %}
                                 <label class="text-body"><i class="fas fa-lock me-2 text-muted"></i>{% if user_to_edit %}Nueva Clave{% else %}Clave{% endif %}</label>
                                 <button type="button" class="btn position-absolute top-50 end-0 translate-middle-y border-0 text-muted toggle-password" style="z-index: 10;">
                                     <i class="fas fa-eye"></i>
                                 </button>
+                                {% for error in form.password.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                             </div>
                         </div>
                         <div class="col-sm-6">
-                            <div class="form-floating mb-1 position-relative">
-                                {{ form.password2|add_class:"form-control bg-body text-body pe-5" }} 
+                            <div class="form-floating position-relative">
+                                {% render_field form.password2 class+="form-control bg-body text-body pe-5" placeholder="Confirmar" %}
                                 <label class="text-body"><i class="fas fa-check-double me-2 text-muted"></i>Confirmar</label>
-                                <button type="button" class="button btn position-absolute top-50 end-0 translate-middle-y border-0 text-muted toggle-password" style="z-index: 10;">
+                                <button type="button" class="btn position-absolute top-50 end-0 translate-middle-y border-0 text-muted toggle-password" style="z-index: 10;">
                                     <i class="fas fa-eye"></i>
                                 </button>
+                                {% for error in form.password2.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                             </div>
                         </div>
                     </div>
@@ -198,23 +237,32 @@
                     </div>
 
                     <div class="row g-3">
-                        <div class="col-sm-6">
-                            <div class="form-floating mb-1">
-                                {{ form.identificacion|add_class:"form-control bg-body text-body" }}
-                                <label class="text-body"><i class="fas fa-id-card me-2 text-muted"></i>Identificación</label>
-                                {% if form.identificacion.errors %}<small class="text-danger">{{ form.identificacion.errors }}</small>{% endif %}
+                        <div class="col-sm-4">
+                            <div class="form-floating">
+                                {% render_field form.tipo_identificacion class+="form-select bg-body text-body" %}
+                                <label class="text-body"><i class="fas fa-fingerprint me-2 text-muted"></i>Tipo</label>
+                                {% for error in form.tipo_identificacion.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-sm-8">
+                            <div class="form-floating">
+                                {% render_field form.identificacion class+="form-control bg-body text-body" placeholder="ID" %}
+                                <label class="text-body"><i class="fas fa-id-card me-2 text-muted"></i>Número de Identificación</label>
+                                {% for error in form.identificacion.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                             </div>
                         </div>
                         <div class="col-sm-6">
-                            <div class="form-floating mb-1">
-                                {{ form.telefono|add_class:"form-control bg-body text-body" }}
+                            <div class="form-floating">
+                                {% render_field form.telefono class+="form-control bg-body text-body" placeholder="Tel" %}
                                 <label class="text-body"><i class="fas fa-phone me-2 text-muted"></i>Teléfono</label>
+                                {% for error in form.telefono.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                             </div>
                         </div>
                         <div class="col-12">
-                            <div class="form-floating mb-1">
-                                {{ form.direccion|add_class:"form-control bg-body text-body" }}
+                            <div class="form-floating">
+                                {% render_field form.direccion class+="form-control bg-body text-body" placeholder="Dir" %}
                                 <label class="text-body"><i class="fas fa-map-marker-alt me-2 text-muted"></i>Dirección</label>
+                                {% for error in form.direccion.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                             </div>
                         </div>
                     </div>
@@ -241,4 +289,86 @@
 <script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
 <script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
 <script src="{% static 'js/password_eye.js' %}"></script>
+
+<script>
+    // Script adicional para añadir is-invalid dinámicamente si hay errores
+    document.addEventListener("DOMContentLoaded", function() {
+        const errors = document.querySelectorAll('.invalid-feedback');
+        errors.forEach(error => {
+            const input = error.parentElement.querySelector('.form-control, .form-select');
+            if (input) {
+                input.classList.add('is-invalid');
+            }
+        });
+    });
+</script>
+
+<script type="application/javascript">
+    // 1. Limpiar errores visuales mientras se escribe
+    document.querySelectorAll('.form-control, .form-select').forEach(input => {
+        input.addEventListener('input', function() {
+            this.classList.remove('is-invalid');
+            const feedback = this.parentElement.querySelectorAll('.invalid-feedback');
+            feedback.forEach(f => f.style.display = 'none');
+        });
+    });
+
+    // 2. Diccionario de traducciones centralizado
+    const traducciones = {
+        "this field is required.": "Este campo es obligatorio.",
+        "enter a valid email address.": "Ingresa un correo electrónico válido.",
+        "user with this username already exists.": "Este nombre de usuario ya existe.",
+        "the two password fields didn't match.": "Las nuevas contraseñas no coinciden.",
+        "this password is too short. it must contain at least 8 characters.": "Contraseña muy corta (mínimo 8 caracteres).",
+        "this password is too common.": "Contraseña muy fácil de adivinar.",
+        "this password is entirely numeric.": "No uses solo números.",
+        "this password is completely numeric.": "No uses solo números.",
+        "the password is too similar to the username.": "La contraseña es muy parecida al usuario.",
+        "the password is too similar to the first name.": "La contraseña es muy parecida a tu nombre.",
+        "the password is too similar to the last name.": "La contraseña es muy parecida a tu apellido.",
+    };
+
+    function realizarTraduccion(msg) {
+        let raw = msg.toLowerCase().trim();
+        if (traducciones[raw]) return traducciones[raw];
+        
+        if (raw.includes("number") || raw.includes("número")) return "Debe incluir al menos un número (0-9).";
+        if (raw.includes("special") || raw.includes("symbol") || raw.includes("símbolo")) return "Usa un carácter especial (ej: @, #, $).";
+        
+        return msg; 
+    }
+
+    // 3. TRADUCIR ERRORES EN EL DOM
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll('.invalid-feedback').forEach(div => {
+            const textoOriginal = div.innerText;
+            div.innerText = realizarTraduccion(textoOriginal);
+        });
+
+        // Script adicional para marcar los inputs como inválidos si tienen errores de Django
+        document.querySelectorAll('.invalid-feedback').forEach(error => {
+            const input = error.parentElement.querySelector('.form-control, .form-select');
+            if (input) input.classList.add('is-invalid');
+        });
+    });
+
+    // 4. SweetAlert2 
+    {% if form.errors %}
+    (function() {
+        var errorList = [];
+        {% for field in form %}{% for error in field.errors %}
+            errorList.push(`<b>{{ field.label|escapejs }}:</b> ${realizarTraduccion("{{ error|escapejs }}")}`);
+        {% endfor %}{% endfor %}
+
+        if (errorList.length > 0) {
+            Swal.fire({
+                title: 'Revisa el formulario',
+                html: '<div style="text-align: left; font-size: 0.85em;">' + errorList.join('<hr style="margin: 8px 0; opacity: 0.1;">') + '</div>',
+                icon: 'error',
+                confirmButtonColor: '#0d6efd'
+            });
+        }
+    })();
+    {% endif %}
+</script>
 {% endblock %}

@@ -27,14 +27,14 @@ urlpatterns = [
     ), name='password_reset_done'),
 
     # 3. Restablecer contraseña (link del email)
-    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(
+    path('reseteo/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(
         # ✅ RUTA SIMPLIFICADA
         template_name='recuperar_confirmar_nueva.html',
-        success_url='/reset/done/',
+        success_url='/reseteo/listo/',
     ), name='password_reset_confirm'),
 
     # 4. Finalizado
-    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(
+    path('reseteo/listo/', auth_views.PasswordResetCompleteView.as_view(
         # ✅ RUTA SIMPLIFICADA
         template_name='recuperar_finalizado.html'
     ), name='password_reset_complete'),

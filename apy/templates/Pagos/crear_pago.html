@@ -1,142 +1,235 @@
 {% extends "form_generico.html" %}
-{% load widget_tweaks %} 
+{% load static %}
+{% load widget_tweaks %}
+{% load humanize %}
+
 {% block form %}
-    {% csrf_token %}
+{% csrf_token %}
 
-    <!-- Tipo pago -->
-    <div class="form-group mb-3">
-        <label for="{{ form.tipo_pago.id_for_label }}">Tipo de pago:</label>
-        <div class="input-group">
-            {{ form.tipo_pago|add_class:'form-control'|attr:'autocomplete:off' }}
-        </div>
-        {% if form.tipo_pago.errors %}
-            <div class="invalid-feedback d-block">
-                {% for error in form.tipo_pago.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
-            </div>
-        {% endif %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="text-body mb-0">
+        <i class="fas fa-file-invoice-dollar text-primary me-2"></i>
+        {% if modo_edicion %}Editar Pago{% else %}Crear Nuevo Pago{% endif %}
+    </h4>
+    <a href="{% url 'apy:pagos_lista' %}" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-arrow-left me-1"></i>Volver a la Lista
+    </a>
+</div>
+
+<!-- CABECERA: Proveedor / Fecha / Tipo de Pago -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-body py-3">
+        <h5 class="mb-0 text-primary">
+            <i class="fas fa-clipboard-list me-2"></i>Información del Pago
+        </h5>
     </div>
-
-    <!-- Fecha -->
-    <div class="form-group mb-3">
-        <label for="{{ form.fecha.id_for_label }}">Fecha:</label>
-        <div class="input-group">
-            {{ form.fecha|add_class:'form-control' }}
-        </div>
-        {% if form.fecha.errors %}
-            <div class="invalid-feedback d-block">
-                {% for error in form.fecha.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
+    <div class="card-body p-4">
+        <div class="row g-3">
+            
+            <div class="col-md-5">
+                <label class="form-label fw-bold">Proveedor</label>
+                <div class="input-group">
+                    {{ form.proveedor|add_class:'form-control' }}
+                    
+                </div>
+                {% if form.proveedor.errors %}
+                    <div class="text-danger small mt-1">{{ form.proveedor.errors|join:", " }}</div>
+                {% endif %}
+            </div> <div class="col-md-4">
+                <label class="form-label fw-bold">Fecha</label>
+                {{ form.fecha|add_class:'form-control' }}
+                {% if form.fecha.errors %}
+                    <div class="text-danger small mt-1">{{ form.fecha.errors|join:", " }}</div>
+                {% endif %}
             </div>
-        {% endif %}
+
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Tipo de Pago</label>
+                {{ form.tipo_pago|add_class:'form-control' }}
+                {% if form.tipo_pago.errors %}
+                    <div class="text-danger small mt-1">{{ form.tipo_pago.errors|join:", " }}</div>
+                {% endif %}
+            </div>
+
+        </div> </div>
+</div>
+
+<!-- SECCIÓN REPUESTOS -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-body py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 text-primary">
+            <i class="fas fa-cog me-2"></i>Repuestos
+        </h5>
+        <button type="button" class="btn btn-primary btn-sm" id="add-repuesto">
+            <i class="fas fa-plus me-1"></i>Agregar Repuesto
+        </button>
     </div>
-
-    <!-- Hora -->
-    <div class="form-group mb-3">
-        <label for="{{ form.hora.id_for_label }}">Hora:</label>
-        <div class="input-group">
-            {{ form.hora|add_class:'form-control' }}
+    <div class="card-body">
+        {{ repuesto_formset.management_form }}
+        <div id="repuestos-formset">
+            {% for form_rep in repuesto_formset %}
+            <div class="repuesto-form row mb-3 border-bottom pb-3 align-items-end">
+                {{ form_rep.id }}
+                <div class="col-md-4">
+                    <label class="small fw-bold">Repuesto:</label>
+                    {{ form_rep.repuesto|add_class:'form-control' }}
+                    {% if form_rep.repuesto.errors %}
+                        <div class="text-danger small">{{ form_rep.repuesto.errors|join:", " }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-2">
+                    <label class="small fw-bold">Cant.</label>
+                    {{ form_rep.cantidad|add_class:'form-control cantidad-repuesto' }}
+                </div>
+                <div class="col-md-3">
+                    <label class="small fw-bold">Precio Unit.</label>
+                    {{ form_rep.precio_unitario|add_class:'form-control precio-repuesto' }}
+                </div>
+                <div class="col-md-2">
+                    <label class="small fw-bold">Subtotal</label>
+                    <input type="text" class="form-control subtotal-repuesto" readonly value="$0">
+                </div>
+                <div class="col-md-1 text-center">
+                    {% if repuesto_formset.can_delete %}
+                        <div style="display:none">{{ form_rep.DELETE }}</div>
+                    {% endif %}
+                    <button type="button" class="btn btn-outline-danger btn-sm remove-form">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
         </div>
-        {% if form.hora.errors %}
-            <div class="invalid-feedback d-block">
-                {% for error in form.hora.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
-            </div>
-        {% endif %}
-    </div>
-
-    <!-- Monto -->
-    <div class="form-group mb-3">
-        <label for="{{ form.monto.id_for_label }}">Monto:</label>
-        <div class="input-group">
-            {{ form.monto|add_class:'form-control' }}
-        </div>
-        {% if form.monto.errors %}
-            <div class="invalid-feedback d-block">
-                {% for error in form.monto.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
-            </div>
-        {% endif %}
-    </div>
-
-    <!-- Id proveedor con modal -->
-    <div class="form-group mb-3">
-        <label for="{{ form.id_proveedor.id_for_label }}">Proveedor:</label>
-        <div class="input-group">
-            {{ form.id_proveedor }}
-            <div class="input-group-append">
-                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_proveedor">
-                    <i class="fas fa-plus"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Id herramienta con modal -->
-    <div class="form-group mb-3">
-        <label for="{{ form.id_herramienta.id_for_label }}">Herramienta:</label>
-        <div class="input-group">
-            {{ form.id_herramienta }}
-            <div class="input-group-append">
-                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_herramienta">
-                    <i class="fas fa-plus"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Id insumos con modal -->
-    <div class="form-group mb-3">
-        <label for="{{ form.id_insumos.id_for_label }}">Insumo:</label>
-        <div class="input-group">
-            {{ form.id_insumos }}
-            <div class="input-group-append">
-                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_insumos">
-                    <i class="fas fa-plus"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Id repuesto con modal -->
-    <div class="form-group mb-3">
-        <label for="{{ form.id_repuesto.id_for_label }}">Repuesto:</label>
-        <div class="input-group">
-            {{ form.id_repuesto|add_class:'form-control' }}
-            <div class="input-group-append">
-                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_repuesto">
-                    <i class="fas fa-plus"></i>
-                </button>
-            </div>
-        </div>
-        {% if form.id_repuesto.errors %}
-            <div class="invalid-feedback d-block">
-                {% for error in form.id_repuesto.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
-            </div>
-        {% endif %}
-    </div>
-    
-    <!-- Id nómina con modal -->
-    <div class="form-group mb-3">
-        <label for="{{ form.id_nomina.id_for_label }}">Nómina:</label>
-        <div class="input-group">
-            {{ form.id_nomina }}
-            <div class="input-group-append">
-                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-id_nomina">
-                    <i class="fas fa-plus"></i>
-                </button>
-            </div>
+        <div class="text-end mt-2">
+            <span class="text-muted">Total Repuestos:</span>
+            <h5 class="d-inline-block ms-2 mb-0" id="total-repuestos">$0</h5>
         </div>
     </div>
+</div>
 
-    <!-- Modal proveedor -->
+<!-- SECCIÓN INSUMOS -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-body py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 text-primary">
+            <i class="fas fa-flask me-2"></i>Insumos
+        </h5>
+        <button type="button" class="btn btn-primary btn-sm" id="add-insumo">
+            <i class="fas fa-plus me-1"></i>Agregar Insumo
+        </button>
+    </div>
+    <div class="card-body">
+        {{ insumo_formset.management_form }}
+        <div id="insumos-formset">
+            {% for form_ins in insumo_formset %}
+            <div class="insumo-form row mb-3 border-bottom pb-3 align-items-end">
+                {{ form_ins.id }}
+                <div class="col-md-4">
+                    <label class="small fw-bold">Insumo:</label>
+                    {{ form_ins.insumo|add_class:'form-control' }}
+                    {% if form_ins.insumo.errors %}
+                        <div class="text-danger small">{{ form_ins.insumo.errors|join:", " }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-2">
+                    <label class="small fw-bold">Cant.</label>
+                    {{ form_ins.cantidad|add_class:'form-control cantidad-insumo' }}
+                </div>
+                <div class="col-md-3">
+                    <label class="small fw-bold">Precio Unit.</label>
+                    {{ form_ins.precio_unitario|add_class:'form-control precio-insumo' }}
+                </div>
+                <div class="col-md-2">
+                    <label class="small fw-bold">Subtotal</label>
+                    <input type="text" class="form-control subtotal-insumo" readonly value="$0">
+                </div>
+                <div class="col-md-1 text-center">
+                    {% if insumo_formset.can_delete %}
+                        <div style="display:none">{{ form_ins.DELETE }}</div>
+                    {% endif %}
+                    <button type="button" class="btn btn-outline-danger btn-sm remove-form">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-end mt-2">
+            <span class="text-muted">Total Insumos:</span>
+            <h5 class="d-inline-block ms-2 mb-0" id="total-insumos">$0</h5>
+        </div>
+    </div>
+</div>
+
+<!-- SECCIÓN HERRAMIENTAS -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-body py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 text-primary">
+            <i class="fas fa-tools me-2"></i>Herramientas
+        </h5>
+        <button type="button" class="btn btn-primary btn-sm" id="add-herramienta">
+            <i class="fas fa-plus me-1"></i>Agregar Herramienta
+        </button>
+    </div>
+    <div class="card-body">
+        {{ herramienta_formset.management_form }}
+        <div id="herramientas-formset">
+            {% for form_her in herramienta_formset %}
+            <div class="herramienta-form row mb-3 border-bottom pb-3 align-items-end">
+                {{ form_her.id }}
+                <div class="col-md-4">
+                    <label class="small fw-bold">Herramienta:</label>
+                    {{ form_her.herramienta|add_class:'form-control' }}
+                    {% if form_her.herramienta.errors %}
+                        <div class="text-danger small">{{ form_her.herramienta.errors|join:", " }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-2">
+                    <label class="small fw-bold">Cant.</label>
+                    {{ form_her.cantidad|add_class:'form-control cantidad-herramienta' }}
+                </div>
+                <div class="col-md-3">
+                    <label class="small fw-bold">Precio Unit.</label>
+                    {{ form_her.precio_unitario|add_class:'form-control precio-herramienta' }}
+                </div>
+                <div class="col-md-2">
+                    <label class="small fw-bold">Subtotal</label>
+                    <input type="text" class="form-control subtotal-herramienta" readonly value="$0">
+                </div>
+                <div class="col-md-1 text-center">
+                    {% if herramienta_formset.can_delete %}
+                        <div style="display:none">{{ form_her.DELETE }}</div>
+                    {% endif %}
+                    <button type="button" class="btn btn-outline-danger btn-sm remove-form">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-end mt-2">
+            <span class="text-muted">Total Herramientas:</span>
+            <h5 class="d-inline-block ms-2 mb-0" id="total-herramientas">$0</h5>
+        </div>
+    </div>
+</div>
+
+<!-- GRAN TOTAL -->
+<div class="card shadow-sm border-0 mb-3 bg-body">
+    <div class="card-body py-3 px-4">
+        <div class="row align-items-center justify-content-end">
+            <div class="col-md-6 text-md-end">
+                <span class="text-uppercase text-muted fw-semibold" style="font-size:0.75rem; letter-spacing:1px;">
+                    Monto Total del Pago
+                </span>
+                <div class="d-flex align-items-baseline justify-content-md-end">
+                    <h2 class="fw-bold text-primary mb-0" id="gran-total-pago" style="font-size:2.2rem;">$ 0</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+ <!-- Modal Marca -->
     <div class="modal fade" id="modal-id_proveedor" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -157,232 +250,218 @@
         </div>
     </div>
 
-
-    <!-- Modal herramienta -->
-    <div class="modal fade" id="modal-id_herramienta" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-            <div class="modal-header d-flex justify-content-between align-items-center">
-                <h5 class="modal-title mb-0">Crear Herramienta</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
-                        style="background-color: #dc3545; color: white; border: none; 
-                                border-radius: 50%; width: 35px; height: 35px;
-                                font-size: 1.5rem; line-height: 1; 
-                                display: flex; justify-content: center; align-items: center;">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Aquí se cargará el form por AJAX -->
-            </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal insumos -->
-    <div class="modal fade" id="modal-id_insumos" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-            <div class="modal-header d-flex justify-content-between align-items-center">
-                <h5 class="modal-title mb-0">Crear Insumo</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
-                        style="background-color: #dc3545; color: white; border: none; 
-                                border-radius: 50%; width: 35px; height: 35px;
-                                font-size: 1.5rem; line-height: 1; 
-                                display: flex; justify-content: center; align-items: center;">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Aquí se cargará el form por AJAX -->
-            </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Repuesto -->
-    <div class="modal fade" id="modal-id_repuesto" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-            <div class="modal-header d-flex justify-content-between align-items-center">
-                <h5 class="modal-title mb-0">Crear Repuesto</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
-                        style="background-color: #dc3545; color: white; border: none; 
-                                border-radius: 50%; width: 35px; height: 35px;
-                                font-size: 1.5rem; line-height: 1; 
-                                display: flex; justify-content: center; align-items: center;">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Aquí se cargará el form por AJAX -->
-            </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal nómina -->
-    <div class="modal fade" id="modal-id_nomina" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-            <div class="modal-header d-flex justify-content-between align-items-center">
-                <h5 class="modal-title mb-0">Crear Nómina</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
-                        style="background-color: #dc3545; color: white; border: none; 
-                                border-radius: 50%; width: 35px; height: 35px;
-                                font-size: 1.5rem; line-height: 1; 
-                                display: flex; justify-content: center; align-items: center;">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Aquí se cargará el form por AJAX -->
-            </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Sub-Modal Marca -->
-    <div class="modal fade" id="modal-id_marca" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-            <div class="modal-header d-flex justify-content-between align-items-center">
-                <h5 class="modal-title mb-0">Crear Marca</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
-                        style="background-color: #dc3545; color: white; border: none; 
-                                border-radius: 50%; width: 35px; height: 35px;
-                                font-size: 1.5rem; line-height: 1; 
-                                display: flex; justify-content: center; align-items: center;">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Aquí se cargará el form por AJAX -->
-            </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- SubModal Empleado -->
-    <div class="modal fade" id="modal-id_empleado" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-            <div class="modal-header d-flex justify-content-between align-items-center">
-                <h5 class="modal-title mb-0">Crear Empleado</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"
-                        style="background-color: #dc3545; color: white; border: none; 
-                                border-radius: 50%; width: 35px; height: 35px;
-                                font-size: 1.5rem; line-height: 1; 
-                                display: flex; justify-content: center; align-items: center;">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Aquí se cargará el form por AJAX -->
-            </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Script sub-modal marca. -->
-    <script>
-        $("#modal-id_marca").on("show.bs.modal", function(){
-            var modal = $(this);
-            $.ajax({
-                url: "{% url 'apy:marca_modal_crear' %}",  // <-- endpoint para crear Marca
-                success: function(data){
-                    modal.find(".modal-body").html(data.html || data);
-                }
-            });
-        });
-    </script>
-
-    <!-- Script sub-modal empleado. -->
-    <script>
-        $("#modal-id_empleado").on("show.bs.modal", function(){
-            var modal = $(this);
-            $.ajax({
-                url: "{% url 'apy:empleado_modal_crear' %}",  // <-- endpoint para crear Empleado
-                success: function(data){
-                    modal.find(".modal-body").html(data.html || data);
-                }
-            });
-        });
-    </script>
-
     <!-- Script proveedor. -->
     <script>
         $("#modal-id_proveedor").on("show.bs.modal", function(){
             var modal = $(this);
             $.ajax({
-                url: "{% url 'apy:proveedor_modal_crear' %}",
+                url: "{% url 'apy:proveedor_modal_crear' %}",  // <-- endpoint para crear Proveedor
                 success: function(data){
                     modal.find(".modal-body").html(data.html || data);
                 }
             });
         });
-    </script>
-
-    <!-- Script herramienta -->
-    <script>
-        $("#modal-id_herramienta").on("show.bs.modal", function(){
-            var modal = $(this);
-            $.ajax({
-                url: "{% url 'apy:herramienta_modal_crear' %}",
-                success: function(data){
-                    modal.find(".modal-body").html(data.html || data);
-                }
-            });
+        $('#id_id_proveedor').select2({
+            theme: 'bootstrap-5',
         });
     </script>
 
-    <!-- Script insumos -->
-    <script>
-        $("#modal-id_insumos").on("show.bs.modal", function(){
-            var modal = $(this);
-            $.ajax({
-                url: "{% url 'apy:insumos_modal_crear' %}",
-                success: function(data){
-                    modal.find(".modal-body").html(data.html || data);
-                }
-            });
+<!-- BOTONES -->
+<div class="d-flex justify-content-end gap-2 mb-2">
+    <a href="{% url 'apy:pagos_lista' %}" class="btn btn-outline-danger px-4">
+        <i class="fas fa-times me-2"></i>Cancelar
+    </a>
+    <button type="submit" class="btn btn-success px-5 fw-bold">
+        <i class="fas fa-save me-2"></i>Guardar Pago
+    </button>
+</div>
+
+<!-- TEMPLATES para clonar filas nuevas -->
+<template id="repuesto-template">
+    <div class="repuesto-form row mb-3 border-bottom pb-3 align-items-end">
+        <div class="col-md-4">
+            <label class="small fw-bold">Repuesto:</label>
+            <select name="repuestos-__prefix__-repuesto" class="form-control">
+                <option value="">---------</option>
+                {% for r in repuestos %}
+                    <option value="{{ r.pk }}">{{ r.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="small fw-bold">Cant.</label>
+            <input type="number" name="repuestos-__prefix__-cantidad"
+                   class="form-control cantidad-repuesto" min="1" value="1">
+        </div>
+        <div class="col-md-3">
+            <label class="small fw-bold">Precio Unit.</label>
+            <input type="number" name="repuestos-__prefix__-precio_unitario"
+                   class="form-control precio-repuesto" min="0" value="0">
+        </div>
+        <div class="col-md-2">
+            <label class="small fw-bold">Subtotal</label>
+            <input type="text" class="form-control subtotal-repuesto" readonly value="$0">
+        </div>
+        <div class="col-md-1 text-center" style="padding-top:1.8rem;">
+            <button type="button" class="btn btn-outline-danger btn-sm remove-form">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </div>
+    </div>
+</template>
+
+<template id="insumo-template">
+    <div class="insumo-form row mb-3 border-bottom pb-3 align-items-end">
+        <div class="col-md-4">
+            <label class="small fw-bold">Insumo:</label>
+            <select name="insumos-__prefix__-insumo" class="form-control">
+                <option value="">---------</option>
+                {% for i in insumos %}
+                    <option value="{{ i.pk }}">{{ i }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="small fw-bold">Cant.</label>
+            <input type="number" name="insumos-__prefix__-cantidad"
+                   class="form-control cantidad-insumo" min="1" value="1">
+        </div>
+        <div class="col-md-3">
+            <label class="small fw-bold">Precio Unit.</label>
+            <input type="number" name="insumos-__prefix__-precio_unitario"
+                   class="form-control precio-insumo" min="0" value="0">
+        </div>
+        <div class="col-md-2">
+            <label class="small fw-bold">Subtotal</label>
+            <input type="text" class="form-control subtotal-insumo" readonly value="$0">
+        </div>
+        <div class="col-md-1 text-center" style="padding-top:1.8rem;">
+            <button type="button" class="btn btn-outline-danger btn-sm remove-form">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </div>
+    </div>
+</template>
+
+<template id="herramienta-template">
+    <div class="herramienta-form row mb-3 border-bottom pb-3 align-items-end">
+        <div class="col-md-4">
+            <label class="small fw-bold">Herramienta:</label>
+            <select name="herramientas-__prefix__-herramienta" class="form-control">
+                <option value="">---------</option>
+                {% for h in herramientas %}
+                    <option value="{{ h.pk }}">{{ h.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="small fw-bold">Cant.</label>
+            <input type="number" name="herramientas-__prefix__-cantidad"
+                   class="form-control cantidad-herramienta" min="1" value="1">
+        </div>
+        <div class="col-md-3">
+            <label class="small fw-bold">Precio Unit.</label>
+            <input type="number" name="herramientas-__prefix__-precio_unitario"
+                   class="form-control precio-herramienta" min="0" value="0">
+        </div>
+        <div class="col-md-2">
+            <label class="small fw-bold">Subtotal</label>
+            <input type="text" class="form-control subtotal-herramienta" readonly value="$0">
+        </div>
+        <div class="col-md-1 text-center" style="padding-top:1.8rem;">
+            <button type="button" class="btn btn-outline-danger btn-sm remove-form">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </div>
+    </div>
+</template>
+
+<!-- JS inline: no depende de block script externo -->
+<script>
+(function ($) {
+    // Contadores iniciales desde Django
+    var idx = {
+        repuestos:    {{ repuesto_formset.total_form_count|default:0 }},
+        insumos:      {{ insumo_formset.total_form_count|default:0 }},
+        herramientas: {{ herramienta_formset.total_form_count|default:0 }}
+    };
+
+    // ── AGREGAR FILA ──────────────────────────────────────────
+    function agregarFila(templateId, contenedorId, prefix, clave) {
+        var tmpl = document.getElementById(templateId);
+        if (!tmpl) return;
+
+        var wrapper = document.createElement('div');
+        wrapper.appendChild(document.importNode(tmpl.content, true));
+        var html = wrapper.innerHTML.replace(/__prefix__/g, idx[clave]);
+        document.getElementById(contenedorId).insertAdjacentHTML('beforeend', html);
+
+        var totalInput = document.querySelector('[name="' + prefix + '-TOTAL_FORMS"]');
+        if (totalInput) { idx[clave]++; totalInput.value = idx[clave]; }
+
+        recalcularTodo();
+    }
+
+    document.getElementById('add-repuesto').addEventListener('click', function () {
+        agregarFila('repuesto-template', 'repuestos-formset', 'repuestos', 'repuestos');
+    });
+    document.getElementById('add-insumo').addEventListener('click', function () {
+        agregarFila('insumo-template', 'insumos-formset', 'insumos', 'insumos');
+    });
+    document.getElementById('add-herramienta').addEventListener('click', function () {
+        agregarFila('herramienta-template', 'herramientas-formset', 'herramientas', 'herramientas');
+    });
+
+    // ── ELIMINAR FILA ─────────────────────────────────────────
+    $(document).on('click', '.remove-form', function () {
+        var fila = $(this).closest('.repuesto-form, .insumo-form, .herramienta-form');
+        var chk  = fila.find('input[type="checkbox"][name*="DELETE"]');
+        if (chk.length) { chk.prop('checked', true); fila.fadeOut(200); }
+        else             { fila.remove(); }
+        recalcularTodo();
+    });
+
+    // ── CÁLCULO ───────────────────────────────────────────────
+    function subtotalFila(fila, selCant, selPrice, selSub) {
+        var qty   = parseFloat(fila.find(selCant).val())  || 0;
+        var price = parseFloat(fila.find(selPrice).val()) || 0;
+        var sub   = qty * price;
+        fila.find(selSub).val('$' + Math.round(sub).toLocaleString('es-CO'));
+        return sub;
+    }
+
+    function totalSeccion(contenedor, claseForm, selCant, selPrice, selSub, idTotal) {
+        var total = 0;
+        $(contenedor + ' .' + claseForm).filter(':visible').each(function () {
+            total += subtotalFila($(this), selCant, selPrice, selSub);
         });
-    </script>
+        $('#' + idTotal).text('$' + Math.round(total).toLocaleString('es-CO'));
+        return total;
+    }
 
-    <!-- Script Repuesto. -->
-    <script>
-        $("#modal-id_repuesto").on("show.bs.modal", function(){
-            var modal = $(this);
-            $.ajax({
-                url: "{% url 'apy:repuesto_modal_crear' %}",
-                success: function(data){
-                    modal.find(".modal-body").html(data.html || data);
-                }
-            });
-        });
-    </script>
+    function recalcularTodo() {
+        var tR = totalSeccion('#repuestos-formset',    'repuesto-form',
+                              '.cantidad-repuesto',    '.precio-repuesto',
+                              '.subtotal-repuesto',    'total-repuestos');
+        var tI = totalSeccion('#insumos-formset',      'insumo-form',
+                              '.cantidad-insumo',      '.precio-insumo',
+                              '.subtotal-insumo',      'total-insumos');
+        var tH = totalSeccion('#herramientas-formset', 'herramienta-form',
+                              '.cantidad-herramienta', '.precio-herramienta',
+                              '.subtotal-herramienta', 'total-herramientas');
+        $('#gran-total-pago').text('$ ' + Math.round(tR + tI + tH).toLocaleString('es-CO'));
+    }
 
-    <!-- Script nomina -->
-    <script>
-        $("#modal-id_nomina").on("show.bs.modal", function(){
-            var modal = $(this);
-            $.ajax({
-                url: "{% url 'apy:nomina_modal_crear' %}",
-                success: function(data){
-                    modal.find(".modal-body").html(data.html || data);
-                }
-            });
-        });
-    </script>
+    $(document).on('input change',
+        '.cantidad-repuesto, .precio-repuesto,' +
+        '.cantidad-insumo, .precio-insumo,' +
+        '.cantidad-herramienta, .precio-herramienta',
+        recalcularTodo
+    );
 
-{% endblock %}
+    recalcularTodo();
 
-{% block Cancelar %}
-                <button type="submit " class="btn btn-primary btn-flat" title="Agregar pago">
-                    <i class="fas fa-save"></i>
-                    Agregar
-                </button>
-                <a href="{% url 'apy:pagos_lista' %}" class="btn btn-danger btn-flat float-right" title="Cancelar registro de pago">
-                    <i class="fas fa-times"></i> Cancelar
-                </a>
+}(jQuery));
+</script>
+
 {% endblock %}

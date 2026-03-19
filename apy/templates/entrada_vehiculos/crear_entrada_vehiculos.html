@@ -1,64 +1,192 @@
-{% extends "form_generico.html"%}
-{% load widget_tweaks%}
+{% extends "form_generico.html" %}
+{% load widget_tweaks %}
+
 {% block form %}
-    {% csrf_token %}
+{% csrf_token %}
 
-
-    <!-- Fecha -->
-    <div class="form-group mb-3">
-        <label for="{{ form.fecha_ingreso.id_for_label }}">Fecha:</label>
-        <div class="input-group">
-            {{ form.fecha_ingreso|add_class:'form-control' }}
+{# ── Vehículo ── #}
+<div class="form-group mb-3">
+    <label for="{{ form.id_vehiculo.auto_id }}">Vehículo:</label>
+    <div class="input-group" style="display:flex; flex-wrap:nowrap;">
+        <div style="flex-grow:1;">
+            {# Asegúrate de que el ID aquí sea el que espera tu JS (ej: id_id_vehiculo) #}
+            {{ form.id_vehiculo|add_class:'form-control select2' }}
         </div>
-        {% if form.fecha_ingreso.errors %}
-            <div class="invalid-feedback d-block">
-                {% for error in form.fecha_ingreso.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
-            </div>
-        {% endif %}
-    </div> 
-
-    <!-- Hora -->
-    <div class="form-group mb-3">
-        <label for="{{ form.hora_ingreso.id_for_label }}">Hora:</label>
-        <div class="input-group">
-            {{ form.hora_ingreso|add_class:'form-control' }}
-        </div>
-        {% if form.hora_ingreso.errors %}
-            <div class="invalid-feedback d-block">
-                {% for error in form.hora_ingreso.errors %}
-                    <small>{{ error }}</small><br>
-                {% endfor %}
-            </div>
-        {% endif %}
+        <button type="button" class="btn btn-primary" id="btnAbrirModalVehiculo" title="Agregar nuevo vehículo">
+            <i class="fas fa-plus"></i>
+        </button>
     </div>
+    {% if form.id_vehiculo.errors %}
+        <div class="invalid-feedback d-block">
+            {% for error in form.id_vehiculo.errors %}<small>{{ error }}</small><br>{% endfor %}
+        </div>
+    {% endif %}
+</div>
 
+{# ── Cliente ── #}
+<div class="form-group mb-3">
+    <label for="{{ form.id_id_cliente.auto_id }}">Cliente:</label>
+    {# Este campo se llenará solo gracias a tu script y el vehiculoClienteMap #}
+    {{ form.id_cliente|add_class:'form-control select2' }}
+    {% if form.id_id_cliente.errors %}
+        <div class="invalid-feedback d-block">
+            {% for error in form.id_cliente.errors %}<small>{{ error }}</small><br>{% endfor %}
+        </div>
+    {% endif %}
+</div>
+{# ── Fecha ── #}
+<div class="form-group mb-3">
+    <label for="{{ form.fecha_ingreso.id_for_label }}"></i>Fecha:
+    </label>
+    {{ form.fecha_ingreso|add_class:'form-control' }}
+    {% if form.fecha_ingreso.errors %}
+        <div class="invalid-feedback d-block">
+            {% for error in form.fecha_ingreso.errors %}<small>{{ error }}</small><br>{% endfor %}
+        </div>
+    {% endif %}
+</div>
 
+{# ── Hora ── #}
+<div class="form-group mb-3">
+    <label for="{{ form.hora_ingreso.id_for_label }}"></i>Hora:
+    </label>
+    {{ form.hora_ingreso|add_class:'form-control' }}
+    {% if form.hora_ingreso.errors %}
+        <div class="invalid-feedback d-block">
+            {% for error in form.hora_ingreso.errors %}<small>{{ error }}</small><br>{% endfor %}
+        </div>
+    {% endif %}
+</div>
 
+{# ── Mapa vehiculo → cliente ── #}
+{{ vehiculo_cliente_map|json_script:"vehiculo-cliente-map" }}
 
-    <!-- Script Cliente. -->
-    <script>
-        $("#modal-id_cliente").on("show.bs.modal", function(){
-            var modal = $(this);
+<script>
+(function() {
+    // Esperar a que jQuery esté listo
+    function initEntrada() {
+        console.log('=== CREAR ENTRADA INICIALIZADO ===');
+
+        // ── Mapa vehículo → cliente ──
+        var vehiculoClienteMap = {};
+        try {
+            var el = document.getElementById('vehiculo-cliente-map');
+            if (el) { vehiculoClienteMap = JSON.parse(el.textContent); }
+            console.log('Mapa cargado:', Object.keys(vehiculoClienteMap).length, 'registros');
+        } catch(e) { console.error('Error mapa:', e); }
+
+        // ── Autocompletado vehículo → cliente ──
+        $(document).on('change', '#id_id_vehiculo', function() {
+            var vid = $(this).val();
+            if (!vid) { $('#id_id_cliente').val('').trigger('change'); return; }
+            var cid = vehiculoClienteMap[String(vid)];
+            if (cid) {
+                $('#id_id_cliente').val(cid).trigger('change');
+                console.log('Cliente autocompletado:', cid);
+            } else {
+                $('#id_id_cliente').val('').trigger('change');
+            }
+        });
+
+        // Trigger inicial (modo edición)
+        if ($('#id_id_vehiculo').val()) {
+            $('#id_id_vehiculo').trigger('change');
+        }
+
+        // ── Cargar formulario al abrir modal ──
+        $('#modal-id_id_vehiculo').on('show.bs.modal', function() {
+            var $body = $(this).find('.modal-body');
+            $body.html(
+                '<div class="text-center p-4">' +
+                '<div class="spinner-border text-primary"></div>' +
+                '<p class="mt-2 text-muted">Cargando...</p></div>'
+            );
             $.ajax({
-                url: "{% url 'apy:cliente_modal_crear' %}",
-                success: function(data){
-                    modal.find(".modal-body").html(data.html || data);
+                url: "{% url 'apy:vehiculo_modal_crear' %}",
+                type: 'GET',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                success: function(response) {
+                    $body.html(response.html || response);
+                    console.log('Formulario vehículo cargado');
+                },
+                error: function(xhr) {
+                    $body.html('<div class="alert alert-danger">Error ' + xhr.status + '</div>');
                 }
             });
         });
-    </script>
+
+        // ── vehiculoCreado → actualizar select ──
+$(document).on('vehiculoCreado', function(event, nuevoVehiculo) {
+    console.log('vehiculoCreado recibido en entrada:', nuevoVehiculo);
+    if (!nuevoVehiculo || !nuevoVehiculo.id) return;
+
+    // ── Vehículo ──
+    var $sel = $('#id_id_vehiculo');
+    if ($sel.find('option[value="' + nuevoVehiculo.id + '"]').length === 0) {
+        $sel.append(new Option(nuevoVehiculo.text, nuevoVehiculo.id, true, true));
+    }
+    $sel.val(nuevoVehiculo.id);
+    // Forzar actualización visual de Select2
+    if ($sel.data('select2')) {
+        $sel.trigger('change.select2');
+    }
+
+    // Actualizar mapa
+    if (nuevoVehiculo.cliente_id) {
+        vehiculoClienteMap[String(nuevoVehiculo.id)] = nuevoVehiculo.cliente_id;
+    }
+
+    // ── Cliente ──
+    if (nuevoVehiculo.cliente_id) {
+        var $selCliente = $('#id_id_cliente');
+        if ($selCliente.find('option[value="' + nuevoVehiculo.cliente_id + '"]').length === 0) {
+            // Si la opción no existe, hacer fetch para obtener el texto del cliente
+            $.get("{% url 'apy:api_entrada_datos' 0 %}".replace('/0/', '/0/'), function() {});
+        }
+        $selCliente.val(nuevoVehiculo.cliente_id);
+        if ($selCliente.data('select2')) {
+            $selCliente.trigger('change.select2');
+        }
+        console.log('✅ Cliente autocompletado en entrada:', nuevoVehiculo.cliente_id);
+    }
+
+    console.log('✅ Select vehículo actualizado:', $sel.val());
+});
+
+        // ════════════════════════════════════════════════════════════════════════════
+        // ✅ NUEVO: BOTÓN ABRIR MODAL VEHÍCULO DESDE ENTRADA
+        // ════════════════════════════════════════════════════════════════════════════
+        $(document).off('click', '#btnAbrirModalVehiculo')
+            .on('click', '#btnAbrirModalVehiculo', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                console.log('🔓 Abriendo modal vehículo desde entrada...');
+                $('#modal-id_vehiculo').modal('show');
+            });
+
+        console.log('=== LISTENERS REGISTRADOS OK ===');
+    }
+
+    // Ejecutar cuando el DOM esté listo
+    if (typeof $ !== 'undefined') {
+        $(document).ready(initEntrada);
+    } else {
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof $ !== 'undefined') { initEntrada(); }
+        });
+    }
+})();
+</script>
 
 {% endblock %}
 
 
 {% block Cancelar %}
-                <button type="submit" class="btn btn-primary btn-flat" title="Agregar ingreso de vehículo">
-                    <i class="fas fa-save"></i>
-                    Agregar
-                </button>
-                <a href="{% url 'apy:entrada_vehiculo_lista' %}" class="btn btn-danger btn-flat float-right" title="Cancelar ingreso de vehículo">
-                    <i class="fas fa-times"></i> Cancelar
-                </a>
+    <button type="submit" class="btn btn-primary btn-flat">
+        <i class="fas fa-save me-1"></i>Guardar
+    </button>
+    <a href="{% url 'apy:entrada_vehiculo_lista' %}" class="btn btn-danger btn-flat float-right">
+        <i class="fas fa-times me-1"></i>Cancelar
+    </a>
 {% endblock %}

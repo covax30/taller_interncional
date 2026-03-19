@@ -1,0 +1,490 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Servicios - Taller Internacional de Motores</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  <!-- Favicons -->
+    <link rel="icon" href="{% static 'img/favico.jpg' %}" type="image/png">
+
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+    rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'info/assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'info/assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'info/assets/vendor/aos/aos.css' %}" rel="stylesheet">
+  <link href="{% static 'info/assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+  <link href="{% static 'info/assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{% static 'info/assets/css/main.css' %}" rel="stylesheet">
+
+  <!-- =======================================================
+  * Template Name: iConstruction
+  * Template URL: https://bootstrapmade.com/iconstruction-bootstrap-construction-template/
+  * Updated: Jul 27 2025 with Bootstrap v5.3.7
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
+</head>
+
+<body class="service-details-page">
+
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center">
+
+      <a href="{% url 'apy:index_informacion' %}" class="logo d-flex align-items-center me-auto">
+        <!-- Uncomment the line below if you also wish to use an image logo -->
+        <!-- <img src="assets/img/logo.webp" alt=""> -->
+        <h1 class="sitename">T.I.M</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="{% url 'apy:index_informacion' %}" class="active">Inicio</a></li>
+          <li class="dropdown"><a href="#"><span>Nosotros</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+              <li><a href="{% url 'apy:about_informacion' %}#about">Historia</a></li>
+              <li><a href="{% url 'apy:about_informacion' %}#about2">Proposito</a></li>
+              <li><a href="{% url 'apy:about_informacion' %}#about3">¿Por qué nosotros?</a></li>
+            </ul>
+          </li>
+          <li><a href="{% url 'apy:service_informacion' %}">Servicios</a></li>
+          <li><a href="{% url 'apy:contact_informacion' %}">Contacto</a></li>
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+<a class="btn-getstarted d-none d-sm-block" href="{% url 'login:login' %}">Iniciar Sesión</a>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- Page Title -->
+    <div class="page-title dark-background" data-aos="fade"
+      style="background-image: url({% static 'info/assets/img/taller/img-header.jpg' %});">
+      <div class="container position-relative">
+        <h1>Servicios</h1>
+        <nav class="breadcrumbs">
+          <ol>
+            <li><a href="{% url 'apy:index_informacion' %}">Inicio</a></li>
+            <li class="current">Servicios</li>
+          </ol>
+        </nav>
+      </div>
+    </div><!-- End Page Title -->
+
+    <!-- Service Details Section -->
+    <section id="service-details" class="service-details section">
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="service-box mb-5" data-aos="fade-up" id="servicio1">
+          <div class="row align-items-stretch g-0">
+            <div class="col-lg-5 px-0"> <img src="{% static 'info/assets/img/taller/motor_diesel.jpg' %}" alt="Mecánica Diésel"
+                class="img-fluid h-100 object-fit-cover">
+            </div>
+            <div class="col-lg-7 d-flex align-items-center">
+              <div class="service-card-content p-4 p-md-5 w-100">
+                <div class="icon-circle mb-3"><i class="bi bi-gear-wide-connected"></i></div>
+                <div class="capabilities-section">
+                  <h2 class="mb-4">Reparación Motores Diésel</h2>
+                  <ul class="nav nav-tabs custom-tabs mb-3" id="service-tabs" role="tablist">
+                    <li class="nav-item">
+                      <button class="nav-link active" id="planning-tab" data-bs-toggle="tab" data-bs-target="#planning"
+                        type="button" role="tab">Reparación</button>
+                    </li>
+                    <li class="nav-item">
+                      <button class="nav-link" id="execution-tab" data-bs-toggle="tab" data-bs-target="#execution"
+                        type="button" role="tab">Beneficios</button>
+                    </li>
+                  </ul>
+
+                  <div class="tab-content" id="service-tabs-content">
+                    <div class="tab-pane fade show active" id="planning" role="tabpanel">
+                      <h4>Ejecución de la Reparación</h4>
+                      <p>En Taller Internacional de Motores, ofrecemos un servicio especializado en la reparación y
+                        mantenimiento de motores diésel para garantizar el máximo rendimiento y durabilidad de tu
+                        vehículo.
+                        Nuestro equipo de expertos utiliza metodos avanzados y repuestos de buena calidad para brindarte
+                        la mejor solución.</p>
+                    </div>
+                    <div class="tab-pane fade" id="execution" role="tabpanel">
+                      <h4>Beneficios de nuestro Servicio</h4>
+                      <p>
+                      <ul class="tech-list-repair">
+                        <li><strong>Mayor Durabilidad:</strong> Cientos de miles de kilómetros más.</li>
+                        <li><strong>Ahorro de Combustible:</strong> Se optimiza el consumo de diésel.</li>
+                        <li><strong>Menos Emisiones:</strong> Un motor bien calibrado contamina menos.</li>
+                        <li><strong>Mayor Potencia:</strong> Se restablece la eficiencia original.</li>
+                        <li><strong>Prevención:</strong> Se evitan averías graves y costos elevados.</li>
+                      </ul>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-box mb-5" data-aos="fade-up" id="servicio2">
+          <div class="row align-items-stretch g-0">
+            <div class="col-lg-7 d-flex align-items-center">
+              <div class="service-card-content p-4 p-md-5 w-100">
+                <div class="icon-circle mb-3"><i class="bi bi-cpu"></i></div>
+                <div class="capabilities-section">
+                  <h2 class="mb-4">Servicios de Scanner</h2>
+                  <ul class="nav nav-tabs custom-tabs mb-3" id="scanner-tabs" role="tablist">
+                    <li class="nav-item">
+                      <button class="nav-link active" id="diag-scanner-tab" data-bs-toggle="tab"
+                        data-bs-target="#diag-scanner" type="button" role="tab">Diagnóstico</button>
+                    </li>
+                    <li class="nav-item">
+                      <button class="nav-link" id="bene-scanner-tab" data-bs-toggle="tab" data-bs-target="#bene-scanner"
+                        type="button" role="tab">Beneficios</button>
+                    </li>
+                  </ul>
+
+                  <div class="tab-content" id="scanner-tabs-content">
+                    <div class="tab-pane fade show active" id="diag-scanner" role="tabpanel">
+                      <h4>Ejecución y Ajuste</h4>
+                      <p>Realizamos un diagnóstico computarizado avanzado para identificar fallas en el motor, 
+                        transmisión, sistema eléctrico y sensores. Con nuestra tecnología de última generación, 
+                        podemos detectar errores antes de que se conviertan en problemas graves, optimizando 
+                        el rendimiento del vehículo y reduciendo costos de reparación.</p>
+                      <p>
+                    </div>
+                    <div class="tab-pane fade" id="bene-scanner" role="tabpanel">
+                      <h4>Beneficios de nuestro Servicio</h4>
+                      <ul class="tech-list-repair">
+                        <li><strong>Diagnóstico Preciso:</strong> Detecta fallos en sensores, inyectores y otros
+                          componentes electrónicos con exactitud.</li>
+                        <li><strong>Ahorro en Reparaciones:</strong> Evita gastos innecesarios al identificar problemas
+                          antes de que se agraven.</li>
+                        <li><strong>Rapidez y Eficiencia:</strong> El diagnóstico computarizado reduce el tiempo de
+                          inspección.</li>
+                        <li><strong>Actualización de Software:</strong> Permite reprogramar la computadora del vehículo
+                          para mejorar su desempeño.</li>
+                        <li><strong>Seguridad en la Conducción:</strong> Reduce el riesgo de fallas imprevistas en
+                          carretera.</li>
+                      </ul>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-5 px-0"> <img src="{% static 'info/assets/img/taller/servicio_scanner.jpg' %}" alt="Mecánica Diésel"
+                class="img-fluid h-100 object-fit-cover">
+            </div>
+          </div>
+        </div>
+
+        <div class="service-box mb-5" data-aos="fade-up" id="servicio3">
+          <div class="row align-items-stretch g-0">
+            <div class="col-lg-5 px-0"> <img src="{% static 'info/assets/img/taller/electronica_motores.jpg' %}" alt="Mecánica Diésel"
+                class="img-fluid h-100 object-fit-cover">
+            </div>
+            <div class="col-lg-7 d-flex align-items-center">
+              <div class="service-card-content p-4 p-md-5 w-100">
+                <div class="icon-circle mb-3"><i class="bi bi-lightning-charge"></i></div>
+                <div class="capabilities-section">
+                  <h2 class="mb-4">Electrónica de Motores </h2>
+                  <ul class="nav nav-tabs custom-tabs mb-3" id="electronica-tabs" role="tablist">
+                    <li class="nav-item">
+                      <button class="nav-link active" id="elec-tab" data-bs-toggle="tab" data-bs-target="#elec"
+                        type="button" role="tab">Electrónica</button>
+                    </li>
+                    <li class="nav-item">
+                      <button class="nav-link" id="bene-elec-tab" data-bs-toggle="tab" data-bs-target="#bene-elec"
+                        type="button" role="tab">Beneficios</button>
+                    </li>
+                  </ul>
+
+                  <div class="tab-content" id="electronica-tabs-content">
+                    <div class="tab-pane fade show active" id="elec" role="tabpanel">
+                      <h4>Electrónica de Motores</h4>
+                      <p>Nos especializamos en la revisión y reparación de sistemas electrónicos en motores diésel y gasolina. 
+                        Desde módulos de control hasta sensores y cableado, aseguramos que cada componente funcione correctamente 
+                        para un desempeño óptimo del motor.</p>
+                    </div>
+                    <div class="tab-pane fade" id="bene-elec" role="tabpanel">
+                      <h4>Beneficios de nuestro Servicio</h4>
+                      <p>
+                      <ul class="tech-list-repair">
+                        <li><strong>Mayor Eficiencia Energética:</strong> Una correcta calibración eléctrica mejora el desempeño del motor.</li>
+                        <li><strong>Solución a Fallos de Encendido:</strong> Detecta y corrige problemas en sensores, bobinas y bujías.</li>
+                        <li><strong>Optimización del Sistema de Inyección:</strong> Asegura una mezcla adecuada de aire y combustible.</li>
+                        <li><strong>Menos Consumo de Batería:</strong> Un sistema eléctrico en buen estado evita descargas innecesarias.</li>
+                        <li><strong>Mejor Adaptabilidad a Climas Extremos:</strong> Se ajustan los parámetros electrónicos para distintas condiciones ambientales.</li>
+                      </ul>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-box mb-5" data-aos="fade-up" id="servicio4">
+          <div class="row align-items-stretch g-0">
+            <div class="col-lg-7 d-flex align-items-center">
+              <div class="service-card-content p-4 p-md-5 w-100">
+                <div class="icon-circle mb-3"><i class="bi bi-clipboard2-pulse"></i></div>
+                <div class="capabilities-section">
+                  <h2 class="mb-4">Mantenimiento y Diagnóstico de Motores</h2>
+                  <ul class="nav nav-tabs custom-tabs mb-3" id="mantenimiento-tabs" role="tablist">
+                    <li class="nav-item">
+                      <button class="nav-link active" id="diag-mantenimiento-tab" data-bs-toggle="tab"
+                        data-bs-target="#diag-mantenimiento" type="button" role="tab">Diagnóstico</button>
+                    </li>
+                    <li class="nav-item">
+                      <button class="nav-link" id="bene-mantenimiento-tab" data-bs-toggle="tab" data-bs-target="#bene-mantenimiento"
+                        type="button" role="tab">Beneficios</button>
+                    </li>
+                  </ul>
+
+                  <div class="tab-content" id="mantenimiento-tabs-content">
+                    <div class="tab-pane fade show active" id="diag-mantenimiento" role="tabpanel">
+                      <h4>Mantenimiento</h4>
+                      <p>Los inyectores de combustible son clave en el desempeño del motor. Nuestro servicio incluye limpieza ultrasónica, 
+                        calibración y reparación para garantizar una combustión eficiente, menor consumo de diésel y reducción de emisiones 
+                        contaminantes.</p>
+                      <p>
+                    </div>
+                    <div class="tab-pane fade" id="bene-mantenimiento" role="tabpanel">
+                      <h4>Beneficios de nuestro Servicio</h4>
+                      <ul class="tech-list-repair">
+                        <li><strong>Mejor Combustión:</strong>Los inyectores limpios garantizan una mejor mezcla de aire y combustible.</li>
+                        <li><strong>Menos Humo y Emisiones:</strong>Reduce la contaminación ambiental y evita el olor fuerte a diésel.</li>
+                        <li><strong>Mayor Vida Útil del Motor:</strong>Un sistema de inyección óptimo protege pistones y cilindros.</li>
+                        <li><strong>Ahorro de Combustible:</strong>Un motor bien alimentado consume menos diésel.</li>
+                        <li><strong>Arranque más Rápido:</strong>Evita dificultades al encender el vehículo en frío.</li>
+                      </ul>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-5 px-0"> <img src="{% static 'info/assets/img/taller/mantenimiento_motor.jpg' %}" alt="Mecánica Diésel"
+                class="img-fluid h-100 object-fit-cover">
+            </div>
+          </div>
+        </div>
+
+        <div class="service-box mb-5" data-aos="fade-up" id="servicio5">
+          <div class="row align-items-stretch g-0">
+            <div class="col-lg-5 px-0"> <img src="{% static 'info/assets/img/taller/reparacion_compresor.jpg' %}" alt="Mecánica Diésel"
+                class="img-fluid h-100 object-fit-cover">
+            </div>
+            <div class="col-lg-7 d-flex align-items-center">
+              <div class="service-card-content p-4 p-md-5 w-100">
+                <div class="icon-circle mb-3"><i class="bi bi-wind"></i></div>
+                <div class="capabilities-section">
+                  <h2 class="mb-4">Reparación de Compresores de Aire</h2>
+                  <ul class="nav nav-tabs custom-tabs mb-3" id="compresor-tabs" role="tablist">
+                    <li class="nav-item">
+                      <button class="nav-link active" id="diag-compresor-tab" data-bs-toggle="tab" data-bs-target="#diag-compresor"
+                        type="button" role="tab">Reparación</button>
+                    </li>
+                    <li class="nav-item">
+                      <button class="nav-link" id="bene-compresor-tab" data-bs-toggle="tab" data-bs-target="#bene-compresor"
+                        type="button" role="tab">Beneficios</button>
+                    </li>
+                  </ul>
+
+                  <div class="tab-content" id="compresor-tabs-content">
+                    <div class="tab-pane fade show active" id="diag-compresor" role="tabpanel">
+                      <h4>Compresores</h4>
+                      <p>Si tu sistema de aire comprimido presenta fallas, nuestro servicio de reparación incluye la revisión, 
+                        mantenimiento y sustitución de piezas desgastadas para asegurar su correcto funcionamiento.</p>
+                    </div>
+                    <div class="tab-pane fade" id="bene-compresor" role="tabpanel">
+                      <h4>Beneficios de nuestro Servicio</h4>
+                      <p>
+                      <ul class="tech-list-repair">
+                        <li><strong>Mejor Rendimiento del Sistema de Frenos:</strong>En camiones y buses, un compresor eficiente es vital para el freno de aire.</li>
+                        <li><strong>Óptima Presión de Aire:</strong>Mantiene el rendimiento adecuado en suspensión neumática y otros sistemas. Se optimiza el consumo de diésel.</li>
+                        <li><strong>Menos Desgaste de Componentes:</strong>Reduce el esfuerzo en el motor y alarga la vida útil del sistema.</li>
+                        <li><strong>Eficiencia en Aire Acondicionado:</strong>Garantiza una climatización estable en el vehículo.</li>
+                        <li><strong>Reducción de Ruidos y Vibraciones:</strong>Un compresor en buen estado trabaja de manera más silenciosa y estable.</li>
+                      </ul>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-box mb-5" data-aos="fade-up" id="servicio6">
+          <div class="row align-items-stretch g-0">
+            <div class="col-lg-7 d-flex align-items-center">
+              <div class="service-card-content p-4 p-md-5 w-100">
+                <div class="icon-circle mb-3"><i class="bi bi-fuel-pump"></i></div>
+                <div class="capabilities-section">
+                  <h2 class="mb-4">Calibración de Inyectores de Combustible</h2>
+                  <ul class="nav nav-tabs custom-tabs mb-3" id="calibracion-tabs" role="tablist">
+                    <li class="nav-item">
+                      <button class="nav-link active" id="diag-calibracion-tab" data-bs-toggle="tab"
+                        data-bs-target="#diag-calibracion" type="button" role="tab">Calibración</button>
+                    </li>
+                    <li class="nav-item">
+                      <button class="nav-link" id="bene-calibracion-tab" data-bs-toggle="tab" data-bs-target="#bene-calibracion"
+                        type="button" role="tab">Beneficios</button>
+                    </li>
+                  </ul>
+
+                  <div class="tab-content" id="calibracion-tabs-content">
+                    <div class="tab-pane fade show active" id="diag-calibracion" role="tabpanel">
+                      <h4>Calibración de Inyectores</h4>
+                      <p>Los inyectores de combustible son clave en el desempeño del motor. Nuestro servicio incluye limpieza ultrasónica, 
+                        calibración y reparación para garantizar una combustión eficiente, menor consumo de diésel y reducción de emisiones 
+                        contaminantes.</p>
+                      <p>
+                    </div>
+                    <div class="tab-pane fade" id="bene-calibracion" role="tabpanel">
+                      <h4>Beneficios de nuestro Servicio</h4>
+                      <ul class="tech-list-repair">
+                        <li><strong>Mejor Combustión:</strong>Los inyectores limpios garantizan una mejor mezcla de aire y combustible.</li>
+                        <li><strong>Menos Humo y Emisiones:</strong>Reduce la contaminación ambiental y evita el olor fuerte a diésel.</li>
+                        <li><strong>Mayor Vida Útil del Motor:</strong>Un sistema de inyección óptimo protege pistones y cilindros.</li>
+                        <li><strong>Ahorro de Combustible:</strong>Un motor bien alimentado consume menos diésel.</li>
+                        <li><strong>Arranque más Rápido:</strong>Evita dificultades al encender el vehículo en frío.</li>
+                      </ul>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-5 px-0"> <img src="{% static 'info/assets/img/taller/inyectores.jpg' %}" alt="Mecánica Diésel"
+                class="img-fluid h-100 object-fit-cover">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section><!-- /Service Details Section -->
+
+
+
+  </main>
+
+  <footer id="footer" class="footer dark-background">
+
+    <div class="container footer-top-contact">
+      <div class="row text-center gy-4">
+
+        <div class="col-6 col-lg-3">
+          <div class="contact-item">
+            <i class="bi bi-geo-alt-fill"></i>
+            <h5>Ubicación</h5>
+            <p>Sogamoso, Boyacá<br>Colombia</p>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <div class="contact-item">
+            <i class="bi bi-telephone-fill"></i>
+            <h5>Teléfono</h5>
+            <p><a href="tel:+573126216800">+57 312 621 6800</a></p>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <div class="contact-item">
+            <i class="bi bi-envelope-at-fill"></i>
+            <h5>Correo</h5>
+            <p><a href="mailto:arturopatino@gmail.com">arturopatino@gmail.com</a></p>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <div class="contact-item">
+            <i class="bi bi-clock-fill"></i>
+            <h5>Horarios</h5>
+            <p>Lun - Sáb: 8 AM - 7 PM</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <div class="footer-bottom-content text-center">
+              <p class="disclaimer-text">
+                <strong>Aviso de Marcas:</strong> Todos los logotipos de terceros son propiedad de sus respectivos
+                dueños.
+                Su uso es informativo para indicar la especialidad técnica de nuestro taller.
+              </p>
+              <div class="legal-links">
+                <span>© 2026 <span class="sitename">T.I.M</span>. Todos los derechos reservados.</span>
+                <a href="{% url 'apy:terms_informacion' %}">Terminos y Condiciones</a>
+              </div>
+              <div class="credits">
+                <!-- All the links in the footer should remain intact. -->
+                <!-- You can delete the links only if you've purchased the pro version. -->
+                <!-- Licensing information: https://bootstrapmade.com/license/ -->
+                <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
+                Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </footer>
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="{% static 'info/assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'info/assets/vendor/php-email-form/validate.js' %}"></script>
+  <script src="{% static 'info/assets/vendor/aos/aos.js' %}"></script>
+  <script src="{% static 'info/assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
+  <script src="{% static 'info/assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
+  <script src="{% static 'info/assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
+
+  <!-- Main JS File -->
+  <script src="{% static 'info/assets/js/main.js' %}"></script>
+
+  <!-- WhatsApp -->
+  <a href="https://wa.me/573126216800?text=Hola%20T.I.M.,%20solicito%20información%20sobre..." class="whatsapp-float"
+    target="_blank" rel="noopener noreferrer">
+    <i class="bi bi-whatsapp"></i>
+  </a>
+          <!-- CSS de Sienna Accessibility -->
+    <link rel="stylesheet" href="{% static 'js/sienna-accessibility/custom.css' %}">
+  <script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
+<script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
+
+</body>
+
+</html>

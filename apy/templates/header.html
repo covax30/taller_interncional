@@ -1,46 +1,33 @@
 {% load static %}
-<nav class="app-header navbar navbar-expand bg-dark" data-bs-theme="dark">
-        <!--begin::Container-->
-        <div class="container-fluid">
-          <!--begin::Start Navbar Links-->
-          <ul class="navbar-nav">
-            <li class="nav-item">
-              <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
-                <i class="bi bi-list"></i>
-              </a>
-            </li>
-            <li class="nav-item d-none d-md-block">
-              <a href="#" class="nav-link">Taller Internacional de Motores</a>
-            </li>
-          </ul>
-          <!--end::Start Navbar Links-->
+<nav class="app-header navbar navbar-expand shadow-sm border-bottom">
+  <div class="container-fluid">
 
-          <!--begin::End Navbar Links-->
-          <ul class="navbar-nav ms-auto">
-            <!--begin::Navbar Search-->
-           
-            <!--end::Navbar Search-->
-            <ul class="navbar-nav ms-auto">
+    <!--begin::Start Navbar Links-->
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
+          <i class="bi bi-list"></i>
+        </a>
+      </li>
+      <li class="nav-item d-none d-md-block">
+        <a href="#" class="nav-link">Taller Internacional de Motores</a>
+      </li>
+    </ul>
+    <!--end::Start Navbar Links-->
+
+    <!--begin::End Navbar Links-->
+    <ul class="navbar-nav ms-auto">
+
+      <!-- Selector de tema -->
       <li class="nav-item dropdown" title="Selecciona el tema">
-        <button
-          class="btn btn-link nav-link py-2 px-0 px-lg-2 dropdown-toggle d-flex align-items-center"
-          id="bd-theme"
-          type="button"
-          aria-expanded="false"
-          data-bs-toggle="dropdown"
-          data-bs-display="static"
-        >
-          <span class="theme-icon-active">
-            <i class="my-1"></i>
-          </span>
-          </i><span class="d-lg-none ms-2" id="bd-theme-text"></span>
+        <button class="btn btn-link nav-link py-2 px-0 px-lg-2 dropdown-toggle d-flex align-items-center"
+                id="bd-theme" type="button" aria-expanded="false"
+                data-bs-toggle="dropdown" data-bs-display="static">
+          <span class="theme-icon-active"><i class="my-1"></i></span>
+          <span class="d-lg-none ms-2" id="bd-theme-text"></span>
         </button>
-        <ul
-          class="dropdown-menu dropdown-menu-end"
-          aria-labelledby="bd-theme-text"
-          style="--bs-dropdown-min-width: 8rem;"
-          
-        >
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bd-theme-text"
+            style="--bs-dropdown-min-width: 8rem;">
           <li>
             <button
               type="button"
@@ -49,7 +36,7 @@
               aria-pressed="false"
             >
               <i class="bi bi-sun-fill me-2"></i>
-              Light
+              Claro
               <i class="bi bi-check-lg ms-auto d-none"></i>
             </button>
           </li>
@@ -61,100 +48,187 @@
               aria-pressed="false"
             >
               <i class="bi bi-moon-fill me-2"></i>
-              Dark
-              <i class="bi bi-check-lg ms-auto d-none"></i>
-            </button>
-          </li>
-          <li>
-            <button
-              type="button"
-              class="dropdown-item d-flex align-items-center"
-              data-bs-theme-value="auto"
-              aria-pressed="true"
-            >
-              <i class="bi bi-circle-fill-half-stroke me-2"></i>
-              Auto
+              Oscuro
               <i class="bi bi-check-lg ms-auto d-none"></i>
             </button>
           </li>
         </ul>
       </li>
-    </ul>
 
+      <!-- Pantalla completa -->
+      <li class="nav-item" title="Pantalla completa">
+        <a class="nav-link" href="#" data-lte-toggle="fullscreen">
+          <i data-lte-icon="maximize" class="bi bi-arrows-fullscreen"></i>
+          <i data-lte-icon="minimize" class="bi bi-fullscreen-exit" style="display:none"></i>
+        </a>
+      </li>
 
-            <!--begin::Fullscreen Toggle-->
-            <li class="nav-item" title="pantalla completa">
-              <a class="nav-link" href="#" data-lte-toggle="fullscreen">
-                <i data-lte-icon="maximize" class="bi bi-arrows-fullscreen"></i>
-                <i data-lte-icon="minimize" class="bi bi-fullscreen-exit" style="display: none"></i>
-              </a>
-            </li>
-            <!--end::Fullscreen Toggle-->
+      <!-- Buscador -->
+      <li class="nav-item dropdown">
+        <a class="nav-link" data-bs-toggle="dropdown" href="#" role="button">
+          <i class="bi bi-search"></i>
+          <span class="ms-1 d-none d-md-inline">Buscar y Filtrar</span>
+        </a>
 
-            <!--begin::User Menu Dropdown-->
-            {% if user.is_authenticated %}
-            <li class="nav-item dropdown user-menu">
-              <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                {# Miniatura superior #}
-                {% if user.profile.imagen and 'default.png' not in user.profile.imagen.url %}
-                  <img src="{{ user.profile.imagen.url }}" class="user-image rounded-circle shadow" style="width: 30px; height: 30px; object-fit: cover;" />
-                {% else %}
-                  <img src="{% if user.is_superuser %}{% static 'img/gerente.png' %}{% else %}{% static 'img/empleado.png' %}{% endif %}" class="user-image rounded-circle shadow" style="width: 30px; height: 30px;" />
-                {% endif %}
-                <span class="d-none d-md-inline">{{ user.username }}</span>
-              </a>
-              
-<ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end shadow-lg border-0 bg-body" 
-    style="border-radius: 15px; overflow: hidden; min-width: 280px;">
-    
-    {# Cabecera: Hereda el fondo del header para total consistencia #}
-    <li class="text-center p-4" 
-        style="background-color: inherit; background-image: inherit; color: inherit; background: var(--bs-navbar-bg, #212529);">
-        
-        {# CONTENEDOR DE IMAGEN: El círculo que rodea la foto ahora es sutil para no desentonar #}
-        <div class="d-inline-block shadow-sm rounded-circle bg-body p-1 mb-2" 
-            style="width: 100px; height: 100px; overflow: hidden; border: 2px solid rgba(128,128,128,0.2);">
-            {% if user.profile.imagen and 'default.png' not in user.profile.imagen.url %}
-                <img src="{{ user.profile.imagen.url }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
-            {% else %}
-                <img src="{% if user.is_superuser %}{% static 'img/gerente.png' %}{% else %}{% static 'img/empleado.png' %}{% endif %}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
-            {% endif %}
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-3 shadow-lg border-0">
+          <form action="{% url 'apy:buscador_global' %}" method="GET">
+            <h6 class="dropdown-header px-0 mb-2 fw-bold text-uppercase" style="font-size: 0.7rem;">Búsqueda General
+            </h6>
+
+            <div class="input-group input-group-sm mb-3">
+              <input type="text" name="q" class="form-control" placeholder="Placa, cliente..."
+                value="{{ query|default:'' }}">
+              <span class="input-group-text"><i class="bi bi-pencil"></i></span>
+            </div>
+
+            <h6 class="dropdown-header px-0 mb-2 fw-bold text-uppercase" style="font-size: 0.7rem;">Filtrar por Fecha
+            </h6>
+
+            <div class="row g-2">
+              <div class="col-6">
+                <label class="small text-muted mb-1">Desde:</label>
+                <input type="date" name="fecha_inicio" class="form-control form-control-sm" value="{{ fecha_inicio }}">
+              </div>
+              <div class="col-6">
+                <label class="small text-muted mb-1">Hasta:</label>
+                <input type="date" name="fecha_fin" class="form-control form-control-sm" value="{{ fecha_fin }}">
+              </div>
+            </div>
+
+            <div class="dropdown-divider my-3"></div>
+
+            <button type="submit" class="btn btn-primary btn-sm w-100 shadow-sm">
+              <i class="bi bi-search me-1"></i> Aplicar Filtros
+            </button>
+          </form>
         </div>
-        
-        {# Nombre con puntos suspensivos si es muy largo #}
-        <h5 class="fw-bold m-0 text-truncate px-2" style="color: inherit;">
-            {{ user.get_full_name|default:user.username }}
-        </h5>
-        <small class="opacity-75 d-block" style="color: inherit;">
-            {% if user.is_superuser %}Administrador{% else %}Personal{% endif %}
-        </small>
-    </li>
+      </li>
 
-    {# Cuerpo del menú: Mantiene el tono neutro que se adapta al tema claro/oscuro #}
-    <li class="p-3 bg-body-tertiary">
-        <div class="d-flex justify-content-between gap-2">
-            <a href="{% url 'apy:perfil_usuario' %}" class="btn btn-sm rounded-pill px-3 flex-grow-1 btn-outline-primary shadow-sm bg-body">
-                <i class="fas fa-user-circle me-1"></i> Perfil
+      {% if user.is_authenticated %}
+      <li class="nav-item" style="position:relative;">
+
+        <!-- Botón campana -->
+        <button id="btn-notificaciones"
+                class="nav-link btn btn-link px-2 mt-1"
+                title="Alertas de inventario"
+                aria-label="Notificaciones de stock bajo"
+                style="position:relative; background:none; border:none; color:inherit; font-size:1.15rem; cursor:pointer;">
+          <i class="bi bi-bell-fill"></i>
+          <!-- Badge contador (oculto hasta que haya alertas) -->
+          <span id="badge-stock"
+                style="display:none; position:absolute; top:2px; right:0px;
+                       background:#dc3545; color:#fff; font-size:.6rem; font-weight:700;
+                       border-radius:50%; min-width:17px; height:17px; line-height:17px;
+                       text-align:center; padding:0 3px;">
+          </span>
+        </button>
+
+        <!-- Panel desplegable -->
+        <div id="panel-notificaciones"
+             style="display:none; position:absolute; top:46px; right:0;
+                    width:330px; max-height:400px; overflow-y:auto;
+                    background:#fff; color:#212529;
+                    border:1px solid #dee2e6; border-radius:.5rem;
+                    box-shadow:0 6px 24px rgba(0,0,0,.18); z-index:1060;">
+
+          <!-- Cabecera del panel -->
+          <div style="display:flex; justify-content:space-between; align-items:center;
+                      padding:10px 14px; border-bottom:1px solid #dee2e6;
+                      background:#f8f9fa; border-radius:.5rem .5rem 0 0;">
+            <span style="font-weight:700; font-size:.9rem;">
+              <i class="bi bi-boxes me-1 text-warning"></i> Inventario — Stock bajo
+            </span>
+            <small id="notif-contador" class="text-muted"></small>
+          </div>
+
+          <!-- Lista de alertas (llenada por JS) -->
+          <div id="notif-lista">
+            <div style="padding:20px; text-align:center; color:#6c757d; font-size:.85rem;">
+              <i class="bi bi-hourglass-split me-1"></i> Cargando...
+            </div>
+          </div>
+
+          <!-- Pie con enlace rápido -->
+          <div style="padding:8px 14px; border-top:1px solid #dee2e6;
+                      background:#f8f9fa; border-radius:0 0 .5rem .5rem; text-align:right;">
+            <a href="{% url 'apy:repuesto_lista' %}" class="btn btn-sm btn-outline-secondary me-1">
+              <i class="bi bi-gear me-1"></i>Repuestos
             </a>
-            
-            <form action="{% url 'login:logout' %}" method="post" class="m-0 flex-grow-1">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-sm rounded-pill px-3 w-100 btn-outline-danger shadow-sm bg-body">
-                    <i class="fas fa-power-off me-1"></i> Salir
-                </button>
-            </form>
+            <a href="{% url 'apy:insumo_lista' %}" class="btn btn-sm btn-outline-secondary me-1">
+              <i class="bi bi-droplet me-1"></i>Insumos
+            </a>
+            <a href="{% url 'apy:herramienta_lista' %}" class="btn btn-sm btn-outline-secondary">
+              <i class="bi bi-wrench me-1"></i>Herramientas
+            </a>
+          </div>
         </div>
-        
-        <div class="text-center mt-3 border-top pt-2" style="border-color: var(--bs-border-color) !important;">
-            <small class="text-body-secondary" style="font-size: 0.75rem;">
-              <i class="far fa-calendar-alt me-1"></i> Miembro desde {{ user.date_joined|date:"M. Y" }}
+      </li>
+      {% endif %}
+
+      <!-- Menú de usuario -->
+      {% if user.is_authenticated %}
+      <li class="nav-item dropdown user-menu">
+        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+          {% if user.profile.imagen and 'default.png' not in user.profile.imagen.url %}
+            <img src="{{ user.profile.imagen.url }}"
+                 class="user-image rounded-circle shadow"
+                 style="width:30px; height:30px; object-fit:cover;">
+          {% else %}
+            <img src="{% if user.is_superuser %}{% static 'img/gerente.png' %}{% else %}{% static 'img/empleado.png' %}{% endif %}"
+                 class="user-image rounded-circle shadow"
+                 style="width:30px; height:30px;">
+          {% endif %}
+          <span class="d-none d-md-inline">{{ user.username }}</span>
+        </a>
+
+        <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end shadow-lg border-0 bg-body"
+            style="border-radius:15px; overflow:hidden; min-width:280px;">
+
+          <li class="text-center p-4"
+              style="background:var(--bs-navbar-bg, #212529); color:inherit;">
+            <div class="d-inline-block shadow-sm rounded-circle bg-body p-1 mb-2"
+                 style="width:100px; height:100px; overflow:hidden; border:2px solid rgba(128,128,128,.2);">
+              {% if user.profile.imagen and 'default.png' not in user.profile.imagen.url %}
+                <img src="{{ user.profile.imagen.url }}"
+                     style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+              {% else %}
+                <img src="{% if user.is_superuser %}{% static 'img/gerente.png' %}{% else %}{% static 'img/empleado.png' %}{% endif %}"
+                     style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+              {% endif %}
+            </div>
+            <h5 class="fw-bold m-0 text-truncate px-2" style="color:inherit;">
+              {{ user.get_full_name|default:user.username }}
+            </h5>
+            <small class="opacity-75 d-block" style="color:inherit;">
+              {% if user.is_superuser %}Administrador{% else %}Personal{% endif %}
             </small>
-        </div>
-    </li>
-</ul>
-            </li>
-            {% endif %}
-            <!--end::User Menu Dropdown-->
+          </li>
+
+          <li class="p-3 bg-body-tertiary">
+            <div class="d-flex justify-content-between gap-2">
+              <a href="{% url 'apy:perfil_usuario' %}"
+                 class="btn btn-sm rounded-pill px-3 flex-grow-1 btn-outline-primary shadow-sm bg-body">
+                <i class="fas fa-user-circle me-1"></i> Perfil
+              </a>
+              <form action="{% url 'login:logout' %}" method="post" class="m-0 flex-grow-1">
+                {% csrf_token %}
+                <button type="submit"
+                        class="btn btn-sm rounded-pill px-3 w-100 btn-outline-danger shadow-sm bg-body">
+                  <i class="fas fa-power-off me-1"></i> Salir
+                </button>
+              </form>
+            </div>
+            <div class="text-center mt-3 border-top pt-2"
+                 style="border-color:var(--bs-border-color) !important;">
+              <small class="text-body-secondary" style="font-size:.75rem;">
+                <i class="far fa-calendar-alt me-1"></i>
+                Miembro desde {{ user.date_joined|date:"M. Y" }}
+              </small>
+            </div>
+          </li>
+        </ul>
+      </li>
+      {% endif %}
 <li class="nav-item">
   <form action="{% url 'login:logout' %}" method="post" style="display: inline;" title="Cerrar sesión">
     {% csrf_token %}
@@ -168,10 +242,142 @@
     </button>
   </form>
 </li>
-          </ul>
-          
-          <!--end::End Navbar Links-->
-          
-        </div>
-        <!--end::Container-->
-      </nav>
+    </ul>
+    <!--end::End Navbar Links-->
+
+  </div>
+</nav>
+
+<script>
+(function () {
+  "use strict";
+
+  {% if user.is_authenticated %}
+
+  const btn   = document.getElementById('btn-notificaciones');
+  const panel = document.getElementById('panel-notificaciones');
+  const badge = document.getElementById('badge-stock');
+  const lista = document.getElementById('notif-lista');
+  const cont  = document.getElementById('notif-contador');
+
+  if (!btn) return;   // Seguridad: si el usuario no está logueado el elemento no existe
+
+  let panelCargado = false;
+
+  /* ── Abrir / cerrar panel ── */
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    const abierto = panel.style.display === 'block';
+    panel.style.display = abierto ? 'none' : 'block';
+    if (!abierto && !panelCargado) {
+      cargarDetalle();
+    }
+  });
+
+  /* ── Cerrar al hacer clic fuera ── */
+  document.addEventListener('click', function (e) {
+    if (!panel.contains(e.target) && e.target !== btn) {
+      panel.style.display = 'none';
+    }
+  });
+
+  /* ── Obtener solo el conteo para el badge ── */
+  function actualizarBadge() {
+    fetch("{% url 'apy:api_stock_bajo' %}", {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.total > 0) {
+        badge.textContent    = data.total > 99 ? '99+' : data.total;
+        badge.style.display  = 'inline-block';
+        btn.style.color      = '#f0ad4e';   // campana amarilla cuando hay alertas
+      } else {
+        badge.style.display  = 'none';
+        btn.style.color      = 'inherit';
+      }
+    })
+    .catch(() => {});
+  }
+
+  /* ── Cargar el detalle dentro del panel ── */
+  function cargarDetalle() {
+    lista.innerHTML = '<div style="padding:20px;text-align:center;color:#6c757d;">'
+                    + '<i class="bi bi-hourglass-split me-1"></i> Cargando...</div>';
+
+    fetch("{% url 'apy:api_stock_bajo' %}", {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.json())
+    .then(data => {
+      panelCargado = true;
+      renderAlertas(data);
+    })
+    .catch(() => {
+      lista.innerHTML = '<div style="padding:16px;color:#dc3545;text-align:center;">'
+                      + '<i class="bi bi-exclamation-triangle me-1"></i> Error al cargar alertas.</div>';
+    });
+  }
+
+  /* ── Renderiza los ítems ── */
+  function renderAlertas(data) {
+    if (data.total === 0) {
+      cont.textContent = '';
+      lista.innerHTML  =
+        '<div style="padding:24px;text-align:center;color:#198754;font-size:.875rem;">'
+        + '<i class="bi bi-check-circle-fill me-2" style="font-size:1.5rem;"></i>'
+        + '<br>Todo el inventario está en buen nivel.</div>';
+      return;
+    }
+
+    cont.textContent = data.total + ' alerta' + (data.total !== 1 ? 's' : '');
+
+    const iconMap = {
+      'Repuesto':    'bi-gear-fill',
+      'Insumo':      'bi-droplet-fill',
+      'Herramienta': 'bi-wrench-adjustable',
+    };
+
+    const html = data.alertas.map(a => {
+      const esCero   = a.stock === 0;
+      const color    = esCero ? '#dc3545' : '#fd7e14';
+      const etiqueta = esCero ? '🔴 Sin stock' : '🟡 Stock bajo';
+      const icono    = iconMap[a.tipo] || 'bi-box-fill';
+
+      return `
+        <div style="display:flex;align-items:flex-start;gap:10px;
+                    padding:10px 14px;border-bottom:1px solid #f0f0f0;">
+          <div style="font-size:1.2rem;color:${color};flex-shrink:0;margin-top:2px;">
+            <i class="bi ${icono}"></i>
+          </div>
+          <div style="flex:1;font-size:.82rem;">
+            <strong style="display:block;font-size:.875rem;">${esc(a.nombre)}</strong>
+            <span style="color:${color};">${etiqueta}</span>
+            <small style="display:block;color:#6c757d;">
+              ${esc(a.tipo)} &middot; Actual: <b>${a.stock}</b>
+              &middot; Mínimo: <b>${a.stock_minimo}</b>
+            </small>
+          </div>
+        </div>`;
+    }).join('');
+
+    lista.innerHTML = html;
+  }
+
+  /* Escape básico contra XSS */
+  function esc(str) {
+    return String(str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* ── Arranque: badge inmediato + polling cada 2 min ── */
+  actualizarBadge();
+  setInterval(function () {
+    panelCargado = false;
+    actualizarBadge();
+  }, 120000);
+
+  {% endif %}  {# end if user.is_authenticated #}
+})();
+</script>

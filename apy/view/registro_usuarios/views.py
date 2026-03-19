@@ -1,18 +1,25 @@
+from gettext import translation
+
+from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.contrib import messages
-from apy.forms import RegistroUsuarioForm 
+from apy.forms import ProfileForm, ProfileForm, RegistroUsuarioForm 
 from apy.decorators import PermisoRequeridoMixin
-
-# MIXINS DE PROTECCIÓN
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.template.loader import render_to_string
+from django.db import transaction
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+
+from apy.models import Profile
 
 # Clase base que implementa la lógica para verificar si el usuario es superusuario
 class SuperuserRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     # Asegura que el usuario esté logueado
-    login_url = '/login/' 
+    login_url = reverse_lazy('login:login') 
     
     # URL a la que se redirige si el usuario no pasa la prueba (no es Superuser)
     raise_exception = False
@@ -25,7 +32,6 @@ class SuperuserRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
 
 # 1. VISTA DE CREACIÓN (RegistroUsuarioCreateView) - PROTEGIDA
 
-# Ahora heredamos de la clase SuperuserRequiredMixin
 class RegistroUsuarioCreateView(SuperuserRequiredMixin, CreateView):
     model = User
     form_class = RegistroUsuarioForm
@@ -37,9 +43,8 @@ class RegistroUsuarioCreateView(SuperuserRequiredMixin, CreateView):
     permission_required = 'add'
 
     def form_valid(self, form):
-        response = super().form_valid(form)
-        messages.success(self.request, form.success_message) 
-        return response
+        messages.success(self.request, f"¡Éxito! El usuario '{form.cleaned_data.get('username')}' ha sido creado.")
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -50,12 +55,12 @@ class RegistroUsuarioCreateView(SuperuserRequiredMixin, CreateView):
 
 # 2. VISTA DE ACTUALIZACIÓN (RegistroUpdateView) - PROTEGIDA
 
-# Ahora heredamos de la clase SuperuserRequiredMixin
 class RegistroUpdateView(SuperuserRequiredMixin, UpdateView):
     model = User
     form_class = RegistroUsuarioForm 
     template_name = 'registro_usuarios/registro_usuarios.html' 
     success_url = reverse_lazy('apy:registro_usuario_lista') 
+    context_object_name = 'user_to_edit'
     
     # --- Configuración de Permisos ---
     module_name = 'GestionUsuarios'
@@ -69,7 +74,6 @@ class RegistroUpdateView(SuperuserRequiredMixin, UpdateView):
         return context
 
     def form_valid(self, form):
-        # Al llamar a form.save(), se ejecuta nuestra lógica personalizada de roles y perfil
         self.object = form.save() 
         messages.success(self.request, f"Usuario {self.object.username} actualizado correctamente.")
         return super().form_valid(form)
@@ -77,11 +81,11 @@ class RegistroUpdateView(SuperuserRequiredMixin, UpdateView):
 
 # 3. VISTA DE ELIMINACIÓN (RegistroDeleteView) - PROTEGIDA
 
-# Ahora heredamos de la clase SuperuserRequiredMixin
 class RegistroDeleteView(SuperuserRequiredMixin, DeleteView):
     model = User
     template_name = 'registro_usuarios/eliminar_registro_usuarios.html'
     success_url = reverse_lazy('apy:registro_usuario_lista') 
+    context_object_name = 'user_to_delete'
     
     # --- Configuración de Permisos ---
     module_name = 'GestionUsuarios'
@@ -95,11 +99,13 @@ class RegistroDeleteView(SuperuserRequiredMixin, DeleteView):
         return context
     
     def form_valid(self, form):
-        messages.success(self.request, f"Usuario '{self.object.username}' eliminado correctamente.")
-        return super().form_valid(form)
+        self.object = self.get_object()
+        self.object.is_active = False
+        self.object.save()
+        messages.success(self.request, f"Usuario {self.object.username} desactivado correctamente.")        
+        return redirect(self.success_url)
     
     def dispatch(self, request, *args, **kwargs):
-        # Obtenemos el usuario que se quiere eliminar
         user_to_delete = self.get_object()
         
         # 1. EVITAR AUTO-ELIMINACIÓN
@@ -119,7 +125,6 @@ class RegistroDeleteView(SuperuserRequiredMixin, DeleteView):
 
 # 4. VISTA DE LISTADO (RegistroUsuarioListView) - PROTEGIDA
 
-# Ahora heredamos de la clase SuperuserRequiredMixin
 class RegistroUsuarioListView(SuperuserRequiredMixin, ListView):
     model = User 
     template_name = 'registro_usuarios/listar_registro_usuarios.html' 
@@ -129,9 +134,80 @@ class RegistroUsuarioListView(SuperuserRequiredMixin, ListView):
     module_name = 'GestionUsuarios'
     permission_required = 'view'
 
+    def get_queryset(self):
+        return User.objects.filter(is_active=True)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['crear_url'] = reverse_lazy('apy:registro_usuario_crear') 
         context['entidad'] = 'Usuarios'
         context['titulo'] = 'Gestión de Usuarios'
         return context
+    
+# 5. VISTA DE USUARIOS INACTIVOS (RegistroUsuarioInactivosListView) - PROTEGIDA
+class RegistroUsuarioInactivosListView(SuperuserRequiredMixin, ListView):
+    model = User
+    template_name = 'registro_usuarios/usuarios_inactivos.html'
+    context_object_name = 'object_list'
+    
+    module_name = 'GestionUsuarios'
+    permission_required = 'view'
+
+    def get_queryset(self):
+        # Filtramos solo los usuarios que no están activos
+        return User.objects.filter(is_active=False)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['listar_url'] = reverse_lazy('apy:registro_usuario_lista')
+        context['entidad'] = 'Usuarios Inactivos'
+        context['titulo'] = 'Usuarios Inactivos'
+        return context
+
+# 6. VISTA DE ACTIVACIÓN (RegistroUsuarioActivarView) - PROTEGIDA
+class RegistroUsuarioActivarView(SuperuserRequiredMixin, UpdateView):
+    model = User
+    
+    def get(self, request, *args, **kwargs):
+        user = self.get_object()
+        user.is_active = True
+        user.save()
+        messages.success(request, f"El usuario {user.username} ha sido reactivado correctamente.")
+        return redirect('apy:registro_usuario_inactivos')
+    
+    
+class EmpleadoCreateModalView(CreateView):
+    model = Profile
+    form_class = ProfileForm
+    template_name = "registro_usuarios/modal_empleado.html"
+
+    def form_valid(self, form):
+        try:
+            with transaction.atomic(): 
+                ident = form.cleaned_data['identificacion']
+                nombre = form.cleaned_data['first_name']
+                apellido = form.cleaned_data['last_name']
+                
+                user, created = User.objects.get_or_create(
+                    username=ident,
+                    defaults={
+                        'first_name': nombre,
+                        'last_name': apellido,
+                        'is_active': True
+                    }
+                )
+                
+                # 2. Vinculamos y guardamos el perfil
+                self.object = form.save(commit=False)
+                self.object.user = user
+                self.object.save()
+
+                return JsonResponse({
+                    "success": True,
+                    "id": self.object.id,
+                    "text": f"{nombre} {apellido} ({ident})",
+                    "message": "Empleado registrado correctamente"
+                })
+        except Exception as e:
+            print(f"Error en el servidor: {e}") 
+            return JsonResponse({"success": False, "message": str(e)}, status=500)

@@ -1,0 +1,278 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Contacto - Taller Internacional de Motores</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  <!-- Favicons -->
+    <link rel="icon" href="{% static 'img/favico.jpg' %}" type="image/png">
+
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+    rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'info/assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'info/assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'info/assets/vendor/aos/aos.css' %}" rel="stylesheet">
+  <link href="{% static 'info/assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+  <link href="{% static 'info/assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{% static 'info/assets/css/main.css' %}" rel="stylesheet">
+
+  <!-- =======================================================
+  * Template Name: iConstruction
+  * Template URL: https://bootstrapmade.com/iconstruction-bootstrap-construction-template/
+  * Updated: Jul 27 2025 with Bootstrap v5.3.7
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
+</head>
+
+<body class="contact-page">
+
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center">
+
+      <a href="{% url 'apy:index_informacion' %}" class="logo d-flex align-items-center me-auto">
+        <!-- Uncomment the line below if you also wish to use an image logo -->
+        <!-- <img src="assets/img/logo.webp" alt=""> -->
+        <h1 class="sitename">T.I.M</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="{% url 'apy:index_informacion' %}" class="active">Inicio</a></li>
+          <li class="dropdown"><a href="#"><span>Nosotros</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+              <li><a href="{% url 'apy:about_informacion' %}#about">Historia</a></li>
+              <li><a href="{% url 'apy:about_informacion' %}#about2">Proposito</a></li>
+              <li><a href="{% url 'apy:about_informacion' %}#about3">¿Por qué nosotros?</a></li>
+            </ul>
+          </li>
+          <li><a href="{% url 'apy:service_informacion' %}">Servicios</a></li>
+          <li><a href="{% url 'apy:contact_informacion' %}">Contacto</a></li>
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+<a class="btn-getstarted d-none d-sm-block" href="{% url 'login:login' %}">Iniciar Sesión</a>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- Page Title -->
+    <div class="page-title dark-background" data-aos="fade"
+      style="background-image: url({% static 'info/assets/img/taller/img-header.jpg' %});">
+      <div class="container position-relative">
+        <h1>Contacto</h1>
+        <nav class="breadcrumbs">
+          <ol>
+            <li><a href="{% url 'apy:index_informacion' %}">Inicio</a></li>
+            <li class="current">Contacto</li>
+          </ol>
+        </nav>
+      </div>
+    </div><!-- End Page Title -->
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact section">
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <div class="contact-main-wrapper">
+          <div class="map-wrapper">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d24985.02538256833!2d-72.96071506485927!3d5.726990335872891!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e6a6be196705c6f%3A0x9e3ac59ad37d7fea!2sTALLER%20INTERNACIONAL%20DE%20MOTORES!5e0!3m2!1ses-419!2sco!4v1771848223140!5m2!1ses-419!2sco"
+              width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"></iframe>
+
+          </div>
+
+          <div class="contact-content">
+            <div class="contact-cards-container" data-aos="fade-up" data-aos-delay="300">
+              <div class="contact-card">
+                <div class="icon-box">
+                  <i class="bi bi-geo-alt"></i>
+                </div>
+                <div class="contact-text">
+                  <h4>Ubicación</h4>
+                  <p>Cl. 9 #32-37, la isla, Sogamoso, Boyacá</p>
+                </div>
+              </div>
+
+              <div class="contact-card">
+                <div class="icon-box">
+                  <i class="bi bi-envelope"></i>
+                </div>
+                <div class="contact-text">
+                  <h4>Correo Electrónico</h4>
+                  <p>arturopatino@gmail.com</p>
+                </div>
+              </div>
+
+              <div class="contact-card">
+                <div class="icon-box">
+                  <i class="bi bi-telephone"></i>
+                </div>
+                <div class="contact-text">
+                  <h4>Llama ahora</h4>
+                  <p>(+57) 3118359251</p>
+                </div>
+              </div>
+
+              <div class="contact-card">
+                <div class="icon-box">
+                  <i class="bi bi-clock"></i>
+                </div>
+                <div class="contact-text">
+                  <h4>Horario</h4>
+                  <p>Lunes - Sabado: 8AM - 7PM</p>
+                  <p>Domingo: Cerrado</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="contact-form-container">
+    <h3>¿Cómo podemos ayudarte?</h3>
+    
+    <form action="{% url 'apy:contact_informacion' %}" method="post" class="p-3">
+        {% csrf_token %}
+        
+        <div class="row gy-3">
+            <div class="col-md-6">{{ form.name }}</div>
+            <div class="col-md-6">{{ form.email }}</div>
+            <div class="col-12">{{ form.subject }}</div>
+            <div class="col-12">{{ form.message }}</div>
+            
+            <div class="col-12 d-flex justify-content-center py-3">
+                {{ form.captcha }}
+            </div>
+
+            <div class="col-12 text-center">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-info">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+                <button type="submit" class="btn btn-primary px-5 py-2" style="border-radius: 50px; background: #0056b3;">
+                    Enviar Mensaje
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+          </div>
+        </div>
+      </div>
+    </section><!-- /Contact Section -->
+
+  </main>
+
+  <footer id="footer" class="footer dark-background">
+
+    <div class="container footer-top-contact">
+      <div class="row text-center gy-4">
+
+        <div class="col-6 col-lg-3">
+          <div class="contact-item">
+            <i class="bi bi-geo-alt-fill"></i>
+            <h5>Ubicación</h5>
+            <p>Sogamoso, Boyacá<br>Colombia</p>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <div class="contact-item">
+            <i class="bi bi-telephone-fill"></i>
+            <h5>Teléfono</h5>
+            <p><a href="tel:+573126216800">+57 312 621 6800</a></p>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <div class="contact-item">
+            <i class="bi bi-envelope-at-fill"></i>
+            <h5>Correo</h5>
+            <p><a href="mailto:arturopatino@gmail.com">arturopatino@gmail.com</a></p>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <div class="contact-item">
+            <i class="bi bi-clock-fill"></i>
+            <h5>Horarios</h5>
+            <p>Lun - Sáb: 8 AM - 7 PM</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <div class="footer-bottom-content text-center">
+              <p class="disclaimer-text">
+                <strong>Aviso de Marcas:</strong> Todos los logotipos de terceros son propiedad de sus respectivos
+                dueños.
+                Su uso es informativo para indicar la especialidad técnica de nuestro taller.
+              </p>
+              <div class="legal-links">
+                <span>© 2026 <span class="sitename">T.I.M</span>. Todos los derechos reservados.</span>
+                <a href="{% url 'apy:terms_informacion' %}">Terminos y Condiciones</a>
+              </div>
+              <div class="credits">
+                <!-- All the links in the footer should remain intact. -->
+                <!-- You can delete the links only if you've purchased the pro version. -->
+                <!-- Licensing information: https://bootstrapmade.com/license/ -->
+                <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
+                Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </footer>
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="{% static 'info/assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'info/assets/vendor/aos/aos.js' %}"></script>
+  <script src="{% static 'info/assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
+  <script src="{% static 'info/assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
+  <script src="{% static 'info/assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
+
+  <!-- Main JS File -->
+  <script src="{% static 'info/assets/js/main.js' %}"></script>
+
+  <!-- WhatsApp -->
+  <a href="https://wa.me/573126216800?text=Hola%20T.I.M.,%20solicito%20información%20sobre..." class="whatsapp-float"
+    target="_blank" rel="noopener noreferrer">
+    <i class="bi bi-whatsapp"></i>
+  </a>
+  <script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
+<script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
+
+</body>
+
+</html>

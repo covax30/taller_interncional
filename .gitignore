@@ -1,17 +1,26 @@
-.venv
-env/
-
-db.sqlite3
- 796aeae4f5a247217655309dff9bd77dba27d4ae
-
-*.pyc
+# Python Cache
 __pycache__/
-.pyc
-.vscode/
-*.pyo
+*.py[cod]
+*$py.class
 *.pyd
+*.pyo
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environments
+.venv/
+env/
+venv/
+ENV/
 .idea
+# Backups and Logs
+*.sql
+*.log
 .env
 db_backups/
-credentials.json
 token.json
+staticfiles/
+db.sqlite3
+*.
+credentials.json

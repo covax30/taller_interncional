@@ -10,18 +10,22 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+from builtins import OSError
 import logging
 import os
+from datetime import timedelta
 from pathlib import Path
+from pyexpat.errors import messages
 from dotenv import load_dotenv
+from django.contrib.messages import constants as messages
 
 
 # Cargar variables del entorno ANTES de cualquier configuración
 load_dotenv()
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 # --- Configuración del Módulo de Backup ---
 # Define la ruta donde se guardarán los backups, dentro del directorio base.
@@ -41,9 +45,11 @@ except OSError as e:
 # En settings.py:
 SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 't')
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'taller_internacional.artisandev.site']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'taller_internacional.artisandev.site', 'web', 'db']
 CSRF_TRUSTED_ORIGINS = ['https://taller_internacional.artisandev.site']
 WHITENOISE_MANIFEST_STRICT = False
+# TEMPORAL para debug — quítalo cuando funcione
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -59,6 +65,8 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'backup_module',
     'axes',
+    'ia_assistant',
+    'django_recaptcha',
 ]
 
 MIDDLEWARE = [
@@ -80,7 +88,9 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'taller.urls'
 
 TEMPLATES = [
+    
     {
+        
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(BASE_DIR / 'templates')],
         'APP_DIRS': True,
@@ -92,13 +102,14 @@ TEMPLATES = [
                 
                 # Nuestro context processor personalizado para permisos de usuario
                 'apy.context_processors.user_permissions',
+                
+                'apy.context_processors.alertas_stock',   
             ],
         },
     },
 ]
 
 WSGI_APPLICATION = 'taller.wsgi.application'
-# settings.py (CONFIGURACIÓN PERMANENTE MYSQL)
 
 DATABASES = {
     'default': {
@@ -107,7 +118,12 @@ DATABASES = {
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASSWORD'),
         'HOST': os.getenv('DB_HOST', 'db'),
-        'PORT': os.getenv('DB_PORT'),
+        'PORT': os.getenv('DB_PORT', '3306'),
+        'CONN_MAX_AGE': 60,   # pool 
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+            'connect_timeout': 10,
+        }
     },
     
     'log_db': {
@@ -116,7 +132,6 @@ DATABASES = {
         'USER': os.getenv('DB_USER'), 
         'PASSWORD': os.getenv('DB_PASSWORD'),
         'HOST': os.getenv('DB_HOST', 'db'),
-        # 🚨 CORRECCIÓN: Usar el mismo puerto que la base de datos 'default'
         'PORT': os.getenv('DB_PORT', '3306'), 
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
@@ -146,6 +161,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'login.validators.ComplexPasswordValidator',
     },
+    {
+        'NAME': 'apy.validators.ComplexPasswordValidator',
+    },
 ]
 
 
@@ -166,8 +184,12 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 AXES_FAILURE_LIMIT = 5          # 5 intentos fallidos → bloqueo
-AXES_COOLOFF_TIME = 0.1          # 10 min de bloqueo
+AXES_COOLOFF_TIME = timedelta(minutes=1)
 AXES_LOCKOUT_PARAMETERS = ["ip_address", "username"]
+AXES_LOCKOUT_TEMPLATE = 'lock_out.html'
+AXES_LOCKOUT_CALLABLE = 'login.views.axes_lockout_view'
+AXES_RESET_COOL_OFF_ON_FAILURE_DURING_LOCKOUT = False
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
@@ -184,18 +206,27 @@ USE_L10N = True
 # La línea USE_TZ = True ya está arriba, la dejamos
 # USE_TZ = True
 
-
+MESSAGE_TAGS = {
+    messages.DEBUG:   'secondary',
+    messages.INFO:    'info',
+    messages.SUCCESS: 'success',
+    messages.WARNING: 'warning',
+    messages.ERROR:   'danger',   # Bootstrap usa 'danger', no 'error'
+}
 # -----------------------------------------------------
 ## 📁 Configuración de Archivos Estáticos (STATIC)
 # -----------------------------------------------------
 STATIC_URL = '/static/'
-
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'apy', 'static'),
-    os.path.join(BASE_DIR, 'login', 'static'), 
-]
-
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] # <--- Aquí busca la de tu app
+
+
+
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+]
 
 # -----------------------------------------------------
 ## 🖼️ Configuración de Archivos de Usuario (MEDIA)
@@ -218,14 +249,16 @@ LOGOUT_REDIRECT_URL = ''
 # -----------------------------------------------------
 # ✅ CONFIGURACIÓN DE CORREO
 # -----------------------------------------------------
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' 
-# Si usas Gmail (lo más común):
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'soportecnico.t.i.m@gmail.com'
+EMAIL_HOST_PASSWORD = 'aocumubtnqxvccbb'
 EMAIL_HOST_PASSWORD = 'vwnifvdwehnmpodg'
-
+DEFAULT_FROM_EMAIL  = EMAIL_HOST_USER                        
+ADMINS_CORREO_STOCK = 'yury45884@gmail.com'    
 
 # -----------------------------------------------------
 # 📦 WhiteNoise y Almacenamiento
@@ -236,8 +269,13 @@ STORAGES = {
     },
     
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage" if not DEBUG else "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
 
 # La duplicación de MEDIA_URL y MEDIA_ROOT ha sido eliminada de aquí
+
+# Captcha
+RECAPTCHA_PUBLIC_KEY = '6LfxrX8sAAAAAL0qNDnErnyfY7SqlUV61EdDMxUp'
+RECAPTCHA_PRIVATE_KEY = '6LfxrX8sAAAAAIDWOhXp7iBZAT4GDhNKOKLuv_eR'
+SILENT_RECAPTCHA_FIELDS = True

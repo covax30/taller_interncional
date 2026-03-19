@@ -17,8 +17,8 @@
 {% block columnas %}
 
         <th>Id Marca</th>
+        <th>Nombre</th>
         <th>Costo</th>
-        <th>Stock</th>
         <th>Cantidad</th>
         <th>Acciones</th>
 
@@ -29,8 +29,8 @@
       {% for i in object_list %}
       <tr>
         <td>{{i.id_marca}}</td>
+        <td>{{i.nombre}}</td>
         <td>{{i.costo|intcomma }}</td>
-        <td>{{i.stock}}</td>
         <td>{{ i.cantidad }}</td>
         <form method="post">
 

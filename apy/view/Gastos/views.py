@@ -52,7 +52,7 @@ class GastosInactivosListView(PermisoRequeridoMixin, ListView):
     template_name = 'Gastos/gastos_inactivos.html'
     
     # --- Configuración de Permisos ---
-    module_name = GASTOS_MODULE_NAME # <-- CORRECCIÓN APLICADA
+    module_name = GASTOS_MODULE_NAME 
     permission_required = 'view'
     
     def get_queryset(self):
@@ -80,14 +80,24 @@ class GastosCreateView(PermisoRequeridoMixin, CreateView):
     success_url = reverse_lazy('apy:gasto_lista')
     
     # --- Configuración de Permisos ---
-    module_name = GASTOS_MODULE_NAME # <-- CORRECCIÓN APLICADA
+    module_name = GASTOS_MODULE_NAME 
     permission_required = 'add'
     
     def form_valid(self, form):
         form.instance.estado = True 
-        messages.success(self.request, "Gasto creado correctamente")
-        return super().form_valid(form)
-    
+        response = super().form_valid(form)
+        
+        # Crear el movimiento en Caja
+        Caja.objects.create(
+            tipo_movimiento='Egreso',  # O el valor que uses en tu modelo
+            monto=form.instance.monto,
+            descripcion=f"Gasto: {form.instance.tipo_gastos} - {form.instance.descripcion}",
+            fecha=form.instance.fecha,
+            estado=True
+        )
+        
+        messages.success(self.request, "Gasto creado y descontado de caja")
+        return response
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context ['titulo'] = 'Crear Gasto'
@@ -135,7 +145,7 @@ class GastosDeleteView(PermisoRequeridoMixin, DeleteView):
         self.object.estado = False
         self.object.save()
         
-        messages.success(self.request, f"Gasto {self.object.nombre} desactivado ")
+        messages.success(self.request, f"Gasto {self.object.descripcion} desactivado ")
         return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):
@@ -163,7 +173,7 @@ class GastosActivateView(PermisoRequeridoMixin, DeleteView):
         self.object.estado = True
         self.object.save()
         
-        messages.success(self.request, f"Gasto {self.object.nombre} activado ")
+        messages.success(self.request, f"Gasto {self.object.descripcion} activado ")
         return HttpResponseRedirect(success_url)
     
     def get_context_data(self, **kwargs):

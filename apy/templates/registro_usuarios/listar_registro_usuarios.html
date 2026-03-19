@@ -8,13 +8,17 @@
     <a href="{% url 'apy:registro_usuario_crear' %}" class="btn btn-primary">
         <i class="fas fa-plus"></i> Agregar Usuario
     </a>
+    <a href="{% url 'apy:registro_usuario_inactivos' %}" class="btn btn-secondary">
+        <i class="fas fa-user-slash"></i> Usuarios Inactivos
+    </a>
 {% endblock %}
 
 {% block columnas %}
     <th>ID</th>
     <th>Nombre Completo</th>
     <th>Usuario</th>
-    <th>Identificación</th> 
+    <th>Identificación</th>
+    <th>Tipo</th>
     <th>Rol</th>
     <th>Email</th>
     <th>Teléfono</th> 
@@ -30,6 +34,7 @@
             <td class="fw-bold">{{ user.get_full_name|default:"Sin Nombre" }}</td>
             <td>{{ user.username }}</td>
             <td>{{ user.profile.identificacion|default:"---" }}</td>
+            <td><span class="badge bg-light text-dark border">{{ user.profile.tipo_identificacion }}</span></td>
             <td>    
                 {% if user.is_superuser %}
                     <span class="badge rounded-pill bg-danger shadow-sm">
@@ -58,7 +63,7 @@
                             {# BOTÓN ELIMINAR DESHABILITADO (Mismo Admin) #}
                             <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="No puedes eliminarte a ti mismo">
                                 <button class="btn btn-light btn-sm text-muted border shadow-sm" style="pointer-events: none;" disabled>
-                                    <i class="fas fa-trash-alt"></i>
+                                    <i class="fas fa-power-off"></i>
                                 </button>
                             </span>
                         {% else %}
@@ -66,7 +71,7 @@
                             <a href="{% url 'apy:registro_usuario_eliminar' user.id %}" 
                             class="btn btn-outline-danger btn-sm shadow-sm" 
                             title="Eliminar usuario">
-                                <i class="fas fa-trash-alt"></i>
+                                <i class="fas fa-power-off"></i>
                             </a>
                         {% endif %}
                     </div>
@@ -80,7 +85,7 @@
             {% for message in messages %}
                 Swal.fire({
                     icon: '{% if "success" in message.tags %}success{% elif "error" in message.tags %}error{% else %}info{% endif %}',
-                    title: '{{ message|escapejs }}',
+                    title: '{{ message|safe }}', 
                     timer: 2500,
                     showConfirmButton: false
                 });

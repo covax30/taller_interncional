@@ -1,0 +1,122 @@
+{% load widget_tweaks %}
+
+{% block form %}
+
+    <div id="msg-empleado"></div>  
+
+<div class="form-group mb-3">
+    <label>Nombre del empleado:</label>
+    {{ form.first_name }} </div>
+
+<div class="form-group mb-3">
+    <label>Apellido del empleado:</label>
+    {{ form.last_name }}        
+</div>
+
+
+
+    <div class="form-group mb-3">
+        <label for ="{{form.tipo_identificacion.id_for_label}}">Tipo de identificación:</label>
+        <div class= "input-group">
+            {{form.tipo_identificacion|add_class:'form-control'|attr:'autocomplete:off'}}
+        </div>
+        {% if form.tipo_identificacion.errors %} 
+            <div class="invalid-feedback d-block">
+                {% for error in form.tipo_identificacion.errors%} 
+                <small> {{error}} </small> <br>
+                {%endfor%}    
+            </div>
+        {% endif%}             
+    </div>
+
+    <div class="form-group mb-3">
+        <label for ="{{form.identificacion.id_for_label}}">Identificación:</label>
+        <div class= "input-group">
+            {{form.identificacion|add_class:'form-control'|attr:'autocomplete:off'}}
+        </div>
+        {% if form.identificacion.errors %} 
+            <div class="invalid-feedback d-block">
+                {% for error in form.identificacion.errors%} 
+                <small> {{error}} </small> <br>
+                {%endfor%}    
+            </div>
+        {% endif%}             
+    </div>
+
+    <div class="form-group mb-3">
+        <label for ="{{form.telefono.id_for_label}}">Teléfono:</label>
+        <div class= "input-group">
+            {{form.telefono|add_class:'form-control'|attr:'autocomplete:off'}}
+        </div>
+        {% if form.telefono.errors %} 
+            <div class="invalid-feedback d-block">
+                {% for error in form.telefono.errors%} 
+                <small> {{error}} </small> <br>
+                {%endfor%}    
+            </div>
+        {% endif%}             
+    </div>
+
+    <div class="form-group mb-3">
+        <label for ="{{form.direccion.id_for_label}}">Dirección:</label>
+        <div class= "input-group">
+            {{form.direccion|add_class:'form-control'|attr:'autocomplete:off'}}
+        </div>
+        {% if form.direccion.errors %} 
+            <div class="invalid-feedback d-block">
+                {% for error in form.direccion.errors%} 
+                <small> {{error}} </small> <br>
+                {%endfor%}    
+            </div>
+        {% endif%}             
+    </div>
+
+{% endblock %}
+{% block Cancelar %}
+<div class="modal-footer border-top-0 d-flex justify-content-end">
+    <button type="button" class="btn btn-secondary btn-flat mr-2" data-dismiss="modal">
+        <i class="fas fa-times"></i> Cancelar
+    </button>
+    <button type="button" id="btnGuardarEmpleado" class="btn btn-success btn-flat">
+        <i class="fas fa-save"></i> Guardar Empleado
+    </button>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).on('click', '#btnGuardarEmpleado', function (e) {
+    e.preventDefault();
+    var form = document.getElementById('RegistroUsuarioForm');
+    var formData = new FormData(form); // Permite enviar la imagen de perfil
+
+    $.ajax({
+        url: $(form).attr('action'),
+        type: 'POST',
+        data: formData,
+        processData: false, // Necesario para FormData
+        contentType: false, // Necesario para FormData
+        success: function (response) {
+            if (response.success) {
+                // 1. Cerrar el modal
+                $('#modal-empleado').modal('hide');
+
+                // 2. Actualizar el select 'empleado' en el formulario de servicio
+                var newOption = new Option(response.text, response.id, true, true);
+                $('select[name="empleado"]').append(newOption).trigger('change');
+
+                // 3. Notificación
+                alert(response.message);
+            } else {
+                // Si el backend devuelve error (por ejemplo, cédula duplicada)
+                // Reemplazamos el contenido del modal con el nuevo HTML que trae los errores
+                $('#modal-empleado .modal-body').html(response.html);
+            }
+        },
+        error: function (xhr) {
+            alert("Error en el servidor: " + xhr.statusText);
+        }
+    });
+});
+</script>
+{% endblock %}

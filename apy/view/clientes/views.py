@@ -5,7 +5,7 @@ from apy.models import *
 # from apy.view.clientes.views import * # Si este archivo contiene estas vistas, esta importación puede ser redundante o generar un conflicto circular. Se recomienda revisar su necesidad.
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import HttpResponseRedirect, JsonResponse
-from django.contrib import messages
+
 from django.utils.decorators import method_decorator
 from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
@@ -15,7 +15,7 @@ from django.contrib.auth.mixins import AccessMixin # Solo necesaria si defines m
 from apy.models import * 
 from apy.forms import *
 from apy.decorators import PermisoRequeridoMixin, permiso_requerido_fbv # <-- Asumo que 'permiso_requerido_fbv' es tu decorador de función 
-
+from django.contrib import messages
 # --- VISTAS BASADAS EN CLASES (CBVs) - PROTEGIDAS ---
 
 class ClienteListView(PermisoRequeridoMixin, ListView):
@@ -86,7 +86,6 @@ class ClienteCreateView(PermisoRequeridoMixin, CreateView):
     
     def form_valid(self, form):
         form.instance.estado = True 
-        messages.success(self.request, "Cliente creado correctamente")
         response = super().form_valid(form)
         messages.success(self.request, "Cliente creado correctamente")
         
@@ -224,7 +223,6 @@ def api_contador_clientes(request):
     """Retorna el total de clientes para actualización AJAX."""
     total_clientes = Cliente.objects.count()
     return JsonResponse({'total_clientes': total_clientes})
-
 class ClienteCreateModalView(CreateView):
     model = Cliente
     form_class = ClienteForm
@@ -236,26 +234,39 @@ class ClienteCreateModalView(CreateView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
+        # Esta línea causaba el error si no tenía exactamente 8 espacios (4 de la clase + 4 de la función)
         form.instance.estado = True
+        self.object = form.save()
+        
+        # El texto debe coincidir con el formato que usas en tus Select2 (Identificación - Nombre)
+        display_text = f"{self.object.identificacion} - {self.object.nombre}"
+        
+        return JsonResponse({ 
+            "success": True,
+            "id": self.object.id,
+            "text": display_text,
+            "message": "Cliente registrado correctamente ✅"
+        })
+
+    def form_valid(self, form):
         try:
             self.object = form.save()
-            display_text = f"{self.object.identificacion} - {self.object.nombre}"
-            return JsonResponse({ 
+            return JsonResponse({
                 "success": True,
-                "id": self.object.id,
-                "text": display_text,
-                "message": "Cliente registrado correctamente ✅"
+                "id": self.object.pk,
+                "text": str(self.object),
+                "message": "Cliente creado correctamente ✅"
             })
         except Exception as e:
             return JsonResponse({
                 "success": False,
                 "message": f"Error al guardar: {str(e)}"
             }, status=500)
-    
+
     def form_invalid(self, form):
         html = render_to_string(self.template_name, {"form": form}, request=self.request)
         return JsonResponse({
             "success": False,
             "html": html,
-            "message": "Por favor, corrige los errores en el formulario ❌"
-        })
+            "message": "Por favor, corrige los errores indicados."
+        })  

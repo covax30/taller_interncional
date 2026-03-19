@@ -49,7 +49,7 @@ class BackupLog(models.Model):
     tipo = models.CharField(max_length=10, choices=TIPO_OPCIONES)
     estado = models.CharField(max_length=10, choices=ESTADO_OPCIONES, default='En Proceso')
     tamaño_mb = models.FloatField(null=True, blank=True, verbose_name="Tamaño (MB)")
-    usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Ejecutado por", db_constraint=False)
+    usuario = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True, blank=True, verbose_name="Ejecutado por", db_constraint=False)
     ruta_archivo = models.CharField(max_length=255, null=True, blank=True, verbose_name="Ruta")
     mensaje_error = models.TextField(null=True, blank=True, verbose_name="Mensaje de Error/Advertencia")
     

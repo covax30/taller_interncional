@@ -1,0 +1,358 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head> 
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Nosotros - Taller Internacional de Motores</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  <!-- Favicons -->
+    <link rel="icon" href="{% static 'img/favico.jpg' %}" type="image/png">
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+    rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'info/assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'info/assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'info/assets/vendor/aos/aos.css' %}" rel="stylesheet">
+  <link href="{% static 'info/assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+  <link href="{% static 'info/assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{% static 'info/assets/css/main.css' %}" rel="stylesheet">
+
+  <!-- =======================================================
+  * Template Name: iConstruction
+  * Template URL: https://bootstrapmade.com/iconstruction-bootstrap-construction-template/
+  * Updated: Jul 27 2025 with Bootstrap v5.3.7
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
+</head>
+
+<body class="about-page">
+
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center">
+
+      <a href="{% url 'apy:index_informacion' %}" class="logo d-flex align-items-center me-auto">
+        <!-- Uncomment the line below if you also wish to use an image logo -->
+        <!-- <img src="assets/img/logo.webp" alt=""> -->
+        <h1 class="sitename">T.I.M</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="{% url 'apy:index_informacion' %}" class="active">Inicio</a></li>
+          <li class="dropdown"><a href="#"><span>Nosotros</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+              <li><a href="{% url 'apy:about_informacion' %}#about">Historia</a></li>
+              <li><a href="{% url 'apy:about_informacion' %}#about2">Proposito</a></li>
+              <li><a href="{% url 'apy:about_informacion' %}#about3">¿Por qué nosotros?</a></li>
+            </ul>
+          </li>
+          <li><a href="{% url 'apy:service_informacion' %}">Servicios</a></li>
+          <li><a href="{% url 'apy:contact_informacion' %}">Contacto</a></li>
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+<a class="btn-getstarted d-none d-sm-block" href="{% url 'login:login' %}">Iniciar Sesión</a>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- Page Title -->
+    <div class="page-title dark-background" data-aos="fade"
+      style="background-image: url({% static 'info/assets/img/taller/img-header.jpg' %});">
+      <div class="container position-relative">
+        <h1>Nosotros</h1>
+        <nav class="breadcrumbs">
+          <ol>
+            <li><a href="{% url 'apy:index_informacion' %}">Inicio</a></li>
+            <li class="current">Nosotros</li>
+          </ol>
+        </nav>
+      </div>
+    </div><!-- End Page Title -->
+
+    <!-- About Section 1 -->
+    <section id="about" class="about section">
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="row align-items-center">
+
+          <div class="col-lg-6 order-2 order-lg-1" data-aos="fade-right" data-aos-delay="200">
+            <div class="content">
+              <h2 class="section-heading mb-4">¿QUIÉNES SOMOS?</h2>
+              <p class="lead-text mb-4">Somos <strong>Taller Internacional de Motores</strong>,
+                una empresa con más de 18 años de experiencia en la reparación de motores diésel.
+                Nos especializamos en brindar servicios personalizados y a domicilio, utilizando tecnología de
+                vanguardia y repuestos originales.
+                Nuestro objetivo es ofrecer soluciones prácticas y efectivas para maximizar el tiempo de nuestros
+                clientes,
+                realizando mantenimiento y reparaciones mientras ellos continúan con sus actividades diarias, desde la
+                comodidad de su hogar u oficina.</p>
+
+              <div class="container section" data-aos="fade-up">
+                <h2>EXPERIENCIA Y TRAYECTORIA</h2>
+                <p>Contamos con un equipo que mezcla experiencia y juventud, integrado por profesionales con más de 35
+                  años en el sector automotriz,
+                  además de nuevos talentos en constante formación. Esta combinación nos permite mantenernos en la
+                  vanguardia de la innovación tecnológica,
+                  ofreciendo servicios de alta calidad y brindando oportunidades para aprender al integrar teoría y
+                  práctica.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6 order-1 order-lg-2" data-aos="fade-left" data-aos-delay="200">
+            <div class="image-section">
+              <div class="main-image">
+                <img src="{% static 'info/assets/img/taller/MOTOR 1.jpg' %}" alt="Construction project showcase" class="img-fluid">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section><!-- /About Section -->
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="testimonials section">
+
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Identidad Corporativa</h2>
+      </div><!-- End Section Title -->
+
+      <div class="container">
+
+        <div class="testimonial-masonry">
+
+          <div class="testimonial-item highlight" data-aos="fade-up">
+            <div class="testimonial-content">
+              <div class="quote-pattern">
+                <i class="bi bi-quote"></i>
+              </div>
+              <div class="client-details">
+                <h3>Misión</h3>
+              </div>
+              <p>Maximizar el tiempo y la comodidad de nuestros clientes al ofrecer un servicio de reparación y
+                mantenimiento automotriz confiable,
+                profesional y sostenible, directamente a domicilio, apoyándonos en la tecnología para garantizar calidad
+                y confianza en cada proceso.</p>
+            </div>
+          </div>
+
+          <div class="testimonial-item highlight" data-aos="fade-up">
+            <div class="testimonial-content">
+              <div class="quote-pattern">
+                <i class="bi bi-quote"></i>
+              </div>
+              <div class="client-details">
+                <h3>Visión</h3>
+              </div>
+              <p>Convertirnos en líderes del sector automotriz a nivel nacional bajo el modelo de servicios 100%
+                virtuales.
+                Aspiramos a ser reconocidos por nuestro compromiso con la innovación, la sostenibilidad y la atención al
+                cliente,
+                contribuyendo a transformar el mercado automotriz hacia una era más digital y personalizada.</p>
+            </div>
+          </div>
+
+          <div class="testimonial-item highlight" data-aos="fade-up">
+            <div class="testimonial-content">
+              <div class="quote-pattern">
+                <i class="bi bi-quote"></i>
+              </div>
+              <div class="client-details">
+                <h3>Valores</h3>
+              </div>
+              <p>
+              <ul>
+                <li>Atención al cliente</li>
+                <li>Transparencia</li>
+                <li>Responsabilidad</li>
+                <li>Innovación</li>
+                <li>Honestidad</li>
+                <li>Comunicación</li>
+                <li>Rapidez</li>
+              </ul>
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section><!-- /Testimonials Section -->
+
+    <!-- About Section 2 -->
+    <section id="about2" class="about section">
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="row align-items-center">
+
+          <div class="col-lg-6 " data-aos="fade-right" data-aos-delay="200">
+            <div class="image-section">
+              <div class="main-image">
+                <img src="{% static 'info/assets/img/taller/CAMION 1.jpg' %}" alt="Construction project showcase" class="img-fluid">
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6 " data-aos="fade-left" data-aos-delay="200">
+            <div class="content">
+              <h2 class="section-heading mb-4">PROPOSITO</h2>
+              <p class="lead-text mb-4">Nuestro propósito es mejorar la calidad de vida de nuestros clientes y su
+                relación con sus vehículos,
+                proporcionando soluciones automotrices que ahorren tiempo y brinden mayor bienestar. Queremos que cada
+                persona se sienta segura y cómoda en cada trayecto,
+                y que aquellos apasionados por los autos puedan acercarse más al mundo de la mecánica a través de
+                nuestro trabajo y contenidos educativos.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section><!-- /About Section -->
+
+    <!-- About Section 3 -->
+    <section id="about3" class="about section">
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="row justify-content-center">
+
+          <div class="col-lg-8 text-center " data-aos="zoom-in" data-aos-delay="200">
+            <div class="content">
+              <h2 class="section-heading mb-4">¿POR QUÉ NOSOTROS?</h2>
+              <p class="lead-text mb-4">
+                En <strong>Taller Internacional de Motores</strong>, no solo resolvemos problemas automotrices, sino que
+                creamos una experiencia única para nuestros clientes.
+                A través de nuestras redes sociales y plataforma digital, fomentamos una comunidad apasionada y
+                comprometida, donde compartimos historias de éxito,
+                consejos prácticos y contenido educativo. Además, con nuestro enfoque personalizado y a domicilio,
+                ofrecemos comodidad, confianza y una conexión directa con el proceso de reparación o mantenimiento de tu
+                vehículo.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section><!-- /About Section -->
+
+  </main>
+
+  <footer id="footer" class="footer dark-background">
+
+    <div class="container footer-top-contact">
+      <div class="row text-center gy-4">
+
+        <div class="col-6 col-lg-3">
+          <div class="contact-item">
+            <i class="bi bi-geo-alt-fill"></i>
+            <h5>Ubicación</h5>
+            <p>Sogamoso, Boyacá<br>Colombia</p>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <div class="contact-item">
+            <i class="bi bi-telephone-fill"></i>
+            <h5>Teléfono</h5>
+            <p><a href="tel:+573126216800">+57 312 621 6800</a></p>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <div class="contact-item">
+            <i class="bi bi-envelope-at-fill"></i>
+            <h5>Correo</h5>
+            <p><a href="mailto:arturopatino@gmail.com">arturopatino@gmail.com</a></p>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <div class="contact-item">
+            <i class="bi bi-clock-fill"></i>
+            <h5>Horarios</h5>
+            <p>Lun - Sáb: 8 AM - 7 PM</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <div class="footer-bottom-content text-center">
+              <p class="disclaimer-text">
+                <strong>Aviso de Marcas:</strong> Todos los logotipos de terceros son propiedad de sus respectivos
+                dueños.
+                Su uso es informativo para indicar la especialidad técnica de nuestro taller.
+              </p>
+              <div class="legal-links">
+                <span>© 2026 <span class="sitename">T.I.M</span>. Todos los derechos reservados.</span>
+                <a href="{% url 'apy:terms_informacion' %}">Terminos y Condiciones</a>
+              </div>
+              <div class="credits">
+                <!-- All the links in the footer should remain intact. -->
+                <!-- You can delete the links only if you've purchased the pro version. -->
+                <!-- Licensing information: https://bootstrapmade.com/license/ -->
+                <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
+                Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </footer>
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="{% static 'info/assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'info/assets/vendor/php-email-form/validate.js' %}"></script>
+  <script src="{% static 'info/assets/vendor/aos/aos.js' %}"></script>
+  <script src="{% static 'info/assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
+  <script src="{% static 'info/assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
+  <script src="{% static 'info/assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
+
+  <!-- Main JS File -->
+  <script src="{% static 'info/assets/js/main.js' %}"></script>
+
+  <!-- WhatsApp -->
+  <a href="https://wa.me/573126216800?text=Hola%20T.I.M.,%20solicito%20información%20sobre..." class="whatsapp-float"
+    target="_blank" rel="noopener noreferrer">
+    <i class="bi bi-whatsapp"></i>
+  </a>
+  <script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
+<script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
+
+</body>
+
+</html>

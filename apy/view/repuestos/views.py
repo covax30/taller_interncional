@@ -83,6 +83,13 @@ class RepuestoCreateView(PermisoRequeridoMixin, CreateView):
     
     def form_valid(self, form):
         form.instance.estado = True 
+        if not form.instance.stock_minimo:
+            form.instance.stock_minimo = 1
+            
+        if form.instance.precio_unitario is None or form.instance.precio_unitario == '':
+            form.instance.precio_unitario = 0.00
+    
+            
         messages.success(self.request, f"Repuesto {form.instance.nombre} creado correctamente")
         return super().form_valid(form)  
     

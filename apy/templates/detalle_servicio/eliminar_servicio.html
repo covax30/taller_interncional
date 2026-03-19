@@ -1,15 +1,36 @@
 {% extends 'eliminar_generic.html' %}
 
 {% block eliminar %}
-                <h5><i class="icon fas fa-ban"></i> Advertencia¡</h5>
-                Deseas eliminar el objeto? #{{object.id}}?
+    {% if object.proceso == 'proceso' %}
+        <h5><i class="icon fas fa-trash"></i> ¡Eliminación permanente!</h5>
+        <p>¿Deseas <strong>eliminar definitivamente</strong> el servicio <strong>#{{ object.id }}</strong>?</p>
+        <div class="alert alert-danger mt-2">
+            <i class="fas fa-exclamation-triangle"></i>
+            Este servicio está <strong>En Proceso</strong> y será eliminado
+            <strong>permanentemente</strong> de la base de datos. Esta acción no se puede deshacer.
+        </div>
+    {% else %}
+        <h5><i class="icon fas fa-ban"></i> ¡Advertencia!</h5>
+        <p>¿Deseas <strong>desactivar</strong> el servicio <strong>#{{ object.id }}</strong>?</p>
+        <div class="alert alert-warning mt-2">
+            <i class="fas fa-info-circle"></i>
+            Este servicio está <strong>Terminado</strong> y será inactivado. 
+            Podrás reactivarlo después si lo necesitas.
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block validar %}
-            <button type="submit" class="btn btn-success swalDefauldtSuccess">
-                <i class="fas fa-save"></i> Si, Aceptar
-            </button>
-            <a href="{{ listar_url }}" class="btn btn-danger btn-flat">
-                <i class="fas fa-times"></i> Cancelar
-            </a>
+    {% if object.proceso == 'proceso' %}
+        <button type="submit" class="btn btn-danger swalDefauldtSuccess">
+            <i class="fas fa-trash"></i> Sí, eliminar permanentemente
+        </button>
+    {% else %}
+        <button type="submit" class="btn btn-success swalDefauldtSuccess">
+            <i class="fas fa-save"></i> Sí, desactivar
+        </button>
+    {% endif %}
+    <a href="{{ listar_url }}" class="btn btn-secondary btn-flat">
+        <i class="fas fa-times"></i> Cancelar
+    </a>
 {% endblock %}

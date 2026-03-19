@@ -1,6 +1,8 @@
+from builtins import Exception, print, str, super
+
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views import View
-from apy.models import Empresa, Cliente  # Importa explícitamente
+from apy.models import Empresa # Importa explícitamente
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib import messages
@@ -11,6 +13,7 @@ from django.urls import reverse_lazy
 from apy.forms import EmpresaForm  # Importa explícitamente
 from django.contrib.auth.mixins import AccessMixin
 from apy.decorators import PermisoRequeridoMixin, permiso_requerido_fbv
+from django.db import transaction
 
 
 ## VISTAS BASADAS EN CLASES (CBVs)
@@ -101,12 +104,39 @@ class EmpresaCreateView(PermisoRequeridoMixin, CreateView):
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
     
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['titulo'] = 'Crear Empresa'  # Corregido texto
-        context['entidad'] = 'Empresa'
-        context['listar_url'] = reverse_lazy('apy:empresa_lista')  # minúsculas
-        return context
+    def get_or_create_empresa_default():
+    # Intentamos obtener la primera empresa activa
+        empresa = Empresa.objects.filter(estado=True).first()
+        
+        if not empresa:
+            try:
+                with transaction.atomic():
+                    empresa = Empresa.objects.create(
+                        nombre="Taller Mecánica Diesel Internacional Arturo Patiño",
+                        nit="74.187366-2",
+                        direccion="Calle 9 #32-37 Barrio La Isla",
+                        telefono="3118112714 - 3133342841",
+                        estado=True
+                    )
+            except Exception as e:
+                # Manejo de error o log si la creación falla
+                print(f"Error creando empresa: {e}")
+                return None
+        return empresa
+
+def get_context_data(self, **kwargs):
+    context = super().get_context_data(**kwargs)
+    empresa = get_or_create_empresa_default() # type: ignore
+    
+    # Usamos diccionarios de forma segura
+    context.update({
+        'titulo': 'Crear Empresa',
+        'entidad': 'Empresa',
+        'listar_url': reverse_lazy('apy:empresa_lista'),
+        'empresa_default_id': empresa.pk if empresa else None,
+        'empresa': empresa # Pasar el objeto completo te da más flexibilidad en el template
+    })
+    return context
     
 class EmpresaUpdateView(PermisoRequeridoMixin, UpdateView):
     model = Empresa
@@ -132,6 +162,7 @@ class EmpresaUpdateView(PermisoRequeridoMixin, UpdateView):
         context['titulo'] = 'Editar Empresa'  # Corregido texto
         context['entidad'] = 'Empresa'
         context['listar_url'] = reverse_lazy('apy:empresa_lista')
+        
         return context
     
 class EmpresaDeleteView(PermisoRequeridoMixin, DeleteView): 

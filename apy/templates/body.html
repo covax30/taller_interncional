@@ -23,7 +23,7 @@
     <!--end::App Wrapper-->
 
     <!--begin::Scripts-->
-    <script src="{% static 'lib/sweetalert2/sweetalert2.all.min.js' %}"></script>
+    
     <script>
       document.addEventListener('DOMContentLoaded', function () {
         {% if messages %}
@@ -82,6 +82,7 @@
     <!--end::OverlayScrollbars Configure-->
 
     <!-- BLOQUE PARA SCRIPTS ADICIONALES DE PÁGINAS ESPECÍFICAS -->
+     <script src="{% static 'lib/sweetalert2/sweetalert2.all.min.js' %}"></script>
     {% block extra_scripts %}
     {% endblock %}
     <script src="{% static 'AdminLTE/dist/js/theme_switcher.js' %}"> </script>
@@ -111,4 +112,9 @@ function confirmarSalida() {
     });
 }
 </script>
+
+  {% include 'ia_assistant/chat_widget.html' %}
+  <script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
+<script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
+
 {% endblock %}

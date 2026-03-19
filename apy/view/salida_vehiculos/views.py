@@ -108,15 +108,19 @@ class SalidaCreateModalView(CreateView):
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
+    def get(self, request, *args, **kwargs):
+        form = self.form_class()
+        html = render_to_string(self.template_name, {"form": form}, request=request)
+        return JsonResponse({"html": html})
+
     def form_valid(self, form):
-        form.instance.estado = True
         try:
             self.object = form.save()
             return JsonResponse({ 
                 "success": True,
                 "id": self.object.id_salida,
                 "text": str(self.object),
-                "message": "Salida de Vehiculo registrada correctamente ✅"
+                "message": "Salida registrada correctamente ✅"
             })
         except Exception as e:
             return JsonResponse({
@@ -125,9 +129,9 @@ class SalidaCreateModalView(CreateView):
             }, status=500)
     
     def form_invalid(self, form):
-        html = render_to_string(self.template_name, {"form": form}, request=self.request) # pyright: ignore[reportUndefinedVariable]
+        html = render_to_string(self.template_name, {"form": form}, request=self.request)
         return JsonResponse({
             "success": False,
             "html": html,
-            "message": "Por favor, corrige los errores en el formulario ❌"
-        })    
+            "message": "Corrige los errores ❌"
+        })

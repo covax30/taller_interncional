@@ -33,6 +33,20 @@
         position: absolute;
         right: 0;
     }
+
+        /* --- FIX PARA EL OJO DE LA CONTRASEÑA --- */
+    .toggle-password {
+        position: absolute;
+        top: 29px !important; 
+        right: 12px !important;
+        transform: translateY(-50%) !important;
+        z-index: 10;
+        padding: 0.25rem 0.5rem;
+        opacity: 0.7;
+    }
+    
+    .toggle-password:hover { opacity: 1; }
+
 </style>
 
 {% with user.is_superuser as is_admin %}
@@ -148,42 +162,86 @@
                             <div class="form-floating mb-1">
                                 {{ form.first_name|add_class:"form-control bg-body text-body" }} 
                                 <label class="text-body"><i class="fas fa-user-circle me-2 text-muted"></i>Nombres</label>
+                                {% if form.first_name.errors %}
+                                    {% for error in form.first_name.errors %}
+                                        <small class="text-danger fw-bold d-block mt-1">{{ error }}</small>
+                                    {% endfor %}
+                                {% endif %}
                             </div>
                         </div>
                         <div class="col-sm-6">
                             <div class="form-floating mb-1">
                                 {{ form.last_name|add_class:"form-control bg-body text-body" }} 
                                 <label class="text-body"><i class="fas fa-user-circle me-2 text-muted"></i>Apellidos</label>
+                                {% if form.last_name.errors %}
+                                    {% for error in form.last_name.errors %}
+                                        <small class="text-danger fw-bold d-block mt-1">{{ error }}</small>
+                                    {% endfor %}
+                                {% endif %}
                             </div>
                         </div>
                         <div class="col-sm-6">
                             <div class="form-floating mb-1">
                                 {{ form.email|add_class:"form-control bg-body text-body text-truncate" }} 
                                 <label class="text-body"><i class="fas fa-at me-2 text-muted"></i>Email</label>
+                                {% if form.email.errors %}
+                                    {% for error in form.email.errors %}
+                                        <small class="text-danger fw-bold d-block mt-1">{{ error }}</small>
+                                    {% endfor %}
+                                {% endif %}
                             </div>
                         </div>
                         <div class="col-sm-6">
                             <div class="form-floating mb-1">
                                 {{ form.username|add_class:"form-control bg-body text-body text-truncate" }} 
                                 <label class="text-body"><i class="fas fa-user-tag me-2 text-muted"></i>Usuario</label>
+                                {% if form.username.errors %}
+                                    {% for error in form.username.errors %}
+                                        <small class="text-danger fw-bold d-block mt-1">{{ error }}</small>
+                                    {% endfor %}
+                                {% endif %}
                             </div>
                         </div> 
                         <div class="col-sm-6">
                             <div class="form-floating mb-1">
                                 {{ profile_form.telefono|add_class:"form-control bg-body text-body" }} 
                                 <label class="text-body"><i class="fas fa-phone me-2 text-muted"></i>Teléfono</label>
+                                {% if profile_form.telefono.errors %}
+                                    {% for error in profile_form.telefono.errors %}
+                                        <small class="text-danger fw-bold d-block mt-1">{{ error }}</small>
+                                    {% endfor %}
+                                {% endif %}
                             </div>
                         </div> 
-                        <div class="col-sm-6">
-                            <div class="form-floating mb-1">
-                                {{ profile_form.identificacion|add_class:"form-control bg-body text-body" }}
-                                <label class="text-body"><i class="fas fa-id-card me-2 text-muted"></i>Cédula</label>
+                        <div class="row g-3">
+                            <div class="col-sm-4">
+                                <div class="form-floating mb-1">
+                                    {{ profile_form.tipo_identificacion|add_class:"form-select bg-body text-body" }}
+                                    <label class="text-body"><i class="fas fa-fingerprint me-2 text-muted"></i>Tipo</label>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-8">
+                                <div class="form-floating mb-1">
+                                    {{ profile_form.identificacion|add_class:"form-control bg-body text-body" }}
+                                    <label class="text-body"><i class="fas fa-id-card me-2 text-muted"></i>Número de Identificación</label>
+                                    {% if profile_form.identificacion.errors %}
+                                        {% for error in profile_form.identificacion.errors %}
+                                            <small class="text-danger fw-bold d-block mt-1">{{ error }}</small>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="form-floating mb-1">
                                 {{ profile_form.direccion|add_class:"form-control bg-body text-body" }}
                                 <label class="text-body"><i class="fas fa-map-marker-alt me-2 text-muted"></i>Dirección</label>
+                                {% if profile_form.direccion.errors %}
+                                    {% for error in profile_form.direccion.errors %}
+                                        <small class="text-danger fw-bold d-block mt-1">{{ error }}</small>
+                                    {% endfor %}
+                                 {% endif %}
                             </div>
                         </div>
                     </div>
@@ -203,14 +261,24 @@
                     <hr class="flex-grow-1 ms-3 opacity-25">
                 </div>
 
-                <form method="POST" action="{% url 'password_change' %}">
+                {# --- SECCIÓN DE SEGURIDAD --- #}
+                <div class="alert bg-body-tertiary border-0 shadow-sm d-flex align-items-center p-2 px-3 mb-3" style="border-left: 4px solid #dc3545 !important;">
+                    <i class="fas fa-shield-alt text-danger me-2"></i>
+                    <span class="text-muted small">Para cambiar tu contraseña, completa los tres campos a continuación.</span>
+                </div>
+
+                <form method="POST" action="{% url 'login:password_change' %}" novalidate>
                     {% csrf_token %}
+                    
                     <div class="form-floating mb-3 position-relative">
                         {{ password_form.old_password|add_class:"form-control border-danger-subtle bg-body text-body pe-5" }}
                         <label class="text-body"><i class="fas fa-key me-2 text-muted"></i>Contraseña Actual</label>
-                        <button type="button" class="btn position-absolute top-50 end-0 translate-middle-y border-0 text-muted toggle-password">
+                        <button type="button" class="btn position-absolute top-50 end-0 translate-middle-y border-0 text-muted toggle-password" tabindex="-1">
                             <i class="fas fa-eye"></i>
                         </button>
+                        {% if password_form.old_password.errors %}
+                            <small class="text-danger fw-bold d-block mt-1 error-msg">{{ password_form.old_password.errors.0 }}</small>
+                        {% endif %}
                     </div>
 
                     <div class="row g-3">
@@ -218,24 +286,31 @@
                             <div class="form-floating mb-1 position-relative">
                                 {{ password_form.new_password1|add_class:"form-control bg-body text-body pe-5" }}
                                 <label class="text-body"><i class="fas fa-lock me-2 text-muted"></i>Nueva Contraseña</label>
-                                <button type="button" class="btn position-absolute top-50 end-0 translate-middle-y border-0 text-muted toggle-password">
+                                <button type="button" class="btn position-absolute top-50 end-0 translate-middle-y border-0 text-muted toggle-password" tabindex="-1">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
+                            {% if password_form.new_password1.errors %}
+                                <small class="text-danger fw-bold d-block mt-1 error-msg">{{ password_form.new_password1.errors.0 }}</small>
+                            {% endif %}
                         </div>
+
                         <div class="col-sm-6">
                             <div class="form-floating mb-1 position-relative">
                                 {{ password_form.new_password2|add_class:"form-control bg-body text-body pe-5" }}
                                 <label class="text-body"><i class="fas fa-check-double me-2 text-muted"></i>Confirmar Nueva</label>
-                                <button type="button" class="btn position-absolute top-50 end-0 translate-middle-y border-0 text-muted toggle-password">
+                                <button type="button" class="btn position-absolute top-50 end-0 translate-middle-y border-0 text-muted toggle-password" tabindex="-1">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
+                            {% if password_form.new_password2.errors %}
+                                <small class="text-danger fw-bold d-block mt-1 error-msg">{{ password_form.new_password2.errors.0 }}</small>
+                            {% endif %}
                         </div>
                     </div>
                     
                     <div class="mt-3">
-                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-4">
+                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-4 shadow-sm">
                             <i class="fas fa-sync-alt me-1"></i> Actualizar mi Contraseña
                         </button>
                     </div>
@@ -249,5 +324,101 @@
 <script src="{% static 'js/sienna-accessibility/sienna.js' %}"></script>
 <script src="{% static 'js/sienna-accessibility/custom.js' %}"></script>
 <script src="{% static 'js/password_eye.js' %}"></script>
+
+<script>
+    // Script adicional para añadir is-invalid dinámicamente si hay errores
+    document.addEventListener("DOMContentLoaded", function() {
+        const errors = document.querySelectorAll('.invalid-feedback');
+        errors.forEach(error => {
+            const input = error.parentElement.querySelector('.form-control, .form-select');
+            if (input) {
+                input.classList.add('is-invalid');
+            }
+        });
+    });
+</script>
+
+
+<script type="application/javascript">
+    (function() {
+        // 1. Diccionario maestro de traducciones
+        const traducciones = {
+            "this field is required.": "Este campo es obligatorio. ⚠️",
+            "the two password fields didn't match.": "Las contraseñas no coinciden. ❌",
+            "this password is too short. it must contain at least 8 characters.": "Contraseña muy corta (mínimo 8 caracteres).",
+            "this password is too common.": "La contraseña es muy común y fácil de adivinar.",
+            "this password is entirely numeric.": "No puedes usar solo números.",
+            "this password is completely numeric.": "No puedes usar solo números.",
+            "password confirmation doesn't match": "La confirmación no coincide. ❌",
+            "enter a valid email address.": "Ingresa un correo electrónico válido."
+        };
+
+        function traducir(msg) {
+            if (!msg) return "";
+            let msgClean = msg.toLowerCase().trim();
+            
+            // Buscar coincidencia exacta
+            if (traducciones[msgClean]) return traducciones[msgClean];
+            
+            // Traducciones por coincidencia parcial (Regex)
+            if (/número/.test(msgClean) || /digit/.test(msgClean)) return "<b>Falta número:</b> Incluye al menos un número (0-9).";
+            if (/especial|símbolo|symbol|special/.test(msgClean)) return "<b>Falta símbolo:</b> Usa un carácter como @, #, $ o *.";
+            if (/too short/.test(msgClean)) return "Mínimo 8 caracteres.";
+            
+            return msg; // Si no hay traducción, devolver original
+        }
+
+        // --- TRADUCIR ERRORES EN EL TEXTO ROJO DEL FORMULARIO ---
+        function traducirErroresEnPantalla() {
+            const errorElements = document.querySelectorAll('.error-msg, small.text-danger');
+            errorElements.forEach(el => {
+                const textoOriginal = el.innerText.trim();
+                // Si contiene letras pero NO contiene tildes/eñes, asumimos que es inglés de Django
+                if (textoOriginal && !/[áéíóúñÁÉÍÓÚÑ]/.test(textoOriginal)) {
+                    el.innerHTML = traducir(textoOriginal);
+                }
+            });
+        }
+
+        // Ejecutar traducción al cargar el DOM
+        document.addEventListener("DOMContentLoaded", traducirErroresEnPantalla);
+
+        // --- LÓGICA DE SWEETALERT2 EXISTENTE ---
+        let errorList = [];
+
+        {# Capturar errores de password_form #}
+        {% if password_form.errors %}
+            {% for field in password_form %}
+                {% for error in field.errors %}
+                    errorList.push(traducir("{{ error|escapejs }}"));
+                {% endfor %}
+            {% endfor %}
+            {% for error in password_form.non_field_errors %}
+                errorList.push(traducir("{{ error|escapejs }}"));
+            {% endfor %}
+        {% endif %}
+
+        {# Capturar errores de form (datos personales) #}
+        {% if form.errors %}
+            {% for field in form %}
+                {% for error in field.errors %}
+                    errorList.push("<b>{{ field.label|escapejs }}:</b> " + traducir("{{ error|escapejs }}"));
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+
+        if (errorList.length > 0) {
+            Swal.fire({
+                title: '¡Corrección necesaria!',
+                html: '<div style="text-align: left; font-size: 0.9em;">' + 
+                       errorList.map(err => `<div>${err}</div>`).join('<hr style="margin: 8px 0; opacity: 0.1;">') + 
+                       '</div>',
+                icon: 'warning',
+                confirmButtonColor: '#007bff'
+            });
+        }
+    })();
+</script>
+
 {% endwith %}
 {% endblock %}
