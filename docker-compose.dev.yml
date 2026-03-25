@@ -1,0 +1,33 @@
+services:
+  web:
+    container_name: taller_dev_app        # ← nombre diferente a prod
+    env_file:
+      - .env.dev                          # ← lee tu .env.dev
+    environment:
+      - DJANGO_SETTINGS_MODULE=taller.settings.settings_development
+    volumes:
+      - .:/app                            # ← hot reload en dev
+      - taller_internacional_static_data:/app/staticfiles
+      - taller_internacional_media_data:/app/media
+    ports:
+      - "8015:8000"                       # ← puerto diferente a prod
+    command: python manage.py runserver 0.0.0.0:8000
+
+  db:
+    container_name: taller_dev_db         # ← nombre diferente a prod
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}          # taller_dev
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3316:3306"                       # ← puerto diferente a prod
+
+  phpmyadmin:
+    container_name: taller_dev_phpmyadmin # ← nombre diferente a prod
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    ports:
+      - "8081:80"                         # ← puerto diferente a prod

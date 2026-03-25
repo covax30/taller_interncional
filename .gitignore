@@ -24,3 +24,7 @@ staticfiles/
 db.sqlite3
 *.
 credentials.json
+.env.dev
+.env.prod
+.env.test
+

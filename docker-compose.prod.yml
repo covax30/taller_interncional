@@ -1,0 +1,34 @@
+services:
+  web:
+    container_name: taller_internacional_app
+    env_file:
+      - .env.prod
+    environment:
+      - DJANGO_SETTINGS_MODULE=taller.settings.settings_production
+    ports:
+      - "8031:8000"
+    command: >
+      gunicorn taller.wsgi:application
+      --bind 0.0.0.0:8000
+      --workers 3
+      --timeout 120
+    restart: always
+
+  db:
+    container_name: taller_internacional_db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}          # taller_internacional
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3315:3306"
+
+  phpmyadmin:
+    container_name: taller_internacional_phpmyadmin
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    ports:
+      - "8080:80"
